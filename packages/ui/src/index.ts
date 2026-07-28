@@ -6,6 +6,28 @@ export type {
   ButtonSize,
   ButtonVariant
 } from "./Button/index.js";
+export { Heading } from "./Heading/index.js";
+export type {
+  HeadingLevel,
+  HeadingProps,
+  HeadingTone,
+  HeadingVariant
+} from "./Heading/index.js";
+export { Link, LinkButton } from "./Link/index.js";
+export type {
+  LinkAppearance,
+  LinkButtonProps,
+  LinkProps,
+  LinkSize,
+  LinkTone
+} from "./Link/index.js";
+export { Text } from "./Text/index.js";
+export type {
+  TextElement,
+  TextProps,
+  TextTone,
+  TextVariant
+} from "./Text/index.js";
 export { ThemeProvider } from "./theme/ThemeProvider.js";
 export type {
   ThemePreference,

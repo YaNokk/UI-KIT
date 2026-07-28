@@ -1,0 +1,31 @@
+.root {
+  margin: var(--ds-space-0);
+}
+
+.sm {
+  font: var(--ds-typography-heading-sm);
+}
+
+.md {
+  font: var(--ds-typography-heading-md);
+}
+
+.lg {
+  font: var(--ds-typography-heading-lg);
+}
+
+.page {
+  font: var(--ds-typography-page-title);
+}
+
+.primary {
+  color: var(--ds-text-primary);
+}
+
+.secondary {
+  color: var(--ds-text-secondary);
+}
+
+.inherit {
+  color: inherit;
+}

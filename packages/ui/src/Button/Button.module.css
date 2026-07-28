@@ -17,8 +17,6 @@
   border-width: var(--ds-border-width-default);
   border-style: solid;
   border-radius: var(--ds-radius-lg);
-  font-family: var(--ds-font-family-sans);
-  font-weight: var(--ds-font-weight-medium);
   text-align: center;
   text-decoration: none;
   cursor: pointer;
@@ -68,8 +66,8 @@
   --button-padding-inline: var(--ds-space-3);
 
   min-height: var(--ds-size-control-sm);
-  font-size: var(--ds-font-size-body-sm);
-  line-height: var(--ds-line-height-body-sm);
+  font: var(--ds-typography-body-sm);
+  font-weight: var(--ds-font-weight-medium);
 }
 
 .md {
@@ -77,8 +75,8 @@
   --button-padding-inline: var(--ds-space-4);
 
   min-height: var(--ds-size-control-md);
-  font-size: var(--ds-font-size-body);
-  line-height: var(--ds-line-height-body);
+  font: var(--ds-typography-body);
+  font-weight: var(--ds-font-weight-medium);
 }
 
 .lg {
@@ -86,8 +84,8 @@
   --button-padding-inline: var(--ds-space-5);
 
   min-height: var(--ds-size-control-lg);
-  font-size: var(--ds-font-size-body);
-  line-height: var(--ds-line-height-body);
+  font: var(--ds-typography-body-lg);
+  font-weight: var(--ds-font-weight-medium);
 }
 
 .primary {

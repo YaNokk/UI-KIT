@@ -15,10 +15,12 @@ export {
   defaultBrandTokens,
   defaultDarkBrandTokens,
   lightSemanticTokens,
-  primitiveTokens
+  primitiveTokens,
+  typographyTokens
 } from "./generated/tokens.js";
 export type {
   BrandTokenPath,
   PrimitiveTokenPath,
-  SemanticTokenPath
+  SemanticTokenPath,
+  TypographyTokenPath
 } from "./generated/tokens.js";

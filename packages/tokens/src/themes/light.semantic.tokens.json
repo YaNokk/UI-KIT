@@ -16,6 +16,10 @@
     "tertiary": { "$type": "color", "$value": "{color.neutral.500}" },
     "placeholder": { "$type": "color", "$value": "{color.neutral.500}" },
     "disabled": { "$type": "color", "$value": "{color.neutral.400}" },
+    "accent": { "$type": "color", "$value": "{brand.accentContent}" },
+    "danger": { "$type": "color", "$value": "{status.danger.foreground}" },
+    "success": { "$type": "color", "$value": "{status.success.foreground}" },
+    "warning": { "$type": "color", "$value": "{status.warning.foreground}" },
     "onAccent": { "$type": "color", "$value": "{brand.onAccent}" },
     "onDanger": { "$type": "color", "$value": "{color.neutral.0}" }
   },
@@ -72,6 +76,11 @@
     "ghost": {
       "backgroundHover": { "$type": "color", "$value": "{brand.accentSoft}" },
       "foreground": { "$type": "color", "$value": "{brand.accentContent}" }
+    },
+    "link": {
+      "foreground": { "$type": "color", "$value": "{brand.accentContent}" },
+      "foregroundHover": { "$type": "color", "$value": "{brand.accentHover}" },
+      "foregroundActive": { "$type": "color", "$value": "{brand.accentActive}" }
     },
     "danger": {
       "background": { "$type": "color", "$value": "{color.red.600}" },

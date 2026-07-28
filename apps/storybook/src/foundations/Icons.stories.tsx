@@ -100,7 +100,7 @@ export const RuntimeBrandAccent: Story = {
     <div className="grid gap-6">
       {modes.map((mode) => (
         <section className="grid gap-3" key={mode}>
-          <h2 className="m-0 text-lg font-semibold capitalize">{mode}</h2>
+          <h2 className="typo-heading-sm m-0 capitalize">{mode}</h2>
           {brands.map(([name, accentColor]) => (
             <ThemeProvider
               brand={{ accentColor }}

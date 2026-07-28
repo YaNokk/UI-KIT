@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   darkSemanticTokens,
   lightSemanticTokens,
-  primitiveTokens
+  primitiveTokens,
+  typographyTokens
 } from "./index";
 
 const themes = [
@@ -62,5 +63,50 @@ describe("icon token contract", () => {
     expect(tokens["icon.danger"]).toBe("{status.danger.foreground}");
     expect(tokens["icon.success"]).toBe("{status.success.foreground}");
     expect(tokens["icon.warning"]).toBe("{status.warning.foreground}");
+  });
+});
+
+describe("typography token contract", () => {
+  it("exposes the complete compact role scale without color", () => {
+    expect(Object.keys(typographyTokens)).toEqual([
+      "typography.caption",
+      "typography.bodySm",
+      "typography.body",
+      "typography.bodyStrong",
+      "typography.bodyLg",
+      "typography.headingSm",
+      "typography.headingMd",
+      "typography.headingLg",
+      "typography.pageTitle"
+    ]);
+
+    for (const value of Object.values(typographyTokens)) {
+      expect(value).toHaveProperty("fontFamily");
+      expect(value).toHaveProperty("fontSize");
+      expect(value).toHaveProperty("fontWeight");
+      expect(value).toHaveProperty("lineHeight");
+      expect(value).not.toHaveProperty("color");
+    }
+  });
+
+  it("keeps typography metrics independent from mode and brand", () => {
+    expect(typographyTokens["typography.body"].fontSize).toBe("{font.size.body}");
+    expect(typographyTokens["typography.headingSm"].fontSize).toBe("{font.size.headingSm}");
+    expect(typographyTokens["typography.pageTitle"].lineHeight).toBe("{lineHeight.pageTitle}");
+  });
+});
+
+describe("text and link color contract", () => {
+  it.each(themes)("%s exposes separate semantic text tones", (_, tokens) => {
+    expect(tokens["text.accent"]).toBe("{brand.accentContent}");
+    expect(tokens["text.danger"]).toBe("{status.danger.foreground}");
+    expect(tokens["text.success"]).toBe("{status.success.foreground}");
+    expect(tokens["text.warning"]).toBe("{status.warning.foreground}");
+  });
+
+  it.each(themes)("%s keeps only the accent link family brand-dependent", (_, tokens) => {
+    expect(tokens["action.link.foreground"]).toBe("{brand.accentContent}");
+    expect(tokens["action.link.foregroundHover"]).toBe("{brand.accentHover}");
+    expect(tokens["action.link.foregroundActive"]).toBe("{brand.accentActive}");
   });
 });

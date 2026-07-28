@@ -47,6 +47,7 @@
     --ds-font-size-body-sm: 13px;
     --ds-font-size-body: 14px;
     --ds-font-size-body-lg: 16px;
+    --ds-font-size-heading-sm: 16px;
     --ds-font-size-heading-md: 18px;
     --ds-font-size-heading-lg: 22px;
     --ds-font-size-page-title: 28px;
@@ -57,6 +58,7 @@
     --ds-line-height-body-sm: 18px;
     --ds-line-height-body: 20px;
     --ds-line-height-body-lg: 24px;
+    --ds-line-height-heading-sm: 24px;
     --ds-line-height-heading-md: 26px;
     --ds-line-height-heading-lg: 30px;
     --ds-line-height-page-title: 36px;
@@ -96,6 +98,15 @@
     --ds-breakpoint-lg: 1024px;
     --ds-breakpoint-xl: 1280px;
     --ds-breakpoint-2xl: 1536px;
+    --ds-typography-caption: var(--ds-font-weight-regular) var(--ds-font-size-caption)/var(--ds-line-height-caption) var(--ds-font-family-sans);
+    --ds-typography-body-sm: var(--ds-font-weight-regular) var(--ds-font-size-body-sm)/var(--ds-line-height-body-sm) var(--ds-font-family-sans);
+    --ds-typography-body: var(--ds-font-weight-regular) var(--ds-font-size-body)/var(--ds-line-height-body) var(--ds-font-family-sans);
+    --ds-typography-body-strong: var(--ds-font-weight-semibold) var(--ds-font-size-body)/var(--ds-line-height-body) var(--ds-font-family-sans);
+    --ds-typography-body-lg: var(--ds-font-weight-regular) var(--ds-font-size-body-lg)/var(--ds-line-height-body-lg) var(--ds-font-family-sans);
+    --ds-typography-heading-sm: var(--ds-font-weight-semibold) var(--ds-font-size-heading-sm)/var(--ds-line-height-heading-sm) var(--ds-font-family-sans);
+    --ds-typography-heading-md: var(--ds-font-weight-semibold) var(--ds-font-size-heading-md)/var(--ds-line-height-heading-md) var(--ds-font-family-sans);
+    --ds-typography-heading-lg: var(--ds-font-weight-semibold) var(--ds-font-size-heading-lg)/var(--ds-line-height-heading-lg) var(--ds-font-family-sans);
+    --ds-typography-page-title: var(--ds-font-weight-semibold) var(--ds-font-size-page-title)/var(--ds-line-height-page-title) var(--ds-font-family-sans);
     --ds-brand-accent: #0080ff;
     --ds-brand-preferred-on-accent: #ffffff;
     --ds-brand-on-accent: #000000;
@@ -130,6 +141,10 @@
     --ds-text-tertiary: var(--ds-color-neutral-500);
     --ds-text-placeholder: var(--ds-color-neutral-500);
     --ds-text-disabled: var(--ds-color-neutral-400);
+    --ds-text-accent: var(--ds-brand-accent-content);
+    --ds-text-danger: var(--ds-status-danger-foreground);
+    --ds-text-success: var(--ds-status-success-foreground);
+    --ds-text-warning: var(--ds-status-warning-foreground);
     --ds-text-on-accent: var(--ds-brand-on-accent);
     --ds-text-on-danger: var(--ds-color-neutral-0);
     --ds-icon-primary: var(--ds-color-neutral-800);
@@ -171,6 +186,9 @@
     --ds-action-soft-foreground: var(--ds-brand-accent-content);
     --ds-action-ghost-background-hover: var(--ds-brand-accent-soft);
     --ds-action-ghost-foreground: var(--ds-brand-accent-content);
+    --ds-action-link-foreground: var(--ds-brand-accent-content);
+    --ds-action-link-foreground-hover: var(--ds-brand-accent-hover);
+    --ds-action-link-foreground-active: var(--ds-brand-accent-active);
     --ds-action-danger-background: var(--ds-color-red-600);
     --ds-action-danger-background-hover: var(--ds-color-red-700);
     --ds-action-danger-background-active: var(--ds-color-red-900);
@@ -231,6 +249,10 @@
     --ds-text-tertiary: var(--ds-color-neutral-400);
     --ds-text-placeholder: var(--ds-color-neutral-400);
     --ds-text-disabled: var(--ds-color-neutral-600);
+    --ds-text-accent: var(--ds-brand-accent-content);
+    --ds-text-danger: var(--ds-status-danger-foreground);
+    --ds-text-success: var(--ds-status-success-foreground);
+    --ds-text-warning: var(--ds-status-warning-foreground);
     --ds-text-on-accent: var(--ds-brand-on-accent);
     --ds-text-on-danger: var(--ds-color-neutral-0);
     --ds-icon-primary: var(--ds-color-neutral-100);
@@ -272,6 +294,9 @@
     --ds-action-soft-foreground: var(--ds-brand-accent-content);
     --ds-action-ghost-background-hover: var(--ds-brand-accent-soft);
     --ds-action-ghost-foreground: var(--ds-brand-accent-content);
+    --ds-action-link-foreground: var(--ds-brand-accent-content);
+    --ds-action-link-foreground-hover: var(--ds-brand-accent-hover);
+    --ds-action-link-foreground-active: var(--ds-brand-accent-active);
     --ds-action-danger-background: var(--ds-color-red-600);
     --ds-action-danger-background-hover: var(--ds-color-red-700);
     --ds-action-danger-background-active: var(--ds-color-red-900);

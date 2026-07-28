@@ -62,6 +62,7 @@
       "bodySm": { "$type": "dimension", "$value": { "value": 13, "unit": "px" } },
       "body": { "$type": "dimension", "$value": { "value": 14, "unit": "px" } },
       "bodyLg": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+      "headingSm": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
       "headingMd": { "$type": "dimension", "$value": { "value": 18, "unit": "px" } },
       "headingLg": { "$type": "dimension", "$value": { "value": 22, "unit": "px" } },
       "pageTitle": { "$type": "dimension", "$value": { "value": 28, "unit": "px" } }
@@ -77,6 +78,7 @@
     "bodySm": { "$type": "dimension", "$value": { "value": 18, "unit": "px" } },
     "body": { "$type": "dimension", "$value": { "value": 20, "unit": "px" } },
     "bodyLg": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+    "headingSm": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
     "headingMd": { "$type": "dimension", "$value": { "value": 26, "unit": "px" } },
     "headingLg": { "$type": "dimension", "$value": { "value": 30, "unit": "px" } },
     "pageTitle": { "$type": "dimension", "$value": { "value": 36, "unit": "px" } }

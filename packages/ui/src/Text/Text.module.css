@@ -1,0 +1,62 @@
+.root {
+  margin: var(--ds-space-0);
+}
+
+.caption {
+  font: var(--ds-typography-caption);
+}
+
+.bodySm {
+  font: var(--ds-typography-body-sm);
+}
+
+.body {
+  font: var(--ds-typography-body);
+}
+
+.bodyStrong {
+  font: var(--ds-typography-body-strong);
+}
+
+.bodyLg {
+  font: var(--ds-typography-body-lg);
+}
+
+.primary {
+  color: var(--ds-text-primary);
+}
+
+.secondary {
+  color: var(--ds-text-secondary);
+}
+
+.disabled {
+  color: var(--ds-text-disabled);
+}
+
+.accent {
+  color: var(--ds-text-accent);
+}
+
+.danger {
+  color: var(--ds-text-danger);
+}
+
+.success {
+  color: var(--ds-text-success);
+}
+
+.warning {
+  color: var(--ds-text-warning);
+}
+
+.inherit {
+  color: inherit;
+}
+
+.truncate {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

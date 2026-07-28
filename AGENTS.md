@@ -32,6 +32,14 @@
 - Production packages не импортируют SVG из `prototypes`; custom icons проходят admission и визуальный review в Storybook.
 - Accessible name icon-only действия принадлежит интерактивному элементу, а не декоративному SVG.
 - Icon package и Lucide imports обязаны сохранять ESM tree-shaking.
+- Typography использует canonical `typography.*` roles, а не произвольные font values.
+- Typography role и semantic text color остаются отдельными решениями.
+- `Text`/`Heading` — optional ergonomic primitives; внутреннюю типографику primitive-компонент задаёт сам.
+- Navigation использует anchor semantics, action — button semantics.
+- `Link` и `LinkButton` разделяют visuals, но не DOM semantics; то же правило действует для `Button` и будущего `ButtonLink`.
+- Не используйте `onClick` navigation, если подходит настоящий `href`; core `Link` остаётся router-agnostic.
+- Typography primitives не добавляют layout margins.
+- Generic Tailwind typography не используется, когда существует canonical `typo-*` role.
 
 ## Добавление токена
 

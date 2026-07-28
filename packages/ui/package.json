@@ -15,6 +15,18 @@
       "types": "./dist/Button/index.d.ts",
       "import": "./dist/Button/index.js"
     },
+    "./heading": {
+      "types": "./dist/Heading/index.d.ts",
+      "import": "./dist/Heading/index.js"
+    },
+    "./link": {
+      "types": "./dist/Link/index.d.ts",
+      "import": "./dist/Link/index.js"
+    },
+    "./text": {
+      "types": "./dist/Text/index.d.ts",
+      "import": "./dist/Text/index.js"
+    },
     "./styles.css": "./dist/styles.css"
   },
   "sideEffects": [

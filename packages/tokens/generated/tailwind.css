@@ -14,6 +14,10 @@
   --color-text-tertiary: var(--ds-text-tertiary);
   --color-text-placeholder: var(--ds-text-placeholder);
   --color-text-disabled: var(--ds-text-disabled);
+  --color-text-accent: var(--ds-text-accent);
+  --color-text-danger: var(--ds-text-danger);
+  --color-text-success: var(--ds-text-success);
+  --color-text-warning: var(--ds-text-warning);
   --color-text-on-accent: var(--ds-text-on-accent);
   --color-text-on-danger: var(--ds-text-on-danger);
   --color-icon-primary: var(--ds-icon-primary);
@@ -55,6 +59,9 @@
   --color-action-soft-foreground: var(--ds-action-soft-foreground);
   --color-action-ghost-background-hover: var(--ds-action-ghost-background-hover);
   --color-action-ghost-foreground: var(--ds-action-ghost-foreground);
+  --color-action-link-foreground: var(--ds-action-link-foreground);
+  --color-action-link-foreground-hover: var(--ds-action-link-foreground-hover);
+  --color-action-link-foreground-active: var(--ds-action-link-foreground-active);
   --color-action-danger-background: var(--ds-action-danger-background);
   --color-action-danger-background-hover: var(--ds-action-danger-background-hover);
   --color-action-danger-background-active: var(--ds-action-danger-background-active);
@@ -96,6 +103,7 @@
   --text-body-sm: var(--ds-font-size-body-sm);
   --text-body: var(--ds-font-size-body);
   --text-body-lg: var(--ds-font-size-body-lg);
+  --text-heading-sm: var(--ds-font-size-heading-sm);
   --text-heading-md: var(--ds-font-size-heading-md);
   --text-heading-lg: var(--ds-font-size-heading-lg);
   --text-page-title: var(--ds-font-size-page-title);
@@ -116,4 +124,32 @@
   --breakpoint-lg: var(--ds-breakpoint-lg);
   --breakpoint-xl: var(--ds-breakpoint-xl);
   --breakpoint-2xl: var(--ds-breakpoint-2xl);
+}
+
+@utility typo-caption {
+  font: var(--ds-typography-caption);
+}
+@utility typo-body-sm {
+  font: var(--ds-typography-body-sm);
+}
+@utility typo-body {
+  font: var(--ds-typography-body);
+}
+@utility typo-body-strong {
+  font: var(--ds-typography-body-strong);
+}
+@utility typo-body-lg {
+  font: var(--ds-typography-body-lg);
+}
+@utility typo-heading-sm {
+  font: var(--ds-typography-heading-sm);
+}
+@utility typo-heading-md {
+  font: var(--ds-typography-heading-md);
+}
+@utility typo-heading-lg {
+  font: var(--ds-typography-heading-lg);
+}
+@utility typo-page-title {
+  font: var(--ds-typography-page-title);
 }

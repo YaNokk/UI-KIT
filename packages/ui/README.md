@@ -4,7 +4,7 @@ ESM React-компоненты дизайн-системы MyPoint.
 
 ```tsx
 import "@mypoint/ui/styles.css";
-import { Button, ThemeProvider } from "@mypoint/ui";
+import { Button, Heading, Link, Text, ThemeProvider } from "@mypoint/ui";
 
 export function App() {
   return (
@@ -12,7 +12,10 @@ export function App() {
       brand={{ accentColor: "#0080ff", foregroundColor: "#ffffff" }}
       mode="light"
     >
-      <Button variant="primary">Сохранить</Button>
+      <Heading level={1} variant="page">Заказы</Heading>
+      <Text as="p" tone="secondary">Управление заказами</Text>
+      <Link href="/orders">Открыть список</Link>
+      <Button variant="primary">Создать заказ</Button>
     </ThemeProvider>
   );
 }
@@ -20,6 +23,10 @@ export function App() {
 
 React и ReactDOM предоставляются consumer-приложением. Tailwind в consumer не
 требуется.
+
+Компоненты доступны через root named exports и явные ESM subpaths:
+`@mypoint/ui/button`, `@mypoint/ui/text`, `@mypoint/ui/heading` и
+`@mypoint/ui/link`.
 
 Generic icons импортируются статически из `lucide-react`. Компонент,
 владеющий icon-slot, задаёт размер, цвет через `currentColor` и decorative

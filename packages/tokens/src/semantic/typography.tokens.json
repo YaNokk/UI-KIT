@@ -1,0 +1,85 @@
+{
+  "typography": {
+    "caption": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.caption}",
+        "fontWeight": "{font.weight.regular}",
+        "lineHeight": "{lineHeight.caption}"
+      }
+    },
+    "bodySm": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.bodySm}",
+        "fontWeight": "{font.weight.regular}",
+        "lineHeight": "{lineHeight.bodySm}"
+      }
+    },
+    "body": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.body}",
+        "fontWeight": "{font.weight.regular}",
+        "lineHeight": "{lineHeight.body}"
+      }
+    },
+    "bodyStrong": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.body}",
+        "fontWeight": "{font.weight.semibold}",
+        "lineHeight": "{lineHeight.body}"
+      }
+    },
+    "bodyLg": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.bodyLg}",
+        "fontWeight": "{font.weight.regular}",
+        "lineHeight": "{lineHeight.bodyLg}"
+      }
+    },
+    "headingSm": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.headingSm}",
+        "fontWeight": "{font.weight.semibold}",
+        "lineHeight": "{lineHeight.headingSm}"
+      }
+    },
+    "headingMd": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.headingMd}",
+        "fontWeight": "{font.weight.semibold}",
+        "lineHeight": "{lineHeight.headingMd}"
+      }
+    },
+    "headingLg": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.headingLg}",
+        "fontWeight": "{font.weight.semibold}",
+        "lineHeight": "{lineHeight.headingLg}"
+      }
+    },
+    "pageTitle": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.pageTitle}",
+        "fontWeight": "{font.weight.semibold}",
+        "lineHeight": "{lineHeight.pageTitle}"
+      }
+    }
+  }
+}

@@ -3,6 +3,7 @@
 Source of truth:
 
 - `src/primitive/primitive.tokens.json`;
+- `src/semantic/typography.tokens.json`;
 - `src/themes/light.semantic.tokens.json`;
 - `src/themes/dark.semantic.tokens.json`;
 - `src/brand/default.brand.tokens.json`.
@@ -19,3 +20,7 @@ Source of truth:
 Icon foundation задаёт `size.icon.sm/md/lg = 16/20/24`,
 `icon.stroke.default = 2` и semantic tones, описанные в
 `../../docs/icons-and-assets.md`.
+
+Typography foundation генерирует `--ds-typography-*` font shorthand variables
+и `typo-*` Tailwind utilities. Метрики не зависят от mode или runtime brand;
+цвет текста подключается отдельным semantic token.

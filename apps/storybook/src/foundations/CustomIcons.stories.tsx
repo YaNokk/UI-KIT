@@ -12,7 +12,7 @@ type Story = StoryObj<typeof meta>;
 export const Catalog: Story = {
   render: () => (
     <section className="grid max-w-2xl gap-3 rounded-lg border border-border-default bg-background-surface p-6">
-      <h2 className="m-0 text-lg font-semibold text-text-primary">
+      <h2 className="typo-heading-sm m-0 text-text-primary">
         Пользовательских иконок пока нет
       </h2>
       <p className="m-0 text-text-secondary">

@@ -96,6 +96,10 @@ export const primitiveTokens = {
     "value": 16,
     "unit": "px"
   },
+  "font.size.headingSm": {
+    "value": 16,
+    "unit": "px"
+  },
   "font.size.headingMd": {
     "value": 18,
     "unit": "px"
@@ -124,6 +128,10 @@ export const primitiveTokens = {
     "unit": "px"
   },
   "lineHeight.bodyLg": {
+    "value": 24,
+    "unit": "px"
+  },
+  "lineHeight.headingSm": {
     "value": 24,
     "unit": "px"
   },
@@ -249,6 +257,63 @@ export const primitiveTokens = {
   }
 } as const;
 
+export const typographyTokens = {
+  "typography.caption": {
+    "fontFamily": "{font.family.sans}",
+    "fontSize": "{font.size.caption}",
+    "fontWeight": "{font.weight.regular}",
+    "lineHeight": "{lineHeight.caption}"
+  },
+  "typography.bodySm": {
+    "fontFamily": "{font.family.sans}",
+    "fontSize": "{font.size.bodySm}",
+    "fontWeight": "{font.weight.regular}",
+    "lineHeight": "{lineHeight.bodySm}"
+  },
+  "typography.body": {
+    "fontFamily": "{font.family.sans}",
+    "fontSize": "{font.size.body}",
+    "fontWeight": "{font.weight.regular}",
+    "lineHeight": "{lineHeight.body}"
+  },
+  "typography.bodyStrong": {
+    "fontFamily": "{font.family.sans}",
+    "fontSize": "{font.size.body}",
+    "fontWeight": "{font.weight.semibold}",
+    "lineHeight": "{lineHeight.body}"
+  },
+  "typography.bodyLg": {
+    "fontFamily": "{font.family.sans}",
+    "fontSize": "{font.size.bodyLg}",
+    "fontWeight": "{font.weight.regular}",
+    "lineHeight": "{lineHeight.bodyLg}"
+  },
+  "typography.headingSm": {
+    "fontFamily": "{font.family.sans}",
+    "fontSize": "{font.size.headingSm}",
+    "fontWeight": "{font.weight.semibold}",
+    "lineHeight": "{lineHeight.headingSm}"
+  },
+  "typography.headingMd": {
+    "fontFamily": "{font.family.sans}",
+    "fontSize": "{font.size.headingMd}",
+    "fontWeight": "{font.weight.semibold}",
+    "lineHeight": "{lineHeight.headingMd}"
+  },
+  "typography.headingLg": {
+    "fontFamily": "{font.family.sans}",
+    "fontSize": "{font.size.headingLg}",
+    "fontWeight": "{font.weight.semibold}",
+    "lineHeight": "{lineHeight.headingLg}"
+  },
+  "typography.pageTitle": {
+    "fontFamily": "{font.family.sans}",
+    "fontSize": "{font.size.pageTitle}",
+    "fontWeight": "{font.weight.semibold}",
+    "lineHeight": "{lineHeight.pageTitle}"
+  }
+} as const;
+
 export const defaultBrandTokens = {
   "brand.accent": "#0080ff",
   "brand.preferredOnAccent": "#ffffff",
@@ -302,6 +367,10 @@ export const lightSemanticTokens = {
   "text.tertiary": "{color.neutral.500}",
   "text.placeholder": "{color.neutral.500}",
   "text.disabled": "{color.neutral.400}",
+  "text.accent": "{brand.accentContent}",
+  "text.danger": "{status.danger.foreground}",
+  "text.success": "{status.success.foreground}",
+  "text.warning": "{status.warning.foreground}",
   "text.onAccent": "{brand.onAccent}",
   "text.onDanger": "{color.neutral.0}",
   "icon.primary": "{color.neutral.800}",
@@ -343,6 +412,9 @@ export const lightSemanticTokens = {
   "action.soft.foreground": "{brand.accentContent}",
   "action.ghost.backgroundHover": "{brand.accentSoft}",
   "action.ghost.foreground": "{brand.accentContent}",
+  "action.link.foreground": "{brand.accentContent}",
+  "action.link.foregroundHover": "{brand.accentHover}",
+  "action.link.foregroundActive": "{brand.accentActive}",
   "action.danger.background": "{color.red.600}",
   "action.danger.backgroundHover": "{color.red.700}",
   "action.danger.backgroundActive": "{color.red.900}",
@@ -386,6 +458,10 @@ export const darkSemanticTokens = {
   "text.tertiary": "{color.neutral.400}",
   "text.placeholder": "{color.neutral.400}",
   "text.disabled": "{color.neutral.600}",
+  "text.accent": "{brand.accentContent}",
+  "text.danger": "{status.danger.foreground}",
+  "text.success": "{status.success.foreground}",
+  "text.warning": "{status.warning.foreground}",
   "text.onAccent": "{brand.onAccent}",
   "text.onDanger": "{color.neutral.0}",
   "icon.primary": "{color.neutral.100}",
@@ -427,6 +503,9 @@ export const darkSemanticTokens = {
   "action.soft.foreground": "{brand.accentContent}",
   "action.ghost.backgroundHover": "{brand.accentSoft}",
   "action.ghost.foreground": "{brand.accentContent}",
+  "action.link.foreground": "{brand.accentContent}",
+  "action.link.foregroundHover": "{brand.accentHover}",
+  "action.link.foregroundActive": "{brand.accentActive}",
   "action.danger.background": "{color.red.600}",
   "action.danger.backgroundHover": "{color.red.700}",
   "action.danger.backgroundActive": "{color.red.900}",
@@ -458,6 +537,8 @@ export const darkSemanticTokens = {
 
 
 export type PrimitiveTokenPath = keyof typeof primitiveTokens;
+
+export type TypographyTokenPath = keyof typeof typographyTokens;
 
 export type BrandTokenPath = keyof typeof defaultBrandTokens;
 
