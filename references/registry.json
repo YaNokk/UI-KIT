@@ -20,6 +20,39 @@
         "coreDs": "https://github.com/core-ds/core-components/tree/master/packages/button",
         "mpUiKit": "raw/mp-ui-kit"
       }
+    },
+    "Portal": {
+      "behavioral": "behavioral/Portal.md",
+      "raw": {
+        "coreDs": "raw/core-ds/portal"
+      }
+    },
+    "FormControl": {
+      "behavioral": "behavioral/FormControl.md",
+      "raw": {
+        "coreDs": "raw/core-ds/form-control"
+      }
+    },
+    "Input": {
+      "behavioral": "behavioral/Input.md",
+      "visual": "visual/FormFields.md",
+      "raw": {
+        "coreDs": "raw/core-ds/input",
+        "mpUiKit": "raw/mp-ui-kit/button/input.tsx"
+      }
+    },
+    "PasswordInput": {
+      "behavioral": "behavioral/PasswordInput.md",
+      "visual": "visual/FormFields.md",
+      "raw": {
+        "coreDs": "raw/core-ds/password-input"
+      }
+    }
+  },
+  "foundations": {
+    "Layers": {
+      "behavioral": "behavioral/Stack.md",
+      "raw": "raw/core-ds/stack"
     }
   },
   "patterns": {

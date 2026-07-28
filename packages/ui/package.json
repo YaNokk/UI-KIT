@@ -19,6 +19,14 @@
       "types": "./dist/ButtonLink/index.d.ts",
       "import": "./dist/ButtonLink/index.js"
     },
+    "./field-shell": {
+      "types": "./dist/FieldShell/index.d.ts",
+      "import": "./dist/FieldShell/index.js"
+    },
+    "./form-control": {
+      "types": "./dist/FormControl/index.d.ts",
+      "import": "./dist/FormControl/index.js"
+    },
     "./heading": {
       "types": "./dist/Heading/index.d.ts",
       "import": "./dist/Heading/index.js"
@@ -27,9 +35,21 @@
       "types": "./dist/IconButton/index.d.ts",
       "import": "./dist/IconButton/index.js"
     },
+    "./input": {
+      "types": "./dist/Input/index.d.ts",
+      "import": "./dist/Input/index.js"
+    },
     "./link": {
       "types": "./dist/Link/index.d.ts",
       "import": "./dist/Link/index.js"
+    },
+    "./password-input": {
+      "types": "./dist/PasswordInput/index.d.ts",
+      "import": "./dist/PasswordInput/index.js"
+    },
+    "./portal": {
+      "types": "./dist/Portal/index.d.ts",
+      "import": "./dist/Portal/index.js"
     },
     "./spinner": {
       "types": "./dist/Spinner/index.d.ts",
@@ -53,9 +73,7 @@
     "react-dom": "^18.2.0 || ^19.0.0"
   },
   "dependencies": {
-    "@mypoint/tokens": "^0.1.0"
-  },
-  "devDependencies": {
+    "@mypoint/tokens": "^0.1.0",
     "lucide-react": "^1.27.0"
   }
 }

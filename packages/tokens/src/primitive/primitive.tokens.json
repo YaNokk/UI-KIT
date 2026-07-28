@@ -111,6 +111,8 @@
     "slow": { "$type": "duration", "$value": { "value": 250, "unit": "ms" } }
   },
   "zIndex": {
+    "default": { "$type": "number", "$value": 0 },
+    "focused": { "$type": "number", "$value": 100 },
     "base": { "$type": "number", "$value": 0 },
     "sticky": { "$type": "number", "$value": 100 },
     "dropdown": { "$type": "number", "$value": 200 },

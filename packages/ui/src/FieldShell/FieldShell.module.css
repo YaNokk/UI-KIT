@@ -1,0 +1,109 @@
+.root {
+  --field-gap: var(--ds-space-2);
+  --field-icon-size: var(--ds-size-icon-md);
+  --field-padding-inline: var(--ds-space-3);
+
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: var(--field-gap);
+  padding-inline: var(--field-padding-inline);
+  color: var(--ds-control-text);
+  background-color: var(--ds-control-background);
+  border: var(--ds-border-width-default) solid var(--ds-control-border);
+  border-radius: var(--ds-radius-lg);
+  transition:
+    background-color var(--ds-motion-fast),
+    border-color var(--ds-motion-fast),
+    box-shadow var(--ds-motion-fast);
+}
+
+@media (hover: hover) {
+  .root:not(.disabled):not(.readOnly):hover {
+    background-color: var(--ds-control-background-hover);
+    border-color: var(--ds-control-border-hover);
+  }
+}
+
+.root:not(.disabled):focus-within {
+  border-color: var(--ds-control-border-focus);
+  outline: var(--ds-focus-ring-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-ring-width);
+  box-shadow: 0 0 0 var(--ds-focus-ring-width) var(--ds-focus-ring-offset);
+}
+
+.root.invalid {
+  border-color: var(--ds-control-border-error);
+}
+
+.root.invalid:focus-within {
+  border-color: var(--ds-control-border-error);
+  outline-color: var(--ds-border-danger);
+}
+
+.content {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  align-self: stretch;
+}
+
+.adornment {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  color: var(--ds-control-icon);
+  font: inherit;
+}
+
+.adornment > svg {
+  width: var(--field-icon-size);
+  height: var(--field-icon-size);
+}
+
+.sm {
+  --field-gap: var(--ds-space-1);
+  --field-icon-size: var(--ds-size-icon-sm);
+  --field-padding-inline: var(--ds-space-2);
+
+  min-height: var(--ds-size-control-sm);
+  font: var(--ds-typography-body-sm);
+}
+
+.md {
+  min-height: var(--ds-size-control-md);
+  font: var(--ds-typography-body);
+}
+
+.lg {
+  --field-icon-size: var(--ds-size-icon-lg);
+  --field-padding-inline: var(--ds-space-4);
+
+  min-height: var(--ds-size-control-lg);
+  font: var(--ds-typography-body-lg);
+}
+
+.disabled {
+  color: var(--ds-text-disabled);
+  background-color: var(--ds-control-background-disabled);
+  border-color: var(--ds-border-subtle);
+  cursor: not-allowed;
+}
+
+.disabled .adornment {
+  color: var(--ds-icon-disabled);
+}
+
+.readOnly {
+  background-color: var(--ds-background-subtle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    transition: none;
+  }
+}

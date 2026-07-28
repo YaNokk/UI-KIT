@@ -21,6 +21,21 @@ export type {
   IconButtonSize,
   IconButtonVariant
 } from "./IconButton/index.js";
+export { FieldShell } from "./FieldShell/index.js";
+export type {
+  FieldShellProps,
+  FieldSize
+} from "./FieldShell/index.js";
+export { FormControl } from "./FormControl/index.js";
+export type {
+  FormControlProps,
+  FormControlRenderProps
+} from "./FormControl/index.js";
+export { Input } from "./Input/index.js";
+export type {
+  InputProps,
+  InputSize
+} from "./Input/index.js";
 export { Link, LinkButton } from "./Link/index.js";
 export type {
   LinkAppearance,
@@ -29,6 +44,13 @@ export type {
   LinkSize,
   LinkTone
 } from "./Link/index.js";
+export { PasswordInput } from "./PasswordInput/index.js";
+export type { PasswordInputProps } from "./PasswordInput/index.js";
+export { Portal, PortalProvider } from "./Portal/index.js";
+export type {
+  PortalProps,
+  PortalProviderProps
+} from "./Portal/index.js";
 export { Spinner } from "./Spinner/index.js";
 export type {
   SpinnerProps,

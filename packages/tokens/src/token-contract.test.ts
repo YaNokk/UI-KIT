@@ -96,6 +96,24 @@ describe("typography token contract", () => {
   });
 });
 
+describe("layer token contract", () => {
+  it("exposes the canonical semantic layer order", () => {
+    const layers = [
+      primitiveTokens["zIndex.default"],
+      primitiveTokens["zIndex.focused"],
+      primitiveTokens["zIndex.popover"],
+      primitiveTokens["zIndex.modal"],
+      primitiveTokens["zIndex.toast"]
+    ] as number[];
+
+    expect(layers).toEqual([0, 100, 300, 500, 600]);
+    layers.reduce((previous, value) => {
+      expect(previous).toBeLessThan(value);
+      return value;
+    }, Number.NEGATIVE_INFINITY);
+  });
+});
+
 describe("text and link color contract", () => {
   it.each(themes)("%s exposes separate semantic text tones", (_, tokens) => {
     expect(tokens["text.accent"]).toBe("{brand.accentContent}");

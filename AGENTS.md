@@ -50,6 +50,14 @@
 - Внутри интерактивного owner `Spinner` декоративный: owner сохраняет accessible name, `aria-busy` и activation policy.
 - Standalone `Spinner` без `label` декоративный, а с `label` предоставляет status semantics.
 - Spinner sizes используют `size.icon.*`, tones — semantic icon tokens; только accent tone зависит от runtime brand.
+- Все input-like controls переиспользуют геометрию `FieldShell`.
+- `FormControl` владеет label/helper/error semantics; `FieldShell` не владеет value или business behavior.
+- Specialized fields композируют foundations, используют generic adornments и не копируют Input styles.
+- Disabled и readOnly остаются разными состояниями; native input refs/events/attributes сохраняются.
+- Base `Input` не форматирует и не маскирует значения и не зависит от form-state library.
+- UI и overlays используют canonical layer tokens без произвольных z-index.
+- Overlay-компоненты используют canonical `Portal`; field-компоненты не вызывают `createPortal` напрямую.
+- Field typography и colors используют canonical semantic tokens; runtime backend brand не читается полями.
 
 ## Добавление токена
 

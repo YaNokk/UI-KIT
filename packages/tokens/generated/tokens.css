@@ -77,6 +77,8 @@
     --ds-motion-fast: 100ms;
     --ds-motion-normal: 150ms;
     --ds-motion-slow: 250ms;
+    --ds-z-index-default: 0;
+    --ds-z-index-focused: 100;
     --ds-z-index-base: 0;
     --ds-z-index-sticky: 100;
     --ds-z-index-dropdown: 200;

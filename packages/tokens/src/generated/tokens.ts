@@ -192,6 +192,8 @@ export const primitiveTokens = {
     "value": 250,
     "unit": "ms"
   },
+  "zIndex.default": 0,
+  "zIndex.focused": 100,
   "zIndex.base": 0,
   "zIndex.sticky": 100,
   "zIndex.dropdown": 200,

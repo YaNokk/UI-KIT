@@ -1,0 +1,33 @@
+.input {
+  appearance: none;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: var(--ds-space-0);
+  padding: var(--ds-space-0);
+  color: inherit;
+  font: inherit;
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+.input::placeholder {
+  color: var(--ds-control-placeholder);
+  opacity: 1;
+}
+
+.input:disabled {
+  color: var(--ds-text-disabled);
+  cursor: not-allowed;
+}
+
+.input:read-only:not(:disabled) {
+  cursor: text;
+}
+
+.input::-webkit-search-cancel-button,
+.input::-webkit-search-decoration {
+  appearance: none;
+}

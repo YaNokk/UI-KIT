@@ -1,0 +1,36 @@
+.root {
+  display: grid;
+  min-width: 0;
+  gap: var(--ds-space-1);
+}
+
+.label {
+  color: var(--ds-text-primary);
+  font: var(--ds-typography-body-sm);
+  font-weight: var(--ds-font-weight-medium);
+  overflow-wrap: anywhere;
+}
+
+.required {
+  margin-inline-start: var(--ds-space-1);
+  color: var(--ds-text-danger);
+}
+
+.description,
+.error {
+  font: var(--ds-typography-body-sm);
+  overflow-wrap: anywhere;
+}
+
+.description {
+  color: var(--ds-text-secondary);
+}
+
+.error {
+  color: var(--ds-text-danger);
+}
+
+.root[data-disabled] .label,
+.root[data-disabled] .description {
+  color: var(--ds-text-disabled);
+}
