@@ -1,0 +1,171 @@
+.root {
+  --button-gap: var(--ds-space-2);
+  --button-icon-size: var(--ds-size-icon-md);
+  --button-padding-inline: var(--ds-space-4);
+
+  appearance: none;
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  min-width: 0;
+  margin: var(--ds-space-0);
+  padding-block: var(--ds-space-1);
+  padding-inline: var(--button-padding-inline);
+  border-width: var(--ds-border-width-default);
+  border-style: solid;
+  border-radius: var(--ds-radius-lg);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color var(--ds-motion-fast),
+    background-color var(--ds-motion-fast),
+    border-color var(--ds-motion-fast);
+}
+
+.root:focus-visible {
+  outline: var(--ds-focus-ring-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-ring-width);
+  box-shadow: 0 0 0 var(--ds-focus-ring-width) var(--ds-focus-ring-offset);
+}
+
+.content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  gap: var(--button-gap);
+}
+
+.label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-icon-size);
+  height: var(--button-icon-size);
+  color: currentColor;
+}
+
+.icon > svg {
+  width: 100%;
+  height: 100%;
+}
+
+.sm {
+  --button-gap: var(--ds-space-1);
+  --button-icon-size: var(--ds-size-icon-sm);
+  --button-padding-inline: var(--ds-space-3);
+
+  min-height: var(--ds-size-control-sm);
+  font: var(--ds-typography-body-sm);
+  font-weight: var(--ds-font-weight-medium);
+}
+
+.md {
+  --button-icon-size: var(--ds-size-icon-md);
+  --button-padding-inline: var(--ds-space-4);
+
+  min-height: var(--ds-size-control-md);
+  font: var(--ds-typography-body);
+  font-weight: var(--ds-font-weight-medium);
+}
+
+.lg {
+  --button-icon-size: var(--ds-size-icon-lg);
+  --button-padding-inline: var(--ds-space-5);
+
+  min-height: var(--ds-size-control-lg);
+  font: var(--ds-typography-body-lg);
+  font-weight: var(--ds-font-weight-medium);
+}
+
+.primary {
+  color: var(--ds-action-primary-foreground);
+  background-color: var(--ds-action-primary-background);
+  border-color: var(--ds-action-primary-background);
+}
+
+@media (hover: hover) {
+  .primary:not(:disabled):not([aria-disabled="true"]):hover {
+    background-color: var(--ds-action-primary-background-hover);
+    border-color: var(--ds-action-primary-background-hover);
+  }
+}
+
+.primary:not(:disabled):not([aria-disabled="true"]):active {
+  background-color: var(--ds-action-primary-background-active);
+  border-color: var(--ds-action-primary-background-active);
+}
+
+.secondary {
+  color: var(--ds-action-secondary-foreground);
+  background-color: var(--ds-action-secondary-background);
+  border-color: var(--ds-border-default);
+}
+
+@media (hover: hover) {
+  .secondary:not(:disabled):not([aria-disabled="true"]):hover {
+    background-color: var(--ds-action-secondary-background-hover);
+    border-color: var(--ds-border-strong);
+  }
+}
+
+.secondary:not(:disabled):not([aria-disabled="true"]):active {
+  background-color: var(--ds-action-secondary-background-active);
+  border-color: var(--ds-border-strong);
+}
+
+.soft {
+  color: var(--ds-action-soft-foreground);
+  background-color: var(--ds-action-soft-background);
+  border-color: var(--ds-action-soft-background);
+}
+
+@media (hover: hover) {
+  .soft:not(:disabled):not([aria-disabled="true"]):hover {
+    background-color: var(--ds-action-soft-background-hover);
+    border-color: var(--ds-action-soft-background-hover);
+  }
+}
+
+.soft:not(:disabled):not([aria-disabled="true"]):active {
+  background-color: var(--ds-action-soft-background-active);
+  border-color: var(--ds-action-soft-background-active);
+}
+
+.danger {
+  color: var(--ds-action-danger-foreground);
+  background-color: var(--ds-action-danger-background);
+  border-color: var(--ds-action-danger-background);
+}
+
+@media (hover: hover) {
+  .danger:not(:disabled):not([aria-disabled="true"]):hover {
+    background-color: var(--ds-action-danger-background-hover);
+    border-color: var(--ds-action-danger-background-hover);
+  }
+}
+
+.danger:not(:disabled):not([aria-disabled="true"]):active {
+  background-color: var(--ds-action-danger-background-active);
+  border-color: var(--ds-action-danger-background-active);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    transition: none;
+  }
+}

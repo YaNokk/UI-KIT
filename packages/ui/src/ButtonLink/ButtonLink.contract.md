@@ -69,8 +69,7 @@ automatically.
 
 ## v1 implementation decision
 
-Contract only. Current `Button` styles are component-local and have loading and
-disabled selectors intertwined with the visual variants. Extracting a shared
-anchor/button visual layer in this iteration would expand the regression
-surface of the approved Button. Implement `ButtonLink` after that refactor has
-its own tests and visual review.
+Implemented after extracting the private `Button` visual layer. `Button` and
+`ButtonLink` consume the same variant, size, content, icon-slot, full-width and
+focus/state class source. Button-only loading, disabled and form behavior
+remain outside this component.

@@ -6,6 +6,8 @@ export type {
   ButtonSize,
   ButtonVariant
 } from "./Button/index.js";
+export { ButtonLink } from "./ButtonLink/index.js";
+export type { ButtonLinkProps } from "./ButtonLink/index.js";
 export { Heading } from "./Heading/index.js";
 export type {
   HeadingLevel,
@@ -13,6 +15,12 @@ export type {
   HeadingTone,
   HeadingVariant
 } from "./Heading/index.js";
+export { IconButton } from "./IconButton/index.js";
+export type {
+  IconButtonProps,
+  IconButtonSize,
+  IconButtonVariant
+} from "./IconButton/index.js";
 export { Link, LinkButton } from "./Link/index.js";
 export type {
   LinkAppearance,

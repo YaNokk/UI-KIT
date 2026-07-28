@@ -14,8 +14,14 @@ export default defineConfig({
         "Button/index": fileURLToPath(
           new URL("./src/Button/index.ts", import.meta.url)
         ),
+        "ButtonLink/index": fileURLToPath(
+          new URL("./src/ButtonLink/index.ts", import.meta.url)
+        ),
         "Heading/index": fileURLToPath(
           new URL("./src/Heading/index.ts", import.meta.url)
+        ),
+        "IconButton/index": fileURLToPath(
+          new URL("./src/IconButton/index.ts", import.meta.url)
         ),
         "Link/index": fileURLToPath(
           new URL("./src/Link/index.ts", import.meta.url)

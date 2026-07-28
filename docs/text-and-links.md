@@ -6,8 +6,9 @@ Do not wrap labels already owned by primitives such as `Button`.
 ```text
 navigation + link visuals   → Link       → <a href>
 action + link visuals       → LinkButton → <button type="button">
-navigation + button visuals → ButtonLink → <a href> (contract only in v1)
+navigation + button visuals → ButtonLink → <a href>
 action + button visuals     → Button     → <button>
+icon-only action            → IconButton → <button>
 ```
 
 Inline links are underlined by default so interaction is not communicated only
@@ -19,3 +20,17 @@ as non-interactive text. `LinkButton` uses native `disabled`.
 
 The core package has no router dependency. Applications may build adapters
 without changing the DOM semantics above.
+
+## Which component do I use?
+
+| Need | Component |
+|---|---|
+| Visible action | `Button` |
+| Navigation with Button visuals | `ButtonLink` |
+| Text navigation | `Link` |
+| Text action | `LinkButton` |
+| Icon-only action | `IconButton` |
+
+`ButtonLink` shares only the private Button visual contract, not loading,
+disabled or form behavior. `IconButton` is action-only in v1 and requires an
+accessible name.

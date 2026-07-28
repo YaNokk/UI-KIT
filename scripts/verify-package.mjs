@@ -30,6 +30,10 @@ const packages = [
       "dist/index.d.ts",
       "dist/Button/index.js",
       "dist/Button/index.d.ts",
+      "dist/ButtonLink/index.js",
+      "dist/ButtonLink/index.d.ts",
+      "dist/IconButton/index.js",
+      "dist/IconButton/index.d.ts",
       "dist/styles.css"
     ]
   }

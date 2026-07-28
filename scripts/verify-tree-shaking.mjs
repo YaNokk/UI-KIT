@@ -55,11 +55,20 @@ if (!treeCss.includes("--ds-action-primary-background")) {
 
 runBuild("tree-icon", "dist-tree-icon");
 const iconJavaScript = readOutput("dist-tree-icon", ".js");
-if (!iconJavaScript.includes("aria-hidden")) {
-  throw new Error("The used Lucide icon was not found in the consumer bundle.");
+if (!iconJavaScript.includes("data-loading") || !iconJavaScript.includes("aria-hidden")) {
+  throw new Error("The used IconButton implementation or Lucide icon was not found.");
 }
 if (iconJavaScript.includes("Trash2") || iconJavaScript.includes("CashRegister")) {
   throw new Error("Unused icon catalog entries survived the Lucide-only build.");
+}
+
+runBuild("tree-link", "dist-tree-link");
+const linkJavaScript = readOutput("dist-tree-link", ".js");
+if (!linkJavaScript.includes("/orders")) {
+  throw new Error("The used ButtonLink implementation was not found in the bundle.");
+}
+if (linkJavaScript.includes("data-loading")) {
+  throw new Error("Button-only loading behavior survived the ButtonLink-only build.");
 }
 
 runBuild("lazy", "dist-lazy");
@@ -71,6 +80,22 @@ if (!hasDynamicEntry) {
   throw new Error("Dynamic @mypoint/ui/button import did not produce an async chunk.");
 }
 
+runBuild("lazy-button-link", "dist-lazy-button-link");
+const buttonLinkManifest = JSON.parse(
+  readFileSync(
+    resolve(consumerRoot, "dist-lazy-button-link", ".vite", "manifest.json"),
+    "utf8"
+  )
+);
+const hasButtonLinkDynamicEntry = Object.values(buttonLinkManifest).some(
+  (entry) => entry.isDynamicEntry
+);
+if (!hasButtonLinkDynamicEntry) {
+  throw new Error(
+    "Dynamic @mypoint/ui/button-link import did not produce an async chunk."
+  );
+}
+
 console.log(
-  "Tree-shaking passed: unused ThemeProvider and icon catalog removed, CSS retained, dynamic subpath split."
+  "Tree-shaking passed: ButtonLink/IconButton stayed independent, unused ThemeProvider and icon catalog were removed, CSS retained, dynamic subpaths split."
 );

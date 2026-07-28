@@ -42,6 +42,8 @@ packages/ui/dist/
   index.js
   index.d.ts
   Button/
+  ButtonLink/
+  IconButton/
   theme/
   styles.css
 ```
@@ -51,11 +53,13 @@ Tarballs и их manifest сохраняются в `.artifacts/packages/`.
 
 Consumer fixture копируется в `.artifacts/consumer/` и устанавливает именно
 эти tarballs, а не workspace symlinks. Проверяются public types, root import,
-`@mypoint/ui/button`, глобальный CSS и production Vite build.
+`@mypoint/ui/button`, `@mypoint/ui/button-link`,
+`@mypoint/ui/icon-button`, глобальный CSS и production Vite build.
 
-Tree-shaking check собирает Button-only entry, проверяет удаление ThemeProvider,
-сохранение CSS и создание отдельного async chunk для динамического
-`@mypoint/ui/button`.
+Tree-shaking check собирает отдельные Button-, ButtonLink- и IconButton-only
+entries, проверяет удаление неиспользуемого ThemeProvider и icon catalog,
+сохранение CSS и создание async chunks для динамических Button/ButtonLink
+subpath imports.
 
 ## Consumer setup
 
