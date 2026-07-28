@@ -53,6 +53,15 @@ if (!treeCss.includes("--ds-action-primary-background")) {
   throw new Error("Required UI/token CSS was removed from the consumer bundle.");
 }
 
+runBuild("tree-icon", "dist-tree-icon");
+const iconJavaScript = readOutput("dist-tree-icon", ".js");
+if (!iconJavaScript.includes("aria-hidden")) {
+  throw new Error("The used Lucide icon was not found in the consumer bundle.");
+}
+if (iconJavaScript.includes("Trash2") || iconJavaScript.includes("CashRegister")) {
+  throw new Error("Unused icon catalog entries survived the Lucide-only build.");
+}
+
 runBuild("lazy", "dist-lazy");
 const manifest = JSON.parse(
   readFileSync(resolve(consumerRoot, "dist-lazy", ".vite", "manifest.json"), "utf8")
@@ -62,4 +71,6 @@ if (!hasDynamicEntry) {
   throw new Error("Dynamic @mypoint/ui/button import did not produce an async chunk.");
 }
 
-console.log("Tree-shaking passed: unused ThemeProvider removed, CSS retained, dynamic subpath split.");
+console.log(
+  "Tree-shaking passed: unused ThemeProvider and icon catalog removed, CSS retained, dynamic subpath split."
+);

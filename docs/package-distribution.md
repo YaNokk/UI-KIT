@@ -2,12 +2,18 @@
 
 ## Public packages
 
-Репозиторий публикует два ESM-пакета:
+Репозиторий сейчас публикует два ESM-пакета:
 
 ```text
 @mypoint/tokens 0.1.0
 @mypoint/ui     0.1.0
 ```
+
+Custom icon catalog пока отсутствует. Если появится оправданная package
+boundary `@mypoint/icons`, пакет остаётся side-effect-free ESM, использует
+React как peer dependency, не re-export-ит Lucide и включается в pack,
+consumer и tree-shaking checks. Условный publish order:
+`tokens → icons → ui → patterns`.
 
 `@mypoint/ui` зависит от `@mypoint/tokens`. React и ReactDOM являются peer
 dependencies UI-пакета и не включаются в library bundle. CommonJS build не

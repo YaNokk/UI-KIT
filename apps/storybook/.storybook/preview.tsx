@@ -1,5 +1,5 @@
 import type { Decorator, Preview } from "@storybook/react-vite";
-import { ThemeProvider, type ThemePreference } from "@app/ui";
+import { ThemeProvider, type ThemePreference } from "@mypoint/ui";
 import "../src/styles.css";
 
 const accents = {

@@ -34,6 +34,10 @@ npm run tree-shaking:test
 
 Generated token files не редактируются вручную.
 
+Icon source, custom-icon admission, asset classification, accessibility и
+tree-shaking описаны в
+[`docs/icons-and-assets.md`](docs/icons-and-assets.md).
+
 ## Package distribution
 
 `npm run build` создаёт ESM packages и declarations. `npm run pack:check`

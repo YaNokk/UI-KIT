@@ -30,5 +30,8 @@
   },
   "dependencies": {
     "@mypoint/tokens": "^0.1.0"
+  },
+  "devDependencies": {
+    "lucide-react": "^1.27.0"
   }
 }

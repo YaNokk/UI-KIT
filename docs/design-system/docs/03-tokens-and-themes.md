@@ -90,8 +90,14 @@ icon.secondary
 icon.tertiary
 icon.disabled
 icon.accent
+icon.danger
+icon.success
+icon.warning
 icon.onAccent
 ```
+
+Иконки используют `currentColor`; canonical geometry, slot ownership и
+asset-классификация описаны в `../../icons-and-assets.md`.
 
 ### Border
 

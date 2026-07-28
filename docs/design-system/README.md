@@ -48,6 +48,9 @@ Our design system always has priority over reference projects.
 Additional template:
 - `examples/AGENTS.md` — starter Codex/agent project rules.
 
+Cross-cutting contract:
+- `../icons-and-assets.md` — Lucide, custom icon admission, assets, accessibility and packaging.
+
 ## Start here
 
 Do not begin by asking Codex to reproduce the full library.

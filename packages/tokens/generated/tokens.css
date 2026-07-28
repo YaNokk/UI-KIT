@@ -67,6 +67,7 @@
     --ds-radius-full: 9999px;
     --ds-border-width-default: 1px;
     --ds-border-width-strong: 2px;
+    --ds-icon-stroke-default: 2;
     --ds-shadow-none: none;
     --ds-shadow-sm: 0 1px 2px rgb(13 16 21 / 0.12);
     --ds-shadow-md: 0 6px 16px rgb(13 16 21 / 0.16);
@@ -136,6 +137,9 @@
     --ds-icon-tertiary: var(--ds-color-neutral-500);
     --ds-icon-disabled: var(--ds-color-neutral-400);
     --ds-icon-accent: var(--ds-brand-accent);
+    --ds-icon-danger: var(--ds-status-danger-foreground);
+    --ds-icon-success: var(--ds-status-success-foreground);
+    --ds-icon-warning: var(--ds-status-warning-foreground);
     --ds-icon-on-accent: var(--ds-brand-on-accent);
     --ds-border-default: var(--ds-color-neutral-200);
     --ds-border-strong: var(--ds-color-neutral-300);
@@ -234,6 +238,9 @@
     --ds-icon-tertiary: var(--ds-color-neutral-400);
     --ds-icon-disabled: var(--ds-color-neutral-600);
     --ds-icon-accent: var(--ds-brand-accent);
+    --ds-icon-danger: var(--ds-status-danger-foreground);
+    --ds-icon-success: var(--ds-status-success-foreground);
+    --ds-icon-warning: var(--ds-status-warning-foreground);
     --ds-icon-on-accent: var(--ds-brand-on-accent);
     --ds-border-default: var(--ds-color-neutral-700);
     --ds-border-strong: var(--ds-color-neutral-600);

@@ -117,6 +117,10 @@ AI выбирает только registry components/patterns.
 - narrow/wide containers;
 - interaction/a11y tests.
 
+При promotion прототипа локальные SVG сначала сверяются с Lucide и canonical
+custom catalog. Production packages не импортируют assets из `prototypes`;
+полный flow описан в `../../icons-and-assets.md`.
+
 ## Step 9. Screen validation
 
 Проверить:

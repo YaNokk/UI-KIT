@@ -25,6 +25,9 @@
     "tertiary": { "$type": "color", "$value": "{color.neutral.400}" },
     "disabled": { "$type": "color", "$value": "{color.neutral.600}" },
     "accent": { "$type": "color", "$value": "{brand.accent}" },
+    "danger": { "$type": "color", "$value": "{status.danger.foreground}" },
+    "success": { "$type": "color", "$value": "{status.success.foreground}" },
+    "warning": { "$type": "color", "$value": "{status.warning.foreground}" },
     "onAccent": { "$type": "color", "$value": "{brand.onAccent}" }
   },
   "border": {

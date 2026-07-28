@@ -21,6 +21,9 @@
   --color-icon-tertiary: var(--ds-icon-tertiary);
   --color-icon-disabled: var(--ds-icon-disabled);
   --color-icon-accent: var(--ds-icon-accent);
+  --color-icon-danger: var(--ds-icon-danger);
+  --color-icon-success: var(--ds-icon-success);
+  --color-icon-warning: var(--ds-icon-warning);
   --color-icon-on-accent: var(--ds-icon-on-accent);
   --color-border-default: var(--ds-border-default);
   --color-border-strong: var(--ds-border-strong);
@@ -105,6 +108,9 @@
   --shadow-sm: var(--ds-shadow-sm);
   --shadow-md: var(--ds-shadow-md);
   --shadow-lg: var(--ds-shadow-lg);
+  --spacing-icon-sm: var(--ds-size-icon-sm);
+  --spacing-icon-md: var(--ds-size-icon-md);
+  --spacing-icon-lg: var(--ds-size-icon-lg);
   --breakpoint-sm: var(--ds-breakpoint-sm);
   --breakpoint-md: var(--ds-breakpoint-md);
   --breakpoint-lg: var(--ds-breakpoint-lg);

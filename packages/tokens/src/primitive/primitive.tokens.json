@@ -92,6 +92,11 @@
     "default": { "$type": "dimension", "$value": { "value": 1, "unit": "px" } },
     "strong": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } }
   },
+  "icon": {
+    "stroke": {
+      "default": { "$type": "number", "$value": 2 }
+    }
+  },
   "shadow": {
     "none": { "$type": "shadow", "$value": "none" },
     "sm": { "$type": "shadow", "$value": "0 1px 2px rgb(13 16 21 / 0.12)" },
@@ -137,4 +142,3 @@
     "2xl": { "$type": "dimension", "$value": { "value": 1536, "unit": "px" } }
   }
 }
-

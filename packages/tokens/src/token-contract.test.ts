@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   darkSemanticTokens,
-  lightSemanticTokens
+  lightSemanticTokens,
+  primitiveTokens
 } from "./index";
 
 const themes = [
@@ -42,5 +43,24 @@ describe("action token contract", () => {
     ];
 
     expect(dangerValues.every((value) => !value.includes("{brand."))).toBe(true);
+  });
+});
+
+describe("icon token contract", () => {
+  it("uses the Lucide-compatible geometry baseline", () => {
+    expect(primitiveTokens["size.icon.sm"]).toEqual({ value: 16, unit: "px" });
+    expect(primitiveTokens["size.icon.md"]).toEqual({ value: 20, unit: "px" });
+    expect(primitiveTokens["size.icon.lg"]).toEqual({ value: 24, unit: "px" });
+    expect(primitiveTokens["icon.stroke.default"]).toBe(2);
+  });
+
+  it.each(themes)("%s exposes all canonical semantic tones", (_, tokens) => {
+    expect(tokens["icon.primary"]).toBeDefined();
+    expect(tokens["icon.secondary"]).toBeDefined();
+    expect(tokens["icon.disabled"]).toBeDefined();
+    expect(tokens["icon.accent"]).toBe("{brand.accent}");
+    expect(tokens["icon.danger"]).toBe("{status.danger.foreground}");
+    expect(tokens["icon.success"]).toBe("{status.success.foreground}");
+    expect(tokens["icon.warning"]).toBe("{status.warning.foreground}");
   });
 });

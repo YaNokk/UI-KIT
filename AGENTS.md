@@ -26,6 +26,12 @@
 - Публичному reusable-компоненту нужны stories и подходящие interaction/a11y tests.
 - Composite UI обязан документировать narrow/mobile, tablet и desktop поведение.
 - Не создавайте вручную component manifest, дублирующий TypeScript/Storybook.
+- Lucide — источник generic UI-иконок по умолчанию; перед custom icon ищите семантический эквивалент в Lucide.
+- Используйте только статические named imports из `lucide-react`; запрещены namespace-import, глобальный string registry и re-export Lucide.
+- Canonical line icons используют `currentColor`, `size.icon.*` и `icon.stroke.default`; размер, tone и a11y icon-slot задаёт владеющий им компонент.
+- Production packages не импортируют SVG из `prototypes`; custom icons проходят admission и визуальный review в Storybook.
+- Accessible name icon-only действия принадлежит интерактивному элементу, а не декоративному SVG.
+- Icon package и Lucide imports обязаны сохранять ESM tree-shaking.
 
 ## Добавление токена
 

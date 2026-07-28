@@ -15,3 +15,7 @@ Source of truth:
 - `src/generated/tokens.ts`.
 
 `runtime-brand.ts` валидирует backend inputs, выбирает безопасный `onAccent` с contrast не ниже 4.5:1 и создаёт только разрешённые brand variables. Status, neutral surfaces, sizing и geometry не зависят от brand.
+
+Icon foundation задаёт `size.icon.sm/md/lg = 16/20/24`,
+`icon.stroke.default = 2` и semantic tones, описанные в
+`../../docs/icons-and-assets.md`.

@@ -1,4 +1,5 @@
 import type { StorybookConfig } from "@storybook/react-vite";
+import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath } from "node:url";
 import { mergeConfig } from "vite";
 
@@ -18,6 +19,7 @@ const config: StorybookConfig = {
   },
   viteFinal: async (config) =>
     mergeConfig(config, {
+      plugins: [tailwindcss()],
       resolve: {
         alias: [
           {

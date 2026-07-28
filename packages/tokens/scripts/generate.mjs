@@ -99,6 +99,7 @@ function tailwindTheme(primitive, light) {
     if (path.startsWith("breakpoint.")) lines.push(`  --breakpoint-${name.slice(11)}: var(${variable(path)});`);
     if (path.startsWith("font.family.")) lines.push(`  --font-${name.slice(12)}: var(${variable(path)});`);
     if (path.startsWith("font.size.")) lines.push(`  --text-${name.slice(10)}: var(${variable(path)});`);
+    if (path.startsWith("size.icon.")) lines.push(`  --spacing-icon-${name.slice(10)}: var(${variable(path)});`);
   }
 
   lines.push("}", "");

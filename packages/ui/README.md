@@ -20,3 +20,7 @@ export function App() {
 
 React и ReactDOM предоставляются consumer-приложением. Tailwind в consumer не
 требуется.
+
+Generic icons импортируются статически из `lucide-react`. Компонент,
+владеющий icon-slot, задаёт размер, цвет через `currentColor` и decorative
+a11y treatment; см. `../../docs/icons-and-assets.md`.

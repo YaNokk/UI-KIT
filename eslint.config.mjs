@@ -1,6 +1,7 @@
 import eslint from "@eslint/js";
 import globals from "globals";
 import tseslint from "typescript-eslint";
+import { noIconAntiPatterns } from "./eslint-rules/no-icon-anti-patterns.mjs";
 import { noDesignLiterals } from "./eslint-rules/no-design-literals.mjs";
 
 export default tseslint.config(
@@ -36,12 +37,14 @@ export default tseslint.config(
     plugins: {
       "design-system": {
         rules: {
-          "no-design-literals": noDesignLiterals
+          "no-design-literals": noDesignLiterals,
+          "no-icon-anti-patterns": noIconAntiPatterns
         }
       }
     },
     rules: {
       "design-system/no-design-literals": "error",
+      "design-system/no-icon-anti-patterns": "error",
       "no-restricted-imports": [
         "error",
         {

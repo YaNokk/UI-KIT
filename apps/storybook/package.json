@@ -8,5 +8,9 @@
     "@mypoint/ui": "*",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "lucide-react": "^1.27.0"
   }
 }

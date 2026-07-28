@@ -12,15 +12,8 @@ import {
   waitFor,
   within
 } from "storybook/test";
+import { Star } from "lucide-react";
 import { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from "./Button";
-
-function StarIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z" />
-    </svg>
-  );
-}
 
 function LoadingExample({
   onClick
@@ -45,7 +38,7 @@ function LoadingExample({
     <Button
       loading={loading}
       onClick={handleClick}
-      startIcon={<StarIcon />}
+      startIcon={<Star />}
       variant="primary"
     >
       Сохранить изменения
@@ -121,22 +114,22 @@ export const Sizes: Story = {
 export const WithStartIcon: Story = {
   args: {
     children: "Добавить",
-    startIcon: <StarIcon />
+    startIcon: <Star />
   }
 };
 
 export const WithEndIcon: Story = {
   args: {
     children: "Продолжить",
-    endIcon: <StarIcon />
+    endIcon: <Star />
   }
 };
 
 export const WithBothIcons: Story = {
   args: {
     children: "Переместить",
-    endIcon: <StarIcon />,
-    startIcon: <StarIcon />
+    endIcon: <Star />,
+    startIcon: <Star />
   }
 };
 
