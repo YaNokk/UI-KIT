@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "noEmit": true,
+    "paths": {
+      "@app/tokens": ["packages/tokens/src/index.ts"],
+      "@app/ui": ["packages/ui/src/index.ts"],
+      "@app/patterns": ["packages/patterns/src/index.ts"]
+    },
+    "types": ["node"]
+  },
+  "include": [
+    "apps/**/*.ts",
+    "apps/**/*.tsx",
+    "packages/**/*.ts",
+    "packages/**/*.tsx"
+  ],
+  "exclude": [
+    "**/dist/**"
+  ]
+}

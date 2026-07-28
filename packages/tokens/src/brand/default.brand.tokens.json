@@ -1,0 +1,13 @@
+{
+  "brand": {
+    "accent": { "$type": "color", "$value": "#0080ff" },
+    "onAccent": { "$type": "color", "$value": "#000000" },
+    "accentHover": { "$type": "color", "$value": "#1f8fff" },
+    "accentActive": { "$type": "color", "$value": "#3399ff" },
+    "accentSoft": { "$type": "color", "$value": "#e0f0ff" },
+    "accentSoftHover": { "$type": "color", "$value": "#cce6ff" },
+    "accentSoftForeground": { "$type": "color", "$value": "#000000" },
+    "accentBorder": { "$type": "color", "$value": "#7abdff" },
+    "accentFocus": { "$type": "color", "$value": "#0080ff" }
+  }
+}

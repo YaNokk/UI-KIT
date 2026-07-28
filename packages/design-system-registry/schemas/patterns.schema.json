@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://app.local/schemas/patterns.schema.json",
+  "title": "Design-system pattern registry",
+  "type": "object",
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "patterns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "useWhen", "slots", "responsive"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "useWhen": { "type": "string", "minLength": 1 },
+          "slots": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          },
+          "responsive": {
+            "type": "object",
+            "required": ["mobile", "tablet", "desktop"],
+            "properties": {
+              "mobile": { "type": "string", "minLength": 1 },
+              "tablet": { "type": "string", "minLength": 1 },
+              "desktop": { "type": "string", "minLength": 1 }
+            },
+            "additionalProperties": false
+          },
+          "rules": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["version", "patterns"],
+  "additionalProperties": false
+}
+

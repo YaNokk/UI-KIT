@@ -1,0 +1,25 @@
+{
+  "color": {
+    "white": { "$type": "color", "$value": "#ffffff" },
+    "black": { "$type": "color", "$value": "#000000" },
+    "blue": {
+      "500": { "$type": "color", "$value": "#0080ff" },
+      "600": { "$type": "color", "$value": "#006cd9" },
+      "700": { "$type": "color", "$value": "#005bb8" }
+    }
+  },
+  "space": {
+    "1": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+    "2": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+    "3": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } },
+    "4": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
+    "6": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } },
+    "8": { "$type": "dimension", "$value": { "value": 32, "unit": "px" } }
+  },
+  "radius": {
+    "sm": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+    "md": { "$type": "dimension", "$value": { "value": 6, "unit": "px" } },
+    "lg": { "$type": "dimension", "$value": { "value": 8, "unit": "px" } },
+    "xl": { "$type": "dimension", "$value": { "value": 12, "unit": "px" } }
+  }
+}

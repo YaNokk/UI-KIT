@@ -1,0 +1,17 @@
+{
+  "color": {
+    "background": {
+      "page": { "$type": "color", "$value": "#f0f2f5" },
+      "surface": { "$type": "color", "$value": "{color.white}" },
+      "subtle": { "$type": "color", "$value": "#f5f5f5" }
+    },
+    "text": {
+      "primary": { "$type": "color", "$value": "#171a1f" },
+      "secondary": { "$type": "color", "$value": "#667085" }
+    },
+    "action": {
+      "primary": { "$type": "color", "$value": "{color.blue.500}" },
+      "primaryHover": { "$type": "color", "$value": "{color.blue.600}" }
+    }
+  }
+}

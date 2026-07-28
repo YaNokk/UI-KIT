@@ -1,0 +1,13 @@
+{
+  "name": "@app/design-system-registry",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "schemas",
+    "patterns.json",
+    "domain-rules.json",
+    "references.json"
+  ]
+}
+
