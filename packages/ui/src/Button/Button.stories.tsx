@@ -68,7 +68,7 @@ const meta = {
     children: { control: "text" },
     variant: {
       control: "select",
-      options: ["primary", "secondary", "danger"]
+      options: ["primary", "secondary", "soft", "danger"]
     },
     size: {
       control: "select",
@@ -83,7 +83,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const variants: ButtonVariant[] = ["primary", "secondary", "danger"];
+const variants: ButtonVariant[] = ["primary", "secondary", "soft", "danger"];
 const sizes: ButtonSize[] = ["sm", "md", "lg"];
 
 export const Variants: Story = {
@@ -250,4 +250,3 @@ export const NarrowContainer: Story = {
     }
   }
 };
-

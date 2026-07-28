@@ -46,6 +46,10 @@
   --color-action-secondary-background-hover: var(--ds-action-secondary-background-hover);
   --color-action-secondary-background-active: var(--ds-action-secondary-background-active);
   --color-action-secondary-foreground: var(--ds-action-secondary-foreground);
+  --color-action-soft-background: var(--ds-action-soft-background);
+  --color-action-soft-background-hover: var(--ds-action-soft-background-hover);
+  --color-action-soft-background-active: var(--ds-action-soft-background-active);
+  --color-action-soft-foreground: var(--ds-action-soft-foreground);
   --color-action-ghost-background-hover: var(--ds-action-ghost-background-hover);
   --color-action-ghost-foreground: var(--ds-action-ghost-foreground);
   --color-action-danger-background: var(--ds-action-danger-background);

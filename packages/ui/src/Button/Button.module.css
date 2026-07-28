@@ -126,6 +126,24 @@
   border-color: var(--ds-border-strong);
 }
 
+.soft {
+  color: var(--ds-action-soft-foreground);
+  background-color: var(--ds-action-soft-background);
+  border-color: var(--ds-action-soft-background);
+}
+
+@media (hover: hover) {
+  .soft:not(:disabled):not(.loading):hover {
+    background-color: var(--ds-action-soft-background-hover);
+    border-color: var(--ds-action-soft-background-hover);
+  }
+}
+
+.soft:not(:disabled):not(.loading):active {
+  background-color: var(--ds-action-soft-background-active);
+  border-color: var(--ds-action-soft-background-active);
+}
+
 .danger {
   color: var(--ds-action-danger-foreground);
   background-color: var(--ds-action-danger-background);

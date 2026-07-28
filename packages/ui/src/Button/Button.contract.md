@@ -19,6 +19,7 @@
 
 - основное действие в локальном контексте;
 - действие средней важности;
+- брендированное действие низкой/средней важности на мягкой accent-поверхности;
 - необратимое или потенциально опасное действие;
 - действие с декоративной иконкой до или после подписи;
 - длительное действие с защитой от повторного запуска;
@@ -41,7 +42,7 @@
 Контракт наследует стандартные атрибуты нативного `button`, включая form-атрибуты, обработчики событий, `aria-*`, `data-*`, `name`, `value` и `className`.
 
 ```ts
-type ButtonVariant = "primary" | "secondary" | "danger";
+type ButtonVariant = "primary" | "secondary" | "soft" | "danger";
 type ButtonSize = "sm" | "md" | "lg";
 
 interface ButtonProps
@@ -89,6 +90,10 @@ type      button
 ### `secondary`
 
 Обычное действие средней важности. Использует нейтральную поверхность и границу, не зависит от runtime brand.
+
+### `soft`
+
+Брендированное действие ниже primary, но выразительнее neutral secondary. Использует mode-aware accent-soft surface и проверенный accent content; зависит от runtime brand только через `action.soft.*`.
 
 ### `danger`
 
@@ -149,7 +154,7 @@ disabled → loading → active → hover → default
 - Используется нативное состояние `disabled`.
 - Кнопка не фокусируется и не активируется мышью, клавиатурой или программным click.
 - Состояние определяется не одной прозрачностью: меняются foreground/background/border semantics.
-- Primary, secondary и danger переходят на `control.backgroundDisabled`.
+- Primary, secondary, soft и danger переходят на `control.backgroundDisabled`.
 - Текст и иконки используют `text.disabled` и `icon.disabled`; secondary-граница использует `border.subtle`.
 - `disabled` не изменяет размер и положение содержимого.
 
@@ -208,6 +213,10 @@ action.primary.background
 action.primary.backgroundHover
 action.primary.backgroundActive
 action.primary.foreground
+action.soft.background
+action.soft.backgroundHover
+action.soft.backgroundActive
+action.soft.foreground
 focus.*
 ```
 
@@ -224,7 +233,7 @@ base text
 base borders
 ```
 
-Primary реагирует на runtime brand только через semantic aliases. Danger остаётся красной danger-семантикой при любом brand accent, включая green, purple, yellow и near-black.
+Primary и soft реагируют на runtime brand только через semantic aliases. Primary использует отдельную accessible action surface, не изменяя identity `brand.accent`. Danger остаётся красной danger-семантикой при любом brand accent, включая green, purple, yellow и near-black.
 
 ## Semantic token mapping
 
@@ -265,6 +274,12 @@ secondary
   action.secondary.backgroundActive   → neutral interactive active
   action.secondary.foreground
 
+soft
+  action.soft.background
+  action.soft.backgroundHover
+  action.soft.backgroundActive
+  action.soft.foreground
+
 danger
   action.danger.background
   action.danger.backgroundHover
@@ -274,9 +289,9 @@ danger
 
 Disabled использует общие neutral control/text/icon/border semantics и не создаёт brand-specific disabled variants. Loading сохраняет colors текущего варианта.
 
-## Обоснование недостающих tokens
+## Принятые token decisions
 
-До реализации необходимы две семантические концепции.
+Для первой реализации приняты следующие переиспользуемые семантические концепции.
 
 ```text
 neutral interactive surface family
@@ -289,6 +304,18 @@ action.secondary.backgroundHover
 action.secondary.backgroundActive
 
 action.danger.backgroundActive
+
+brand.accentContent
+brand.accentSoftActive
+brand.actionBackground
+brand.actionBackgroundHover
+brand.actionBackgroundActive
+brand.actionForeground
+
+action.soft.background
+action.soft.backgroundHover
+action.soft.backgroundActive
+action.soft.foreground
 ```
 
 ### Neutral interactive surfaces
@@ -312,6 +339,28 @@ action.danger.backgroundActive
 7. Роль применима ко всем danger actions, а не только к Button.
 
 Новый component token для spinner не требуется: размеры индикатора выражаются существующими `size.icon.*`.
+
+Brand action palette отделяет identity accent от primary action surface: resolver сначала сохраняет запрошенный foreground и подбирает доступную производную background-поверхность. Accent content проверяется одновременно против soft default/hover/active surfaces. Ни один из этих tokens не является Button-specific.
+
+### Brand action palette
+
+1. Отсутствующая роль — доступная заливка брендированного действия, которая не изменяет identity accent.
+2. `brand.accent` обязан точно сохранять цвет бренда, поэтому он не может одновременно гарантировать контраст preferred foreground для любого runtime-ввода.
+3. Минимальный слой — bounded runtime brand roles `brand.actionBackground*` и `brand.actionForeground`; semantic `action.primary.*` только ссылается на них.
+4. Палитра проверяется в light/dark; геометрия и markup от mode не зависят.
+5. Brand влияет на эти роли по определению, но не расширяет набор разрешённых semantic consumers.
+6. Responsive-вариация не нужна.
+7. Роли переиспользуемы всеми primary actions, а не только Button.
+
+### Accent soft content and active surface
+
+1. Отсутствующие роли — читаемый accent content на мягкой поверхности и отдельное pressed-состояние этой поверхности.
+2. `brand.onAccent` рассчитан для identity accent, а `accentSoftHover` не выражает pressed state; существующие роли семантически неприменимы.
+3. Минимальный слой — bounded runtime roles `brand.accentContent` и `brand.accentSoftActive`; `action.soft.*` предоставляет action-level aliases.
+4. Все три soft-поверхности выводятся отдельно для light/dark, а content проверяется против каждой.
+5. Роли brand-dependent, поскольку сохраняют accent identity в низкой визуальной иерархии.
+6. Responsive-вариация не нужна.
+7. Роли пригодны для branded soft actions и других явно разрешённых accent-soft interactions.
 
 ## Storybook coverage
 
@@ -383,7 +432,7 @@ Hover, active и focus-visible проверяются через interaction/pse
 
 - все sizes используют системную геометрию;
 - отсутствуют raw colors и arbitrary spacing/radius values;
-- danger не зависит от brand, primary корректно реагирует на runtime brand;
+- danger не зависит от brand, primary и soft корректно реагируют на runtime brand;
 - light/dark работают без markup branching;
 - yellow и near-black stress cases остаются usable;
 - reduced motion соблюдается;
@@ -392,12 +441,13 @@ Hover, active и focus-visible проверяются через interaction/pse
 ## Критерии приёмки контракта
 
 - Финальный API не содержит визуальных escape-hatch props.
-- `ghost` отсутствует в Button v1, а `variant` обязателен.
+- `ghost` отсутствует в Button v1; `soft` добавлен как подтверждённая branded hierarchy, а `variant` обязателен.
 - Icon slots используют честный тип `ReactNode` и контролируемые Button wrappers.
 - Button не смешивает action и navigation semantics.
 - Loading подавляет click, keyboard, programmatic click и form submission без потери focus/name/layout.
 - Все варианты выражаются approved semantic/foundation tokens.
 - Danger не зависит от runtime brand.
+- Primary использует derived accessible action palette, не мутируя `brand.accent`; soft использует проверенные accent-soft/content semantics.
 - Light/dark и brand не ветвят markup или geometry.
 - Responsive behavior остаётся на уровне layout/pattern.
 - Neutral active-state определён на переиспользуемом surface layer; danger active остаётся action semantic.

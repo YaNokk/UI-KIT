@@ -49,10 +49,10 @@
   },
   "action": {
     "primary": {
-      "background": { "$type": "color", "$value": "{brand.accent}" },
-      "backgroundHover": { "$type": "color", "$value": "{brand.accentHover}" },
-      "backgroundActive": { "$type": "color", "$value": "{brand.accentActive}" },
-      "foreground": { "$type": "color", "$value": "{brand.onAccent}" }
+      "background": { "$type": "color", "$value": "{brand.actionBackground}" },
+      "backgroundHover": { "$type": "color", "$value": "{brand.actionBackgroundHover}" },
+      "backgroundActive": { "$type": "color", "$value": "{brand.actionBackgroundActive}" },
+      "foreground": { "$type": "color", "$value": "{brand.actionForeground}" }
     },
     "secondary": {
       "background": { "$type": "color", "$value": "{background.interactive}" },
@@ -60,9 +60,15 @@
       "backgroundActive": { "$type": "color", "$value": "{background.interactiveActive}" },
       "foreground": { "$type": "color", "$value": "{text.primary}" }
     },
+    "soft": {
+      "background": { "$type": "color", "$value": "{brand.accentSoft}" },
+      "backgroundHover": { "$type": "color", "$value": "{brand.accentSoftHover}" },
+      "backgroundActive": { "$type": "color", "$value": "{brand.accentSoftActive}" },
+      "foreground": { "$type": "color", "$value": "{brand.accentContent}" }
+    },
     "ghost": {
       "backgroundHover": { "$type": "color", "$value": "{brand.accentSoft}" },
-      "foreground": { "$type": "color", "$value": "{brand.accentSoftForeground}" }
+      "foreground": { "$type": "color", "$value": "{brand.accentContent}" }
     },
     "danger": {
       "background": { "$type": "color", "$value": "{color.red.600}" },
@@ -99,7 +105,7 @@
       "backgroundHover": { "$type": "color", "$value": "{background.subtle}" },
       "backgroundActive": { "$type": "color", "$value": "{brand.accentSoft}" },
       "text": { "$type": "color", "$value": "{text.secondary}" },
-      "textActive": { "$type": "color", "$value": "{brand.accentSoftForeground}" },
+      "textActive": { "$type": "color", "$value": "{brand.accentContent}" },
       "icon": { "$type": "color", "$value": "{icon.secondary}" },
       "iconActive": { "$type": "color", "$value": "{brand.accent}" }
     }

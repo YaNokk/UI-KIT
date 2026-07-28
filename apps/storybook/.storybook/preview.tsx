@@ -64,7 +64,7 @@ const preview: Preview = {
   initialGlobals: {
     mode: "light",
     accent: "blue",
-    foreground: "auto"
+    foreground: "light"
   },
   parameters: {
     a11y: {

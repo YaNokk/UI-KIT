@@ -20,10 +20,17 @@ describe("action token contract", () => {
   });
 
   it.each(themes)("%s keeps primary brand-dependent", (_, tokens) => {
-    expect(tokens["action.primary.background"]).toBe("{brand.accent}");
-    expect(tokens["action.primary.backgroundHover"]).toBe("{brand.accentHover}");
-    expect(tokens["action.primary.backgroundActive"]).toBe("{brand.accentActive}");
-    expect(tokens["action.primary.foreground"]).toBe("{brand.onAccent}");
+    expect(tokens["action.primary.background"]).toBe("{brand.actionBackground}");
+    expect(tokens["action.primary.backgroundHover"]).toBe("{brand.actionBackgroundHover}");
+    expect(tokens["action.primary.backgroundActive"]).toBe("{brand.actionBackgroundActive}");
+    expect(tokens["action.primary.foreground"]).toBe("{brand.actionForeground}");
+  });
+
+  it.each(themes)("%s exposes a brand-dependent soft action family", (_, tokens) => {
+    expect(tokens["action.soft.background"]).toBe("{brand.accentSoft}");
+    expect(tokens["action.soft.backgroundHover"]).toBe("{brand.accentSoftHover}");
+    expect(tokens["action.soft.backgroundActive"]).toBe("{brand.accentSoftActive}");
+    expect(tokens["action.soft.foreground"]).toBe("{brand.accentContent}");
   });
 
   it.each(themes)("%s keeps danger brand-independent", (_, tokens) => {

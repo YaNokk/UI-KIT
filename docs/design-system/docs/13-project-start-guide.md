@@ -87,14 +87,21 @@ focus.*
 
 ```text
 brand.accent
+brand.preferredOnAccent
 brand.onAccent
-brand.accent.hover
-brand.accent.active
-brand.accent.soft
-brand.accent.softHover
-brand.accent.softForeground
-brand.accent.border
-brand.accent.focus
+brand.accentContent
+brand.accentHover
+brand.accentActive
+brand.accentSoft
+brand.accentSoftHover
+brand.accentSoftActive
+brand.accentSoftForeground
+brand.accentBorder
+brand.accentFocus
+brand.actionBackground
+brand.actionBackgroundHover
+brand.actionBackgroundActive
+brand.actionForeground
 ```
 
 Do not create component tokens before a component demonstrates a repeated need that cannot be expressed semantically.
@@ -283,7 +290,9 @@ Requirements:
 - Tailwind as styling engine, not source of truth;
 - primitive → semantic token architecture;
 - light/dark themes;
-- runtime brand input accentColor + foregroundColor with safe derived accent states;
+- runtime brand input accentColor + foregroundColor with unchanged identity
+  accent, mode-aware soft states and a separately derived accessible action
+  palette;
 - mobile/tablet/desktop foundations;
 - Storybook with theme/brand controls;
 - registry skeleton;

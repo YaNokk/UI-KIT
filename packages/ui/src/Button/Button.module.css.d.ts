@@ -11,6 +11,7 @@ declare const styles: {
   readonly root: string;
   readonly secondary: string;
   readonly sm: string;
+  readonly soft: string;
   readonly spinner: string;
   readonly spinnerTrack: string;
 };

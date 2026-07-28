@@ -6,7 +6,7 @@ import {
 } from "react";
 import styles from "./Button.module.css";
 
-export type ButtonVariant = "primary" | "secondary" | "danger";
+export type ButtonVariant = "primary" | "secondary" | "soft" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 export interface ButtonProps
@@ -27,6 +27,7 @@ export interface ButtonProps
 const variantClassNames: Record<ButtonVariant, string> = {
   primary: styles.primary,
   secondary: styles.secondary,
+  soft: styles.soft,
   danger: styles.danger
 };
 

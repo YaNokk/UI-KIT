@@ -129,10 +129,21 @@ action.primary.foreground
 
 action.secondary.background
 action.secondary.backgroundHover
+action.secondary.backgroundActive
 action.secondary.foreground
+
+action.soft.background
+action.soft.backgroundHover
+action.soft.backgroundActive
+action.soft.foreground
 
 action.ghost.backgroundHover
 action.ghost.foreground
+
+action.danger.background
+action.danger.backgroundHover
+action.danger.backgroundActive
+action.danger.foreground
 ```
 
 ### Status
@@ -183,17 +194,28 @@ Theme engine resolves it into:
 
 ```text
 brand.accent
+brand.preferredOnAccent
 brand.onAccent
-brand.accent.hover
-brand.accent.active
-brand.accent.soft
-brand.accent.softHover
-brand.accent.softForeground
-brand.accent.border
-brand.accent.focus
+brand.accentContent
+brand.accentHover
+brand.accentActive
+brand.accentSoft
+brand.accentSoftHover
+brand.accentSoftActive
+brand.accentSoftForeground
+brand.accentBorder
+brand.accentFocus
+brand.actionBackground
+brand.actionBackgroundHover
+brand.actionBackgroundActive
+brand.actionForeground
 ```
 
-Semantic action/navigation/selection/focus tokens may alias this family.
+`brand.accent` preserves the supplied identity color. Primary actions alias the
+separate, contrast-safe `brand.action*` palette; soft actions alias the
+mode-aware `brand.accentSoft*` surfaces and `brand.accentContent`.
+Semantic navigation, selection and focus tokens may alias the appropriate
+identity roles.
 
 Brand must not alter spacing, typography, radius, neutral surfaces, control sizes, success/warning/danger or breakpoints.
 

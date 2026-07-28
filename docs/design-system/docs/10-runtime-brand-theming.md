@@ -54,24 +54,42 @@ The theme engine may expose only this bounded family:
 
 ```text
 brand.accent
+brand.preferredOnAccent
 brand.onAccent
-brand.accent.hover
-brand.accent.active
-brand.accent.soft
-brand.accent.softHover
-brand.accent.softForeground
-brand.accent.border
-brand.accent.focus
+brand.accentContent
+brand.accentHover
+brand.accentActive
+brand.accentSoft
+brand.accentSoftHover
+brand.accentSoftActive
+brand.accentSoftForeground
+brand.accentBorder
+brand.accentFocus
+brand.actionBackground
+brand.actionBackgroundHover
+brand.actionBackgroundActive
+brand.actionForeground
 ```
 
-`accentColor` is the seed. Derived colors are generated centrally, preferably in a perceptual color space such as OKLCH, and then contrast-checked.
+`accentColor` is the identity seed and remains unchanged in `brand.accent`.
+Derived colors are generated centrally and contrast-checked.
 
-`foregroundColor` is a preference, not an unconditional truth. If contrast is insufficient, the theme engine chooses a safe on-accent foreground.
+`foregroundColor` is recorded as `preferredOnAccent`. For primary actions the
+resolver first tries to preserve that preference by deriving a safe
+`actionBackground`; only if no safe action surface is possible may it fall
+back to another `actionForeground`. `brand.onAccent` remains the foreground
+that is safe directly on the unchanged identity accent.
+
+Identity and action are deliberately separate: an accent may be correct for
+links, indicators and focus while still being unsafe as a filled control
+surface. `accentContent` is checked against all default, hover and active soft
+surfaces.
 
 ## What brand is allowed to affect
 
 Recommended:
 - primary actions;
+- branded soft actions;
 - links;
 - checked checkbox/radio/switch;
 - active tab indicator;
@@ -79,7 +97,7 @@ Recommended:
 - selected navigation item;
 - selected/active filters;
 - pagination active state;
-- selection backgrounds via `accent.soft`;
+- selection backgrounds via `accentSoft`;
 - informational accent where it does not conflict with semantic status.
 
 Brand must not redefine:
@@ -114,7 +132,11 @@ control.background
 
 Brand defines only accent semantics.
 
-`accent.soft` must be mode-aware. A pale accent surface for light mode must not be reused unchanged in dark mode.
+`accentSoft`, `accentSoftHover` and `accentSoftActive` must be mode-aware. Pale
+light-mode surfaces must not be reused unchanged in dark mode. The
+`actionBackground*` family is resolved independently from mode-neutral
+identity preservation and may only be consumed through semantic action
+aliases.
 
 ## React boundary
 

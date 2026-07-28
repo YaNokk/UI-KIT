@@ -1,13 +1,20 @@
 {
   "brand": {
     "accent": { "$type": "color", "$value": "#0080ff" },
+    "preferredOnAccent": { "$type": "color", "$value": "#ffffff" },
     "onAccent": { "$type": "color", "$value": "#000000" },
     "accentHover": { "$type": "color", "$value": "#1f8fff" },
     "accentActive": { "$type": "color", "$value": "#3399ff" },
+    "accentContent": { "$type": "color", "$value": "#67b3ff" },
     "accentSoft": { "$type": "color", "$value": "#122f4e" },
     "accentSoftHover": { "$type": "color", "$value": "#103964" },
-    "accentSoftForeground": { "$type": "color", "$value": "#ffffff" },
+    "accentSoftActive": { "$type": "color", "$value": "#0e437a" },
+    "accentSoftForeground": { "$type": "color", "$value": "#67b3ff" },
     "accentBorder": { "$type": "color", "$value": "#085db2" },
-    "accentFocus": { "$type": "color", "$value": "#0080ff" }
+    "accentFocus": { "$type": "color", "$value": "#0080ff" },
+    "actionBackground": { "$type": "color", "$value": "#0074e8" },
+    "actionBackgroundHover": { "$type": "color", "$value": "#006bd5" },
+    "actionBackgroundActive": { "$type": "color", "$value": "#0061c3" },
+    "actionForeground": { "$type": "color", "$value": "#ffffff" }
   }
 }

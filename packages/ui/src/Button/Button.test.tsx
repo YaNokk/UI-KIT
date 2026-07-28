@@ -200,6 +200,7 @@ describe("Button accessibility", () => {
       <div>
         <Button variant="primary">Сохранить</Button>
         <Button disabled variant="secondary">Недоступно</Button>
+        <Button variant="soft">Подробнее</Button>
         <Button loading variant="danger">Удаление</Button>
       </div>
     );
