@@ -1,12 +1,24 @@
 {
-  "name": "@app/tokens",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@mypoint/tokens",
+  "version": "0.1.0",
   "type": "module",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "exports": {
-    ".": "./src/index.ts",
-    "./tokens.css": "./generated/tokens.css",
-    "./tailwind.css": "./generated/tailwind.css"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tokens.css": "./dist/tokens.css",
+    "./tailwind.css": "./dist/tailwind.css"
+  },
+  "sideEffects": [
+    "*.css",
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "vite build --configLoader runner && tsc -p tsconfig.build.json"
   }
 }
-

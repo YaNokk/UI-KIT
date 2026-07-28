@@ -1,32 +1,46 @@
 # Design System Foundation
 
-Реализована Iteration 0 из `docs/design-system/docs/13-project-start-guide.md`.
+Монорепозиторий дизайн-системы MyPoint.
 
 ## Структура
 
-- `packages/tokens` — DTCG token sources, generated CSS/Tailwind bridge, typed metadata и runtime brand adapter;
-- `packages/ui` — theme boundary; публичные product components намеренно ещё отсутствуют;
-- `packages/patterns` — пустой public layer до первого vertical slice;
-- `packages/design-system-registry` — authored pattern/domain/reference registry и schemas;
-- `apps/storybook` — executable foundation documentation с light/dark/system и brand stress controls;
-- `references` — раздельные behavioral/visual/raw reference areas.
+- `packages/tokens` — DTCG sources, semantic themes и runtime brand resolver;
+- `packages/ui` — React-компоненты и ThemeProvider;
+- `packages/patterns` — композиционный слой будущих product patterns;
+- `packages/design-system-registry` — authored registry и schemas;
+- `apps/storybook` — документация компонентов и brand/theme stress controls;
+- `fixtures/vite-react` — clean packed-package consumer.
+
+Публичные пакеты:
+
+```text
+@mypoint/tokens
+@mypoint/ui
+```
 
 ## Команды
 
 ```bash
-npm install
-npm run tokens:generate
+npm ci
 npm run tokens:check
 npm run lint
 npm run typecheck
-npm run storybook
+npm test
+npm run build
+npm run pack:check
+npm run consumer:test
+npm run tree-shaking:test
 ```
 
 Generated token files не редактируются вручную.
 
-## Границы итерации
+## Package distribution
 
-Button относится к Iteration 1 и не реализован: для него документация требует предварительный `Button.contract.md` на основе Core DS Button и MP UI KIT, которых в исходном архиве нет.
+`npm run build` создаёт ESM packages и declarations. `npm run pack:check`
+проверяет реальное содержимое tarball, после чего consumer fixture устанавливает
+оба `.tgz`, запускает typecheck и production build. Releases публикуются в
+GitLab Package Registry только pipeline для SemVer-тегов.
 
-Runtime brand принимает только `accentColor` и опциональный `foregroundColor`, проверяет HEX и WCAG contrast, затем создаёт ограниченную accent-family. Производные цвета сейчас рассчитываются детерминированным смешиванием sRGB; переход на OKLCH оставлен заменяемой внутренней деталью и не меняет публичный контракт.
-
+Настройка registry, локальная публикация, consumer authentication и требуемые
+environment variables описаны в
+[`docs/package-distribution.md`](docs/package-distribution.md).

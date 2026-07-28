@@ -1,0 +1,3 @@
+@mypoint:registry=https://${GITLAB_HOST}/api/v4/projects/${GITLAB_PACKAGE_PROJECT_ID}/packages/npm/
+//${GITLAB_HOST}/api/v4/projects/${GITLAB_PACKAGE_PROJECT_ID}/packages/npm/:_authToken=${NPM_READ_TOKEN}
+always-auth=true

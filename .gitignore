@@ -2,6 +2,10 @@ node_modules/
 dist/
 storybook-static/
 coverage/
+.artifacts/
+.env
+.env.local
+.env.*.local
+.npmrc
 *.tsbuildinfo
 .DS_Store
-

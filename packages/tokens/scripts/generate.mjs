@@ -1,5 +1,5 @@
-import { readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
 import process from "node:process";
 
 const packageRoot = resolve(import.meta.dirname, "..");
@@ -14,7 +14,7 @@ const sources = {
 const outputs = {
   css: resolve(packageRoot, "generated/tokens.css"),
   tailwind: resolve(packageRoot, "generated/tailwind.css"),
-  typescript: resolve(packageRoot, "generated/tokens.ts")
+  typescript: resolve(packageRoot, "src/generated/tokens.ts")
 };
 
 const parse = async (path) => JSON.parse(await readFile(path, "utf8"));
@@ -186,6 +186,7 @@ for (const [key, path] of Object.entries(outputs)) {
       hasMismatch = true;
     }
   } else {
+    await mkdir(dirname(path), { recursive: true });
     await writeFile(path, generated[key], "utf8");
   }
 }

@@ -8,11 +8,18 @@
     "packages/*"
   ],
   "scripts": {
+    "build": "npm run tokens:generate && npm run build --workspace=@mypoint/tokens && npm run build --workspace=@mypoint/ui",
     "tokens:generate": "node packages/tokens/scripts/generate.mjs",
     "tokens:check": "node packages/tokens/scripts/generate.mjs --check",
     "lint": "eslint .",
     "test": "vitest run packages",
     "typecheck": "tsc -p tsconfig.check.json --noEmit",
+    "pack:check": "node scripts/verify-package.mjs",
+    "consumer:test": "node scripts/test-consumer.mjs",
+    "tree-shaking:test": "node scripts/verify-tree-shaking.mjs",
+    "registry:configure": "node scripts/configure-npm-registry.mjs",
+    "publish:local": "node scripts/publish-local.mjs",
+    "release:check": "node scripts/verify-release-version.mjs",
     "storybook": "storybook dev -p 6006 -c apps/storybook/.storybook",
     "build-storybook": "storybook build -c apps/storybook/.storybook -o storybook-static"
   },

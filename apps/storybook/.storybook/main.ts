@@ -1,4 +1,6 @@
 import type { StorybookConfig } from "@storybook/react-vite";
+import { fileURLToPath } from "node:url";
+import { mergeConfig } from "vite";
 
 const config: StorybookConfig = {
   stories: [
@@ -13,7 +15,32 @@ const config: StorybookConfig = {
   framework: {
     name: "@storybook/react-vite",
     options: {}
-  }
+  },
+  viteFinal: async (config) =>
+    mergeConfig(config, {
+      resolve: {
+        alias: [
+          {
+            find: /^@mypoint\/tokens$/,
+            replacement: fileURLToPath(
+              new URL("../../../packages/tokens/src/index.ts", import.meta.url)
+            )
+          },
+          {
+            find: /^@mypoint\/tokens\/tokens\.css$/,
+            replacement: fileURLToPath(
+              new URL("../../../packages/tokens/generated/tokens.css", import.meta.url)
+            )
+          },
+          {
+            find: /^@mypoint\/ui$/,
+            replacement: fileURLToPath(
+              new URL("../../../packages/ui/src/index.ts", import.meta.url)
+            )
+          }
+        ]
+      }
+    })
 };
 
 export default config;

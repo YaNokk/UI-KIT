@@ -5,4 +5,5 @@
 - Runtime brand is limited to the documented `brand.*` family.
 - Components may consume semantic and brand tokens, never primitive color tokens directly.
 - Run `npm run tokens:generate` after source-token changes and `npm run tokens:check` in validation.
-
+- Public exports указывают только на `dist`; generated sources не становятся deep-import API.
+- Изменение package boundary проверяется через packed consumer вместе с `@mypoint/ui`.

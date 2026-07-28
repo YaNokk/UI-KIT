@@ -79,7 +79,7 @@ component (только при необходимости)
 Пример:
 
 ```tsx
-import { Select } from "@app/ui";
+import { Select } from "@mypoint/ui";
 ```
 
 а не по всему приложению:

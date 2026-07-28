@@ -31,3 +31,13 @@
 
 Перед добавлением объясните отсутствующую semantic role, невозможность использовать существующий токен, слой, поведение light/dark, связь с brand и responsive.
 
+## Package distribution
+
+- Публикуемые пакеты никогда не экспортируют `src` или внутренние `dist`-пути.
+- React и ReactDOM остаются external peer dependencies UI-пакета.
+- Изменения public package сохраняют ESM и анализируемый tree-shakeable module graph.
+- Опубликованный CSS работает без Tailwind-конфигурации consumer-проекта.
+- Package-изменения требуют проверки `npm pack` и установки tarball в clean consumer fixture.
+- Секреты и authenticated `.npmrc` запрещено коммитить; registry auth поступает только из CI/env.
+- Новые deep imports запрещены без явного subpath в `exports`.
+- Publish допускается только после validation, build, consumer и tree-shaking checks.

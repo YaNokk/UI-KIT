@@ -4,8 +4,8 @@
     "baseUrl": ".",
     "noEmit": true,
     "paths": {
-      "@app/tokens": ["packages/tokens/src/index.ts"],
-      "@app/ui": ["packages/ui/src/index.ts"],
+      "@mypoint/tokens": ["packages/tokens/src/index.ts"],
+      "@mypoint/ui": ["packages/ui/src/index.ts"],
       "@app/patterns": ["packages/patterns/src/index.ts"]
     },
     "types": ["node"]

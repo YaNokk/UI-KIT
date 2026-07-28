@@ -3,7 +3,7 @@ import {
   createBrandCssVariables,
   type BrandInput,
   type ThemeMode
-} from "@app/tokens";
+} from "@mypoint/tokens";
 import {
   useMemo,
   useSyncExternalStore,
@@ -69,4 +69,3 @@ export function ThemeProvider({
     </div>
   );
 }
-

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   defaultBrandTokens,
   defaultDarkBrandTokens
-} from "../generated/tokens";
+} from "./generated/tokens";
 import { resolveBrand, type ThemeMode } from "./runtime-brand";
 
 type Rgb = readonly [number, number, number];

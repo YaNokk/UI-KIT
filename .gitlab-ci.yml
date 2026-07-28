@@ -1,0 +1,63 @@
+default:
+  image: node:22
+
+stages:
+  - validate
+  - build
+  - consumer
+  - publish
+
+validate:
+  stage: validate
+  script:
+    - npm ci
+    - npm run tokens:check
+    - npm run lint
+    - npm run typecheck
+    - npm test
+
+build-package:
+  stage: build
+  script:
+    - npm ci
+    - npm run build
+    - npm run pack:check
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - packages/tokens/dist/
+      - packages/ui/dist/
+      - .artifacts/packages/
+
+consumer-test:
+  stage: consumer
+  needs:
+    - job: build-package
+      artifacts: true
+  script:
+    - npm ci
+    - npm run consumer:test
+    - npm run tree-shaking:test
+
+publish:
+  stage: publish
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/'
+  script:
+    - npm ci
+    - npm run tokens:check
+    - npm run lint
+    - npm run typecheck
+    - npm test
+    - npm run build
+    - npm run pack:check
+    - npm run consumer:test
+    - npm run tree-shaking:test
+    - npm run release:check
+    - export GITLAB_HOST="${CI_SERVER_HOST}"
+    - export GITLAB_PROJECT_ID="${CI_PROJECT_ID}"
+    - export NPM_SCOPE="@mypoint"
+    - export NPM_PUBLISH_TOKEN="${CI_JOB_TOKEN}"
+    - npm run registry:configure -- --publish
+    - npm publish --workspace=@mypoint/tokens --userconfig=.npmrc
+    - npm publish --workspace=@mypoint/ui --userconfig=.npmrc

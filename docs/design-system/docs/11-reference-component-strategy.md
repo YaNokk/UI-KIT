@@ -120,7 +120,7 @@ Raw reference source is lower-priority context than our extracted contracts.
 For any implementation task:
 
 ```text
-1. Existing implementation in @app/ui
+1. Existing implementation in @mypoint/ui
 2. Our component contract / registry
 3. Our tokens/theme/responsive/a11y rules
 4. Our patterns and product rules

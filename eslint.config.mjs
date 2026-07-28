@@ -8,6 +8,7 @@ export default tseslint.config(
     ignores: [
       "**/dist/**",
       "**/generated/**",
+      ".artifacts/**",
       "storybook-static/**",
       "docs/design-system/**",
       "references/raw/**"
