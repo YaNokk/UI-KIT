@@ -21,7 +21,8 @@
 - действие средней важности;
 - брендированное действие низкой/средней важности на мягкой accent-поверхности;
 - необратимое или потенциально опасное действие;
-- действие с декоративной иконкой до или после подписи;
+- действие с декоративной иконкой до или после подписи; `startIcon` и
+  `endIcon` всегда скрыты от assistive technology, а имя принадлежит подписи;
 - длительное действие с защитой от повторного запуска;
 - действие на всю ширину доступного контейнера.
 
@@ -447,6 +448,8 @@ Hover, active и focus-visible проверяются через interaction/pse
 - Icon slots используют честный тип `ReactNode` и контролируемые Button wrappers.
 - Button не смешивает action и navigation semantics.
 - Loading подавляет click, keyboard, programmatic click и form submission без потери focus/name/layout.
+- Loading visual использует canonical decorative `Spinner`; Button остаётся
+  владельцем accessible name, busy state и activation policy.
 - Все варианты выражаются approved semantic/foundation tokens.
 - Danger не зависит от runtime brand.
 - Primary использует derived accessible action palette, не мутируя `brand.accent`; soft использует проверенные accent-soft/content semantics.

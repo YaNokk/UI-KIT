@@ -31,6 +31,10 @@
       "types": "./dist/Link/index.d.ts",
       "import": "./dist/Link/index.js"
     },
+    "./spinner": {
+      "types": "./dist/Spinner/index.d.ts",
+      "import": "./dist/Spinner/index.js"
+    },
     "./text": {
       "types": "./dist/Text/index.d.ts",
       "import": "./dist/Text/index.js"

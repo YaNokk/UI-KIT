@@ -5,6 +5,7 @@ import {
   type ReactNode
 } from "react";
 import { classNames } from "../shared/classNames";
+import { Spinner } from "../Spinner/Spinner";
 import styles from "./IconButton.module.css";
 
 export type IconButtonVariant =
@@ -124,24 +125,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         </span>
 
         {loading ? (
-          <span aria-hidden="true" className={styles.spinner}>
-            <svg fill="none" viewBox="0 0 24 24">
-              <circle
-                className={styles.spinnerTrack}
-                cx="12"
-                cy="12"
-                r="9"
-                stroke="currentColor"
-                strokeWidth="3"
-              />
-              <path
-                d="M12 3a9 9 0 0 1 9 9"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeWidth="3"
-              />
-            </svg>
-          </span>
+          <Spinner className={styles.spinner} size={size} tone="current" />
         ) : null}
       </button>
     );

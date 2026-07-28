@@ -63,7 +63,9 @@ not pass arbitrary icon size, color or stroke overrides.
 `disabled` uses the native attribute. `loading` preserves geometry, focus and
 the accessible name, exposes `aria-busy=true` and `aria-disabled=true`, and
 suppresses pointer, keyboard, programmatic and capture activation without
-setting native disabled.
+setting native disabled. A loading submit control does not submit its form.
+The visual is the canonical decorative `Spinner` in `currentColor`;
+IconButton remains the owner of name, busy state and activation policy.
 
 ## Responsive behavior
 

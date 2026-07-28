@@ -26,6 +26,9 @@ export default defineConfig({
         "Link/index": fileURLToPath(
           new URL("./src/Link/index.ts", import.meta.url)
         ),
+        "Spinner/index": fileURLToPath(
+          new URL("./src/Spinner/index.ts", import.meta.url)
+        ),
         "Text/index": fileURLToPath(
           new URL("./src/Text/index.ts", import.meta.url)
         )

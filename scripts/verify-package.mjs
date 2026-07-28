@@ -34,6 +34,8 @@ const packages = [
       "dist/ButtonLink/index.d.ts",
       "dist/IconButton/index.js",
       "dist/IconButton/index.d.ts",
+      "dist/Spinner/index.js",
+      "dist/Spinner/index.d.ts",
       "dist/styles.css"
     ]
   }

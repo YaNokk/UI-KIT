@@ -1,0 +1,89 @@
+.root {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+.sm {
+  width: var(--ds-size-icon-sm);
+  height: var(--ds-size-icon-sm);
+}
+
+.md {
+  width: var(--ds-size-icon-md);
+  height: var(--ds-size-icon-md);
+}
+
+.lg {
+  width: var(--ds-size-icon-lg);
+  height: var(--ds-size-icon-lg);
+}
+
+.current {
+  color: currentColor;
+}
+
+.primary {
+  color: var(--ds-icon-primary);
+}
+
+.secondary {
+  color: var(--ds-icon-secondary);
+}
+
+.accent {
+  color: var(--ds-icon-accent);
+}
+
+.danger {
+  color: var(--ds-icon-danger);
+}
+
+.inverse {
+  color: var(--ds-icon-on-accent);
+}
+
+.graphic {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  /* Local optical geometry for the progress ring, not the Lucide icon stroke. */
+  stroke-width: 3;
+  animation: spinner-rotate var(--ds-motion-slow) linear infinite;
+}
+
+.track {
+  opacity: 0.32;
+}
+
+.indicator {
+  stroke-linecap: round;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .graphic {
+    animation: none;
+  }
+}

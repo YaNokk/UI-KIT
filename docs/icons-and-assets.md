@@ -47,10 +47,16 @@ status foregrounds. None of these roles is responsive.
 ## Slot ownership
 
 The component that owns an icon slot owns its rendered size, color, alignment,
-flex behavior, and accessibility treatment. `Button`, future `IconButton`,
+flex behavior, and accessibility treatment. `Button`, `IconButton`,
 inputs, selects, navigation, tabs, and toolbars therefore accept a React node
 and normalize its SVG through the slot. Consumers pass a plain Lucide or
 canonical custom icon without sizing or coloring it.
+
+`Spinner` is a feedback/progress primitive, not a generic line icon. It uses
+the same approved `size.icon.*` rendered sizes and `currentColor`, but its
+documented local ring stroke is not the Lucide `icon.stroke.default`
+geometry. `Button` and `IconButton` reuse the canonical Spinner instead of
+owning duplicate SVG.
 
 Do not add a generic `Icon` wrapper until a repeated standalone-icon use case
 proves that it is needed. Icon-only actions belong to `IconButton`, not
@@ -66,6 +72,9 @@ proves that it is needed. Icon-only actions belong to `IconButton`, not
   behavior. Prefer adjacent visible text.
 - Never infer accessible names from exports, filenames, SVG titles, or backend
   icon strings.
+- Standalone Spinner is decorative without `label` and exposes a status with
+  visually hidden text when labeled. Inside an interactive control it remains
+  decorative; the control owns its name and busy state.
 
 ## Asset classification
 

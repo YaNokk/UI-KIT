@@ -10,6 +10,7 @@ import {
   Heading,
   IconButton,
   Link,
+  Spinner,
   Text,
   ThemeProvider
 } from "@mypoint/ui";
@@ -27,6 +28,7 @@ export function App() {
       <ButtonLink href="/orders/new" variant="secondary">Новый заказ</ButtonLink>
       <Button variant="primary">Создать заказ</Button>
       <IconButton aria-label="Обновить" icon={<RefreshCw />} />
+      <Spinner label="Загрузка заказов" tone="accent" />
     </ThemeProvider>
   );
 }
@@ -37,7 +39,7 @@ React и ReactDOM предоставляются consumer-приложением
 
 Компоненты доступны через root named exports и явные ESM subpaths:
 `@mypoint/ui/button`, `@mypoint/ui/button-link`,
-`@mypoint/ui/icon-button`, `@mypoint/ui/text`, `@mypoint/ui/heading` и
+`@mypoint/ui/icon-button`, `@mypoint/ui/spinner`, `@mypoint/ui/text`, `@mypoint/ui/heading` и
 `@mypoint/ui/link`.
 
 Generic icons импортируются статически из `lucide-react`. Компонент,

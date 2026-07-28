@@ -44,6 +44,7 @@ packages/ui/dist/
   Button/
   ButtonLink/
   IconButton/
+  Spinner/
   theme/
   styles.css
 ```
@@ -55,10 +56,11 @@ Consumer fixture копируется в `.artifacts/consumer/` и устана�
 эти tarballs, а не workspace symlinks. Проверяются public types, root import,
 `@mypoint/ui/button`, `@mypoint/ui/button-link`,
 `@mypoint/ui/icon-button`, глобальный CSS и production Vite build.
+Также проверяется standalone import `@mypoint/ui/spinner`.
 
-Tree-shaking check собирает отдельные Button-, ButtonLink- и IconButton-only
+Tree-shaking check собирает отдельные Button-, ButtonLink-, IconButton- и Spinner-only
 entries, проверяет удаление неиспользуемого ThemeProvider и icon catalog,
-сохранение CSS и создание async chunks для динамических Button/ButtonLink
+сохранение CSS, независимость Spinner от Button behavior и создание async chunks для динамических Button/ButtonLink
 subpath imports.
 
 ## Consumer setup

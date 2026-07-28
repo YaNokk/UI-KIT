@@ -46,6 +46,10 @@
 - `IconButton` владеет размером и tone иконки; icon-only action требует accessible name.
 - Не передавайте произвольные Lucide `size`/`color` в `IconButton`.
 - Извлечение shared Button visuals обязано сохранять Button behavior и ESM tree-shaking.
+- `Spinner` — единый progress visual; `Button` и `IconButton` не создают собственные spinner SVG.
+- Внутри интерактивного owner `Spinner` декоративный: owner сохраняет accessible name, `aria-busy` и activation policy.
+- Standalone `Spinner` без `label` декоративный, а с `label` предоставляет status semantics.
+- Spinner sizes используют `size.icon.*`, tones — semantic icon tokens; только accent tone зависит от runtime brand.
 
 ## Добавление токена
 

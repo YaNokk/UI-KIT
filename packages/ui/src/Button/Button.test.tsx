@@ -136,6 +136,10 @@ describe("Button activation", () => {
     expect(button).toHaveAttribute("aria-busy", "true");
     expect(button).toHaveAttribute("aria-disabled", "true");
     expect(button).not.toBeDisabled();
+    expect(button.querySelector("[data-spinner]")).toHaveAttribute(
+      "aria-hidden",
+      "true"
+    );
   });
 });
 

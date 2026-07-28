@@ -1,0 +1,10 @@
+.inverseSurface {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-3);
+  color: var(--ds-icon-on-accent);
+  background-color: var(--ds-brand-accent);
+  border-radius: var(--ds-radius-lg);
+}

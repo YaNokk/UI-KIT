@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axe from "axe-core";
+import type { FormEvent } from "react";
 import styles from "./IconButton.module.css";
 import { IconButton } from "./IconButton";
 
@@ -141,6 +142,36 @@ describe("IconButton activation", () => {
     expect(button).toHaveAttribute("aria-busy", "true");
     expect(button).toHaveAttribute("aria-disabled", "true");
     expect(button).not.toBeDisabled();
+    expect(button.querySelector("[data-spinner]")).toHaveAttribute(
+      "aria-hidden",
+      "true"
+    );
+  });
+
+  it("prevents native form submission while loading", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn((event: FormEvent<HTMLFormElement>) => event.preventDefault());
+
+    render(
+      <form onSubmit={onSubmit}>
+        <IconButton
+          aria-label="Отправить"
+          icon={<TestIcon />}
+          loading
+          type="submit"
+          variant="primary"
+        />
+      </form>
+    );
+
+    const button = screen.getByRole("button", { name: "Отправить" });
+    button.focus();
+    await user.click(button);
+    await user.keyboard("{Enter}");
+    await user.keyboard(" ");
+    button.click();
+
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });
 

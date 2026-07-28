@@ -56,7 +56,8 @@ brand behavior must stay visually equivalent to `Button`.
 ## Accessibility
 
 - The anchor owns its accessible name.
-- Text-adjacent icons are decorative and normalized by the ButtonLink icon slot.
+- `startIcon` and `endIcon` are decorative by contract and normalized by the
+  ButtonLink icon slot; the visible link text owns the accessible name.
 - There is no disabled prop: native anchors do not support disabled semantics.
   Omit unavailable navigation or render non-interactive text.
 - No automatic margins are added.

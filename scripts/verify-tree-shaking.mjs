@@ -71,6 +71,15 @@ if (linkJavaScript.includes("data-loading")) {
   throw new Error("Button-only loading behavior survived the ButtonLink-only build.");
 }
 
+runBuild("tree-spinner", "dist-tree-spinner");
+const spinnerJavaScript = readOutput("dist-tree-spinner", ".js");
+if (!spinnerJavaScript.includes("data-spinner") || !spinnerJavaScript.includes("status")) {
+  throw new Error("The used standalone Spinner implementation was not found.");
+}
+if (spinnerJavaScript.includes("data-loading")) {
+  throw new Error("Button loading behavior survived the Spinner-only build.");
+}
+
 runBuild("lazy", "dist-lazy");
 const manifest = JSON.parse(
   readFileSync(resolve(consumerRoot, "dist-lazy", ".vite", "manifest.json"), "utf8")
@@ -97,5 +106,5 @@ if (!hasButtonLinkDynamicEntry) {
 }
 
 console.log(
-  "Tree-shaking passed: ButtonLink/IconButton stayed independent, unused ThemeProvider and icon catalog were removed, CSS retained, dynamic subpaths split."
+  "Tree-shaking passed: ButtonLink/IconButton/Spinner stayed independent, unused ThemeProvider and icon catalog were removed, CSS retained, dynamic subpaths split."
 );

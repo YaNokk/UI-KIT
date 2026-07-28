@@ -29,6 +29,12 @@ export type {
   LinkSize,
   LinkTone
 } from "./Link/index.js";
+export { Spinner } from "./Spinner/index.js";
+export type {
+  SpinnerProps,
+  SpinnerSize,
+  SpinnerTone
+} from "./Spinner/index.js";
 export { Text } from "./Text/index.js";
 export type {
   TextElement,
