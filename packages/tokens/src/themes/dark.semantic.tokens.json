@@ -4,6 +4,9 @@
     "surface": { "$type": "color", "$value": "{color.neutral.900}" },
     "surfaceRaised": { "$type": "color", "$value": "{color.neutral.800}" },
     "subtle": { "$type": "color", "$value": "{color.neutral.800}" },
+    "interactive": { "$type": "color", "$value": "{background.surface}" },
+    "interactiveHover": { "$type": "color", "$value": "{background.subtle}" },
+    "interactiveActive": { "$type": "color", "$value": "{color.neutral.700}" },
     "selected": { "$type": "color", "$value": "{brand.accentSoft}" },
     "overlay": { "$type": "color", "$value": "rgb(0 0 0 / 0.68)" }
   },
@@ -52,8 +55,9 @@
       "foreground": { "$type": "color", "$value": "{brand.onAccent}" }
     },
     "secondary": {
-      "background": { "$type": "color", "$value": "{background.surface}" },
-      "backgroundHover": { "$type": "color", "$value": "{background.subtle}" },
+      "background": { "$type": "color", "$value": "{background.interactive}" },
+      "backgroundHover": { "$type": "color", "$value": "{background.interactiveHover}" },
+      "backgroundActive": { "$type": "color", "$value": "{background.interactiveActive}" },
       "foreground": { "$type": "color", "$value": "{text.primary}" }
     },
     "ghost": {
@@ -63,6 +67,7 @@
     "danger": {
       "background": { "$type": "color", "$value": "{color.red.600}" },
       "backgroundHover": { "$type": "color", "$value": "{color.red.700}" },
+      "backgroundActive": { "$type": "color", "$value": "{color.red.900}" },
       "foreground": { "$type": "color", "$value": "{text.onDanger}" }
     }
   },

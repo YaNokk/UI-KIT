@@ -9,7 +9,8 @@ export default tseslint.config(
       "**/dist/**",
       "**/generated/**",
       "storybook-static/**",
-      "docs/design-system/**"
+      "docs/design-system/**",
+      "references/raw/**"
     ]
   },
   eslint.configs.recommended,

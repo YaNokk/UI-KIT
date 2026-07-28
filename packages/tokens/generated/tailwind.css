@@ -4,6 +4,9 @@
   --color-background-surface: var(--ds-background-surface);
   --color-background-surface-raised: var(--ds-background-surface-raised);
   --color-background-subtle: var(--ds-background-subtle);
+  --color-background-interactive: var(--ds-background-interactive);
+  --color-background-interactive-hover: var(--ds-background-interactive-hover);
+  --color-background-interactive-active: var(--ds-background-interactive-active);
   --color-background-selected: var(--ds-background-selected);
   --color-background-overlay: var(--ds-background-overlay);
   --color-text-primary: var(--ds-text-primary);
@@ -41,11 +44,13 @@
   --color-action-primary-foreground: var(--ds-action-primary-foreground);
   --color-action-secondary-background: var(--ds-action-secondary-background);
   --color-action-secondary-background-hover: var(--ds-action-secondary-background-hover);
+  --color-action-secondary-background-active: var(--ds-action-secondary-background-active);
   --color-action-secondary-foreground: var(--ds-action-secondary-foreground);
   --color-action-ghost-background-hover: var(--ds-action-ghost-background-hover);
   --color-action-ghost-foreground: var(--ds-action-ghost-foreground);
   --color-action-danger-background: var(--ds-action-danger-background);
   --color-action-danger-background-hover: var(--ds-action-danger-background-hover);
+  --color-action-danger-background-active: var(--ds-action-danger-background-active);
   --color-action-danger-foreground: var(--ds-action-danger-foreground);
   --color-status-success-background: var(--ds-status-success-background);
   --color-status-success-foreground: var(--ds-status-success-foreground);

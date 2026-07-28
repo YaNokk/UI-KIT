@@ -1,0 +1,29 @@
+{
+  "$schemaVersion": 1,
+  "sources": {
+    "core-ds": {
+      "role": "behavioral",
+      "url": "https://github.com/core-ds/core-components",
+      "raw": "raw/core-ds"
+    },
+    "mp-ui-kit": {
+      "role": "visual",
+      "raw": "raw/mp-ui-kit"
+    }
+  },
+  "components": {
+    "Button": {
+      "behavioral": "behavioral/Button.md",
+      "visual": "visual/components/Button.md",
+      "sharedVisual": "visual/VisualLanguage.md",
+      "raw": {
+        "coreDs": "https://github.com/core-ds/core-components/tree/master/packages/button",
+        "mpUiKit": "raw/mp-ui-kit"
+      }
+    }
+  },
+  "patterns": {
+    "FilterToolbar": "visual/patterns/FilterToolbar.md",
+    "DenseTable": "visual/patterns/DenseTable.md"
+  }
+}
