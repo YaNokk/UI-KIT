@@ -28,3 +28,29 @@
   color: var(--ds-text-secondary);
   font: var(--ds-typography-body-sm);
 }
+
+.insetMatrix {
+  display: grid;
+  gap: var(--ds-space-5);
+}
+
+.insetGroup {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.insetGroupTitle,
+.insetCaseLabel {
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-body-sm);
+}
+
+.insetCases {
+  display: grid;
+  gap: var(--ds-space-3);
+}
+
+.insetCase {
+  display: grid;
+  gap: var(--ds-space-1);
+}

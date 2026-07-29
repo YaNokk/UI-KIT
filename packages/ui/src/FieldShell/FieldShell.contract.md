@@ -12,6 +12,10 @@ FieldShell supports the shared outer/inner label placement. The owner supplies
 generic `labelFloated` state; FieldShell never reads a native value. Content and
 control fill the shell height and remaining width so the primary native control
 can own the normal hit area. The positioned inner label does not consume a row.
+Its logical inline inset and the native control padding resolve from the same
+internal geometry variables. Canonical inline padding is `space-2`, `space-3`
+and `space-4` for `sm`, `md` and `lg`; a start or end adornment consumes that
+side through flex layout and clears only the corresponding content inset.
 
 `onFocusRequest` is a fallback for shell gaps, decorative icons and
 non-interactive prefix/suffix columns only. Native controls, semantic labels,

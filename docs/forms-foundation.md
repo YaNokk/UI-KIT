@@ -75,3 +75,10 @@ The inner label is absolutely positioned over the full-size input instead of
 consuming a normal-flow row. Only floated value alignment changes through
 native input padding; its hit-area dimensions do not change. Input and
 PasswordInput share this exact content/native-control chain.
+
+Value, placeholder and positioned inner label resolve their inline start/end
+from the same internal geometry variables. The canonical inline padding is
+`space-2` for `sm`, `space-3` for `md` and `space-4` for `lg`. Start/end
+adornments consume space in the flex layout and clear only their corresponding
+content-side inset, so neither direction-specific offsets nor runtime text/icon
+measurement are required.

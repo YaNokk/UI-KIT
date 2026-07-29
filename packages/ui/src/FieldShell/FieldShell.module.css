@@ -78,13 +78,17 @@
   position: absolute;
   z-index: var(--ds-z-index-default);
   inset-block-start: 50%;
-  inset-inline: 0;
+  inset-inline-end: var(--field-control-padding-inline-end);
+  inset-inline-start: var(--field-control-padding-inline-start);
   display: block;
+  overflow: hidden;
   pointer-events: none;
   color: var(--ds-text-secondary);
   font: inherit;
+  text-overflow: ellipsis;
   transform: translateY(-50%);
   transform-origin: top center;
+  white-space: nowrap;
   transition:
     color var(--ds-motion-fast),
     font var(--ds-motion-fast),

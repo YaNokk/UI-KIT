@@ -123,6 +123,62 @@ export const InnerLabelEndAdornment: Story = {
   args: { endAdornment: <span>RUB</span>, labelView: "inner" }
 };
 
+const insetCases = [
+  { id: "none", label: "No adornments" },
+  {
+    id: "start",
+    label: "Start adornment",
+    startAdornment: <Search aria-hidden="true" />
+  },
+  {
+    id: "end",
+    label: "End adornment",
+    endAdornment: <span>RUB</span>
+  },
+  {
+    id: "both",
+    label: "Both adornments",
+    startAdornment: <Search aria-hidden="true" />,
+    endAdornment: <span>RUB</span>
+  }
+] as const;
+
+export const InnerLabelInsetAlignment: Story = {
+  parameters: {
+    layout: "padded"
+  },
+  render: () => (
+    <div className={styles.insetMatrix}>
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <section className={styles.insetGroup} key={size}>
+          <div className={styles.insetGroupTitle}>Size {size}</div>
+          <div className={styles.insetCases}>
+            {insetCases.flatMap((insetCase) =>
+              (["resting", "floating"] as const).map((state) => (
+                <div className={styles.insetCase} key={`${insetCase.id}-${state}`}>
+                  <span className={styles.insetCaseLabel}>
+                    {insetCase.label} · {state}
+                  </span>
+                  <Input
+                    data-testid={`inset-${size}-${insetCase.id}-${state}`}
+                    defaultValue={state === "floating" ? "Aligned value" : undefined}
+                    endAdornment={"endAdornment" in insetCase ? insetCase.endAdornment : undefined}
+                    label="Aligned label stays inside the available content area"
+                    labelView="inner"
+                    placeholder="Aligned placeholder"
+                    size={size}
+                    startAdornment={"startAdornment" in insetCase ? insetCase.startAdornment : undefined}
+                  />
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      ))}
+    </div>
+  )
+};
+
 function HintErrorTransitionExample() {
   const [invalid, setInvalid] = useState(false);
   return (

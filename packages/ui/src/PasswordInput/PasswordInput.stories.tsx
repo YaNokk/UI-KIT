@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within } from "storybook/test";
 import { PasswordInput } from "./PasswordInput";
+import styles from "../Input/Input.stories.module.css";
 
 const meta = {
   title: "Components/PasswordInput",
@@ -29,6 +30,33 @@ export const NewPasswordAutocomplete: Story = {
 };
 export const InnerLabel: Story = {
   args: { labelView: "inner" }
+};
+export const InnerLabelInsetAlignment: Story = {
+  parameters: {
+    layout: "padded"
+  },
+  render: () => (
+    <div className={styles.insetMatrix}>
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <section className={styles.insetGroup} key={size}>
+          <div className={styles.insetGroupTitle}>Size {size}</div>
+          {(["resting", "floating"] as const).map((state) => (
+            <div className={styles.insetCase} key={state}>
+              <span className={styles.insetCaseLabel}>Visibility toggle · {state}</span>
+              <PasswordInput
+                data-testid={`password-inset-${size}-${state}`}
+                defaultValue={state === "floating" ? "secret" : undefined}
+                label="Password label"
+                labelView="inner"
+                placeholder="Password placeholder"
+                size={size}
+              />
+            </div>
+          ))}
+        </section>
+      ))}
+    </div>
+  )
 };
 export const KeyboardToggle: Story = {
   play: async ({ canvasElement }) => {
