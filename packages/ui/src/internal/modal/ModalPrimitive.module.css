@@ -37,7 +37,7 @@
     var(--ds-size-overlay-dialog-md),
     calc(100vw - var(--ds-space-8))
   );
-  max-block-size: calc(100dvh - var(--ds-space-8));
+  max-block-size: min(88dvh, calc(100dvh - var(--ds-space-8)));
   border-radius: var(--ds-radius-xl);
   transform: translate(-50%, -50%);
 }
@@ -107,7 +107,7 @@
   gap: var(--ds-space-3);
   align-items: start;
   padding: var(--ds-space-6);
-  border-block-end: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  padding-block-end: var(--ds-space-5);
 }
 
 .heading {
@@ -124,19 +124,24 @@
 
 .body {
   min-block-size: 0;
-  padding: var(--ds-space-6);
+  padding: var(--ds-space-0) var(--ds-space-6) var(--ds-space-6);
   overflow: auto;
   overscroll-behavior: contain;
   touch-action: pan-y;
 }
 
 .footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  align-items: center;
+  justify-content: flex-end;
   padding: var(--ds-space-4) var(--ds-space-6);
   border-block-start: var(--ds-border-width-default) solid var(--ds-border-subtle);
 }
 
 .dragHandle {
-  inline-size: var(--ds-space-8);
+  inline-size: var(--ds-space-10);
   block-size: var(--ds-space-1);
   margin-block: var(--ds-space-2) var(--ds-space-0);
   margin-inline: auto;
@@ -146,7 +151,16 @@
 }
 
 .bottomSheet .header {
+  padding: var(--ds-space-2) var(--ds-space-5) var(--ds-space-4);
   touch-action: none;
+}
+
+.bottomSheet .body {
+  padding: var(--ds-space-0) var(--ds-space-5) var(--ds-space-3);
+}
+
+.bottomSheet .footer {
+  padding: var(--ds-space-3) var(--ds-space-5) var(--ds-space-6);
 }
 
 @media (--ds-below-md) {
@@ -158,7 +172,6 @@
 
   .dialog {
     inline-size: calc(100vw - var(--ds-space-4));
-    max-block-size: calc(100dvh - var(--ds-space-4));
   }
 }
 

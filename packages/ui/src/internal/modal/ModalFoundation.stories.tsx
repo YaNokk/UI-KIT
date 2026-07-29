@@ -8,6 +8,7 @@ import { Dialog, type DialogProps } from "../../Dialog/Dialog";
 import { Drawer } from "../../Drawer/Drawer";
 import { Input } from "../../Input/Input";
 import { Portal } from "../../Portal/Portal";
+import { Text } from "../../Text/Text";
 import type { ModalBaseProps } from "../../modal/types";
 import { ModalLayerContext } from "./ModalRuntime";
 
@@ -270,6 +271,61 @@ function MissingOpenerHarness() {
   );
 }
 
+function VisualCalibrationHarness({
+  destructive = false,
+  kind,
+  title
+}: {
+  destructive?: boolean;
+  kind: keyof typeof components;
+  title: string;
+}) {
+  const [open, setOpen] = useState(true);
+  const Component = components[kind];
+  const description = destructive
+    ? "Действие нельзя будет отменить"
+    : "Заполните поля — данные сохранятся в справочник";
+
+  return (
+    <div className="min-h-screen">
+      <Button onClick={() => setOpen(true)} variant="secondary">
+        Открыть пример
+      </Button>
+      <Component
+        closeLabel="Закрыть"
+        description={description}
+        footer={
+          <>
+            <Button onClick={() => setOpen(false)} variant="secondary">
+              Отменить
+            </Button>
+            <Button
+              onClick={() => setOpen(false)}
+              variant={destructive ? "danger" : "primary"}
+            >
+              {destructive ? "Удалить" : "Сохранить"}
+            </Button>
+          </>
+        }
+        onOpenChange={setOpen}
+        open={open}
+        title={title}
+      >
+        {destructive ? (
+          <Text as="p" tone="danger" variant="body">
+            Единица измерения «Упаковка» будет удалена из справочника.
+          </Text>
+        ) : (
+          <div className="grid gap-4">
+            <Input label="Наименование" />
+            <Input label="Краткое обозначение" />
+          </div>
+        )}
+      </Component>
+    </div>
+  );
+}
+
 const meta = {
   title: "Foundations/Modal",
   component: Dialog,
@@ -344,6 +400,48 @@ export const BottomSheetInput: Story = {
     <Harness kind="sheet">
       <Input label="Поле рядом с экранной клавиатурой" />
     </Harness>
+  ),
+  parameters: { viewport: { defaultViewport: "mobile" } }
+};
+
+export const DialogDesignerReference: Story = {
+  args: {} as DialogProps,
+  render: () => (
+    <VisualCalibrationHarness
+      kind="dialog"
+      title="Создание единицы измерения"
+    />
+  )
+};
+
+export const DialogDestructiveReference: Story = {
+  args: {} as DialogProps,
+  render: () => (
+    <VisualCalibrationHarness
+      destructive
+      kind="dialog"
+      title="Удалить единицу измерения?"
+    />
+  )
+};
+
+export const DrawerDesignerReference: Story = {
+  args: {} as DialogProps,
+  render: () => (
+    <VisualCalibrationHarness
+      kind="drawer"
+      title="Редактирование единицы измерения"
+    />
+  )
+};
+
+export const BottomSheetDesignerReference: Story = {
+  args: {} as DialogProps,
+  render: () => (
+    <VisualCalibrationHarness
+      kind="sheet"
+      title="Фильтр товаров"
+    />
   ),
   parameters: { viewport: { defaultViewport: "mobile" } }
 };
