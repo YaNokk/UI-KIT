@@ -1,5 +1,10 @@
 import "@mypoint/tokens/tokens.css";
 
+export { DesignSystemProvider } from "./DesignSystemProvider/index.js";
+export type {
+  DesignSystemProviderProps
+} from "./DesignSystemProvider/index.js";
+export type { BrandInput, ThemeMode } from "@mypoint/tokens";
 export { Amount } from "./Amount/index.js";
 export type {
   AmountMinorTone,

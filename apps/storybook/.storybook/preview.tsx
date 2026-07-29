@@ -1,5 +1,8 @@
 import type { Decorator, Preview } from "@storybook/react-vite";
-import { ThemeProvider, type ThemePreference } from "@mypoint/ui";
+import {
+  DesignSystemProvider,
+  type ThemePreference
+} from "@mypoint/ui";
 import "../src/styles.css";
 
 const accents = {
@@ -16,29 +19,37 @@ const foregrounds = {
   dark: "#000000"
 } as const;
 
-const withTheme: Decorator = (Story, context) => {
+const withDesignSystem: Decorator = (Story, context) => {
   const accent = accents[context.globals.accent as keyof typeof accents] ?? accents.blue;
   const foreground =
     foregrounds[context.globals.foreground as keyof typeof foregrounds] ??
     foregrounds.auto;
 
   return (
-    <ThemeProvider
+    <DesignSystemProvider
       brand={{
         accentColor: accent,
         ...(foreground ? { foregroundColor: foreground } : {})
       }}
       className="min-h-screen bg-background-page p-4 text-text-primary"
+      locale={context.globals.locale as string}
       mode={context.globals.mode as ThemePreference}
     >
       <Story />
-    </ThemeProvider>
+    </DesignSystemProvider>
   );
 };
 
 const preview: Preview = {
-  decorators: [withTheme],
+  decorators: [withDesignSystem],
   globalTypes: {
+    locale: {
+      description: "Formatting locale",
+      toolbar: {
+        icon: "globe",
+        items: ["en-US", "ru-RU", "kk-KZ"]
+      }
+    },
     mode: {
       description: "Color mode",
       toolbar: {
@@ -62,6 +73,7 @@ const preview: Preview = {
     }
   },
   initialGlobals: {
+    locale: "en-US",
     mode: "light",
     accent: "blue",
     foreground: "light"

@@ -88,6 +88,14 @@
 - Trimming остаётся локальным для control visual foundation, пока одинаковая потребность не доказана в нескольких независимых control families.
 - Проверяйте в Storybook/browser кириллицу, descenders, числа, иконки, размеры и loading; fallback без text-box support должен оставаться визуально приемлемым.
 - Используйте только canonical layer names; произвольные z-index aliases запрещены.
+- Runtime-конфигурация дизайн-системы принадлежит `DesignSystemProvider`; provider остаётся optional.
+- Locale, runtime brand, theme mode и portal environment — runtime concerns provider-а.
+- Canonical spacing, radius, typography, layers, control sizes и breakpoint values остаются tokens/contracts, а не provider props.
+- Явный locale компонента переопределяет locale ближайшего provider-а; locale не определяет currency, application country или phone region.
+- Brand/theme visuals проходят через scoped semantic CSS variables; компоненты не читают backend colors напрямую.
+- Внутренние locale, theme/brand и portal contexts остаются разделёнными; provider не становится service locator.
+- Вложенный provider наследует неуказанные runtime values и переопределяет только переданные.
+- Breakpoint numbers не являются runtime-configurable API.
 - Monetary display и monetary editing используют общие amount-domain helpers, но не общий React/editing state.
 - Maskito — внутренний numeric editing engine и не определяет публичный API компонентов.
 - Semantic value `AmountInput` отделён от форматированной DOM-строки; пустое значение — `null`, а `0` остаётся валидным.

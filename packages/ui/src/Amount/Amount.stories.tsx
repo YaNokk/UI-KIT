@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 import { Amount } from "./Amount";
 
 const meta = {
@@ -6,7 +7,6 @@ const meta = {
   component: Amount,
   args: {
     currency: "PLN",
-    locale: "pl-PL",
     minority: 100,
     value: 123456
   },
@@ -47,7 +47,7 @@ export const Currencies: Story = {
   )
 };
 
-export const CISCurrencies: Story = {
+export const RegionalCurrencyExamples: Story = {
   parameters: {
     docs: {
       description: {
@@ -97,9 +97,17 @@ export const TypographyComposition: Story = {
     <div className="grid gap-3">
       <Amount {...args} className="typo-body-sm" />
       <Amount {...args} className="typo-heading-md" />
-      <Amount {...args} className="typo-page-title" />
+      <Amount {...args} className="typo-page-title" size="sm" />
     </div>
-  )
+  ),
+  play: async ({ canvasElement }) => {
+    const roots = Array.from(
+      canvasElement.querySelectorAll("[data-amount-part=\"major\"]")
+    ).map((part) => part.parentElement);
+    expect(roots).toHaveLength(3);
+    expect(getComputedStyle(roots[2] as HTMLElement).fontSize).toBe("28px");
+    expect(getComputedStyle(roots[2] as HTMLElement).lineHeight).toBe("36px");
+  }
 };
 
 export const ContextInheritance: Story = {

@@ -9,8 +9,7 @@ const meta = {
   args: {
     currency: "PLN",
     id: "amount-input",
-    label: "Сумма",
-    locale: "pl-PL"
+    label: "Сумма"
   },
   parameters: {
     docs: {
@@ -61,7 +60,7 @@ export const Currencies: Story = {
   )
 };
 
-export const CISCurrencies: Story = {
+export const RegionalCurrencyExamples: Story = {
   parameters: {
     docs: {
       description: {

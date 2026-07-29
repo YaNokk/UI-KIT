@@ -2,6 +2,7 @@ import type { HTMLAttributes } from "react";
 import { classNames } from "../shared/classNames";
 import { getAmountParts } from "../internal/amount/amountParts";
 import type { AmountValue } from "../internal/amount/types";
+import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import styles from "./Amount.module.css";
 
 export type AmountSize = "sm" | "md" | "lg";
@@ -37,9 +38,10 @@ export function Amount({
   value,
   ...nativeProps
 }: AmountProps) {
+  const resolvedLocale = useResolvedLocale(locale);
   const parts = getAmountParts(value, {
     ...(currency === undefined ? {} : { currency }),
-    ...(locale === undefined ? {} : { locale }),
+    locale: resolvedLocale,
     ...(minority === undefined ? {} : { minority }),
     showPlus,
     trimTrailingZeros

@@ -8,7 +8,7 @@
 - `onChange(value, { inputValue })` separates the semantic amount from the
   formatted editing string.
 - `minority`, currency precision and locale follow the `Amount` policy:
-  explicit locale → shared locale boundary → deterministic `en-US`.
+  explicit locale → nearest `DesignSystemProvider` → deterministic `en-US`.
 - `fractionDisplay="auto"` trims cosmetic trailing zeroes;
   `fractionDisplay="always"` pads them when the field is synchronized or
   blurred. Semantic precision always comes from `minority`.
@@ -40,3 +40,7 @@
 Maskito is internal. Its options and events are not public API. Future
 `NumberInput`, `QuantityInput` and `PercentInput` may reuse the numeric adapter,
 but are deliberately not exported here.
+
+The AmountInput v1 public contract is frozen under the same change policy as
+Amount: further API changes require a product use case, bug, accessibility
+issue or shared numeric-component requirement.

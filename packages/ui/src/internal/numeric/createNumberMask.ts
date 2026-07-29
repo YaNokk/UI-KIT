@@ -1,9 +1,44 @@
-import type { MaskitoOptions } from "@maskito/core";
+import type { MaskitoOptions, MaskitoPlugin } from "@maskito/core";
 import {
   maskitoCaretGuard,
   maskitoNumberOptionsGenerator
 } from "@maskito/kit";
 import type { NumberEditingConfig } from "./types";
+
+function editableRange(
+  value: string,
+  config: NumberEditingConfig
+): [number, number] {
+  const from = Math.min(config.prefix?.length ?? 0, value.length);
+  const to = Math.max(
+    from,
+    config.postfix ? value.length - config.postfix.length : value.length
+  );
+  return [from, to];
+}
+
+function selectEditableSegmentPlugin(
+  config: NumberEditingConfig
+): MaskitoPlugin {
+  return (element) => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.altKey
+        || (!event.ctrlKey && !event.metaKey)
+        || event.key.toLowerCase() !== "a"
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      const [from, to] = editableRange(element.value, config);
+      element.setSelectionRange(from, to);
+    };
+
+    element.addEventListener("keydown", onKeyDown);
+    return () => element.removeEventListener("keydown", onKeyDown);
+  };
+}
 
 export function createNumberMask(config: NumberEditingConfig): MaskitoOptions {
   const integerDigits = config.integerDigits ?? 16;
@@ -32,15 +67,9 @@ export function createNumberMask(config: NumberEditingConfig): MaskitoOptions {
     ...options,
     plugins: [
       ...options.plugins,
+      selectEditableSegmentPlugin(config),
       maskitoCaretGuard((value) => {
-        const prefixLength = config.prefix?.length ?? 0;
-        const postfixStart = config.postfix
-          ? value.length - config.postfix.length
-          : value.length;
-        return [
-          Math.min(prefixLength, value.length),
-          Math.max(prefixLength, postfixStart)
-        ];
+        return editableRange(value, config);
       })
     ]
   };

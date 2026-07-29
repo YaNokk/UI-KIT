@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { getAmountParts } from "./amountParts";
-import { resolveAmountFormat } from "./currency";
+import {
+  DEFAULT_AMOUNT_FRACTION_DIGITS,
+  resolveAmountFormat
+} from "./currency";
 import { formatAmount } from "./formatAmount";
 import {
   decimalStringToMinor,
@@ -105,7 +108,7 @@ describe("amount foundation", () => {
       currency: "not-a-currency",
       currencyPosition: "suffix",
       currencySeparator: " ",
-      fractionDigits: 2
+      fractionDigits: DEFAULT_AMOUNT_FRACTION_DIGITS
     });
   });
 

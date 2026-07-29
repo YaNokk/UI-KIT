@@ -11,6 +11,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./design-system-provider": {
+      "types": "./dist/DesignSystemProvider/index.d.ts",
+      "import": "./dist/DesignSystemProvider/index.js"
+    },
     "./amount": {
       "types": "./dist/Amount/index.d.ts",
       "import": "./dist/Amount/index.js"

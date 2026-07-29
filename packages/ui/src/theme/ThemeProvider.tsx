@@ -5,6 +5,8 @@ import {
   type ThemeMode
 } from "@mypoint/tokens";
 import {
+  createContext,
+  useContext,
   useMemo,
   useSyncExternalStore,
   type CSSProperties,
@@ -21,6 +23,16 @@ export interface ThemeProviderProps extends Omit<HTMLAttributes<HTMLDivElement>,
 }
 
 const mediaQuery = "(prefers-color-scheme: dark)";
+interface ThemeConfiguration {
+  brand: BrandInput;
+  mode: ThemePreference;
+}
+
+const defaultThemeConfiguration: ThemeConfiguration = {
+  brand: DEFAULT_BRAND_INPUT,
+  mode: "system"
+};
+const ThemeConfigurationContext = createContext(defaultThemeConfiguration);
 
 function subscribeToSystemMode(onChange: () => void): () => void {
   const query = window.matchMedia(mediaQuery);
@@ -37,21 +49,28 @@ function getServerMode(): ThemeMode {
 }
 
 export function ThemeProvider({
-  brand = DEFAULT_BRAND_INPUT,
+  brand,
   children,
-  mode = "system",
+  mode,
   style,
   ...props
 }: ThemeProviderProps) {
+  const inherited = useContext(ThemeConfigurationContext);
+  const configuredBrand = brand ?? inherited.brand;
+  const configuredMode = mode ?? inherited.mode;
   const systemMode = useSyncExternalStore(
     subscribeToSystemMode,
     getSystemMode,
     getServerMode
   );
-  const resolvedMode = mode === "system" ? systemMode : mode;
+  const resolvedMode = configuredMode === "system" ? systemMode : configuredMode;
   const brandVariables = useMemo(
-    () => createBrandCssVariables(brand, resolvedMode),
-    [brand, resolvedMode]
+    () => createBrandCssVariables(configuredBrand, resolvedMode),
+    [configuredBrand, resolvedMode]
+  );
+  const configuration = useMemo(
+    () => ({ brand: configuredBrand, mode: configuredMode }),
+    [configuredBrand, configuredMode]
   );
   const themeStyle = {
     ...style,
@@ -59,13 +78,15 @@ export function ThemeProvider({
   } as CSSProperties;
 
   return (
-    <div
-      {...props}
-      data-brand-theme=""
-      data-theme={resolvedMode}
-      style={themeStyle}
-    >
-      {children}
-    </div>
+    <ThemeConfigurationContext.Provider value={configuration}>
+      <div
+        {...props}
+        data-brand-theme=""
+        data-theme={resolvedMode}
+        style={themeStyle}
+      >
+        {children}
+      </div>
+    </ThemeConfigurationContext.Provider>
   );
 }

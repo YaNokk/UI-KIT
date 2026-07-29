@@ -126,6 +126,27 @@ describe("AmountInput", () => {
     expect(input).toHaveValue("1 234,5 zł");
   });
 
+  it("selects and copies only the editable segment with Ctrl+A", async () => {
+    const user = userEvent.setup();
+    render(
+      <AmountInput
+        allowNegative
+        aria-label="Copy dollars"
+        currency="USD"
+        locale="en-US"
+        value={-123456}
+      />
+    );
+    const input = screen.getByLabelText<HTMLInputElement>("Copy dollars");
+    await user.click(input);
+    await user.keyboard("{Control>}a{/Control}");
+
+    expect(input.selectionStart).toBe(1);
+    expect(input.selectionEnd).toBe(input.value.length);
+    const copied = await user.copy();
+    expect(copied?.getData("text/plain")).toBe("-1,234.56");
+  });
+
   it("pastes the configured locale format including currency", async () => {
     const user = userEvent.setup();
     render(

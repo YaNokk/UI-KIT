@@ -15,6 +15,7 @@ import {
   minorToDecimalString
 } from "../internal/amount/minorUnits";
 import type { AmountValue } from "../internal/amount/types";
+import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import { createNumberMask } from "../internal/numeric/createNumberMask";
 import { formatNumericInput } from "../internal/numeric/formatNumericInput";
 import { parseNumericInput } from "../internal/numeric/parseNumericInput";
@@ -84,13 +85,14 @@ export const AmountInput = forwardRef<HTMLInputElement, AmountInputProps>(
     },
     forwardedRef
   ) {
+    const resolvedLocale = useResolvedLocale(locale);
     const resolved = useMemo(
       () => resolveAmountFormat({
         ...(currency === undefined ? {} : { currency }),
-        ...(locale === undefined ? {} : { locale }),
+        locale: resolvedLocale,
         ...(minority === undefined ? {} : { minority })
       }),
-      [currency, locale, minority]
+      [currency, minority, resolvedLocale]
     );
     const numberConfig = useMemo<NumberEditingConfig>(
       () => {

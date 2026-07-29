@@ -11,6 +11,9 @@ export default defineConfig({
     lib: {
       entry: {
         index: fileURLToPath(new URL("./src/index.ts", import.meta.url)),
+        "DesignSystemProvider/index": fileURLToPath(
+          new URL("./src/DesignSystemProvider/index.ts", import.meta.url)
+        ),
         "Amount/index": fileURLToPath(
           new URL("./src/Amount/index.ts", import.meta.url)
         ),

@@ -3,6 +3,8 @@ import { resolveLocale } from "../locale/resolveLocale";
 import { getNumberFormatter } from "../locale/numberFormat";
 import type { AmountFormatConfig } from "./types";
 
+export const DEFAULT_AMOUNT_FRACTION_DIGITS = 2;
+
 export interface ResolvedAmountFormat {
   currency: string | null;
   currencySeparator: string;
@@ -40,7 +42,7 @@ export function resolveAmountFormat(
     ?? ".";
 
   let fractionDigits = config.minority == null
-    ? 2
+    ? DEFAULT_AMOUNT_FRACTION_DIGITS
     : fractionDigitsFromMinority(config.minority);
   let currency: string | null = null;
   let currencySeparator = "";
@@ -74,7 +76,8 @@ export function resolveAmountFormat(
       : "";
 
     if (config.minority == null) {
-      fractionDigits = formatter.resolvedOptions().maximumFractionDigits ?? 2;
+      fractionDigits = formatter.resolvedOptions().maximumFractionDigits
+        ?? DEFAULT_AMOUNT_FRACTION_DIGITS;
     }
   }
 

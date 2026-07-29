@@ -29,13 +29,13 @@ Locale resolution is:
 
 ```text
 explicit component override
-→ future shared application/DS formatting configuration
+→ nearest DesignSystemProvider locale
 → deterministic en-US library fallback
 ```
 
 The resolver never reads `navigator.language` or the server environment during
-render. No general provider exists in the repository yet; `ThemeProvider` owns
-visual theme/brand and is not expanded into an unrelated formatting provider.
+render. `DesignSystemProvider` composes the locale boundary with the existing
+theme/brand and portal layers while keeping their internal contexts separate.
 
 ## Domain boundaries
 

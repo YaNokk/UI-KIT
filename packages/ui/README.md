@@ -7,19 +7,20 @@ import "@mypoint/ui/styles.css";
 import {
   Button,
   ButtonLink,
+  DesignSystemProvider,
   Heading,
   IconButton,
   Link,
   Spinner,
   Text,
-  ThemeProvider
 } from "@mypoint/ui";
 import { RefreshCw } from "lucide-react";
 
 export function App() {
   return (
-    <ThemeProvider
+    <DesignSystemProvider
       brand={{ accentColor: "#0080ff", foregroundColor: "#ffffff" }}
+      locale="ru-RU"
       mode="light"
     >
       <Heading level={1} variant="page">Заказы</Heading>
@@ -29,16 +30,26 @@ export function App() {
       <Button variant="primary">Создать заказ</Button>
       <IconButton aria-label="Обновить" icon={<RefreshCw />} />
       <Spinner label="Загрузка заказов" tone="accent" />
-    </ThemeProvider>
+    </DesignSystemProvider>
   );
 }
+```
+
+For application roots, prefer `DesignSystemProvider`; it composes locale,
+theme/brand and portal environment while remaining optional for isolated
+component usage:
+
+```tsx
+<DesignSystemProvider locale="ru-RU" mode="system">
+  <App />
+</DesignSystemProvider>
 ```
 
 React и ReactDOM предоставляются consumer-приложением. Tailwind в consumer не
 требуется.
 
 Компоненты доступны через root named exports и явные ESM subpaths:
-`@mypoint/ui/button`, `@mypoint/ui/button-link`,
+`@mypoint/ui/design-system-provider`, `@mypoint/ui/button`, `@mypoint/ui/button-link`,
 `@mypoint/ui/icon-button`, `@mypoint/ui/spinner`, `@mypoint/ui/text`, `@mypoint/ui/heading` и
 `@mypoint/ui/link`. Monetary-компоненты также доступны через
 `@mypoint/ui/amount` и `@mypoint/ui/amount-input`.
@@ -57,7 +68,7 @@ fields композируют эти foundations и не копируют Input 
 Пустой `AmountInput` возвращает `null`, а `0` остаётся валидным значением.
 Валюта, точность и расположение символа определяются через `Intl`; явный
 `minority` имеет приоритет. Locale resolution: component override → shared
-application/DS boundary → детерминированный fallback `en-US`.
+`DesignSystemProvider` → детерминированный fallback `en-US`.
 
 Форматированная строка поля не является публичным semantic value и доступна
 только как `meta.inputValue` в `onChange`. Maskito скрыт за внутренним numeric
@@ -74,7 +85,8 @@ authoritative backend currency registry, поэтому UI использует 
 отображается буквально и не подменяется. Смена currency не выполняет FX.
 
 Архитектурное разделение locale/currency/phone region описано в
-`../../docs/formatting-foundation.md`.
+`../../docs/formatting-foundation.md`, а runtime API provider — в
+`../../docs/design-system-provider.md`.
 
 Generic icons импортируются статически из `lucide-react`. Компонент,
 владеющий icon-slot, задаёт размер, цвет через `currentColor` и decorative
