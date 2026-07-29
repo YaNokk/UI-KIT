@@ -16,13 +16,13 @@
   color: var(--ds-text-danger);
 }
 
-.description,
+.hint,
 .error {
   font: var(--ds-typography-body-sm);
   overflow-wrap: anywhere;
 }
 
-.description {
+.hint {
   color: var(--ds-text-secondary);
 }
 
@@ -31,6 +31,6 @@
 }
 
 .root[data-disabled] .label,
-.root[data-disabled] .description {
+.root[data-disabled] .hint {
   color: var(--ds-text-disabled);
 }

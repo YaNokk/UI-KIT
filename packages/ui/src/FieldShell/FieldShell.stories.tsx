@@ -46,6 +46,27 @@ export const Adornments: Story = {
 
 export const InteractiveAdornment: Story = {
   args: {
-    endAdornment: <IconButton aria-label="Найти" icon={<Search />} size="sm" />
+    endAdornment: (
+      <span data-field-interactive>
+        <IconButton aria-label="Найти" icon={<Search />} size="sm" />
+      </span>
+    )
+  }
+};
+
+export const InnerLabelResting: Story = {
+  args: {
+    label: <label htmlFor="inner-trigger">Магазин</label>,
+    labelView: "inner",
+    children: <button id="inner-trigger" type="button" />
+  }
+};
+
+export const InnerLabelFloated: Story = {
+  args: {
+    label: <label htmlFor="inner-trigger-floated">Магазин</label>,
+    labelFloated: true,
+    labelView: "inner",
+    children: <button id="inner-trigger-floated" type="button">Центральный</button>
   }
 };

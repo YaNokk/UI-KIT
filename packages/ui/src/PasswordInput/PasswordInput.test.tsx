@@ -25,7 +25,9 @@ describe("PasswordInput", () => {
     expect(input).toHaveAttribute("type", "password");
     expect(input).toHaveAttribute("autocomplete", "current-password");
 
-    await user.click(screen.getByRole("button", { name: "Показать пароль" }));
+    const toggle = screen.getByRole("button", { name: "Показать пароль" });
+    await user.click(toggle);
+    expect(toggle).toHaveFocus();
     expect(input).toHaveAttribute("type", "text");
     expect(input).toHaveValue("secret");
 

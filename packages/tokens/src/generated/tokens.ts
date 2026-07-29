@@ -194,11 +194,8 @@ export const primitiveTokens = {
   },
   "zIndex.default": 0,
   "zIndex.focused": 100,
-  "zIndex.base": 0,
   "zIndex.sticky": 100,
-  "zIndex.dropdown": 200,
   "zIndex.popover": 300,
-  "zIndex.overlay": 400,
   "zIndex.modal": 500,
   "zIndex.toast": 600,
   "size.control.sm": {

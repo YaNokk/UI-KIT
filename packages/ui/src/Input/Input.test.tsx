@@ -14,7 +14,9 @@ describe("Input native behavior", () => {
   it("forwards native attributes, events and the input ref", async () => {
     const user = userEvent.setup();
     const ref = { current: null as HTMLInputElement | null };
+    const onBlur = vi.fn();
     const onChange = vi.fn();
+    const onFocus = vi.fn();
 
     render(
       <Input
@@ -24,7 +26,9 @@ describe("Input native behavior", () => {
         inputMode="email"
         label="Email"
         name="email"
+        onBlur={onBlur}
         onChange={onChange}
+        onFocus={onFocus}
         placeholder="name@example.com"
         ref={ref}
         type="email"
@@ -39,6 +43,9 @@ describe("Input native behavior", () => {
     expect(input).toHaveAttribute("inputmode", "email");
     expect(input).toHaveAttribute("data-testid", "email");
     expect(onChange).toHaveBeenCalled();
+    expect(onFocus).toHaveBeenCalled();
+    input.blur();
+    expect(onBlur).toHaveBeenCalled();
   });
 
   it("supports normal controlled and uncontrolled usage", async () => {
@@ -68,14 +75,14 @@ describe("Input native behavior", () => {
     expect(screen.getByLabelText("Uncontrolled")).toHaveValue("start-end");
   });
 
-  it("wires required, invalid, description and caller aria-describedby", () => {
+  it("wires required and lets error replace hint in aria-describedby", () => {
     render(
       <>
         <span id="external">External</span>
         <Input
           aria-describedby="external"
-          description="Подсказка"
           error="Ошибка"
+          hint="Подсказка"
           id="name"
           label="Имя"
           required
@@ -88,8 +95,9 @@ describe("Input native behavior", () => {
     expect(input).toHaveAttribute("aria-invalid", "true");
     expect(input).toHaveAttribute(
       "aria-describedby",
-      "external name-description name-error"
+      "external name-error"
     );
+    expect(screen.queryByText("Подсказка")).not.toBeInTheDocument();
   });
 
   it("keeps disabled and readOnly native semantics distinct", () => {
@@ -116,6 +124,95 @@ describe("Input native behavior", () => {
 
     expect(screen.getByText("от")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Валюта" })).toBeInTheDocument();
+  });
+
+  it("focuses the native input from shell and decorative adornment clicks", async () => {
+    const user = userEvent.setup();
+    render(
+      <Input
+        endAdornment={<span>kg</span>}
+        label="Вес"
+        startAdornment={<span>≈</span>}
+      />
+    );
+    const input = screen.getByRole("textbox", { name: "Вес" });
+    const shell = input.closest("[data-label-view]");
+    if (!shell) throw new Error("FieldShell was not rendered.");
+
+    await user.click(input);
+    expect(input).toHaveFocus();
+    input.blur();
+    await user.click(shell);
+    expect(input).toHaveFocus();
+    input.blur();
+    await user.click(screen.getByText("≈"));
+    expect(input).toHaveFocus();
+    input.blur();
+    await user.click(screen.getByText("kg"));
+    expect(input).toHaveFocus();
+  });
+
+  it("floats an inner semantic label on focus and content", async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <Input label="Название" labelView="inner" placeholder="Введите название" />
+    );
+    const input = screen.getByRole("textbox", { name: "Название" });
+    const shell = input.closest("[data-label-view]");
+    if (!shell) throw new Error("FieldShell was not rendered.");
+    expect(shell).toHaveAttribute("data-label-view", "inner");
+    expect(shell).not.toHaveAttribute("data-label-floated");
+    expect(input).not.toHaveAttribute("data-label-floated");
+
+    await user.click(shell);
+    expect(input).toHaveFocus();
+    expect(shell).toHaveAttribute("data-label-floated");
+
+    await user.type(input, "Товар");
+    input.blur();
+    expect(shell).toHaveAttribute("data-label-floated");
+
+    rerender(
+      <Input
+        key="controlled-empty"
+        label="Название"
+        labelView="inner"
+        onChange={() => undefined}
+        placeholder="Введите название"
+        value=""
+      />
+    );
+    const controlledInput = screen.getByRole("textbox", { name: "Название" });
+    expect(controlledInput.closest("[data-label-view]"))
+      .not.toHaveAttribute("data-label-floated");
+  });
+
+  it("updates inner-label content state from React-controlled values", async () => {
+    const user = userEvent.setup();
+    function ControlledInner() {
+      const [value, setValue] = useState("");
+      return (
+        <>
+          <Input
+            label="Код"
+            labelView="inner"
+            onChange={(event) => setValue(event.currentTarget.value)}
+            value={value}
+          />
+          <button onClick={() => setValue("remote")} type="button">
+            Установить значение
+          </button>
+        </>
+      );
+    }
+
+    render(<ControlledInner />);
+    const input = screen.getByRole("textbox", { name: "Код" });
+    const shell = input.closest("[data-label-view]");
+    expect(shell).not.toHaveAttribute("data-label-floated");
+    await user.click(screen.getByRole("button", { name: "Установить значение" }));
+    expect(input).toHaveValue("remote");
+    expect(shell).toHaveAttribute("data-label-floated");
   });
 
   it("has no detectable axe violations in required and error states", async () => {

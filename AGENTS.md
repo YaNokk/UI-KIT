@@ -58,6 +58,14 @@
 - UI и overlays используют canonical layer tokens без произвольных z-index.
 - Overlay-компоненты используют canonical `Portal`; field-компоненты не вызывают `createPortal` напрямую.
 - Field typography и colors используют canonical semantic tokens; runtime backend brand не читается полями.
+- Все form labels используют общий `FieldLabelView`; placeholder не заменяет label.
+- Inner-label floating state остаётся generic и не привязывает `FieldShell` к native input value.
+- `hint` — supporting text под полем; `error` отличается от hint и заменяет его при отображении.
+- Вся видимая область `FieldShell` делегирует focus primary control через shared contract.
+- Decorative adornments участвуют в field hit target; interactive adornments сохраняют собственные semantics.
+- Click-to-focus и floating-label CSS реализуются в shared foundation, а не отдельно в specialized fields.
+- `FieldShell` остаётся совместимым с Select/Autocomplete и другими non-input controls.
+- Используйте только canonical layer names; произвольные z-index aliases запрещены.
 
 ## Добавление токена
 

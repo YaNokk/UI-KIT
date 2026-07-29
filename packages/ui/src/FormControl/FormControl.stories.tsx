@@ -14,11 +14,14 @@ type Story = StoryObj<typeof meta>;
 const renderControl = (args: React.ComponentProps<typeof FormControl>) => (
   <div className="w-80 max-w-full">
     <FormControl {...args}>
-      {(props) => (
-        <input
-          {...props}
-          className="box-border h-10 w-full rounded-lg border border-border-default bg-control-background px-3 text-text-primary"
-        />
+      {({ label, ...props }) => (
+        <>
+          {label}
+          <input
+            {...props}
+            className="box-border h-10 w-full rounded-lg border border-border-default bg-control-background px-3 text-text-primary"
+          />
+        </>
       )}
     </FormControl>
   </div>
@@ -34,10 +37,10 @@ export const Required: Story = {
   render: renderControl
 };
 
-export const Description: Story = {
+export const Hint: Story = {
   args: {
     children: () => null,
-    description: "Используется для уведомлений",
+    hint: "Используется для уведомлений",
     label: "Email"
   },
   render: renderControl
@@ -52,10 +55,10 @@ export const Error: Story = {
   render: renderControl
 };
 
-export const DescriptionAndError: Story = {
+export const HintAndError: Story = {
   args: {
     children: () => null,
-    description: "Рабочий адрес",
+    hint: "Рабочий адрес",
     error: "Адрес уже используется",
     label: "Email"
   },
@@ -70,7 +73,7 @@ export const DisabledComposition: Story = {
 export const LongContent: Story = {
   args: {
     children: () => null,
-    description: "Длинное пояснение переносится и сохраняет связь с полем при любой ширине контейнера.",
+    hint: "Длинное пояснение переносится и сохраняет связь с полем при любой ширине контейнера.",
     error: "Длинное сообщение об ошибке не должно нарушать геометрию формы.",
     label: "Очень длинная подпись поля для проверки переноса"
   },

@@ -1,6 +1,6 @@
 declare const styles: {
-  readonly description: string;
   readonly error: string;
+  readonly hint: string;
   readonly label: string;
   readonly required: string;
   readonly root: string;

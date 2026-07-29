@@ -18,6 +18,10 @@
   opacity: 1;
 }
 
+.input[data-label-view="inner"]:not([data-label-floated])::placeholder {
+  color: transparent;
+}
+
 .input:disabled {
   color: var(--ds-text-disabled);
   cursor: not-allowed;

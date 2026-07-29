@@ -27,6 +27,9 @@ export const Error: Story = { args: { error: "Пароль обязателен"
 export const NewPasswordAutocomplete: Story = {
   args: { autoComplete: "new-password", label: "Новый пароль" }
 };
+export const InnerLabel: Story = {
+  args: { labelView: "inner" }
+};
 export const KeyboardToggle: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -37,5 +40,17 @@ export const KeyboardToggle: Story = {
     await expect(toggle).toHaveFocus();
     await userEvent.keyboard("{Enter}");
     await expect(input).toHaveAttribute("type", "text");
+  }
+};
+export const InteractiveAdornmentIsolation: Story = {
+  args: { labelView: "inner" },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByLabelText("Пароль");
+    const toggle = canvas.getByRole("button", { name: "Показать пароль" });
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveFocus();
+    await expect(input).toHaveAttribute("type", "text");
+    await expect(input).not.toHaveFocus();
   }
 };

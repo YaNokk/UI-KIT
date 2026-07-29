@@ -43,11 +43,69 @@
 }
 
 .content {
+  position: relative;
   display: flex;
   flex: 1 1 auto;
   align-items: center;
   min-width: 0;
   align-self: stretch;
+}
+
+.control {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  align-self: stretch;
+}
+
+.innerLabel {
+  display: none;
+}
+
+.inner .content {
+  align-items: stretch;
+}
+
+.inner .innerLabel {
+  position: absolute;
+  z-index: var(--ds-z-index-default);
+  inset-block-start: 50%;
+  inset-inline: 0;
+  display: block;
+  color: var(--ds-text-secondary);
+  font: inherit;
+  transform: translateY(-50%);
+  transform-origin: top center;
+  transition:
+    color var(--ds-motion-fast),
+    font var(--ds-motion-fast),
+    inset-block-start var(--ds-motion-fast),
+    transform var(--ds-motion-fast);
+}
+
+.inner .control {
+  padding-block-start: var(--ds-space-3);
+}
+
+.inner.floated .innerLabel,
+.inner:focus-within .innerLabel {
+  inset-block-start: var(--ds-space-1);
+  font: var(--ds-typography-caption);
+  transform: translateY(0);
+}
+
+.inner.invalid .innerLabel {
+  color: var(--ds-text-danger);
+}
+
+.inner.disabled .innerLabel {
+  color: var(--ds-text-disabled);
+}
+
+.inner.readOnly:not(.invalid) .innerLabel {
+  color: var(--ds-text-secondary);
 }
 
 .adornment {
@@ -72,6 +130,10 @@
 
   min-height: var(--ds-size-control-sm);
   font: var(--ds-typography-body-sm);
+}
+
+.inner.sm {
+  min-height: var(--ds-size-control-md);
 }
 
 .md {
@@ -104,6 +166,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .root {
+    transition: none;
+  }
+
+  .inner .innerLabel {
     transition: none;
   }
 }

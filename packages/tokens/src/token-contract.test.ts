@@ -111,6 +111,10 @@ describe("layer token contract", () => {
       expect(previous).toBeLessThan(value);
       return value;
     }, Number.NEGATIVE_INFINITY);
+    expect(Object.keys(primitiveTokens)).not.toContain("zIndex.base");
+    expect(Object.keys(primitiveTokens)).not.toContain("zIndex.dropdown");
+    expect(Object.keys(primitiveTokens)).not.toContain("zIndex.overlay");
+    expect(primitiveTokens["zIndex.sticky"]).toBe(100);
   });
 });
 

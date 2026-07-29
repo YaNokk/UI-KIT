@@ -1,4 +1,5 @@
 export type FieldSize = "sm" | "md" | "lg";
+export type FieldLabelView = "inner" | "outer";
 
 export function mergeIds(...values: Array<string | undefined>) {
   return [...new Set(

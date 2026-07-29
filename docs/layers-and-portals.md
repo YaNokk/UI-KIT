@@ -10,6 +10,10 @@ default 0 < focused 100 < popover 300 < modal 500 < toast 600
 focused control. UI code consumes the generated `--ds-z-index-*` variables and
 does not introduce arbitrary z-index values.
 
+The pre-stable aliases `base`, `dropdown` and `overlay` were removed. `sticky`
+remains a separate layout role; overlay components use only
+`default/focused/popover/modal/toast`.
+
 Portal is transport infrastructure, not an overlay. It preserves React context
 and targets an explicit `container`, then the nearest `PortalProvider` root,
 then `document.body`. DOM access starts after the client effect, so the default

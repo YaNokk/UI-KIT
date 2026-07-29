@@ -10,15 +10,15 @@ import { FormControl } from "./FormControl";
 afterEach(cleanup);
 
 describe("FormControl", () => {
-  it("wires explicit IDs, required, description, error and caller IDs", () => {
+  it("lets error replace hint and wires only the visible message", () => {
     render(
       <>
         <span id="external-help">External</span>
         <FormControl
           controlId="email"
           describedBy="external-help"
-          description="Рабочий адрес"
           error="Проверьте адрес"
+          hint="Рабочий адрес"
           label="Email"
           required
         >
@@ -33,8 +33,10 @@ describe("FormControl", () => {
     expect(input).toHaveAttribute("aria-invalid", "true");
     expect(input).toHaveAttribute(
       "aria-describedby",
-      "external-help email-description email-error"
+      "external-help email-error"
     );
+    expect(screen.queryByText("Рабочий адрес")).not.toBeInTheDocument();
+    expect(screen.getByText("Проверьте адрес")).toBeInTheDocument();
   });
 
   it("generates a stable control ID when none is supplied", () => {
@@ -67,7 +69,7 @@ describe("FormControl", () => {
 
   it("has no detectable axe violations", async () => {
     const { container } = render(
-      <FormControl description="Подсказка" label="Имя">
+      <FormControl hint="Подсказка" label="Имя">
         {(props) => <input {...props} />}
       </FormControl>
     );
@@ -75,5 +77,21 @@ describe("FormControl", () => {
       rules: { "color-contrast": { enabled: false } }
     });
     expect(results.violations).toEqual([]);
+  });
+
+  it("passes the same semantic label into the inner field composition", () => {
+    render(
+      <FormControl controlId="inner" label="Внутренняя подпись" labelView="inner">
+        {({ label: innerLabel, ...props }) => (
+          <div>
+            {innerLabel}
+            <input {...props} />
+          </div>
+        )}
+      </FormControl>
+    );
+
+    expect(screen.getByRole("textbox", { name: "Внутренняя подпись" }))
+      .toHaveAttribute("id", "inner");
   });
 });

@@ -23,6 +23,7 @@ export type {
 } from "./IconButton/index.js";
 export { FieldShell } from "./FieldShell/index.js";
 export type {
+  FieldLabelView,
   FieldShellProps,
   FieldSize
 } from "./FieldShell/index.js";

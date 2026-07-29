@@ -47,7 +47,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         {...inputProps}
         disabled={disabled}
         endAdornment={
-          <span className={styles.actions}>
+          <span className={styles.actions} data-field-interactive>
             {trailingAdornment}
             <IconButton
               aria-label={isVisible ? hidePasswordLabel : showPasswordLabel}
