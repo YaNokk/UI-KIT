@@ -10,4 +10,5 @@ Source: local Core DS snapshot in `references/raw/core-ds/input`.
 - Deferred: clear action; it is not required for the stable base contract.
 - Dropped: numeric/amount, lock, responsive package split and reference styling.
 - Base Input performs no value transformation, preserving IME and autofill.
-- Full-shell/decorative clicks request focus; interactive adornments are isolated.
+- Native input fills the content box and owns normal clicks/caret behavior.
+  Decorative adornments/gaps may request focus; interactive adornments are isolated.

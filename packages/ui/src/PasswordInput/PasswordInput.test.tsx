@@ -7,6 +7,7 @@ import userEvent from "@testing-library/user-event";
 import axe from "axe-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PasswordInput } from "./PasswordInput";
+import { Input } from "../Input/Input";
 
 afterEach(cleanup);
 
@@ -84,6 +85,36 @@ describe("PasswordInput", () => {
     const ref = { current: null as HTMLInputElement | null };
     render(<PasswordInput aria-label="Пароль" ref={ref} />);
     expect(ref.current).toBe(screen.getByLabelText("Пароль"));
+  });
+
+  it("shares the exact FieldShell/content/native-control geometry with Input", () => {
+    render(
+      <>
+        <Input aria-label="Обычное поле" labelView="inner" label="Обычное поле" />
+        <PasswordInput label="Пароль" labelView="inner" />
+      </>
+    );
+
+    const plainInput = screen.getByRole("textbox", { name: "Обычное поле" });
+    const passwordInput = screen.getByLabelText("Пароль");
+    const inputShell = plainInput
+      .closest("[data-field-part=\"shell\"]");
+    const passwordShell = passwordInput
+      .closest("[data-field-part=\"shell\"]");
+
+    expect(plainInput.className).toBe(passwordInput.className);
+    expect(inputShell).toHaveAttribute("data-label-view", "inner");
+    expect(passwordShell).toHaveAttribute("data-label-view", "inner");
+    expect(passwordInput).toHaveAttribute(
+      "data-field-part",
+      "native-control"
+    );
+    expect(inputShell?.querySelector("[data-field-part=\"content\"]")?.className)
+      .toBe(
+        passwordShell?.querySelector("[data-field-part=\"content\"]")?.className
+      );
+    expect(passwordShell?.querySelector("[data-field-part=\"content\"]"))
+      .toBeInTheDocument();
   });
 
   it("has no detectable axe violations", async () => {

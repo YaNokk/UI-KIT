@@ -8,8 +8,10 @@ wired without replacing browser input, autofill, selection or IME behavior.
 The documented label default is `outer`. `inner` uses a real semantic floating
 label: focus or non-empty text floats it, while an empty unfocused input rests
 it and hides the placeholder. Input tracks focus/content and supplies generic
-presentation state to FieldShell. Shell focus requests target the native input
-without swallowing caller focus/change/blur handlers.
+presentation state to FieldShell. The native input fills the full content box
+and owns its inline padding, so ordinary clicks remain native. Shell focus
+requests are limited to decorative/non-native zones and do not swallow caller
+focus/change/blur handlers.
 
 Input performs no masking, parsing, formatting or value transformation.
 Password, amount, masked and date behavior remain specialized compositions.

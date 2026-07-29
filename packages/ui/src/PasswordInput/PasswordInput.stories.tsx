@@ -54,3 +54,15 @@ export const InteractiveAdornmentIsolation: Story = {
     await expect(input).not.toHaveFocus();
   }
 };
+export const ToggleHitArea: Story = {
+  args: { labelView: "inner" },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByLabelText("Пароль");
+    const toggle = canvas.getByRole("button", { name: "Показать пароль" });
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveFocus();
+    await expect(input).toHaveAttribute("type", "text");
+    await expect(input).not.toHaveFocus();
+  }
+};

@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Mail, Search } from "lucide-react";
 import { expect, userEvent, within } from "storybook/test";
 import { Input } from "./Input";
+import styles from "./Input.stories.module.css";
 
 const meta = {
   title: "Components/Input",
@@ -24,6 +25,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 export const Sizes: Story = {
+  args: {
+    labelView: "outer"
+  },
+
   render: (args) => (
     <div className="grid gap-3">
       {(["sm", "md", "lg"] as const).map((size) => (
@@ -181,5 +186,59 @@ export const InteractiveAdornmentIsolation: Story = {
     await userEvent.click(action);
     await expect(action).toHaveFocus();
     await expect(canvas.getByRole("textbox", { name: "Название" })).not.toHaveFocus();
+  }
+};
+
+export const HitAreas: Story = {
+  args: {
+    className: styles.hitAreas,
+    endAdornment: <span>%</span>,
+    labelView: "inner",
+    startAdornment: <Search aria-hidden="true" />
+  },
+  render: (args) => (
+    <div>
+      <Input {...args} />
+      <div className={styles.legend}>
+        <span>Solid outline — FieldShell</span>
+        <span>Accent inset — full-height content</span>
+        <span>Dashed outline — native input hit area</span>
+        <span>Subtle columns — adornments</span>
+        <span>Selected surface — positioned inner label</span>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole("textbox", { name: "Название" });
+    const content = canvasElement.querySelector<HTMLElement>(
+      "[data-field-part=\"content\"]"
+    );
+    if (!content) throw new globalThis.Error("Field content was not rendered.");
+
+    const inputRect = input.getBoundingClientRect();
+    const contentRect = content.getBoundingClientRect();
+    await expect(Math.abs(inputRect.width - contentRect.width)).toBeLessThan(1);
+    await expect(Math.abs(inputRect.height - contentRect.height)).toBeLessThan(1);
+
+    const points = [
+      { x: inputRect.right - 2, y: inputRect.top + 2 },
+      { x: inputRect.right - 2, y: inputRect.bottom - 2 },
+      { x: inputRect.left + 2, y: inputRect.top + inputRect.height / 2 }
+    ];
+
+    for (const point of points) {
+      const hitTarget = document.elementFromPoint(point.x, point.y);
+      if (!(hitTarget instanceof HTMLElement)) {
+        throw new globalThis.Error("Hit-area target was not found.");
+      }
+      await userEvent.pointer({
+        target: hitTarget,
+        coords: { clientX: point.x, clientY: point.y },
+        keys: "[MouseLeft]"
+      });
+      await expect(input).toHaveFocus();
+      input.blur();
+    }
   }
 };

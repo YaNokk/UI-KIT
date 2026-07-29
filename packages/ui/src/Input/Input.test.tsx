@@ -126,7 +126,7 @@ describe("Input native behavior", () => {
     expect(screen.getByRole("button", { name: "Валюта" })).toBeInTheDocument();
   });
 
-  it("focuses the native input from shell and decorative adornment clicks", async () => {
+  it("uses native focus for content and delegates decorative adornment clicks", async () => {
     const user = userEvent.setup();
     render(
       <Input
@@ -138,11 +138,9 @@ describe("Input native behavior", () => {
     const input = screen.getByRole("textbox", { name: "Вес" });
     const shell = input.closest("[data-label-view]");
     if (!shell) throw new Error("FieldShell was not rendered.");
+    expect(input).toHaveAttribute("data-field-part", "native-control");
 
     await user.click(input);
-    expect(input).toHaveFocus();
-    input.blur();
-    await user.click(shell);
     expect(input).toHaveFocus();
     input.blur();
     await user.click(screen.getByText("≈"));

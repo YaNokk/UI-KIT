@@ -20,8 +20,9 @@ and does not contain a floating label or supporting message. Therefore:
 - outer label/message gap uses canonical `space.1 = 4px`;
 - outer label and hint/error use `typography.bodySm = 13/18`; label adds the
   existing medium weight, hint uses secondary and error uses danger;
-- shell inline padding normalizes the MP `px-3` observation into canonical
-  `sm=8px`, `md=12px`, `lg=16px`;
+- native-control inline padding normalizes the MP `px-3` observation into
+  canonical `sm=8px`, `md=12px`, `lg=16px`; it remains inside the native hit
+  area, while adornment columns own only their outside-edge padding;
 - outer heights remain canonical `32/40/48`;
 - inner resting label uses the field value role and is vertically centered;
 - inner floating label uses existing `typography.caption = 11/16`, starts at
@@ -39,3 +40,12 @@ and does not contain a floating label or supporting message. Therefore:
 These inner-label decisions normalize onto existing system tokens. They are not
 claimed as MP measurements because the supplied MP snapshot has no floating
 label example.
+
+## v1.2 native hit-area correction
+
+The local Core DS Input confirms the behavioral principle `width:100%` and
+`height:100%` for the native control. The current MP-derived visual values do
+not change. FieldShell now owns an explicit canonical height, content/control
+stretch through that height, and Input owns full-size fill plus value padding.
+The floating label remains positioned over the input. PasswordInput inherits
+the identical geometry and adds only a centered trailing action column.

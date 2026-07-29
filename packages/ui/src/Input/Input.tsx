@@ -119,6 +119,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
             {...nativeProps}
             {...controlProps}
             className={styles.input}
+            data-field-part="native-control"
             data-label-floated={labelFloated ? "" : undefined}
             data-label-view={effectiveLabelView}
             defaultValue={defaultValue}

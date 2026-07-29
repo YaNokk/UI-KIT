@@ -55,11 +55,23 @@ hidden while the inner label rests. Input owns focus/content tracking and
 FieldShell receives only generic `labelFloated` state. Caller focus, blur and
 change handlers are composed with internal tracking.
 
-The complete visible FieldShell area is a hit target. `onFocusRequest` delegates
-shell, border/padding, decorative SVG and non-interactive prefix/suffix clicks
-to the primary control. Native interactive descendants and explicit
-`data-field-interactive` regions retain their action and focus behavior.
+FieldShell establishes a canonical block size; its content and control regions
+stretch to the full inner height and remaining width. The native Input then
+fills that box with `width/height: 100%`. Its own inline padding provides value
+alignment, so center, upper, lower and inline-edge content clicks use native
+pointer, caret, selection and mobile-keyboard behavior rather than `.focus()`.
+
+`onFocusRequest` remains only for root gaps, decorative SVGs and
+non-interactive prefix/suffix columns outside the native content. Native
+interactive descendants, the semantic label and explicit
+`data-field-interactive` regions retain their own action/focus behavior.
+Adornments stretch with the shell but center their contents independently.
 
 Outer heights remain 32/40/48. Inner `sm` uses the existing 40px control token
 because caption 11/16 plus bodySm 13/18 cannot fit accessibly in a 32px shell;
 inner `md` and `lg` remain 40/48. No new size token is introduced.
+
+The inner label is absolutely positioned over the full-size input instead of
+consuming a normal-flow row. Only floated value alignment changes through
+native input padding; its hit-area dimensions do not change. Input and
+PasswordInput share this exact content/native-control chain.

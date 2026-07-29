@@ -1,0 +1,30 @@
+.hitAreas [data-field-part="shell"] {
+  outline: var(--ds-border-width-strong) solid var(--ds-border-strong);
+  outline-offset: var(--ds-space-1);
+}
+
+.hitAreas [data-field-part="content"] {
+  box-shadow:
+    inset 0 0 0 var(--ds-border-width-default) var(--ds-border-focus);
+}
+
+.hitAreas [data-field-part="native-control"] {
+  outline: var(--ds-border-width-default) dashed var(--ds-border-default);
+  outline-offset: calc(-1 * var(--ds-border-width-default));
+}
+
+.hitAreas [data-field-part$="adornment"] {
+  background: var(--ds-background-subtle);
+}
+
+.hitAreas [data-field-part="inner-label"] {
+  background: var(--ds-background-selected);
+}
+
+.legend {
+  display: grid;
+  gap: var(--ds-space-1);
+  margin-block-start: var(--ds-space-4);
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-body-sm);
+}

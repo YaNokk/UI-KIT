@@ -9,8 +9,11 @@ region. Adornment nodes retain their own semantics; only direct decorative SVG
 geometry is normalized by the slot.
 
 FieldShell supports the shared outer/inner label placement. The owner supplies
-generic `labelFloated` state; FieldShell never reads a native value. Its visible
-hit area calls `onFocusRequest` for shell, decorative icon and non-interactive
-prefix/suffix clicks. Native interactive descendants and nodes marked
-`data-field-interactive` preserve their own interaction. FieldShell never owns
-a value or business behavior.
+generic `labelFloated` state; FieldShell never reads a native value. Content and
+control fill the shell height and remaining width so the primary native control
+can own the normal hit area. The positioned inner label does not consume a row.
+
+`onFocusRequest` is a fallback for shell gaps, decorative icons and
+non-interactive prefix/suffix columns only. Native controls, semantic labels,
+interactive descendants and nodes marked `data-field-interactive` preserve
+their own interaction. FieldShell never owns a value or business behavior.

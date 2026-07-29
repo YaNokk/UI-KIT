@@ -71,6 +71,26 @@ describe("FieldShell", () => {
     expect(onFocusRequest).toHaveBeenCalledTimes(3);
   });
 
+  it("lets a full-size primary control own normal content clicks", async () => {
+    const user = userEvent.setup();
+    const onFocusRequest = vi.fn();
+    render(
+      <FieldShell onFocusRequest={onFocusRequest}>
+        <input aria-label="Основное поле" />
+      </FieldShell>
+    );
+
+    const input = screen.getByRole("textbox", { name: "Основное поле" });
+    await user.click(input);
+    expect(input).toHaveFocus();
+    expect(onFocusRequest).not.toHaveBeenCalled();
+    expect(input.parentElement).toHaveAttribute("data-field-part", "control");
+    expect(input.parentElement?.parentElement).toHaveAttribute(
+      "data-field-part",
+      "content"
+    );
+  });
+
   it("does not swallow explicitly interactive adornments", async () => {
     const user = userEvent.setup();
     const onAction = vi.fn();

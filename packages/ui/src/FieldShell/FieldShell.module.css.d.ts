@@ -5,6 +5,8 @@ declare const styles: {
   readonly disabled: string;
   readonly invalid: string;
   readonly floated: string;
+  readonly hasEndAdornment: string;
+  readonly hasStartAdornment: string;
   readonly inner: string;
   readonly innerLabel: string;
   readonly lg: string;

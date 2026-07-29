@@ -60,7 +60,7 @@ export const FieldShell = forwardRef<HTMLDivElement, FieldShellProps>(
         target instanceof Element
         && target.closest(
           "[data-field-interactive],button,a,input,select,textarea,"
-          + "[contenteditable=\"true\"],[tabindex]:not([tabindex=\"-1\"])"
+          + "label,[contenteditable=\"true\"],[tabindex]:not([tabindex=\"-1\"])"
         )
       ) {
         return;
@@ -80,6 +80,8 @@ export const FieldShell = forwardRef<HTMLDivElement, FieldShellProps>(
           invalid && styles.invalid,
           labelView === "inner" && styles.inner,
           labelFloated && styles.floated,
+          startAdornment != null && styles.hasStartAdornment,
+          endAdornment != null && styles.hasEndAdornment,
           className
         )}
         data-disabled={disabled ? "" : undefined}
@@ -87,22 +89,35 @@ export const FieldShell = forwardRef<HTMLDivElement, FieldShellProps>(
         data-label-floated={labelFloated ? "" : undefined}
         data-label-view={labelView}
         data-readonly={readOnly ? "" : undefined}
+        data-field-part="shell"
         onClick={handleClick}
         ref={ref}
       >
         {startAdornment == null ? null : (
-          <span className={styles.adornment} data-position="start">
+          <span
+            className={styles.adornment}
+            data-field-part="start-adornment"
+            data-position="start"
+          >
             {startAdornment}
           </span>
         )}
-        <span className={styles.content}>
+        <span className={styles.content} data-field-part="content">
           {label == null ? null : (
-            <span className={styles.innerLabel}>{label}</span>
+            <span className={styles.innerLabel} data-field-part="inner-label">
+              {label}
+            </span>
           )}
-          <span className={styles.control}>{children}</span>
+          <span className={styles.control} data-field-part="control">
+            {children}
+          </span>
         </span>
         {endAdornment == null ? null : (
-          <span className={styles.adornment} data-position="end">
+          <span
+            className={styles.adornment}
+            data-field-part="end-adornment"
+            data-position="end"
+          >
             {endAdornment}
           </span>
         )}

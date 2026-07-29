@@ -61,8 +61,12 @@
 - Все form labels используют общий `FieldLabelView`; placeholder не заменяет label.
 - Inner-label floating state остаётся generic и не привязывает `FieldShell` к native input value.
 - `hint` — supporting text под полем; `error` отличается от hint и заменяет его при отображении.
-- Вся видимая область `FieldShell` делегирует focus primary control через shared contract.
+- Native input заполняет всю usable content-area `FieldShell`; shell-wide JS focus delegation не является основной interaction model.
+- Root/content layout обязан обеспечивать vertical stretch native control; adornments центрируются независимо.
+- Floating label позиционируется поверх full-size native control и не уменьшает его hit area.
 - Decorative adornments участвуют в field hit target; interactive adornments сохраняют собственные semantics.
+- Focus delegation используется только для decorative adornments, gaps и truly non-native shell zones.
+- Input и PasswordInput используют одну geometry model; hit areas проверяются в browser/Storybook, не только JSDOM.
 - Click-to-focus и floating-label CSS реализуются в shared foundation, а не отдельно в specialized fields.
 - `FieldShell` остаётся совместимым с Select/Autocomplete и другими non-input controls.
 - Используйте только canonical layer names; произвольные z-index aliases запрещены.
