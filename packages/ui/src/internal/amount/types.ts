@@ -8,6 +8,7 @@ export interface AmountFormatConfig {
 
 export interface AmountParts {
   currency: string | null;
+  currencySeparator: string;
   currencyPosition: "prefix" | "suffix";
   decimalSeparator: string;
   fractionDigits: number;
@@ -15,5 +16,4 @@ export interface AmountParts {
   major: string;
   minor: string;
   sign: "" | "-" | "+";
-  spaceBetweenCurrency: boolean;
 }

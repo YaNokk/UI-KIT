@@ -56,11 +56,17 @@ fields композируют эти foundations и не копируют Input 
 единицах. Например, `123456` при `minority={100}` означает `1234.56`.
 Пустой `AmountInput` возвращает `null`, а `0` остаётся валидным значением.
 Валюта, точность и расположение символа определяются через `Intl`; явный
-`minority` имеет приоритет. Локаль по умолчанию — `ru-RU`.
+`minority` имеет приоритет. Locale resolution: component override → shared
+application/DS boundary → детерминированный fallback `en-US`.
 
 Форматированная строка поля не является публичным semantic value и доступна
 только как `meta.inputValue` в `onChange`. Maskito скрыт за внутренним numeric
 adapter и не входит в публичные типы.
+
+В `AmountInput` currency affix является фиксированной частью masked input value,
+а не `FieldShell` adornment. Generic adornments остаются отдельными слотами.
+`Amount` поддерживает canonical `typo-*` utilities через `className`; utility
+переопределяет convenience preset `size`.
 
 Generic icons импортируются статически из `lucide-react`. Компонент,
 владеющий icon-slot, задаёт размер, цвет через `currentColor` и decorative

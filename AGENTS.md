@@ -93,6 +93,12 @@
 - Semantic value `AmountInput` отделён от форматированной DOM-строки; пустое значение — `null`, а `0` остаётся валидным.
 - Для преобразования минорных единиц используйте строковые операции, когда они безопаснее floating-point transforms.
 - Не добавляйте financial arithmetic в UI-KIT и не создавайте публичный `NumberInput` как побочный эффект monetary-задач.
+- Currency в `AmountInput` является частью monetary editing presentation, а не generic `FieldShell` adornment.
+- Generic field adornments и фиксированный currency affix остаются разными архитектурными концепциями.
+- Component-level locale — optional override; foundation использует shared app/DS resolver boundary и не hardcode-ит product locale.
+- `Amount` композируется через canonical typography utilities/className; его default typography обязан оставаться overrideable.
+- Styling API `Amount` остаётся semantic и не принимает raw font/color/opacity props.
+- Импорт одного `Amount` не должен подтягивать Maskito editing payload.
 
 ## Добавление токена
 

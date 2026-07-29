@@ -6,6 +6,5 @@ declare const styles: {
   readonly root: string;
   readonly secondaryMinor: string;
   readonly sm: string;
-  readonly strong: string;
 };
 export default styles;

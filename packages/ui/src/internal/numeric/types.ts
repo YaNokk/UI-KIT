@@ -4,4 +4,6 @@ export interface NumberEditingConfig {
   maximumFractionDigits: number;
   decimalSeparator: string;
   groupSeparator: string;
+  postfix?: string;
+  prefix?: string;
 }

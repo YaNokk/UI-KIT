@@ -29,4 +29,14 @@ describe("numeric editing foundation", () => {
     expect(options.mask).toBeDefined();
     expect(options.postprocessors?.length).toBeGreaterThan(0);
   });
+
+  it("formats and parses fixed currency affixes", () => {
+    const suffixConfig = { ...config, postfix: " zł" };
+    const prefixConfig = { ...config, prefix: "$ " };
+
+    expect(formatNumericInput("1234.5", suffixConfig)).toBe("1 234,5 zł");
+    expect(parseNumericInput("1 234,5 zł", suffixConfig)).toBe("1234.5");
+    expect(formatNumericInput("-1234.5", prefixConfig)).toBe("$ -1 234,5");
+    expect(parseNumericInput("$ -1 234,5", prefixConfig)).toBe("-1234.5");
+  });
 });

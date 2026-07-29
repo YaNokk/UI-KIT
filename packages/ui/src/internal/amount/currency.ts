@@ -1,15 +1,16 @@
 import { fractionDigitsFromMinority } from "./minorUnits";
+import { resolveLocale } from "../locale/resolveLocale";
 import type { AmountFormatConfig } from "./types";
 
 export interface ResolvedAmountFormat {
   currency: string | null;
+  currencySeparator: string;
   currencyPosition: "prefix" | "suffix";
   decimalSeparator: string;
   fractionDigits: number;
   groupSeparator: string;
   locale: string;
   minority: number;
-  spaceBetweenCurrency: boolean;
 }
 
 function currencyFormatter(locale: string, currency: string): Intl.NumberFormat {
@@ -27,19 +28,19 @@ function currencyFormatter(locale: string, currency: string): Intl.NumberFormat 
 export function resolveAmountFormat(
   config: AmountFormatConfig
 ): ResolvedAmountFormat {
-  const locale = config.locale ?? "ru-RU";
+  const locale = resolveLocale(config.locale);
   const numberParts = new Intl.NumberFormat(locale).formatToParts(12345.6);
   const groupSeparator = numberParts.find((part) => part.type === "group")?.value
-    ?? "\u00a0";
+    ?? "";
   const decimalSeparator = numberParts.find((part) => part.type === "decimal")?.value
-    ?? ",";
+    ?? ".";
 
   let fractionDigits = config.minority == null
     ? 2
     : fractionDigitsFromMinority(config.minority);
   let currency: string | null = null;
+  let currencySeparator = "";
   let currencyPosition: "prefix" | "suffix" = "suffix";
-  let spaceBetweenCurrency = true;
 
   if (config.currency) {
     const formatter = currencyFormatter(locale, config.currency);
@@ -52,7 +53,9 @@ export function resolveAmountFormat(
     const adjacentPart = currencyPosition === "prefix"
       ? parts[currencyPartIndex + 1]
       : parts[currencyPartIndex - 1];
-    spaceBetweenCurrency = adjacentPart?.type === "literal";
+    currencySeparator = adjacentPart?.type === "literal"
+      ? adjacentPart.value
+      : "";
 
     if (config.minority == null) {
       fractionDigits = formatter.resolvedOptions().maximumFractionDigits ?? 2;
@@ -61,12 +64,12 @@ export function resolveAmountFormat(
 
   return {
     currency,
+    currencySeparator,
     currencyPosition,
     decimalSeparator,
     fractionDigits,
     groupSeparator,
     locale,
-    minority: config.minority ?? 10 ** fractionDigits,
-    spaceBetweenCurrency
+    minority: config.minority ?? 10 ** fractionDigits
   };
 }

@@ -5,13 +5,11 @@ import type { AmountValue } from "../internal/amount/types";
 import styles from "./Amount.module.css";
 
 export type AmountSize = "sm" | "md" | "lg";
-export type AmountEmphasis = "default" | "strong";
 export type AmountMinorTone = "same" | "secondary";
 
 export interface AmountProps
   extends Omit<HTMLAttributes<HTMLSpanElement>, "children" | "color" | "style"> {
   currency?: string;
-  emphasis?: AmountEmphasis;
   locale?: string;
   minority?: number;
   minorTone?: AmountMinorTone;
@@ -30,7 +28,6 @@ const sizeClasses: Record<AmountSize, string> = {
 export function Amount({
   className,
   currency,
-  emphasis = "default",
   locale,
   minority,
   minorTone = "same",
@@ -47,7 +44,7 @@ export function Amount({
     showPlus,
     trimTrailingZeros
   });
-  const currencyGap = parts.spaceBetweenCurrency ? "\u00a0" : "";
+  const currencyGap = parts.currencySeparator;
   const currencyNode = parts.currency == null ? null : (
     <span className={styles.currency} data-amount-part="currency">
       {parts.currency}
@@ -60,7 +57,6 @@ export function Amount({
       className={classNames(
         styles.root,
         sizeClasses[size],
-        emphasis === "strong" && styles.strong,
         minorTone === "secondary" && styles.secondaryMinor,
         className
       )}

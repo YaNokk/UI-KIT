@@ -53,11 +53,47 @@ export const Negative: Story = {
 
 export const MinorTone: Story = {
   args: {
-    emphasis: "strong",
     minorTone: "secondary"
   }
 };
 
-export const LongValues: Story = {
+export const LargeTotals: Story = {
   args: { value: Number.MAX_SAFE_INTEGER }
+};
+
+export const TypographyComposition: Story = {
+  render: (args) => (
+    <div className="grid gap-3">
+      <Amount {...args} className="typo-body-sm" />
+      <Amount {...args} className="typo-heading-md" />
+      <Amount {...args} className="typo-page-title" />
+    </div>
+  )
+};
+
+export const ContextInheritance: Story = {
+  render: (args) => (
+    <div className="typo-heading-lg text-text-secondary">
+      <Amount {...args} />
+    </div>
+  )
+};
+
+export const CompositionContexts: Story = {
+  render: (args) => (
+    <div className="grid max-w-xl gap-4">
+      <div className="flex justify-between typo-body-sm">
+        <span>Table cell</span>
+        <Amount {...args} className="text-right" />
+      </div>
+      <div className="flex justify-between typo-body">
+        <span>Receipt row</span>
+        <Amount {...args} />
+      </div>
+      <div className="flex justify-between typo-page-title">
+        <span>Payment total</span>
+        <Amount {...args} minorTone="secondary" />
+      </div>
+    </div>
+  )
 };

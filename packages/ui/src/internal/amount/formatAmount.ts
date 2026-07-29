@@ -13,7 +13,7 @@ export function formatAmount(
     parts.minor ? `${parts.decimalSeparator}${parts.minor}` : ""
   }`;
   if (!parts.currency) return `${parts.sign}${number}`;
-  const gap = parts.spaceBetweenCurrency ? "\u00a0" : "";
+  const gap = parts.currencySeparator;
   return parts.currencyPosition === "prefix"
     ? `${parts.sign}${parts.currency}${gap}${number}`
     : `${parts.sign}${number}${gap}${parts.currency}`;

@@ -29,16 +29,16 @@ describe("Amount", () => {
   it("applies controlled semantic variants without raw styling props", () => {
     const { container } = render(
       <Amount
-        emphasis="strong"
+        className="consumer-typography"
         minorTone="secondary"
         showPlus
         size="lg"
         value={120}
       />
     );
-    expect(container.firstChild).toHaveTextContent("+1,20");
+    expect(container.firstChild).toHaveTextContent("+1.20");
     expect(container.firstChild).toHaveClass(
-      styles.strong,
+      "consumer-typography",
       styles.secondaryMinor,
       styles.lg
     );
@@ -51,7 +51,7 @@ describe("Amount", () => {
         <Amount data-testid="negative" value={-5} />
       </>
     );
-    expect(screen.getByTestId("zero")).toHaveTextContent("0,00");
-    expect(screen.getByTestId("negative")).toHaveTextContent("-0,05");
+    expect(screen.getByTestId("zero")).toHaveTextContent("0.00");
+    expect(screen.getByTestId("negative")).toHaveTextContent("-0.05");
   });
 });

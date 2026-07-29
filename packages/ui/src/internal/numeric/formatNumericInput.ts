@@ -5,6 +5,7 @@ export function formatNumericInput(
   config: Pick<
     NumberEditingConfig,
     "decimalSeparator" | "groupSeparator" | "maximumFractionDigits"
+    | "postfix" | "prefix"
   >
 ): string {
   const negative = decimal.startsWith("-");
@@ -14,5 +15,7 @@ export function formatNumericInput(
   const fraction = minor == null || config.maximumFractionDigits === 0
     ? ""
     : `${config.decimalSeparator}${minor.slice(0, config.maximumFractionDigits)}`;
-  return `${negative ? "-" : ""}${grouped}${fraction}`;
+  return `${config.prefix ?? ""}${negative ? "-" : ""}${grouped}${fraction}${
+    config.postfix ?? ""
+  }`;
 }

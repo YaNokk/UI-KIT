@@ -1,31 +1,30 @@
-.root {
-  display: inline;
-  color: var(--ds-text-primary);
-  white-space: nowrap;
-}
+@layer components {
+  .root {
+    display: inline;
+    color: inherit;
+    font: inherit;
+    white-space: nowrap;
+  }
 
-.sm {
-  font: var(--ds-typography-body-sm);
-}
+  .sm {
+    font: var(--ds-typography-body-sm);
+  }
 
-.md {
-  font: var(--ds-typography-body);
-}
+  .md {
+    font: var(--ds-typography-body);
+  }
 
-.lg {
-  font: var(--ds-typography-body-lg);
-}
+  .lg {
+    font: var(--ds-typography-body-lg);
+  }
 
-.strong {
-  font-weight: var(--ds-font-weight-semibold);
-}
+  .minor,
+  .currency {
+    color: inherit;
+  }
 
-.minor,
-.currency {
-  color: inherit;
-}
-
-.secondaryMinor .minor,
-.secondaryMinor .currency {
-  color: var(--ds-text-secondary);
+  .secondaryMinor .minor,
+  .secondaryMinor .currency {
+    color: var(--ds-text-secondary);
+  }
 }

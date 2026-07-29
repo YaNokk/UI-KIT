@@ -24,13 +24,13 @@ export function getAmountParts(
 
   return {
     currency: resolved.currency,
+    currencySeparator: resolved.currencySeparator,
     currencyPosition: resolved.currencyPosition,
     decimalSeparator: resolved.decimalSeparator,
     fractionDigits: resolved.fractionDigits,
     groupSeparator: resolved.groupSeparator,
     major: formattedMajor,
     minor,
-    sign: value < 0 ? "-" : value > 0 && config.showPlus ? "+" : "",
-    spaceBetweenCurrency: resolved.spaceBetweenCurrency
+    sign: value < 0 ? "-" : value > 0 && config.showPlus ? "+" : ""
   };
 }

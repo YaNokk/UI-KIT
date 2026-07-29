@@ -1,6 +1,5 @@
 export { Amount } from "./Amount.js";
 export type {
-  AmountEmphasis,
   AmountMinorTone,
   AmountProps,
   AmountSize

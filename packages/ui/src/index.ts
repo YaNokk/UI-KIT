@@ -2,7 +2,6 @@ import "@mypoint/tokens/tokens.css";
 
 export { Amount } from "./Amount/index.js";
 export type {
-  AmountEmphasis,
   AmountMinorTone,
   AmountProps,
   AmountSize,

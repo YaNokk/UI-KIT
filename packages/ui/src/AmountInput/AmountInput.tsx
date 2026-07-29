@@ -20,7 +20,6 @@ import { formatNumericInput } from "../internal/numeric/formatNumericInput";
 import { parseNumericInput } from "../internal/numeric/parseNumericInput";
 import { useNumberEditing } from "../internal/numeric/useNumberEditing";
 import type { NumberEditingConfig } from "../internal/numeric/types";
-import styles from "./AmountInput.module.css";
 
 export interface AmountInputChangeMeta {
   inputValue: string;
@@ -30,10 +29,8 @@ export interface AmountInputProps
   extends Omit<
     InputProps,
     | "defaultValue"
-    | "endAdornment"
     | "inputMode"
     | "onChange"
-    | "startAdornment"
     | "type"
     | "value"
   > {
@@ -96,13 +93,24 @@ export const AmountInput = forwardRef<HTMLInputElement, AmountInputProps>(
       [currency, locale, minority]
     );
     const numberConfig = useMemo<NumberEditingConfig>(
-      () => ({
-        allowNegative,
-        decimalSeparator: resolved.decimalSeparator,
-        groupSeparator: resolved.groupSeparator,
-        integerDigits,
-        maximumFractionDigits: resolved.fractionDigits
-      }),
+      () => {
+        const currencyAffix = resolved.currency == null
+          ? ""
+          : `${resolved.currency}${resolved.currencySeparator}`;
+        const currencyPostfix = resolved.currency == null
+          ? ""
+          : `${resolved.currencySeparator}${resolved.currency}`;
+
+        return {
+          allowNegative,
+          decimalSeparator: resolved.decimalSeparator,
+          groupSeparator: resolved.groupSeparator,
+          integerDigits,
+          maximumFractionDigits: resolved.fractionDigits,
+          postfix: resolved.currencyPosition === "suffix" ? currencyPostfix : "",
+          prefix: resolved.currencyPosition === "prefix" ? currencyAffix : ""
+        };
+      },
       [allowNegative, integerDigits, resolved]
     );
     const maskOptions = useMemo(() => createNumberMask(numberConfig), [numberConfig]);
@@ -186,25 +194,13 @@ export const AmountInput = forwardRef<HTMLInputElement, AmountInputProps>(
       onBlur?.(event);
     };
 
-    const currencyAdornment = resolved.currency == null ? undefined : (
-      <span aria-hidden="true" className={styles.currency}>
-        {resolved.currency}
-      </span>
-    );
-
     return (
       <Input
         {...inputProps}
-        endAdornment={
-          resolved.currencyPosition === "suffix" ? currencyAdornment : undefined
-        }
         inputMode="decimal"
         onBlur={handleBlur}
         onChange={handleChange}
         ref={setRef}
-        startAdornment={
-          resolved.currencyPosition === "prefix" ? currencyAdornment : undefined
-        }
         type="text"
         value={inputValue}
       />

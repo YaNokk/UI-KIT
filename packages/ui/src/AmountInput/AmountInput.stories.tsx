@@ -61,6 +61,64 @@ export const Currencies: Story = {
   )
 };
 
+export const CurrencyAffix: Story = {
+  args: {
+    defaultValue: 123456,
+    hint: "Currency is fixed inside the masked input value."
+  }
+};
+
+export const CurrencyPositions: Story = {
+  render: () => (
+    <div className="grid gap-3">
+      <AmountInput currency="USD" label="Prefix" locale="en-US" value={123456} />
+      <AmountInput currency="PLN" label="Suffix" locale="pl-PL" value={123456} />
+    </div>
+  )
+};
+
+export const Locale: Story = {
+  render: () => (
+    <div className="grid gap-3">
+      <AmountInput currency="EUR" label="German" locale="de-DE" value={123456} />
+      <AmountInput currency="EUR" label="English" locale="en-US" value={123456} />
+    </div>
+  )
+};
+
+export const CaretWithCurrency: Story = {
+  args: { allowNegative: true },
+  render: (args) => <ControlledExample {...args} />
+};
+
+function ControlledCurrencySwitchExample() {
+  const [currency, setCurrency] = useState("PLN");
+  const [locale, setLocale] = useState("pl-PL");
+  return (
+    <div className="grid gap-3">
+      <AmountInput
+        currency={currency}
+        label="Switchable amount"
+        locale={locale}
+        value={123456}
+      />
+      <button
+        onClick={() => {
+          setCurrency((current) => current === "PLN" ? "USD" : "PLN");
+          setLocale((current) => current === "pl-PL" ? "en-US" : "pl-PL");
+        }}
+        type="button"
+      >
+        Switch currency and locale
+      </button>
+    </div>
+  );
+}
+
+export const ControlledCurrencySwitch: Story = {
+  render: () => <ControlledCurrencySwitchExample />
+};
+
 export const Negative: Story = {
   args: { allowNegative: true, value: -123456 }
 };
@@ -104,12 +162,16 @@ export const EditingInteraction: Story = {
     const canvas = within(canvasElement);
     const input = canvas.getByRole<HTMLInputElement>("textbox", { name: "Сумма" });
     await userEvent.type(input, "1234,56");
-    await expect(input).toHaveValue("1.234,56");
+    await expect(input).toHaveValue("1.234,56 €");
+    input.setSelectionRange(0, input.value.indexOf(" €"));
+    const copied = await userEvent.copy();
+    if (!copied) throw new Error("Clipboard data was not returned.");
+    await expect(copied.getData("text/plain")).toBe("1.234,56");
     input.setSelectionRange(0, input.value.length);
     await userEvent.keyboard("-5,2");
-    await expect(input).toHaveValue("-5,2");
+    await expect(input).toHaveValue("-5,2 €");
     await userEvent.type(input, "{backspace}");
-    await expect(input).toHaveValue("-5,");
+    await expect(input).toHaveValue("-5, €");
     await userEvent.tab();
   }
 };
