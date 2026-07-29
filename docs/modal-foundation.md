@@ -1,4 +1,4 @@
-# Modal Foundation v1.2
+# Modal Foundation v1.4
 
 ## Status
 
@@ -112,6 +112,26 @@ Concrete z-index values are not public behavior.
 `closeLabel` remains required until the design system has a verified
 translation catalog for canonical control labels.
 
+## Responsive consumption
+
+Modal surfaces consume the generated responsive artifacts described in
+`responsive-foundation.md`; they do not own raw breakpoint values.
+`ModalPrimitive` uses `--ds-below-md`, generated from canonical
+`breakpoint.md`, for the existing compact Drawer and Dialog presentation.
+
+The exact behavior remains:
+
+```text
+width < 768px  → compact Drawer/Dialog presentation
+width >= 768px → regular presentation
+```
+
+Breakpoints are static build/design configuration. They do not vary by
+runtime brand, theme, locale, backend input or `DesignSystemProvider`.
+Dialog and Drawer are frozen against this boundary. BottomSheet does not
+consume `md` merely because it is mobile-first; its real-device gesture and
+VisualViewport hardening remains a separate track.
+
 ## BottomSheet gesture spike
 
 `react-swipeable@7.0.2` was evaluated separately after Dialog and Drawer were
@@ -188,6 +208,29 @@ Touch velocity/distance arbitration and nested scroll-owner selection are
 covered deterministically by pointer tests. Full mobile keyboard positioning,
 `offsetTop`, real-device touch physics and safe-area combinations are still
 outside the frozen promise and remain BottomSheet hardening work.
+
+## v1.4 responsive freeze baseline
+
+Revalidated in a fresh Storybook dev process with the generated responsive
+artifact and PostCSS expansion active:
+
+- loaded component CSS contained the static
+  `@media (width < 768px)` fallback and no unresolved
+  `--ds-below-md` reference;
+- at 767 CSS px Drawer used the compact viewport-cover width and zero radius;
+- at 768 CSS px Drawer used the regular independent 500 px width and regular
+  leading radius;
+- the next-above-boundary browser override remained regular; exact 767/768/769
+  classification is also covered by the generated TypeScript boundary test;
+- Radix default focus still selected the visible eligible control;
+- ancestor invalidation still emitted once for child A and did not suppress
+  remounted sibling B;
+- a completed Dialog guard click still emitted `backdrop`;
+- Drawer outside interaction remained blocked and document lock stayed active.
+
+No `ModalRuntime`, focus, identity, backdrop or scroll-lock architecture
+changed in v1.4. Dialog and Drawer are frozen. BottomSheet API remains stable
+with the previously documented mobile-hardening work outstanding.
 
 Validation commands: `tokens:check`, lint, typecheck, Storybook MCP readiness
 and the complete unit suite. Build, Storybook build, pack/consumer and

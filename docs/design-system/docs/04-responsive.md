@@ -45,6 +45,10 @@ Mobile: entity cards/list rows
 
 ## Breakpoints
 
+Канонический source of truth и generated CSS/TypeScript/Tailwind consumers
+описаны в `../../responsive-foundation.md`. Значения ниже — продуктовая
+интерпретация scale, а не отдельная конфигурация.
+
 Начальный viewport set:
 
 ```text

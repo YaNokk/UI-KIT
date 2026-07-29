@@ -24,3 +24,11 @@ export type {
   SemanticTokenPath,
   TypographyTokenPath
 } from "./generated/tokens.js";
+export {
+  breakpoints,
+  mediaQueries
+} from "./generated/responsive.js";
+export type {
+  BreakpointName,
+  MediaQueryName
+} from "./generated/responsive.js";

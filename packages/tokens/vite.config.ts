@@ -11,6 +11,7 @@ function copyPublicCss(): Plugin {
     closeBundle() {
       mkdirSync(outputRoot, { recursive: true });
       copyFileSync(`${packageRoot}generated/tokens.css`, `${outputRoot}/tokens.css`);
+      copyFileSync(`${packageRoot}generated/responsive.css`, `${outputRoot}/responsive.css`);
       copyFileSync(`${packageRoot}generated/tailwind.css`, `${outputRoot}/tailwind.css`);
     }
   };

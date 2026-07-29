@@ -149,7 +149,7 @@
   touch-action: none;
 }
 
-@media (width < 768px) {
+@media (--ds-below-md) {
   .drawer {
     inline-size: 100vw;
     border-inline-start: 0;

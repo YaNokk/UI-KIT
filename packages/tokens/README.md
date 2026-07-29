@@ -12,8 +12,14 @@ Source of truth:
 `scripts/generate.mjs` валидирует aliases и симметрию light/dark paths, затем генерирует:
 
 - `generated/tokens.css`;
+- `generated/responsive.css`;
 - `generated/tailwind.css`;
+- `src/generated/responsive.ts`;
 - `src/generated/tokens.ts`.
+
+Responsive artifacts derive `belowMd`, `mdUp`, typed breakpoint values and
+static Tailwind breakpoint values from the same DTCG source. CSS Modules use
+the repository PostCSS pipeline to expand custom media before distribution.
 
 `runtime-brand.ts` валидирует backend inputs, выбирает безопасный `onAccent` с contrast не ниже 4.5:1 и создаёт только разрешённые brand variables. Status, neutral surfaces, sizing и geometry не зависят от brand.
 

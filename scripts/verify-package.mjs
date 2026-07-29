@@ -23,6 +23,7 @@ const packages = [
       "dist/Amount/index.d.ts",
       "dist/AmountInput/index.js",
       "dist/AmountInput/index.d.ts",
+      "dist/responsive.css",
       "dist/tokens.css",
       "dist/tailwind.css"
     ]

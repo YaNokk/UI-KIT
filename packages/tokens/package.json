@@ -11,6 +11,7 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./responsive.css": "./dist/responsive.css",
     "./tokens.css": "./dist/tokens.css",
     "./tailwind.css": "./dist/tailwind.css"
   },
