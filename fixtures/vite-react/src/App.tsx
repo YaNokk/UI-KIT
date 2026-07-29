@@ -5,6 +5,9 @@ import { ButtonLink } from "@mypoint/ui/button-link";
 import { IconButton } from "@mypoint/ui/icon-button";
 import { Spinner } from "@mypoint/ui/spinner";
 import { Button, LinkButton, ThemeProvider } from "@mypoint/ui";
+import { NumberInput } from "@mypoint/ui/number-input";
+import { QuantityInput } from "@mypoint/retail-ui/quantity-input";
+import "@mypoint/retail-ui/styles.css";
 import { RefreshCw } from "lucide-react";
 
 export function App() {
@@ -25,6 +28,14 @@ export function App() {
         label="Сумма"
         locale="pl-PL"
         value={123456}
+      />
+      <NumberInput aria-label="Number" value={1.25} />
+      <QuantityInput
+        aria-label="Quantity"
+        decreaseLabel="Decrease quantity"
+        increaseLabel="Increase quantity"
+        min={1}
+        value={2}
       />
     </ThemeProvider>
   );

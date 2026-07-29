@@ -11,10 +11,9 @@ import {
   IconButton,
   NumberInput,
   type NumberInputProps,
+  type NumberInputStepActions,
 } from "@mypoint/ui";
 import styles from "./QuantityInput.module.css";
-
-const NUMBER_INPUT_STEP_EVENT = "mypoint-number-input-step";
 
 export interface QuantityInputProps
   extends Omit<
@@ -65,7 +64,7 @@ export const QuantityInput = forwardRef<
   forwardedRef,
 ) {
   const controlled = value !== undefined;
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const stepActionsRef = useRef<NumberInputStepActions | null>(null);
   const [uncontrolledValue, setUncontrolledValue] = useState<number | null>(
     defaultValue,
   );
@@ -86,16 +85,12 @@ export const QuantityInput = forwardRef<
   );
 
   const stepValue = (direction: 1 | -1) => {
-    inputRef.current?.dispatchEvent(
-      new CustomEvent(NUMBER_INPUT_STEP_EVENT, {
-        detail: direction,
-      }),
-    );
+    if (direction === 1) stepActionsRef.current?.increment();
+    else stepActionsRef.current?.decrement();
   };
 
   const setInputRef = useCallback(
     (node: HTMLInputElement | null) => {
-      inputRef.current = node;
       if (typeof forwardedRef === "function") forwardedRef(node);
       else if (forwardedRef) forwardedRef.current = node;
     },
@@ -103,10 +98,10 @@ export const QuantityInput = forwardRef<
   );
 
   const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
+    onBlur?.(event);
     if (latestValue.current === null && min !== undefined) {
       emitValue(min);
     }
-    onBlur?.(event);
   };
 
   const unavailable = disabled || readOnly;
@@ -150,6 +145,7 @@ export const QuantityInput = forwardRef<
         ref={setInputRef}
         size="sm"
         step={step}
+        stepActionsRef={stepActionsRef}
         value={effectiveValue}
       />
       <IconButton

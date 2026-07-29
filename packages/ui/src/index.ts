@@ -65,7 +65,8 @@ export type {
 export { NumberInput } from "./NumberInput/index.js";
 export type {
   NumberInputChangeMeta,
-  NumberInputProps
+  NumberInputProps,
+  NumberInputStepActions
 } from "./NumberInput/index.js";
 export { PasswordInput } from "./PasswordInput/index.js";
 export type { PasswordInputProps } from "./PasswordInput/index.js";

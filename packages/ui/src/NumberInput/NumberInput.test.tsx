@@ -1,13 +1,16 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { useState } from "react";
+import { createRef, useState } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axe from "axe-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DesignSystemProvider } from "../DesignSystemProvider";
-import { NumberInput } from "./NumberInput";
+import {
+  NumberInput,
+  type NumberInputStepActions,
+} from "./NumberInput";
 
 afterEach(cleanup);
 
@@ -50,6 +53,70 @@ describe("NumberInput", () => {
     await user.keyboard("{ArrowUp}");
     expect(input).toHaveValue("0.3");
     expect(onChange).toHaveBeenLastCalledWith(0.3, { inputValue: "0.3" });
+  });
+
+  it("shares the keyboard stepping path through typed composition actions", async () => {
+    const user = userEvent.setup();
+    const actionsRef = createRef<NumberInputStepActions>();
+    render(
+      <>
+        <NumberInput
+          aria-label="Шаг"
+          defaultValue={0.2}
+          maximumFractionDigits={2}
+          step={0.1}
+          stepActionsRef={actionsRef}
+        />
+        <button onClick={() => actionsRef.current?.increment()} type="button">
+          Увеличить
+        </button>
+        <button onClick={() => actionsRef.current?.decrement()} type="button">
+          Уменьшить
+        </button>
+      </>,
+    );
+    const input = screen.getByRole("spinbutton", { name: "Шаг" });
+    await user.click(screen.getByRole("button", { name: "Увеличить" }));
+    expect(input).toHaveValue("0.3");
+    await user.click(input);
+    await user.keyboard("{ArrowDown}");
+    expect(input).toHaveValue("0.2");
+    await user.click(screen.getByRole("button", { name: "Уменьшить" }));
+    expect(input).toHaveValue("0.1");
+  });
+
+  it("keeps natural editing text and applies minimum fraction digits on blur", async () => {
+    const user = userEvent.setup();
+    render(
+      <NumberInput
+        aria-label="Точность"
+        maximumFractionDigits={2}
+        minimumFractionDigits={2}
+      />,
+    );
+    const input = screen.getByRole("spinbutton", { name: "Точность" });
+    await user.type(input, "1.2");
+    expect(input).toHaveValue("1.2");
+    await user.tab();
+    expect(input).toHaveValue("1.20");
+  });
+
+  it("keeps aria-valuenow aligned when a controlled consumer rejects an update", async () => {
+    const user = userEvent.setup();
+    render(
+      <NumberInput
+        aria-label="Контролируемое число"
+        onChange={() => undefined}
+        value={1}
+      />,
+    );
+    const input = screen.getByRole("spinbutton", {
+      name: "Контролируемое число",
+    });
+    await user.clear(input);
+    await user.type(input, "2");
+    expect(input).toHaveValue("1");
+    expect(input).toHaveAttribute("aria-valuenow", "1");
   });
 
   it("allows temporary out-of-range editing and clamps on blur", async () => {
@@ -111,6 +178,23 @@ describe("NumberInput", () => {
     expect(
       screen.getByRole("spinbutton", { name: "Внешнее значение" }),
     ).toHaveValue("-5");
+  });
+
+  it("serializes the localized visible value through a native name", () => {
+    const { container } = render(
+      <form>
+        <NumberInput
+          aria-label="Вес формы"
+          locale="ru-RU"
+          name="weight"
+          value={1234.5}
+        />
+      </form>,
+    );
+    const form = container.querySelector("form");
+    if (!form) throw new Error("Expected a form element.");
+    expect(new FormData(form).get("weight")).toBe("1 234,5");
+    expect(form.querySelector('input[type="hidden"]')).not.toBeInTheDocument();
   });
 
   it("does not step disabled or read-only fields and forwards the native ref", async () => {

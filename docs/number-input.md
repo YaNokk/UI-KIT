@@ -26,12 +26,27 @@ import { NumberInput } from "@mypoint/ui/number-input";
 - `locale`: явное значение имеет приоритет над ближайшим
   `DesignSystemProvider`; форматирование не выводит валюту или страну.
 - `minimumFractionDigits` по умолчанию `0`, `maximumFractionDigits` — `3`.
+  Три знака после разделителя — текущая DS-политика для веса, объёма и
+  fractional quantity; это не требование JavaScript или Intl.
 - `allowNegative={false}` запрещает ввод и вставку отрицательных значений, но
   не переписывает отрицательное controlled-значение молча.
 - `onChange` возвращает семантическое значение и текущую локализованную
   DOM-строку в `meta.inputValue`.
 - `type="text"` и `inputMode="decimal"` используются для дробных значений;
   integer-only режим использует `inputMode="numeric"`.
+
+## Controlled contract и accessibility
+
+При переданном `value` prop является авторитетным семантическим состоянием.
+Controlled consumer должен синхронно отразить локальный `onChange` в `value`.
+Можно debounce-ить сохранение на сервере, но не локальное controlled-обновление.
+
+`aria-valuenow` вычисляется из текущей отображаемой и успешно разобранной
+editing-строки, поэтому assistive technology описывает видимое состояние поля.
+При соблюдении controlled contract оно совпадает с `value`. Пустая или
+промежуточная строка не получает `aria-valuenow`. Если controlled consumer
+отклоняет изменение, поле возвращается к авторитетному `value`, и
+`aria-valuenow` возвращается вместе с видимым значением.
 
 ## Редактирование и commit
 
@@ -46,11 +61,29 @@ import { NumberInput } from "@mypoint/ui/number-input";
 без `min` ArrowUp выбирает `step`, а ArrowDown — `-step` либо `0`, когда
 отрицательные значения запрещены.
 
+Связанные композиции используют типизированный `stepActionsRef` с методами
+`increment()` и `decrement()`. Это узкая composition-capability самого
+`NumberInput`: она вызывает тот же путь, что и клавиатура, и не экспортирует
+низкоуровневую арифметику. Основной ref остаётся `HTMLInputElement` и сохраняет
+focus, selection и нативную интеграцию с формой. DOM `CustomEvent` для stepping
+не используется.
+
+`minimumFractionDigits` применяется при commit/blur и внешнем форматировании,
+но не заставляет показывать завершающие нули во время свободного ввода:
+`1.2` остаётся `1.2`, а после blur при `minimumFractionDigits={2}` становится
+`1.20` с разделителем выбранной locale.
+
 Disabled и read-only поля не изменяются с клавиатуры. Нативные атрибуты формы,
 `name`, ref и события фокуса сохраняются через `Input`. При обычной отправке
 формы браузер сериализует локализованную DOM-строку; если backend ожидает
 каноническое число, приложение должно сериализовать семантическое значение
 отдельно.
+
+Например, `name="weight"` при `locale="ru-RU"` и видимом `1 234,5` добавит в
+`FormData` именно локализованный текст `1 234,5`, а не JS-число `1234.5`.
+Скрытое canonical-поле намеренно не добавляется. Отложенные варианты интеграции:
+form adapter над `value/onChange`, hidden canonical field, serialization
+callback или адаптер конкретной form-library.
 
 ## Границы ответственности
 

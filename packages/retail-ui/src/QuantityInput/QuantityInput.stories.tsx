@@ -74,6 +74,40 @@ export const FractionalStep: Story = {
   },
 };
 
+export const KeyboardButtonParity: Story = {
+  args: {
+    maximumFractionDigits: 2,
+    min: 0,
+    step: 0.1,
+    value: 0.2,
+  },
+  render: (args) => <ControlledExample {...args} />,
+};
+
+export const Controlled: Story = {
+  args: {
+    max: 10,
+    min: 1,
+    value: 2,
+  },
+  render: (args) => <ControlledExample {...args} />,
+};
+
+export const EmptyBlur: Story = {
+  args: {
+    defaultValue: 2,
+    min: 1,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Clear the field and move focus away: the retail policy restores min.",
+      },
+    },
+  },
+};
+
 export const Disabled: Story = {
   args: {
     disabled: true,

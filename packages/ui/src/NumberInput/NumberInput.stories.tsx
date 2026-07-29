@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { expect, userEvent, within } from "storybook/test";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { NumberInput } from "./NumberInput";
+import { Button } from "../Button/Button";
+import {
+  NumberInput,
+  type NumberInputStepActions,
+} from "./NumberInput";
 
 const meta = {
   title: "Components/NumberInput",
@@ -30,14 +34,17 @@ function ControlledExample(props: React.ComponentProps<typeof NumberInput>) {
 }
 
 export const Default: Story = {
+  args: {
+    locale: "ru-RU",
+  },
   render: (args) => <ControlledExample {...args} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const input = canvas.getByRole("spinbutton", { name: "Количество" });
-    await userEvent.type(input, "12.5");
-    await expect(input).toHaveValue("12.5");
+    await userEvent.type(input, "12,5");
+    await expect(input).toHaveValue("12,5");
     await userEvent.keyboard("{ArrowUp}");
-    await expect(input).toHaveValue("13.5");
+    await expect(input).toHaveValue("13,5");
   },
 };
 
@@ -72,6 +79,22 @@ export const Decimal: Story = {
   },
 };
 
+export const MinimumFractionCommit: Story = {
+  args: {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+    value: null,
+  },
+  render: (args) => (
+    <div style={{ display: "grid", gap: "var(--ds-space-2)" }}>
+      <ControlledExample {...args} />
+      <Button size="sm" variant="secondary">
+        Commit focus target
+      </Button>
+    </div>
+  ),
+};
+
 export const Negative: Story = {
   args: {
     allowNegative: true,
@@ -95,6 +118,45 @@ export const Step: Story = {
     step: 0.25,
     value: 1.25,
   },
+};
+
+function StepParityExample() {
+  const [value, setValue] = useState<number | null>(0.2);
+  const actionsRef = useRef<NumberInputStepActions | null>(null);
+
+  return (
+    <div style={{ display: "grid", gap: "var(--ds-space-2)" }}>
+      <NumberInput
+        aria-label="Проверка шага"
+        label="Клавиатура и типизированные действия"
+        maximumFractionDigits={2}
+        onChange={setValue}
+        step={0.1}
+        stepActionsRef={actionsRef}
+        value={value}
+      />
+      <div style={{ display: "flex", gap: "var(--ds-space-2)" }}>
+        <Button
+          onClick={() => actionsRef.current?.decrement()}
+          size="sm"
+          variant="secondary"
+        >
+          Decrement
+        </Button>
+        <Button
+          onClick={() => actionsRef.current?.increment()}
+          size="sm"
+          variant="secondary"
+        >
+          Increment
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export const StepParity: Story = {
+  render: () => <StepParityExample />,
 };
 
 export const Locale: Story = {

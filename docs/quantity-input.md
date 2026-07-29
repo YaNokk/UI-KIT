@@ -33,12 +33,25 @@ import { QuantityInput } from "@mypoint/retail-ui/quantity-input";
 - Кнопка на достигнутой границе disabled. `disabled` и `readOnly` отключают обе
   кнопки, не меняя геометрию.
 - Кнопки и стрелки клавиатуры активируют один step engine из `NumberInput`;
-  отдельной retail-арифметики нет.
+  отдельной retail-арифметики нет. Композиция вызывает поддерживаемые
+  типизированные `increment()`/`decrement()` actions; DOM events и private
+  imports из `packages/ui/src/internal` не используются.
 - После клика фокус остаётся на активированной кнопке. Press-and-hold в v1 не
   поддерживается.
 - Пустое значение разрешено во время редактирования. На blur оно
   восстанавливается до `min`, если `min` задан; без `min` остаётся `null`.
+- Порядок blur намеренный: сначала `NumberInput` commit/clamp-ит editing value,
+  затем вызывает consumer `onBlur`, после чего `QuantityInput` применяет
+  retail-правило `null → min`.
 - Группа и каждая icon-only кнопка получают явные accessible names.
+
+`QuantityInput` не вводит отдельную form serialization. `name` принадлежит
+видимому `NumberInput`, поэтому нативная форма отправляет локализованный текст.
+Для canonical quantity продуктовый form adapter должен читать семантические
+`value/onChange`. Кнопки имеют `type="button"` и не отправляют форму.
+
+Зависимость пакета направлена только через публичный `@mypoint/ui`. React и
+ReactDOM остаются peer dependencies, private UI internals не импортируются.
 
 Композиция сохраняет одинаковую intrinsic-геометрию на narrow/mobile, tablet и
 desktop. На узкой поверхности средняя колонка может сжиматься, но порядок,

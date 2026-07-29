@@ -7,15 +7,6 @@ import axe from "axe-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { QuantityInput } from "./QuantityInput";
 
-vi.mock("@mypoint/ui", async () => {
-  const [{ IconButton }, { NumberInput }] = await Promise.all([
-    import("../../../ui/src/IconButton/IconButton"),
-    import("../../../ui/src/NumberInput/NumberInput"),
-  ]);
-
-  return { IconButton, NumberInput };
-});
-
 afterEach(cleanup);
 
 const accessibleProps = {
@@ -44,6 +35,10 @@ describe("QuantityInput", () => {
     ).toHaveValue("2");
     expect(onChange).toHaveBeenLastCalledWith(2);
     expect(increase).toHaveFocus();
+    expect(increase).toHaveAttribute("type", "button");
+    expect(
+      screen.getByRole("button", { name: "Уменьшить количество" }),
+    ).toHaveAttribute("type", "button");
   });
 
   it("disables boundary actions", () => {
@@ -83,6 +78,46 @@ describe("QuantityInput", () => {
     expect(screen.getByRole("spinbutton")).toHaveValue("0.3");
   });
 
+  it("keeps keyboard and button stepping in parity", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <QuantityInput
+          aria-label="Клавиатурное количество"
+          decreaseLabel="Уменьшить клавиатурное количество"
+          defaultValue={0.2}
+          increaseLabel="Увеличить клавиатурное количество"
+          maximumFractionDigits={2}
+          min={0}
+          step={0.1}
+        />
+        <QuantityInput
+          aria-label="Кнопочное количество"
+          decreaseLabel="Уменьшить кнопочное количество"
+          defaultValue={0.2}
+          increaseLabel="Увеличить кнопочное количество"
+          maximumFractionDigits={2}
+          min={0}
+          step={0.1}
+        />
+      </>,
+    );
+    const keyboardInput = screen.getByRole("spinbutton", {
+      name: "Клавиатурное количество",
+    });
+    await user.click(keyboardInput);
+    await user.keyboard("{ArrowUp}");
+    await user.click(
+      screen.getByRole("button", {
+        name: "Увеличить кнопочное количество",
+      }),
+    );
+    expect(keyboardInput).toHaveValue("0.3");
+    expect(
+      screen.getByRole("spinbutton", { name: "Кнопочное количество" }),
+    ).toHaveValue("0.3");
+  });
+
   it("restores min on blur after an empty edit", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
@@ -100,6 +135,25 @@ describe("QuantityInput", () => {
     await user.tab();
     expect(input).toHaveValue("1");
     expect(onChange).toHaveBeenLastCalledWith(1);
+  });
+
+  it("applies the retail null policy after forwarding blur", async () => {
+    const user = userEvent.setup();
+    const order: string[] = [];
+    render(
+      <QuantityInput
+        {...accessibleProps}
+        defaultValue={2}
+        min={1}
+        onBlur={() => order.push("blur")}
+        onChange={(nextValue) => order.push(`change:${String(nextValue)}`)}
+      />,
+    );
+    const input = screen.getByRole("spinbutton");
+    await user.clear(input);
+    order.length = 0;
+    await user.tab();
+    expect(order).toEqual(["blur", "change:1"]);
   });
 
   it("disables all actions in disabled and read-only states", () => {

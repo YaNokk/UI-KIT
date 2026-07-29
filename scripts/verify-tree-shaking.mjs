@@ -92,6 +92,30 @@ if (
   throw new Error("Maskito editing code survived the Amount-only build.");
 }
 
+runBuild("tree-number-input", "dist-tree-number-input");
+const numberInputJavaScript = readOutput("dist-tree-number-input", ".js");
+if (!numberInputJavaScript.includes("spinbutton")) {
+  throw new Error("The used NumberInput implementation was not found.");
+}
+if (
+  numberInputJavaScript.includes("data-amount-part")
+  || numberInputJavaScript.includes("Tree-shaken quantity")
+) {
+  throw new Error("Amount or retail-ui survived the NumberInput-only build.");
+}
+
+runBuild("tree-quantity-input", "dist-tree-quantity-input");
+const quantityInputJavaScript = readOutput("dist-tree-quantity-input", ".js");
+if (
+  !quantityInputJavaScript.includes("Tree-shaken quantity")
+  || !quantityInputJavaScript.includes("spinbutton")
+) {
+  throw new Error("QuantityInput or its required NumberInput was not found.");
+}
+if (quantityInputJavaScript.includes("data-amount-part")) {
+  throw new Error("Amount survived the QuantityInput-only build.");
+}
+
 runBuild("lazy", "dist-lazy");
 const manifest = JSON.parse(
   readFileSync(resolve(consumerRoot, "dist-lazy", ".vite", "manifest.json"), "utf8")

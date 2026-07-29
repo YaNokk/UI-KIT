@@ -162,3 +162,13 @@
   labels, обычный tab order и отключаются при disabled/readOnly или на границе.
 - Пустой `QuantityInput` допускается во время редактирования и на blur
   восстанавливает `min`, если он задан.
+- Stepping `NumberInput` запрещено запускать через DOM `CustomEvent`; higher-level
+  numeric compositions используют только поддерживаемые typed actions.
+- `retail-ui` не импортирует private internals из `packages/ui/src/internal`.
+- Controlled `NumberInput` обязан синхронно отражать локальный `onChange` в
+  `value`; debounce допустим для persistence, но не для локального value.
+- Нативный `name` numeric field сериализует локализованный видимый текст, пока
+  продукт не использует отдельный canonical form adapter.
+- `QuantityInput` policy `null → min` принадлежит retail/domain слою и не
+  переносится в generic `NumberInput`.
+- Не публикуйте `NumberStepper` без доказанного второго generic use case.

@@ -2,12 +2,14 @@ import {
   forwardRef,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
   type ChangeEvent,
   type FocusEvent,
   type KeyboardEvent,
+  type Ref,
 } from "react";
 import { Input, type InputProps } from "../Input/Input";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
@@ -22,10 +24,13 @@ import { parseNumericInput } from "../internal/numeric/parseNumericInput";
 import { stepNumber, type StepDirection } from "../internal/numeric/stepNumber";
 import { useNumberEditing } from "../internal/numeric/useNumberEditing";
 
-const NUMBER_INPUT_STEP_EVENT = "mypoint-number-input-step";
-
 export interface NumberInputChangeMeta {
   inputValue: string;
+}
+
+export interface NumberInputStepActions {
+  decrement(): void;
+  increment(): void;
 }
 
 export interface NumberInputProps
@@ -49,6 +54,7 @@ export interface NumberInputProps
   min?: number;
   onChange?: (value: number | null, meta: NumberInputChangeMeta) => void;
   step?: number;
+  stepActionsRef?: Ref<NumberInputStepActions>;
   value?: number | null;
 }
 
@@ -82,6 +88,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       onKeyDown,
       readOnly = false,
       step = 1,
+      stepActionsRef,
       value,
       ...inputProps
     },
@@ -138,6 +145,10 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         previousFormat.current.numberConfig !== numberConfig;
       previousFormat.current = { minimumFractionDigits, numberConfig };
 
+      if (!controlled && !formatChanged) {
+        return;
+      }
+
       if (
         controlled &&
         !formatChanged &&
@@ -151,6 +162,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       controlled,
       effectiveValue,
       formatValue,
+      inputValue,
       minimumFractionDigits,
       numberConfig,
       value,
@@ -220,20 +232,21 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       ],
     );
 
-    useEffect(() => {
-      const input = nativeRef.current;
-      if (!input) return;
+    const requestStep = useCallback(
+      (direction: StepDirection) => {
+        if (!disabled && !readOnly) applyStep(direction);
+      },
+      [applyStep, disabled, readOnly],
+    );
 
-      const handleStepRequest = (event: Event) => {
-        if (disabled || readOnly) return;
-        const direction = (event as CustomEvent<StepDirection>).detail;
-        if (direction === 1 || direction === -1) applyStep(direction);
-      };
-
-      input.addEventListener(NUMBER_INPUT_STEP_EVENT, handleStepRequest);
-      return () =>
-        input.removeEventListener(NUMBER_INPUT_STEP_EVENT, handleStepRequest);
-    }, [applyStep, disabled, readOnly]);
+    useImperativeHandle(
+      stepActionsRef,
+      () => ({
+        decrement: () => requestStep(-1),
+        increment: () => requestStep(1),
+      }),
+      [requestStep],
+    );
 
     const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
       onKeyDown?.(event);
@@ -248,7 +261,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       }
 
       event.preventDefault();
-      applyStep(event.key === "ArrowUp" ? 1 : -1);
+      requestStep(event.key === "ArrowUp" ? 1 : -1);
     };
 
     const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
@@ -271,7 +284,13 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         {...inputProps}
         aria-valuemax={max}
         aria-valuemin={min}
-        aria-valuenow={effectiveValue ?? undefined}
+        aria-valuenow={
+          semanticNumber(
+            inputValue,
+            numberConfig.decimalSeparator,
+            numberConfig.groupSeparator,
+          ) ?? undefined
+        }
         disabled={disabled}
         inputMode={maximumFractionDigits === 0 ? "numeric" : "decimal"}
         onBlur={handleBlur}
