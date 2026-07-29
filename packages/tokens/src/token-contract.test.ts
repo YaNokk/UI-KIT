@@ -141,6 +141,8 @@ describe("text and link color contract", () => {
     expect(tokens["text.danger"]).toBe("{status.danger.foreground}");
     expect(tokens["text.success"]).toBe("{status.success.foreground}");
     expect(tokens["text.warning"]).toBe("{status.warning.foreground}");
+    expect(tokens["background.inverse"]).toBe("{color.neutral.900}");
+    expect(tokens["text.onInverse"]).toBe("{color.neutral.0}");
   });
 
   it.each(themes)("%s keeps only the accent link family brand-dependent", (_, tokens) => {

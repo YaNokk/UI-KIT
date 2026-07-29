@@ -8,6 +8,7 @@
   --color-background-interactive-hover: var(--ds-background-interactive-hover);
   --color-background-interactive-active: var(--ds-background-interactive-active);
   --color-background-selected: var(--ds-background-selected);
+  --color-background-inverse: var(--ds-background-inverse);
   --color-background-overlay: var(--ds-background-overlay);
   --color-text-primary: var(--ds-text-primary);
   --color-text-secondary: var(--ds-text-secondary);
@@ -20,6 +21,7 @@
   --color-text-warning: var(--ds-text-warning);
   --color-text-on-accent: var(--ds-text-on-accent);
   --color-text-on-danger: var(--ds-text-on-danger);
+  --color-text-on-inverse: var(--ds-text-on-inverse);
   --color-icon-primary: var(--ds-icon-primary);
   --color-icon-secondary: var(--ds-icon-secondary);
   --color-icon-tertiary: var(--ds-icon-tertiary);

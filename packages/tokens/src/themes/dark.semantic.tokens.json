@@ -8,6 +8,7 @@
     "interactiveHover": { "$type": "color", "$value": "{background.subtle}" },
     "interactiveActive": { "$type": "color", "$value": "{color.neutral.700}" },
     "selected": { "$type": "color", "$value": "{brand.accentSoft}" },
+    "inverse": { "$type": "color", "$value": "{color.neutral.900}" },
     "overlay": { "$type": "color", "$value": "rgb(0 0 0 / 0.68)" }
   },
   "text": {
@@ -21,7 +22,8 @@
     "success": { "$type": "color", "$value": "{status.success.foreground}" },
     "warning": { "$type": "color", "$value": "{status.warning.foreground}" },
     "onAccent": { "$type": "color", "$value": "{brand.onAccent}" },
-    "onDanger": { "$type": "color", "$value": "{color.neutral.0}" }
+    "onDanger": { "$type": "color", "$value": "{color.neutral.0}" },
+    "onInverse": { "$type": "color", "$value": "{color.neutral.0}" }
   },
   "icon": {
     "primary": { "$type": "color", "$value": "{color.neutral.100}" },

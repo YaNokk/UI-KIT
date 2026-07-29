@@ -82,6 +82,11 @@ export type {
 } from "./NumberInput/index.js";
 export { PasswordInput } from "./PasswordInput/index.js";
 export type { PasswordInputProps } from "./PasswordInput/index.js";
+export { Popover } from "./Popover/index.js";
+export type {
+  PopoverPlacement,
+  PopoverProps
+} from "./Popover/index.js";
 export { Portal, PortalProvider } from "./Portal/index.js";
 export type {
   PortalProps,
@@ -100,6 +105,11 @@ export type {
   TextTone,
   TextVariant
 } from "./Text/index.js";
+export { Tooltip } from "./Tooltip/index.js";
+export type {
+  TooltipPlacement,
+  TooltipProps
+} from "./Tooltip/index.js";
 export { ThemeProvider } from "./theme/ThemeProvider.js";
 export type {
   ThemePreference,

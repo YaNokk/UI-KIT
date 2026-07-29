@@ -1,0 +1,11 @@
+.surface {
+  box-sizing: border-box;
+  overflow: auto;
+  color: var(--ds-text-primary);
+  background: var(--ds-background-surface-raised);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-lg);
+  box-shadow: var(--ds-shadow-md);
+  padding: var(--ds-space-3);
+  outline: none;
+}

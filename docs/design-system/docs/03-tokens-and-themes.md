@@ -68,6 +68,7 @@ background.surfaceRaised
 background.subtle
 background.selected
 background.overlay
+background.inverse
 ```
 
 ### Text
@@ -80,6 +81,7 @@ text.placeholder
 text.disabled
 text.onAccent
 text.onDanger
+text.onInverse
 ```
 
 ### Icon

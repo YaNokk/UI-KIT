@@ -136,6 +136,7 @@
     --ds-background-interactive-hover: var(--ds-background-subtle);
     --ds-background-interactive-active: var(--ds-color-neutral-200);
     --ds-background-selected: var(--ds-brand-accent-soft);
+    --ds-background-inverse: var(--ds-color-neutral-900);
     --ds-background-overlay: rgb(13 16 21 / 0.56);
     --ds-text-primary: var(--ds-color-neutral-900);
     --ds-text-secondary: var(--ds-color-neutral-600);
@@ -148,6 +149,7 @@
     --ds-text-warning: var(--ds-status-warning-foreground);
     --ds-text-on-accent: var(--ds-brand-on-accent);
     --ds-text-on-danger: var(--ds-color-neutral-0);
+    --ds-text-on-inverse: var(--ds-color-neutral-0);
     --ds-icon-primary: var(--ds-color-neutral-800);
     --ds-icon-secondary: var(--ds-color-neutral-600);
     --ds-icon-tertiary: var(--ds-color-neutral-500);
@@ -244,6 +246,7 @@
     --ds-background-interactive-hover: var(--ds-background-subtle);
     --ds-background-interactive-active: var(--ds-color-neutral-700);
     --ds-background-selected: var(--ds-brand-accent-soft);
+    --ds-background-inverse: var(--ds-color-neutral-900);
     --ds-background-overlay: rgb(0 0 0 / 0.68);
     --ds-text-primary: var(--ds-color-neutral-50);
     --ds-text-secondary: var(--ds-color-neutral-300);
@@ -256,6 +259,7 @@
     --ds-text-warning: var(--ds-status-warning-foreground);
     --ds-text-on-accent: var(--ds-brand-on-accent);
     --ds-text-on-danger: var(--ds-color-neutral-0);
+    --ds-text-on-inverse: var(--ds-color-neutral-0);
     --ds-icon-primary: var(--ds-color-neutral-100);
     --ds-icon-secondary: var(--ds-color-neutral-300);
     --ds-icon-tertiary: var(--ds-color-neutral-400);
