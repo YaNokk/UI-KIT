@@ -62,6 +62,11 @@ export type {
   LinkSize,
   LinkTone
 } from "./Link/index.js";
+export { NumberInput } from "./NumberInput/index.js";
+export type {
+  NumberInputChangeMeta,
+  NumberInputProps
+} from "./NumberInput/index.js";
 export { PasswordInput } from "./PasswordInput/index.js";
 export type { PasswordInputProps } from "./PasswordInput/index.js";
 export { Portal, PortalProvider } from "./Portal/index.js";

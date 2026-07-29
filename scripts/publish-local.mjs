@@ -33,6 +33,7 @@ try {
   generatedAuthentication = true;
   run(["publish", "--workspace=@mypoint/tokens", "--userconfig=.npmrc"]);
   run(["publish", "--workspace=@mypoint/ui", "--userconfig=.npmrc"]);
+  run(["publish", "--workspace=@mypoint/retail-ui", "--userconfig=.npmrc"]);
 } finally {
   if (generatedAuthentication && existsSync(npmrcPath)) {
     rmSync(npmrcPath);

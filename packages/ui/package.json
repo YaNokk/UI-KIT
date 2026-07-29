@@ -55,6 +55,10 @@
       "types": "./dist/Link/index.d.ts",
       "import": "./dist/Link/index.js"
     },
+    "./number-input": {
+      "types": "./dist/NumberInput/index.d.ts",
+      "import": "./dist/NumberInput/index.js"
+    },
     "./password-input": {
       "types": "./dist/PasswordInput/index.d.ts",
       "import": "./dist/PasswordInput/index.js"

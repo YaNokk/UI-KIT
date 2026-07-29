@@ -1,0 +1,21 @@
+.root {
+  display: inline-grid;
+  grid-template-columns:
+    var(--ds-size-control-sm)
+    minmax(
+      calc(var(--ds-size-control-sm) + var(--ds-size-control-sm)),
+      max-content
+    )
+    var(--ds-size-control-sm);
+  align-items: start;
+  gap: var(--ds-space-1);
+  max-width: 100%;
+}
+
+.input {
+  min-width: 0;
+}
+
+.input [data-field-part="native-control"] {
+  text-align: center;
+}

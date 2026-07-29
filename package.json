@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run tokens:generate && npm run build --workspace=@mypoint/tokens && npm run build --workspace=@mypoint/ui",
+    "build": "npm run tokens:generate && npm run build --workspace=@mypoint/tokens && npm run build --workspace=@mypoint/ui && npm run build --workspace=@mypoint/retail-ui",
     "tokens:generate": "node packages/tokens/scripts/generate.mjs",
     "tokens:check": "node packages/tokens/scripts/generate.mjs --check",
     "lint": "eslint .",

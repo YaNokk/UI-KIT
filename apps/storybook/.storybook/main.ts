@@ -42,6 +42,12 @@ const config: StorybookConfig = {
             replacement: fileURLToPath(
               new URL("../../../packages/ui/src/index.ts", import.meta.url)
             )
+          },
+          {
+            find: /^@mypoint\/retail-ui$/,
+            replacement: fileURLToPath(
+              new URL("../../../packages/retail-ui/src/index.ts", import.meta.url)
+            )
           }
         ]
       }

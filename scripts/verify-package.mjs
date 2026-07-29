@@ -44,12 +44,24 @@ const packages = [
       "dist/IconButton/index.d.ts",
       "dist/Input/index.js",
       "dist/Input/index.d.ts",
+      "dist/NumberInput/index.js",
+      "dist/NumberInput/index.d.ts",
       "dist/PasswordInput/index.js",
       "dist/PasswordInput/index.d.ts",
       "dist/Portal/index.js",
       "dist/Portal/index.d.ts",
       "dist/Spinner/index.js",
       "dist/Spinner/index.d.ts",
+      "dist/styles.css"
+    ]
+  },
+  {
+    name: "@mypoint/retail-ui",
+    required: [
+      "dist/index.js",
+      "dist/index.d.ts",
+      "dist/QuantityInput/index.js",
+      "dist/QuantityInput/index.d.ts",
       "dist/styles.css"
     ]
   }

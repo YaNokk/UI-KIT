@@ -148,3 +148,17 @@
   отдельная задача нормализации, а не перемещение файлов.
 - Перед созданием primitive-like control проверяйте public exports, contracts,
   stories и Storybook MCP, когда он доступен.
+- `NumberInput` хранит semantic `number | null` отдельно от локализованной
+  editing-строки и переиспользует общий `internal/numeric` adapter.
+- `NumberInput` и `AmountInput` — sibling-компоненты; generic numeric control
+  не зависит от amount-domain и не принимает monetary semantics.
+- Min/max не блокируют временное редактирование `NumberInput`; границы
+  применяются при commit/step по документированной политике.
+- Все keyboard и button step-действия используют один decimal-safe engine;
+  внутренние step helpers и публичный `NumberStepper` не экспортируются.
+- `QuantityInput` принадлежит `retail-ui` и композирует sibling
+  `IconButton − NumberInput − IconButton`; кнопки не являются adornments.
+- Quantity actions используют canonical `sm`/32 px density, явные accessible
+  labels, обычный tab order и отключаются при disabled/readOnly или на границе.
+- Пустой `QuantityInput` допускается во время редактирования и на blur
+  восстанавливает `min`, если он задан.
