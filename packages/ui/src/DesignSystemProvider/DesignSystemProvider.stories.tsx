@@ -1,6 +1,8 @@
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Amount } from "../Amount/Amount";
 import { Button } from "../Button/Button";
+import { Portal } from "../Portal/Portal";
 import { DesignSystemProvider } from "./DesignSystemProvider";
 
 const meta = {
@@ -38,7 +40,7 @@ export const RuntimeScope: Story = {
   }
 };
 
-export const NestedOverrides: Story = {
+export const NestedScopes: Story = {
   args: {
     children: null
   },
@@ -49,13 +51,52 @@ export const NestedOverrides: Story = {
       mode="dark"
     >
       <div className="grid gap-3 p-4">
+        <div data-provider-probe="outer-content">Outer content</div>
+        <Portal>
+          <div data-provider-probe="outer-portal">Outer portal content</div>
+        </Portal>
         <Amount currency="KZT" value={123456} />
-        <DesignSystemProvider locale="en-US">
+        <DesignSystemProvider brand={purpleBrand} locale="en-US">
           <div className="p-4">
+            <div data-provider-probe="inner-content">Inner content</div>
+            <Portal>
+              <div data-provider-probe="inner-portal">Inner portal content</div>
+            </Portal>
             <Amount currency="KZT" value={123456} />
           </div>
         </DesignSystemProvider>
       </div>
     </DesignSystemProvider>
   )
+};
+
+function ExplicitPortalTargetExample() {
+  const [target, setTarget] = useState<HTMLDivElement | null>(null);
+
+  return (
+    <div className="grid gap-3 p-4">
+      <div data-explicit-portal-root="" ref={setTarget} />
+      {target ? (
+        <DesignSystemProvider
+          brand={purpleBrand}
+          mode="dark"
+          portalContainer={target}
+        >
+          <div>Provider content</div>
+          <Portal>
+            <div data-provider-probe="explicit-portal">
+              Explicit portal content
+            </div>
+          </Portal>
+        </DesignSystemProvider>
+      ) : null}
+    </div>
+  );
+}
+
+export const ExplicitPortalTarget: Story = {
+  args: {
+    children: null
+  },
+  render: () => <ExplicitPortalTargetExample />
 };

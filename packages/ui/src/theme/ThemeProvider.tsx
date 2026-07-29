@@ -48,6 +48,32 @@ function getServerMode(): ThemeMode {
   return "light";
 }
 
+function subscribeToNothing(): () => void {
+  return () => undefined;
+}
+
+function getLightMode(): ThemeMode {
+  return "light";
+}
+
+function getDarkMode(): ThemeMode {
+  return "dark";
+}
+
+function useResolvedThemeMode(mode: ThemePreference): ThemeMode {
+  const subscribe = mode === "system"
+    ? subscribeToSystemMode
+    : subscribeToNothing;
+  const getSnapshot = mode === "system"
+    ? getSystemMode
+    : mode === "dark"
+      ? getDarkMode
+      : getLightMode;
+  const getServerSnapshot = mode === "system" ? getServerMode : getSnapshot;
+
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
+
 export function ThemeProvider({
   brand,
   children,
@@ -58,12 +84,7 @@ export function ThemeProvider({
   const inherited = useContext(ThemeConfigurationContext);
   const configuredBrand = brand ?? inherited.brand;
   const configuredMode = mode ?? inherited.mode;
-  const systemMode = useSyncExternalStore(
-    subscribeToSystemMode,
-    getSystemMode,
-    getServerMode
-  );
-  const resolvedMode = configuredMode === "system" ? systemMode : configuredMode;
+  const resolvedMode = useResolvedThemeMode(configuredMode);
   const brandVariables = useMemo(
     () => createBrandCssVariables(configuredBrand, resolvedMode),
     [configuredBrand, resolvedMode]

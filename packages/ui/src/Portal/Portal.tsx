@@ -7,7 +7,12 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-const PortalRootContext = createContext<HTMLElement | null>(null);
+/**
+ * `undefined` is an internal pending target. It prevents a provider-owned
+ * portal from briefly falling back to body before its host ref is available.
+ * `null` remains the library-default target (`document.body` on the client).
+ */
+const PortalRootContext = createContext<HTMLElement | null | undefined>(null);
 
 export interface PortalProviderProps {
   children: ReactNode;
@@ -15,6 +20,23 @@ export interface PortalProviderProps {
 }
 
 export function PortalProvider({ children, root }: PortalProviderProps) {
+  return (
+    <PortalRootContext.Provider value={root}>
+      {children}
+    </PortalRootContext.Provider>
+  );
+}
+
+interface PortalScopeProviderProps {
+  children: ReactNode;
+  root: HTMLElement | null | undefined;
+}
+
+/** Internal provider bridge; intentionally not exported from the package. */
+export function PortalScopeProvider({
+  children,
+  root
+}: PortalScopeProviderProps) {
   return (
     <PortalRootContext.Provider value={root}>
       {children}
@@ -42,6 +64,7 @@ export function Portal({
 
   if (disabled) return children;
   if (!mounted) return null;
+  if (container === undefined && configuredRoot === undefined) return null;
 
   const mountNode = container ?? configuredRoot ?? document.body;
   return createPortal(children, mountNode);

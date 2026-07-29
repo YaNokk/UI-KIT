@@ -11,6 +11,8 @@ import { DesignSystemProvider } from "./DesignSystemProvider";
 
 // eslint-disable-next-line design-system/no-design-literals -- Runtime brand test fixture.
 const greenBrand = { accentColor: "#16a34a" };
+// eslint-disable-next-line design-system/no-design-literals -- Nested runtime brand test fixture.
+const purpleBrand = { accentColor: "#7c3aed" };
 
 function installMatchMedia(matches = false) {
   Object.defineProperty(window, "matchMedia", {
@@ -103,6 +105,61 @@ describe("DesignSystemProvider", () => {
     target.remove();
   });
 
+  it("uses its own scoped portal host by default", () => {
+    render(
+      <DesignSystemProvider
+        brand={greenBrand}
+        data-testid="provider"
+        mode="dark"
+      >
+        <Portal><span data-testid="scoped-portal">Overlay</span></Portal>
+      </DesignSystemProvider>
+    );
+
+    const provider = screen.getByTestId("provider");
+    const content = screen.getByTestId("scoped-portal");
+    expect(content.parentElement).toHaveAttribute("data-ds-portal-root");
+    expect(provider).toContainElement(content.parentElement);
+  });
+
+  it("gives nested providers independent portal hosts", () => {
+    render(
+      <DesignSystemProvider
+        brand={greenBrand}
+        data-testid="outer-provider"
+        mode="light"
+      >
+        <Portal><span data-testid="outer-portal">Outer overlay</span></Portal>
+        <DesignSystemProvider
+          brand={purpleBrand}
+          data-testid="inner-provider"
+        >
+          <Portal><span data-testid="inner-portal">Inner overlay</span></Portal>
+        </DesignSystemProvider>
+      </DesignSystemProvider>
+    );
+
+    const outer = screen.getByTestId("outer-provider");
+    const inner = screen.getByTestId("inner-provider");
+    const outerPortal = screen.getByTestId("outer-portal");
+    const innerPortal = screen.getByTestId("inner-portal");
+    expect(outerPortal.parentElement).toHaveAttribute("data-ds-portal-root");
+    expect(innerPortal.parentElement).toHaveAttribute("data-ds-portal-root");
+    expect(outer).toContainElement(outerPortal);
+    expect(inner).not.toContainElement(outerPortal);
+    expect(inner).toContainElement(innerPortal);
+  });
+
+  it("treats null as an explicit reset to document.body", () => {
+    render(
+      <DesignSystemProvider mode="light" portalContainer={null}>
+        <Portal><span data-testid="reset-portal">Reset overlay</span></Portal>
+      </DesignSystemProvider>
+    );
+
+    expect(screen.getByTestId("reset-portal").parentElement).toBe(document.body);
+  });
+
   it("keeps the provider and portal path SSR-safe", () => {
     const html = renderToString(
       <DesignSystemProvider locale="ru-RU" mode="light">
@@ -110,6 +167,8 @@ describe("DesignSystemProvider", () => {
         <Amount currency="KZT" value={123456} />
       </DesignSystemProvider>
     );
+    expect(html).toContain("data-ds-root");
+    expect(html).toContain("data-ds-portal-root");
     expect(html).toContain("1 234");
     expect(html).toContain("56");
   });

@@ -45,6 +45,10 @@ component usage:
 </DesignSystemProvider>
 ```
 
+`DesignSystemProvider` renders a real scoped DOM root and automatically keeps
+normal Portal content inside that theme/brand scope. `ThemeProvider` remains a
+public advanced primitive for local theme/brand-only scopes.
+
 React и ReactDOM предоставляются consumer-приложением. Tailwind в consumer не
 требуется.
 

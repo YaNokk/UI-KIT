@@ -96,6 +96,14 @@
 - Внутренние locale, theme/brand и portal contexts остаются разделёнными; provider не становится service locator.
 - Вложенный provider наследует неуказанные runtime values и переопределяет только переданные.
 - Breakpoint numbers не являются runtime-configurable API.
+- `DesignSystemProvider` рендерит реальный scoped DOM root; он не Fragment-like.
+- Provider root по умолчанию остаётся layout-neutral: без transform, contain, overflow clipping, positioning и размеров.
+- Overlay внутри provider по умолчанию использует portal host внутри того же theme/brand scope.
+- Consumer не передаёт `portalContainer` только ради сохранения brand/theme; это override/escape hatch.
+- `portalContainer={undefined}` означает собственный host provider-а, `HTMLElement` — override, `null` — reset к `document.body`.
+- Каждый вложенный `DesignSystemProvider` по умолчанию создаёт собственный scoped portal host.
+- Явные `light`/`dark` режимы не подписываются на system color scheme; подписка принадлежит только `system`.
+- Публичный `ThemeProvider` — advanced/local theme+brand scope; нормальный app root — `DesignSystemProvider`.
 - Monetary display и monetary editing используют общие amount-domain helpers, но не общий React/editing state.
 - Maskito — внутренний numeric editing engine и не определяет публичный API компонентов.
 - Semantic value `AmountInput` отделён от форматированной DOM-строки; пустое значение — `null`, а `0` остаётся валидным.

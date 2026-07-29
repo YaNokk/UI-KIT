@@ -1,11 +1,16 @@
 import type { BrandInput } from "@mypoint/tokens";
-import type { HTMLAttributes, ReactNode } from "react";
+import {
+  useState,
+  type HTMLAttributes,
+  type ReactNode
+} from "react";
 import {
   ThemeProvider,
   type ThemePreference
 } from "../theme/ThemeProvider";
 import { LocaleProvider } from "../internal/locale/LocaleContext";
-import { PortalProvider } from "../Portal/Portal";
+import { PortalScopeProvider } from "../Portal/Portal";
+import styles from "./DesignSystemProvider.module.css";
 
 export interface DesignSystemProviderProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
@@ -16,6 +21,38 @@ export interface DesignSystemProviderProps
   portalContainer?: HTMLElement | null;
 }
 
+interface RuntimeScopeProps {
+  children: ReactNode;
+  locale?: string;
+  portalContainer?: HTMLElement | null;
+}
+
+function RuntimeScope({
+  children,
+  locale,
+  portalContainer
+}: RuntimeScopeProps) {
+  const [internalPortalRoot, setInternalPortalRoot] = useState<
+    HTMLElement | null | undefined
+  >(undefined);
+  const portalRoot = portalContainer === undefined
+    ? internalPortalRoot
+    : portalContainer;
+
+  return (
+    <LocaleProvider {...(locale === undefined ? {} : { locale })}>
+      <PortalScopeProvider root={portalRoot}>
+        {children}
+        <div
+          className={styles.portalRoot}
+          data-ds-portal-root=""
+          ref={setInternalPortalRoot}
+        />
+      </PortalScopeProvider>
+    </LocaleProvider>
+  );
+}
+
 export function DesignSystemProvider({
   brand,
   children,
@@ -24,19 +61,19 @@ export function DesignSystemProvider({
   portalContainer,
   ...scopeProps
 }: DesignSystemProviderProps) {
-  const content = portalContainer === undefined
-    ? children
-    : <PortalProvider root={portalContainer}>{children}</PortalProvider>;
-
   return (
     <ThemeProvider
       {...scopeProps}
       {...(brand === undefined ? {} : { brand })}
       {...(mode === undefined ? {} : { mode })}
+      data-ds-root=""
     >
-      <LocaleProvider {...(locale === undefined ? {} : { locale })}>
-        {content}
-      </LocaleProvider>
+      <RuntimeScope
+        {...(locale === undefined ? {} : { locale })}
+        {...(portalContainer === undefined ? {} : { portalContainer })}
+      >
+        {children}
+      </RuntimeScope>
     </ThemeProvider>
   );
 }
