@@ -12,9 +12,10 @@ export type { DialogProps } from "./Dialog/index.js";
 export { Drawer } from "./Drawer/index.js";
 export type { DrawerProps } from "./Drawer/index.js";
 export type {
+  ModalBaseProps,
   ModalCloseReason,
   ModalOpenChangeMeta
-} from "./internal/modal/types.js";
+} from "./modal/index.js";
 export { Amount } from "./Amount/index.js";
 export type {
   AmountMinorTone,

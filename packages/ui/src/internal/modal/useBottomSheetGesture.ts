@@ -5,6 +5,7 @@ import {
   type CSSProperties,
   type PointerEventHandler
 } from "react";
+import { findNearestVerticalScrollOwner } from "./scrollOwnership";
 
 const DISMISS_VELOCITY = 0.4;
 const DISMISS_DISTANCE_RATIO = 0.2;
@@ -16,6 +17,7 @@ interface GestureState {
   startTime: number;
   startX: number;
   startY: number;
+  verticalScrollOwner: HTMLElement | null;
 }
 
 interface BottomSheetGestureOptions {
@@ -26,6 +28,7 @@ interface BottomSheetGestureOptions {
 interface BottomSheetGestureResult {
   onPointerCancel: PointerEventHandler<HTMLDivElement>;
   onPointerDown: PointerEventHandler<HTMLDivElement>;
+  onLostPointerCapture: PointerEventHandler<HTMLDivElement>;
   onPointerMove: PointerEventHandler<HTMLDivElement>;
   onPointerUp: PointerEventHandler<HTMLDivElement>;
   style: CSSProperties;
@@ -37,7 +40,8 @@ const idleGesture: GestureState = {
   pointerId: -1,
   startTime: 0,
   startX: 0,
-  startY: 0
+  startY: 0,
+  verticalScrollOwner: null
 };
 
 export function useBottomSheetGesture({
@@ -49,6 +53,13 @@ export function useBottomSheetGesture({
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
 
   useEffect(() => {
+    if (!enabled) {
+      gestureRef.current = idleGesture;
+      setOffset(0);
+      setViewportHeight(null);
+      return;
+    }
+
     const viewport = window.visualViewport;
     if (!viewport) return;
     const sync = () => setViewportHeight(viewport.height);
@@ -59,7 +70,7 @@ export function useBottomSheetGesture({
       viewport.removeEventListener("resize", sync);
       viewport.removeEventListener("scroll", sync);
     };
-  }, []);
+  }, [enabled]);
 
   const reset = () => {
     gestureRef.current = idleGesture;
@@ -75,19 +86,17 @@ export function useBottomSheetGesture({
       return;
     }
 
-    const target = event.target instanceof HTMLElement ? event.target : null;
-    const scrollOwner = target?.closest<HTMLElement>(
-      "[data-modal-scroll-container]"
-    );
-    if (scrollOwner && scrollOwner.scrollTop > 0) return;
-
     gestureRef.current = {
       active: true,
       cancelled: false,
       pointerId: event.pointerId,
       startTime: performance.now(),
       startX: event.clientX,
-      startY: event.clientY
+      startY: event.clientY,
+      verticalScrollOwner: findNearestVerticalScrollOwner(
+        event.target,
+        event.currentTarget
+      )
     };
   };
 
@@ -98,6 +107,15 @@ export function useBottomSheetGesture({
     const deltaX = event.clientX - gesture.startX;
     const deltaY = event.clientY - gesture.startY;
     if (Math.abs(deltaX) > Math.abs(deltaY) || deltaY <= 0) {
+      gesture.cancelled = true;
+      setOffset(0);
+      return;
+    }
+
+    if (
+      gesture.verticalScrollOwner
+      && gesture.verticalScrollOwner.scrollTop > 0
+    ) {
       gesture.cancelled = true;
       setOffset(0);
       return;
@@ -126,6 +144,7 @@ export function useBottomSheetGesture({
   };
 
   return {
+    onLostPointerCapture: reset,
     onPointerCancel: reset,
     onPointerDown,
     onPointerMove,

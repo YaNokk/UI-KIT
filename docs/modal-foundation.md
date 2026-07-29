@@ -18,8 +18,8 @@ Escape/outside arbitration and SSR suites.
 | Concern | Core DS behavior | Radix 1.1.23 observed behavior | Final owner | Decision |
 | --- | --- | --- | --- | --- |
 | Focus containment | `react-focus-lock` in `BaseModal` | Modal `Content` composes a trapped focus scope | Radix per surface, DS contract | Adopt mechanics; browser-test nested scope suspension |
-| Initial focus | Focuses modal wrapper unless disabled | Provides preventable mount autofocus | DS policy through Radix signal | Explicit ref, then first eligible control, then surface |
-| Focus return | `FocusLock` return focus | Provides preventable unmount autofocus | DS policy through Radix signal | Restore child → parent opener → page opener |
+| Initial focus | Focuses modal wrapper unless disabled | Provides preventable mount autofocus | Radix default; DS explicit override | A valid explicit ref overrides; otherwise Radix owns tabbability discovery |
+| Focus return | `FocusLock` return focus | Provides preventable unmount autofocus | DS fallback through Radix signal | Valid opener → parent surface/opener → Radix safe fallback |
 | ARIA isolation | Modal wrapper and focus lock; isolation is not hierarchy-aware | Modal content uses `aria-hidden` isolation | Radix per surface | Adopt only after nested browser verification |
 | Escape | Wrapper keydown stops propagation | Dismissable layer emits a preventable top-layer signal | ModalRuntime | Only the active top entry may request close |
 | Outside interaction | Backdrop mouse-down/up target validation | Dismissable layer emits preventable outside signals | ModalRuntime | Drawer always prevents; Dialog/BottomSheet follow `dismissOnBackdrop` |
@@ -70,12 +70,13 @@ Components are controlled-only. A DS-initiated close emits
 `onOpenChange(false, { reason })` at most once per activation. A later
 consumer-driven `open=false` does not echo the callback.
 
-Ancestor closure immediately deactivates descendants and emits one
-`reason: "ancestor"` request. The consumer must reconcile each child from
-`open=true` to `open=false`. Until that acknowledgement and a later
-`false → true` transition, the invalidated activation remains suppressed.
-Development builds warn if a parent becomes active while a controlled child
-still exposes the invalidated `open=true`; production remains silent.
+Ancestor closure immediately deactivates the currently registered descendants
+and emits one `reason: "ancestor"` request per activation. Invalidation is
+tied to the exact internal instance id and activation version. A normally
+rerendered instance remains suppressed until `false → true`; an unmounted and
+later remounted component receives a new logical identity and is not matched
+to an old tombstone. Tombstones are never transferred by `parentId + kind`,
+so same-kind siblings cannot suppress one another.
 
 ## Layer contract
 
@@ -133,11 +134,12 @@ Validated in Storybook dev mode at 390×844, 768×1024 and 1440×900:
 - Drawer → Drawer, Drawer → Dialog and Dialog → Dialog kept one effective
   guard, one document lock and top-only Escape/pointer arbitration;
 - Drawer guards never dismissed on outside pointer; Dialog and BottomSheet
-  reported `backdrop`;
+  reported `backdrop` only after a completed down/up sequence on the same
+  effective guard;
 - explicit nested initial focus and child → parent opener restoration passed;
-- ancestor closure hid the child immediately, emitted one `ancestor`, warned
-  once for stale controlled state, suppressed it after parent reopen, and
-  allowed a later acknowledged `false → true` activation;
+- ancestor closure hid the registered child immediately and emitted one
+  `ancestor`; a different same-kind remount was treated as a new instance
+  without tombstone leakage;
 - layer probes observed guard `+0`, surface `+1`, floating `+2` and nested
   surface `+9` relationships without asserting the public meaning of numbers;
 - nested provider Portal content remained inside its dark/runtime-brand scope;
@@ -150,6 +152,42 @@ Validated in Storybook dev mode at 390×844, 768×1024 and 1440×900:
 
 The private gesture adapter also has a deterministic pointer test for swipe
 dismissal and non-zero inner-scroll priority.
+
+Dialog and Drawer are frozen at this baseline. BottomSheet tracks only
+`VisualViewport.height` while active to reduce keyboard overlap; it does not
+claim verified keyboard positioning, `offsetTop` handling or full mobile
+viewport resilience. BottomSheet remains mobile-hardening pending until those
+real-device geometry and gesture checks pass.
+
+## v1.3 corrective browser baseline
+
+Revalidated against the Storybook dev server after the identity, focus,
+backdrop and gesture corrections:
+
+- Radix default focus skipped native hidden, CSS-hidden, disabled and inert
+  candidates and selected the first visible eligible control. An explicit ref
+  to a hidden control fell back to the same Radix discovery path.
+- When a nested Dialog opener was removed before close, DS restoration focused
+  the parent Drawer surface. Radix remains the fallback when DS has no valid
+  opener or ancestor target.
+- Invalidating child A emitted `child-A:ancestor`; mounting same-kind sibling B
+  and reopening the root displayed B immediately. No tombstone was transferred
+  across the remount.
+- A completed pointer down/up on the Dialog guard emitted one `backdrop`.
+  Guard drag into the surface left the Dialog open. The same outside click left
+  Drawer open.
+- At 390×844 the active BottomSheet surface height equalled
+  `VisualViewport.height=844`; its body had `overflow-y: auto` and a real wheel
+  interaction changed `scrollTop` from `0` to approximately `450` without
+  dismissing the sheet.
+- At 768×1024 Dialog retained its independent 500 px width and one document
+  lock. At 1440×900 Drawer retained its independent 500 px width, one guard and
+  one document lock.
+
+Touch velocity/distance arbitration and nested scroll-owner selection are
+covered deterministically by pointer tests. Full mobile keyboard positioning,
+`offsetTop`, real-device touch physics and safe-area combinations are still
+outside the frozen promise and remain BottomSheet hardening work.
 
 Validation commands: `tokens:check`, lint, typecheck, Storybook MCP readiness
 and the complete unit suite. Build, Storybook build, pack/consumer and

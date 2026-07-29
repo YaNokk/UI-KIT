@@ -53,6 +53,9 @@ export default defineConfig({
         "Link/index": fileURLToPath(
           new URL("./src/Link/index.ts", import.meta.url)
         ),
+        "modal/index": fileURLToPath(
+          new URL("./src/modal/index.ts", import.meta.url)
+        ),
         "NumberInput/index": fileURLToPath(
           new URL("./src/NumberInput/index.ts", import.meta.url)
         ),

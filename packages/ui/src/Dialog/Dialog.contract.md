@@ -7,8 +7,11 @@ not call `onOpenChange`.
 
 - `dismissOnBackdrop` and `dismissOnEscape` default to `true`.
 - `closeLabel` is required for the canonical close `IconButton`.
-- Focus starts at a valid `initialFocusRef`, otherwise at the first eligible
-  control, otherwise at the dialog surface.
+- A valid `initialFocusRef` overrides autofocus; otherwise Radix FocusScope
+  owns default tabbability discovery.
+- Focus returns to a still-valid opener, then to the parent modal fallback.
+  If neither DS target is valid, the Radix close-autofocus path is not
+  prevented.
 - Nested modal ownership, layers, ancestor invalidation and document scroll
   locking belong to `ModalRuntime`.
 

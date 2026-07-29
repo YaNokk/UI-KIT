@@ -1,7 +1,7 @@
 import { ModalPrimitive } from "../internal/modal/ModalPrimitive";
-import type { SharedModalProps } from "../internal/modal/types";
+import type { ModalBaseProps } from "../modal/types";
 
-export interface DialogProps extends SharedModalProps {
+export interface DialogProps extends ModalBaseProps {
   dismissOnBackdrop?: boolean;
 }
 

@@ -1,7 +1,7 @@
 import { ModalPrimitive } from "../internal/modal/ModalPrimitive";
-import type { SharedModalProps } from "../internal/modal/types";
+import type { ModalBaseProps } from "../modal/types";
 
-export type DrawerProps = SharedModalProps;
+export type DrawerProps = ModalBaseProps;
 
 export function Drawer(props: DrawerProps) {
   return (

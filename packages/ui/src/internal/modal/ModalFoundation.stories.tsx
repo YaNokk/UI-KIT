@@ -8,10 +8,10 @@ import { Dialog, type DialogProps } from "../../Dialog/Dialog";
 import { Drawer } from "../../Drawer/Drawer";
 import { Input } from "../../Input/Input";
 import { Portal } from "../../Portal/Portal";
-import type { ModalOpenChangeMeta, SharedModalProps } from "./types";
+import type { ModalBaseProps } from "../../modal/types";
 import { ModalLayerContext } from "./ModalRuntime";
 
-type ModalComponentProps = SharedModalProps & {
+type ModalComponentProps = ModalBaseProps & {
   dismissOnBackdrop?: boolean;
 };
 
@@ -22,7 +22,7 @@ const components = {
 };
 
 interface HarnessProps {
-  children?: SharedModalProps["children"];
+  children?: ModalBaseProps["children"];
   kind: keyof typeof components;
   openInitially?: boolean;
 }
@@ -121,47 +121,45 @@ function LongContent() {
 
 function AncestorHarness() {
   const [rootOpen, setRootOpen] = useState(true);
-  const [childOpen, setChildOpen] = useState(true);
+  const [childIdentity, setChildIdentity] = useState<"A" | "B">("A");
   const [events, setEvents] = useState<string[]>([]);
-  const close = (
-    owner: "root" | "child",
-    setter: (open: boolean) => void
-  ) => (nextOpen: boolean, meta: ModalOpenChangeMeta) => {
-    setEvents((current) => [...current, `${owner}:${meta.reason}`]);
-    if (owner === "root") setter(nextOpen);
-    if (owner === "child" && meta.reason !== "ancestor") setter(nextOpen);
-  };
 
   return (
     <div className="grid gap-3">
       <Button onClick={() => setRootOpen(true)} variant="secondary">
         Повторно открыть root
       </Button>
+      <Button onClick={() => setChildIdentity("B")} variant="secondary">
+        Смонтировать sibling B
+      </Button>
       <output data-ancestor-events="">{events.join(",")}</output>
       <Dialog
         closeLabel="Закрыть root"
-        onOpenChange={close("root", setRootOpen)}
+        onOpenChange={(nextOpen, meta) => {
+          setEvents((current) => [...current, `root:${meta.reason}`]);
+          setRootOpen(nextOpen);
+        }}
         open={rootOpen}
         title="Ancestor root"
       >
-        <Button onClick={() => setChildOpen(false)} variant="secondary">
-          Подтвердить child=false
-        </Button>
-        <Button onClick={() => setChildOpen(true)} variant="secondary">
-          Новый child false→true
-        </Button>
         <Drawer
+          key={childIdentity}
           closeLabel="Закрыть child"
           headerActions={
             <Button onClick={() => setRootOpen(false)} variant="secondary">
               Закрыть ancestor
             </Button>
           }
-          onOpenChange={close("child", setChildOpen)}
-          open={childOpen}
-          title="Stale child"
+          onOpenChange={(_nextOpen, meta) => {
+            setEvents((current) => [
+              ...current,
+              `child-${childIdentity}:${meta.reason}`
+            ]);
+          }}
+          open
+          title={`Child ${childIdentity}`}
         >
-          Потомок должен скрыться немедленно.
+          Invalidation A не должна мигрировать на remounted sibling B.
         </Drawer>
       </Dialog>
     </div>
@@ -208,6 +206,67 @@ function FocusHarness() {
         <Button variant="primary">Child action</Button>
       </Dialog>
     </Dialog>
+  );
+}
+
+function FocusDiscoveryHarness({ invalidRef }: { invalidRef: boolean }) {
+  const hiddenRef = useRef<HTMLButtonElement>(null);
+  return (
+    <Dialog
+      closeLabel="Закрыть focus discovery"
+      headerActions={
+        <>
+          <button hidden ref={hiddenRef}>Hidden control</button>
+          <button className="hidden">Display none control</button>
+          <button disabled>Disabled control</button>
+          <div inert>
+            <button>Inert control</button>
+          </div>
+          <button>Visible focus control</button>
+        </>
+      }
+      {...(invalidRef ? { initialFocusRef: hiddenRef } : {})}
+      onOpenChange={() => undefined}
+      open
+      title={invalidRef ? "Invalid explicit focus" : "Radix focus discovery"}
+    >
+      Focus fixture body
+    </Dialog>
+  );
+}
+
+function MissingOpenerHarness() {
+  const [childOpen, setChildOpen] = useState(false);
+  const [openerVisible, setOpenerVisible] = useState(true);
+  return (
+    <Drawer
+      closeLabel="Закрыть fallback parent"
+      onOpenChange={() => undefined}
+      open
+      title="Fallback parent"
+    >
+      {openerVisible ? (
+        <Button onClick={() => setChildOpen(true)} variant="secondary">
+          Открыть fallback child
+        </Button>
+      ) : null}
+      <Dialog
+        closeLabel="Закрыть fallback child"
+        headerActions={
+          <Button
+            onClick={() => setOpenerVisible(false)}
+            variant="secondary"
+          >
+            Удалить opener
+          </Button>
+        }
+        onOpenChange={setChildOpen}
+        open={childOpen}
+        title="Fallback child"
+      >
+        После удаления opener фокус должен вернуться на surface родителя.
+      </Dialog>
+    </Drawer>
   );
 }
 
@@ -297,6 +356,21 @@ export const StackStress: Story = {
 export const RadixNestedFocus: Story = {
   args: {} as DialogProps,
   render: () => <FocusHarness />
+};
+
+export const RadixDefaultFocusDiscovery: Story = {
+  args: {} as DialogProps,
+  render: () => <FocusDiscoveryHarness invalidRef={false} />
+};
+
+export const InvalidInitialFocusRef: Story = {
+  args: {} as DialogProps,
+  render: () => <FocusDiscoveryHarness invalidRef />
+};
+
+export const MissingOpenerFallback: Story = {
+  args: {} as DialogProps,
+  render: () => <MissingOpenerHarness />
 };
 
 export const AncestorInvalidation: Story = {

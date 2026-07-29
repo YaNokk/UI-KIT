@@ -1,12 +1,12 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import {
+  useContext,
   useEffect,
   useId,
   useLayoutEffect,
   useMemo,
   useRef,
-  useContext,
   type CSSProperties,
   type ReactNode
 } from "react";
@@ -16,36 +16,37 @@ import { Portal } from "../../Portal/Portal";
 import { Text } from "../../Text/Text";
 import { classNames } from "../../shared/classNames";
 import {
+  ModalFocusReturnContext,
   ModalLayerContext,
   ModalParentContext,
   useModalEntryView,
   useResolvedModalRuntime
 } from "./ModalRuntime";
 import type {
-  ModalCloseReason,
-  ModalKind,
-  SharedModalProps
-} from "./types";
+  ModalBaseProps,
+  ModalCloseReason
+} from "../../modal/types";
+import type { ModalKind } from "./types";
 import { useBottomSheetGesture } from "./useBottomSheetGesture";
 import styles from "./ModalPrimitive.module.css";
 
-const focusableSelector = [
-  "button:not(:disabled)",
-  "[href]",
-  "input:not(:disabled)",
-  "select:not(:disabled)",
-  "textarea:not(:disabled)",
-  "[tabindex]:not([tabindex='-1'])"
-].join(",");
+const BACKDROP_DRAG_TOLERANCE = 8;
 
 type SurfaceKind = ModalKind;
 
-export interface ModalPrimitiveProps extends SharedModalProps {
+export interface ModalPrimitiveProps extends ModalBaseProps {
   dim: boolean;
   dismissOnBackdrop: boolean;
   kind: SurfaceKind;
   surfaceChildren?: ReactNode;
   surfaceStyle?: CSSProperties;
+}
+
+interface GuardPointerSequence {
+  guard: HTMLDivElement;
+  pointerId: number;
+  startX: number;
+  startY: number;
 }
 
 const surfaceClassNames: Record<SurfaceKind, string> = {
@@ -54,13 +55,26 @@ const surfaceClassNames: Record<SurfaceKind, string> = {
   "bottom-sheet": styles.bottomSheet
 };
 
-function isFocusable(element: HTMLElement | null): element is HTMLElement {
-  return Boolean(
-    element
-    && element.isConnected
-    && !element.hasAttribute("disabled")
-    && element.getAttribute("aria-hidden") !== "true"
-  );
+function isValidFocusTarget(
+  element: HTMLElement | null
+): element is HTMLElement {
+  if (
+    !element
+    || !element.isConnected
+    || element.hasAttribute("disabled")
+    || element.closest("[inert], [hidden], [aria-hidden='true']")
+  ) {
+    return false;
+  }
+
+  if ("checkVisibility" in element) {
+    return element.checkVisibility({
+      checkOpacity: false,
+      checkVisibilityCSS: true
+    });
+  }
+
+  return true;
 }
 
 export function ModalPrimitive({
@@ -83,6 +97,7 @@ export function ModalPrimitive({
 }: ModalPrimitiveProps) {
   const id = useId();
   const parentId = useContext(ModalParentContext);
+  const parentFocusReturn = useContext(ModalFocusReturnContext);
   const store = useResolvedModalRuntime();
   const view = useModalEntryView(store, id);
   const openRef = useRef(open);
@@ -91,6 +106,7 @@ export function ModalPrimitive({
   const openerRef = useRef<HTMLElement | null>(null);
   const previousOpenRef = useRef(false);
   const pendingReasonRef = useRef<ModalCloseReason | null>(null);
+  const guardPointerRef = useRef<GuardPointerSequence | null>(null);
 
   openRef.current = open;
   callbackRef.current = onOpenChange;
@@ -153,6 +169,10 @@ export function ModalPrimitive({
     if (store && registration) store.update(id, registration);
   }, [id, registration, store]);
 
+  useEffect(() => {
+    guardPointerRef.current = null;
+  }, [open, view.top]);
+
   const handleOpenChange = (nextOpen: boolean) => {
     if (nextOpen) return;
     const reason = pendingReasonRef.current;
@@ -161,27 +181,21 @@ export function ModalPrimitive({
   };
 
   const handleOpenAutoFocus = (event: Event) => {
-    event.preventDefault();
     const explicitTarget = initialFocusRef?.current ?? null;
-    if (isFocusable(explicitTarget)) {
+    if (isValidFocusTarget(explicitTarget)) {
+      event.preventDefault();
       explicitTarget.focus({ preventScroll: true });
-      return;
     }
-
-    const firstEligible = contentRef.current?.querySelector<HTMLElement>(
-      focusableSelector
-    ) ?? null;
-    if (isFocusable(firstEligible)) {
-      firstEligible.focus({ preventScroll: true });
-      return;
-    }
-    contentRef.current?.focus({ preventScroll: true });
   };
 
   const handleCloseAutoFocus = (event: Event) => {
-    event.preventDefault();
     const opener = openerRef.current;
-    if (isFocusable(opener)) opener.focus({ preventScroll: true });
+    const fallback = isValidFocusTarget(opener)
+      ? opener
+      : parentFocusReturn?.getFallbackTarget() ?? null;
+    if (!isValidFocusTarget(fallback)) return;
+    event.preventDefault();
+    fallback.focus({ preventScroll: true });
   };
 
   if (!store || !view.registered || !view.active) return null;
@@ -202,9 +216,45 @@ export function ModalPrimitive({
               className={styles.guard}
               data-dim={dim ? "" : undefined}
               data-modal-guard=""
+              onLostPointerCapture={() => {
+                guardPointerRef.current = null;
+              }}
+              onPointerCancel={() => {
+                guardPointerRef.current = null;
+              }}
               onPointerDown={(event) => {
+                if (!event.isPrimary) return;
                 event.preventDefault();
-                if (dismissOnBackdrop) requestClose("backdrop");
+                guardPointerRef.current = {
+                  guard: event.currentTarget,
+                  pointerId: event.pointerId,
+                  startX: event.clientX,
+                  startY: event.clientY
+                };
+              }}
+              onPointerMove={(event) => {
+                const sequence = guardPointerRef.current;
+                if (!sequence || sequence.pointerId !== event.pointerId) return;
+                const distance = Math.hypot(
+                  event.clientX - sequence.startX,
+                  event.clientY - sequence.startY
+                );
+                if (distance > BACKDROP_DRAG_TOLERANCE) {
+                  guardPointerRef.current = null;
+                }
+              }}
+              onPointerUp={(event) => {
+                const sequence = guardPointerRef.current;
+                guardPointerRef.current = null;
+                if (
+                  !sequence
+                  || sequence.pointerId !== event.pointerId
+                  || sequence.guard !== event.currentTarget
+                  || !dismissOnBackdrop
+                ) {
+                  return;
+                }
+                requestClose("backdrop");
               }}
               style={{ zIndex: view.guardLayer }}
             />
@@ -229,79 +279,105 @@ export function ModalPrimitive({
               pendingReasonRef.current = "escape";
             }}
             onOpenAutoFocus={handleOpenAutoFocus}
-            onPointerCancel={
-              kind === "bottom-sheet"
-                ? sheetGesture.onPointerCancel
-                : undefined
-            }
-            onPointerDown={
-              kind === "bottom-sheet" ? sheetGesture.onPointerDown : undefined
-            }
-            onPointerDownOutside={(event) => {
-              if (!view.top || !dismissOnBackdrop) {
-                event.preventDefault();
-                return;
+            onLostPointerCapture={(event) => {
+              guardPointerRef.current = null;
+              if (kind === "bottom-sheet") {
+                sheetGesture.onLostPointerCapture(event);
               }
-              pendingReasonRef.current = "backdrop";
             }}
-            onPointerMove={
-              kind === "bottom-sheet" ? sheetGesture.onPointerMove : undefined
-            }
-            onPointerUp={
-              kind === "bottom-sheet" ? sheetGesture.onPointerUp : undefined
-            }
+            onPointerCancel={(event) => {
+              guardPointerRef.current = null;
+              if (kind === "bottom-sheet") {
+                sheetGesture.onPointerCancel(event);
+              }
+            }}
+            onPointerDown={(event) => {
+              guardPointerRef.current = null;
+              if (kind === "bottom-sheet") {
+                sheetGesture.onPointerDown(event);
+              }
+            }}
+            onPointerDownOutside={(event) => {
+              event.preventDefault();
+            }}
+            onPointerMove={(event) => {
+              guardPointerRef.current = null;
+              if (kind === "bottom-sheet") {
+                sheetGesture.onPointerMove(event);
+              }
+            }}
+            onPointerUp={(event) => {
+              guardPointerRef.current = null;
+              if (kind === "bottom-sheet") {
+                sheetGesture.onPointerUp(event);
+              }
+            }}
             ref={contentRef}
             style={layerStyle}
             tabIndex={-1}
           >
             <ModalParentContext.Provider value={id}>
-              <ModalLayerContext.Provider
+              <ModalFocusReturnContext.Provider
                 value={{
-                  floatingLayer: view.floatingLayer,
-                  surfaceLayer: view.surfaceLayer
+                  getFallbackTarget: () => {
+                    if (isValidFocusTarget(contentRef.current)) {
+                      return contentRef.current;
+                    }
+                    if (isValidFocusTarget(openerRef.current)) {
+                      return openerRef.current;
+                    }
+                    return parentFocusReturn?.getFallbackTarget() ?? null;
+                  }
                 }}
               >
-                {kind === "bottom-sheet" ? (
-                  <div aria-hidden="true" className={styles.dragHandle} />
-                ) : null}
+                <ModalLayerContext.Provider
+                  value={{
+                    floatingLayer: view.floatingLayer,
+                    surfaceLayer: view.surfaceLayer
+                  }}
+                >
+                  {kind === "bottom-sheet" ? (
+                    <div aria-hidden="true" className={styles.dragHandle} />
+                  ) : null}
 
-                <header className={styles.header}>
-                  <div className={styles.heading}>
-                    <DialogPrimitive.Title asChild>
-                      <Heading level={2} variant="md">
-                        {title}
-                      </Heading>
-                    </DialogPrimitive.Title>
-                    {description != null ? (
-                      <DialogPrimitive.Description asChild>
-                        <Text as="p" tone="secondary" variant="bodySm">
-                          {description}
-                        </Text>
-                      </DialogPrimitive.Description>
-                    ) : null}
+                  <header className={styles.header}>
+                    <div className={styles.heading}>
+                      <DialogPrimitive.Title asChild>
+                        <Heading level={2} variant="md">
+                          {title}
+                        </Heading>
+                      </DialogPrimitive.Title>
+                      {description != null ? (
+                        <DialogPrimitive.Description asChild>
+                          <Text as="p" tone="secondary" variant="bodySm">
+                            {description}
+                          </Text>
+                        </DialogPrimitive.Description>
+                      ) : null}
+                    </div>
+
+                    <div className={styles.actions}>
+                      {headerActions}
+                      <IconButton
+                        aria-label={closeLabel}
+                        icon={<X />}
+                        onClick={() => requestClose("close-button")}
+                        size="sm"
+                        variant="ghost"
+                      />
+                    </div>
+                  </header>
+
+                  <div className={styles.body} data-modal-scroll-container="">
+                    {children}
+                    {surfaceChildren}
                   </div>
 
-                  <div className={styles.actions}>
-                    {headerActions}
-                    <IconButton
-                      aria-label={closeLabel}
-                      icon={<X />}
-                      onClick={() => requestClose("close-button")}
-                      size="sm"
-                      variant="ghost"
-                    />
-                  </div>
-                </header>
-
-                <div className={styles.body} data-modal-scroll-container="">
-                  {children}
-                  {surfaceChildren}
-                </div>
-
-                {footer != null ? (
-                  <footer className={styles.footer}>{footer}</footer>
-                ) : null}
-              </ModalLayerContext.Provider>
+                  {footer != null ? (
+                    <footer className={styles.footer}>{footer}</footer>
+                  ) : null}
+                </ModalLayerContext.Provider>
+              </ModalFocusReturnContext.Provider>
             </ModalParentContext.Provider>
           </DialogPrimitive.Content>
         </div>

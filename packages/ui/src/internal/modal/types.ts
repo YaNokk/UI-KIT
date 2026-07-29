@@ -1,17 +1,8 @@
-import type { ReactNode, RefObject } from "react";
+import type {
+  ModalOpenChangeMeta
+} from "../../modal/types";
 
 export type ModalKind = "dialog" | "drawer" | "bottom-sheet";
-
-export type ModalCloseReason =
-  | "escape"
-  | "backdrop"
-  | "swipe"
-  | "close-button"
-  | "ancestor";
-
-export interface ModalOpenChangeMeta {
-  reason: ModalCloseReason;
-}
 
 export interface ModalRegistration {
   id: string;
@@ -34,18 +25,4 @@ export interface ModalEntryView {
   registered: boolean;
   surfaceLayer: number;
   top: boolean;
-}
-
-export interface SharedModalProps {
-  children: ReactNode;
-  className?: string;
-  closeLabel: string;
-  description?: ReactNode;
-  dismissOnEscape?: boolean;
-  footer?: ReactNode;
-  headerActions?: ReactNode;
-  initialFocusRef?: RefObject<HTMLElement | null>;
-  onOpenChange: (open: boolean, meta: ModalOpenChangeMeta) => void;
-  open: boolean;
-  title: ReactNode;
 }

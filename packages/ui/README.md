@@ -68,7 +68,9 @@ fields композируют эти foundations и не копируют Input 
 Controlled modal surfaces доступны как `Dialog`, `Drawer` и `BottomSheet`
 через root exports и subpaths `dialog`, `drawer`, `bottom-sheet`. Они требуют
 `open`, `onOpenChange` и `closeLabel`; Trigger/defaultOpen, raw z-index,
-placement, snap points и Radix types не входят в публичный API. Общие Portal,
+placement, snap points и Radix types не входят в публичный API. Общие
+`ModalCloseReason` и `ModalOpenChangeMeta` доступны через root export и
+`@mypoint/ui/modal`; runtime и layer types остаются private. Общие Portal,
 focus, hierarchy, ancestor invalidation, layer arbitration и document scroll
 lock описаны в `../../docs/modal-foundation.md`.
 

@@ -4,10 +4,13 @@
 It dims and guards the page and reports backdrop, Escape, close-button,
 ancestor or swipe close reasons.
 
-The sheet uses `100dvh`, `VisualViewport` height updates and bottom safe-area
-padding. Its body remains independently scrollable. A private touch/pen
-adapter dismisses on downward velocity `0.4 px/ms` or distance `20%`, ignores
-horizontal/upward gestures and never takes a downward gesture from an inner
-scroll container while that container is above `scrollTop=0`.
+The sheet uses `100dvh`, tracks `VisualViewport.height` only while active to
+reduce keyboard overlap, and applies bottom safe-area padding. It does not yet
+promise keyboard positioning or `VisualViewport.offsetTop` handling. Its body
+remains independently scrollable. A private touch/pen adapter dismisses on
+downward velocity `0.4 px/ms` or distance `20%`, ignores horizontal/upward
+gestures and gives the nearest vertically scrollable ancestor priority while
+its `scrollTop` is above zero.
 
-Gesture tuning, snap points and raw geometry are not public API.
+Gesture tuning, snap points and raw geometry are not public API. BottomSheet
+remains mobile-hardening pending; Dialog and Drawer may freeze independently.

@@ -10,10 +10,10 @@ import {
 import { primitiveTokens } from "@mypoint/tokens";
 import { acquireDocumentScrollLock, type DocumentScrollLock } from "./scrollLock";
 import type {
-  ModalCloseReason,
   ModalEntryView,
   ModalRegistration
 } from "./types";
+import type { ModalCloseReason } from "../../modal/types";
 
 export const MODAL_LAYER_STRIDE = 8;
 const MODAL_BASE_LAYER = primitiveTokens["zIndex.modal"];
@@ -28,8 +28,6 @@ interface RuntimeEntry extends ModalRegistration {
 
 interface InvalidatedTombstone {
   invalidatedVersion: number;
-  kind: ModalRegistration["kind"];
-  parentId: string | null;
   warned: boolean;
 }
 
@@ -136,8 +134,6 @@ function createModalRuntimeStore(): ModalRuntimeStore {
     entry.invalidatedVersion = entry.activationVersion;
     tombstones.set(entry.id, {
       invalidatedVersion: entry.activationVersion,
-      kind: entry.kind,
-      parentId: entry.parentId,
       warned: false
     });
     notifyClose(entry, "ancestor");
@@ -209,26 +205,7 @@ function createModalRuntimeStore(): ModalRuntimeStore {
       return version;
     },
     register(registration) {
-      let tombstone = tombstones.get(registration.id);
-      if (!tombstone && registration.open) {
-        const staleSlot = [...tombstones.entries()].find(
-          ([staleId, candidate]) =>
-            !entries.has(staleId)
-            && candidate.parentId === registration.parentId
-            && candidate.kind === registration.kind
-        );
-        if (staleSlot) {
-          const [staleId, candidate] = staleSlot;
-          tombstones.delete(staleId);
-          tombstones.set(registration.id, candidate);
-          for (const descendant of tombstones.values()) {
-            if (descendant.parentId === staleId) {
-              descendant.parentId = registration.id;
-            }
-          }
-          tombstone = candidate;
-        }
-      }
+      const tombstone = tombstones.get(registration.id);
       const suppressed = Boolean(tombstone && registration.open);
       if (
         suppressed
@@ -302,6 +279,13 @@ function createModalRuntimeStore(): ModalRuntimeStore {
 
 const ModalRuntimeContext = createContext<ModalRuntimeStore | null>(null);
 export const ModalParentContext = createContext<string | null>(null);
+
+export interface ModalFocusReturnValue {
+  getFallbackTarget(): HTMLElement | null;
+}
+
+export const ModalFocusReturnContext =
+  createContext<ModalFocusReturnValue | null>(null);
 
 export interface ModalLayerValue {
   floatingLayer: number;
