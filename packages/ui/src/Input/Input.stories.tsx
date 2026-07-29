@@ -1,7 +1,9 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Mail, Search } from "lucide-react";
+import { Mail, Search, X } from "lucide-react";
 import { expect, userEvent, within } from "storybook/test";
+import { IconButton } from "../IconButton/IconButton";
+import { PasswordInput } from "../PasswordInput/PasswordInput";
 import { Input } from "./Input";
 import styles from "./Input.stories.module.css";
 
@@ -179,6 +181,230 @@ export const InnerLabelInsetAlignment: Story = {
   )
 };
 
+export const FloatingLabelGeometry: Story = {
+  parameters: {
+    layout: "padded"
+  },
+  render: () => (
+    <div className={styles.insetMatrix}>
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <section className={styles.insetGroup} key={size}>
+          <div className={styles.insetGroupTitle}>Size {size}</div>
+          <div className={styles.insetCases}>
+            <Input
+              data-testid={`geometry-${size}-resting`}
+              label="Resting label"
+              labelView="inner"
+              placeholder="Placeholder baseline"
+              size={size}
+            />
+            <Input
+              data-testid={`geometry-${size}-value`}
+              defaultValue="Stable value baseline"
+              label="Floating label"
+              labelView="inner"
+              placeholder="Placeholder baseline"
+              size={size}
+            />
+          </div>
+        </section>
+      ))}
+      <Input
+        defaultValue="A long native value remains selectable and aligned across the full input hit area"
+        label="A long floating label truncates inside the available content area without vertical clipping"
+        labelView="inner"
+        size="md"
+      />
+      <Input
+        defaultValue="Invalid value"
+        error="Geometry remains stable in the invalid state"
+        label="Invalid"
+        labelView="inner"
+        size="md"
+      />
+      <Input
+        defaultValue="Disabled value"
+        disabled
+        label="Disabled"
+        labelView="inner"
+        size="md"
+      />
+      <Input
+        label="Read only"
+        labelView="inner"
+        readOnly
+        size="md"
+        value="Read-only value"
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const size of ["sm", "md", "lg"] as const) {
+      const input = canvas.getByTestId(`geometry-${size}-resting`);
+      await userEvent.click(input);
+      await expect(input).toHaveFocus();
+      await expect(input.closest("[data-label-floated]")).toBeInTheDocument();
+    }
+  }
+};
+
+export const FloatingLabelMdReference: Story = {
+  parameters: {
+    layout: "padded"
+  },
+  render: () => (
+    <div className={styles.insetMatrix}>
+      <Input
+        data-testid="md-reference-focused"
+        label="Focused empty"
+        labelView="inner"
+        placeholder="Placeholder baseline"
+        size="md"
+      />
+      <Input
+        defaultValue="Value"
+        label="Start adornment"
+        labelView="inner"
+        size="md"
+        startAdornment={<Search aria-hidden="true" />}
+      />
+      <Input
+        defaultValue="Value"
+        endAdornment={<span>RUB</span>}
+        label="End adornment"
+        labelView="inner"
+        size="md"
+      />
+      <Input
+        defaultValue="Value"
+        endAdornment={<span>RUB</span>}
+        label="Both adornments"
+        labelView="inner"
+        size="md"
+        startAdornment={<Search aria-hidden="true" />}
+      />
+      <PasswordInput
+        defaultValue="secret"
+        label="PasswordInput parity"
+        labelView="inner"
+        size="md"
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const focusedInput = within(canvasElement).getByTestId("md-reference-focused");
+    await userEvent.click(focusedInput);
+    await expect(focusedInput).toHaveFocus();
+  }
+};
+
+export const InteractionAnatomy: Story = {
+  args: {
+    className: styles.interactionAnatomy,
+    endAdornment: (
+      <span data-field-interactive data-testid="anatomy-interactive">
+        <IconButton
+          aria-label="Independent action"
+          icon={<X />}
+          size="sm"
+          variant="ghost"
+        />
+      </span>
+    ),
+    label: "Semantic inner label",
+    labelView: "inner",
+    placeholder: "Native input",
+    startAdornment: (
+      <span data-testid="anatomy-decorative">
+        <Search aria-hidden="true" />
+      </span>
+    )
+  },
+  render: (args) => (
+    <div>
+      <Input {...args} />
+      <div className={styles.legend}>
+        <span>Solid outline — FieldShell boundary</span>
+        <span>Dashed outline — full-size native input</span>
+        <span>Selected surface — semantic label</span>
+        <span>Subtle surface — decorative adornment forwarding zone</span>
+        <span>Interactive action — independent button semantics</span>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole("textbox", { name: "Semantic inner label" });
+    const label = canvas.getByText("Semantic inner label", { selector: "label" });
+    const decorative = canvas.getByTestId("anatomy-decorative");
+    const action = canvas.getByRole("button", { name: "Independent action" });
+
+    await userEvent.click(label);
+    await expect(input).toHaveFocus();
+    input.blur();
+    await userEvent.click(decorative);
+    await expect(input).toHaveFocus();
+    input.blur();
+    await userEvent.click(action);
+    await expect(action).toHaveFocus();
+    await expect(input).not.toHaveFocus();
+  }
+};
+
+export const CursorAreas: Story = {
+  parameters: {
+    layout: "padded"
+  },
+  render: () => (
+    <div className={styles.insetMatrix}>
+      <Input
+        data-testid="cursor-editable"
+        label="Resting inner label"
+        labelView="inner"
+        placeholder="Editable input"
+      />
+      <Input
+        data-testid="cursor-decorative"
+        label="Decorative adornment"
+        labelView="inner"
+        startAdornment={<Search aria-hidden="true" data-testid="cursor-icon" />}
+      />
+      <Input
+        data-testid="cursor-readonly"
+        label="Read-only label and value"
+        labelView="inner"
+        readOnly
+        value="Selectable value"
+      />
+      <Input
+        data-testid="cursor-disabled"
+        disabled
+        label="Disabled field"
+        labelView="inner"
+        value="Unavailable"
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const editable = canvas.getByTestId("cursor-editable");
+    const editableLabel = canvas.getByText("Resting inner label", { selector: "label" });
+    const decorative = canvas.getByTestId("cursor-icon").closest(
+      "[data-field-part=\"start-adornment\"]"
+    );
+    const readOnly = canvas.getByTestId("cursor-readonly");
+    const disabled = canvas.getByTestId("cursor-disabled");
+
+    await expect(getComputedStyle(editable).cursor).toBe("text");
+    await expect(getComputedStyle(editableLabel).cursor).toBe("text");
+    if (!decorative) throw new globalThis.Error("Decorative adornment was not rendered.");
+    await expect(getComputedStyle(decorative).cursor).toBe("text");
+    await expect(getComputedStyle(readOnly).cursor).toBe("text");
+    await expect(getComputedStyle(disabled).cursor).toBe("not-allowed");
+  }
+};
+
 function HintErrorTransitionExample() {
   const [invalid, setInvalid] = useState(false);
   return (
@@ -208,13 +434,11 @@ export const LongError: Story = {
     error: "Длинное сообщение об ошибке переносится под полем, заменяет подсказку и не меняет геометрию FieldShell."
   }
 };
-export const ClickShellFocus: Story = {
+export const NativeContentFocus: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const input = canvas.getByRole("textbox", { name: "Название" });
-    const shell = input.closest("[data-label-view]");
-    if (!shell) throw new globalThis.Error("FieldShell was not rendered.");
-    await userEvent.click(shell);
+    await userEvent.click(input);
     await expect(input).toHaveFocus();
   }
 };

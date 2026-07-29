@@ -54,3 +54,21 @@
   display: grid;
   gap: var(--ds-space-1);
 }
+
+.interactionAnatomy [data-field-part="shell"] {
+  outline: var(--ds-border-width-strong) solid var(--ds-border-strong);
+  outline-offset: var(--ds-space-1);
+}
+
+.interactionAnatomy [data-field-part="native-control"] {
+  outline: var(--ds-border-width-default) dashed var(--ds-border-default);
+  outline-offset: calc(-1 * var(--ds-border-width-default));
+}
+
+.interactionAnatomy [data-field-part="inner-label"] {
+  background: var(--ds-background-selected);
+}
+
+.interactionAnatomy [data-field-part="start-adornment"] {
+  background: var(--ds-background-subtle);
+}

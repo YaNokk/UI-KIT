@@ -16,8 +16,14 @@ Its logical inline inset and the native control padding resolve from the same
 internal geometry variables. Canonical inline padding is `space-2`, `space-3`
 and `space-4` for `sm`, `md` and `lg`; a start or end adornment consumes that
 side through flex layout and clears only the corresponding content inset.
+Shared block geometry variables place the resting label at 50%, the floating
+label at `space-0`, and floated native content at `space-4`/`space-0`
+block-start/block-end padding. Inner heights are 40/48/48 for `sm`/`md`/`lg`;
+adornments and presentation states do not change those vertical baselines.
 
-`onFocusRequest` is a fallback for shell gaps, decorative icons and
-non-interactive prefix/suffix columns only. Native controls, semantic labels,
+`onFocusRequest` is invoked only by non-interactive start/end adornment columns.
+Their visual gap is internal logical padding, so the root needs no click
+delegation. Native controls and semantic labels use browser interaction;
 interactive descendants and nodes marked `data-field-interactive` preserve
-their own interaction. FieldShell never owns a value or business behavior.
+their own action. FieldShell is not focusable and never owns a value or business
+behavior.

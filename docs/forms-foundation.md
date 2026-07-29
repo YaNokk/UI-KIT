@@ -43,7 +43,7 @@ Field sizes are explicit: `sm=32`, `md=40`, `lg=48`; typography and direct SVG
 geometry use the matching canonical roles. Geometry uses logical inline
 properties and semantic CSS variables.
 
-## Label placement and focus delegation
+## Label placement and native interaction
 
 The default is `labelView="outer"`. The local MP Input reference has no floating
 label, so inner placement is opt-in rather than guessed as the canonical form
@@ -61,20 +61,36 @@ fills that box with `width/height: 100%`. Its own inline padding provides value
 alignment, so center, upper, lower and inline-edge content clicks use native
 pointer, caret, selection and mobile-keyboard behavior rather than `.focus()`.
 
-`onFocusRequest` remains only for root gaps, decorative SVGs and
-non-interactive prefix/suffix columns outside the native content. Native
-interactive descendants, the semantic label and explicit
-`data-field-interactive` regions retain their own action/focus behavior.
-Adornments stretch with the shell but center their contents independently.
+The FieldShell root has no focus-forwarding click handler. Outer/inner
+`<label htmlFor>` clicks and all content-area input interactions use native
+browser behavior. `onFocusRequest` remains only on decorative start/end
+adornment columns. Their visual gap is logical padding inside those columns,
+not a separate shell pointer boundary. Explicit `data-field-interactive`
+regions retain their own action/focus behavior.
+
+Text-like Input composition marks its semantic labels, content and decorative
+adornments with `cursor:text`; readOnly remains text/selectable and disabled
+uses the canonical disabled cursor. Password visibility keeps IconButton
+pointer/keyboard semantics. Cursor CSS communicates affordance but does not
+emulate focus.
 
 Outer heights remain 32/40/48. Inner `sm` uses the existing 40px control token
-because caption 11/16 plus bodySm 13/18 cannot fit accessibly in a 32px shell;
-inner `md` and `lg` remain 40/48. No new size token is introduced.
+because caption 11/16 plus bodySm 13/18 cannot fit accessibly in a 32px shell.
+Inner `md` and `lg` use the existing 48px control token: `md` is the primary
+floating-label calibration size, while `lg` preserves the larger value role.
+No new size token is introduced.
 
 The inner label is absolutely positioned over the full-size input instead of
 consuming a normal-flow row. Only floated value alignment changes through
 native input padding; its hit-area dimensions do not change. Input and
 PasswordInput share this exact content/native-control chain.
+
+FieldShell also owns the shared vertical variables for resting/floating label
+block-start and floated value block padding. The calibrated values are:
+resting label at 50%, floating label at `space-0`, value padding-block-start at
+`space-4`, and padding-block-end at `space-0`. The resulting approximate
+line-box gaps are 2px/5px/3px for inner `sm`/`md`/`lg`. Adornments and field
+states do not override these variables.
 
 Value, placeholder and positioned inner label resolve their inline start/end
 from the same internal geometry variables. The canonical inline padding is

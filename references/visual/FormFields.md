@@ -49,3 +49,26 @@ not change. FieldShell now owns an explicit canonical height, content/control
 stretch through that height, and Input owns full-size fill plus value padding.
 The floating label remains positioned over the input. PasswordInput inherits
 the identical geometry and adds only a centered trailing action column.
+
+## v1.2.2 floating-label vertical calibration
+
+`md` is the primary calibration size. The previous `md` combination used a
+40px inner shell, `space.1` floating-label inset and `space.3` value
+padding-block-start; its caption and value line boxes visually collided.
+
+| Property | sm | md | lg |
+| --- | ---: | ---: | ---: |
+| Inner field height | 40px | 48px | 48px |
+| Floating label block-start | 0px (`space.0`) | 0px (`space.0`) | 0px (`space.0`) |
+| Value padding block-start | 16px (`space.4`) | 16px (`space.4`) | 16px (`space.4`) |
+| Value padding block-end | 0px (`space.0`) | 0px (`space.0`) | 0px (`space.0`) |
+| Label typography role | `caption` 11/16 | `caption` 11/16 | `caption` 11/16 |
+| Value typography role | `bodySm` 13/18 | `body` 14/20 | `bodyLg` 16/24 |
+| Visual line-box gap | about 2px | about 5px | about 3px |
+
+The `space.4` hypothesis is retained. Increasing only inner `md` to the
+existing 48px control token creates the clearest reference separation without
+adding a token; `sm` stays compact at 40px and `lg` remains balanced at 48px.
+Resting labels still use 50% plus translation. Floating geometry comes from
+FieldShell variables, so adornments and field state do not alter the vertical
+baseline, and Input/PasswordInput retain full-size native controls.

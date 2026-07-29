@@ -34,3 +34,11 @@
 .root[data-disabled] .hint {
   color: var(--ds-text-disabled);
 }
+
+.root[data-field-textlike]:not([data-disabled]) .label {
+  cursor: text;
+}
+
+.root[data-field-textlike][data-disabled] .label {
+  cursor: not-allowed;
+}

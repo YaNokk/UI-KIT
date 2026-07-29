@@ -12,13 +12,15 @@
   padding-inline-start: var(--field-control-padding-inline-start);
   color: inherit;
   font: inherit;
+  cursor: text;
   background: transparent;
   border: 0;
   outline: 0;
 }
 
 .input[data-label-view="inner"][data-label-floated] {
-  padding-block-start: var(--ds-space-3);
+  padding-block-end: var(--field-value-padding-block-end);
+  padding-block-start: var(--field-value-padding-block-start);
 }
 
 .input::placeholder {

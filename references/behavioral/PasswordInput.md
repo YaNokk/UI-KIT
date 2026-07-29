@@ -9,3 +9,8 @@ Source: local Core DS snapshot in `references/raw/core-ds/password-input`.
 - Normalized: `visible`/`onVisibleChange` naming and canonical Lucide Eye icons.
 - Dropped: reference colors, numeric sizes and title-only naming.
 - Autocomplete remains caller-owned for current/new password use cases.
+- The local reference composes Input with an IconButton in the right-addon
+  column. Our PasswordInput keeps the same structural principle: the full-size
+  native password input owns caret/focus interaction, while the visibility
+  IconButton remains an independent sibling action with its own keyboard,
+  pointer and accessible-name behavior.

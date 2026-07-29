@@ -93,6 +93,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     <FormControl
       className={className}
       controlId={id}
+      data-field-textlike=""
       describedBy={ariaDescribedBy}
       disabled={disabled}
       error={error}
@@ -102,12 +103,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       labelView={effectiveLabelView}
       required={required}
     >
-      {(controlProps) => (
+      {({ label: controlLabel, ...controlProps }) => (
         <FieldShell
           disabled={disabled}
+          data-field-textlike=""
           endAdornment={endAdornment}
           invalid={invalid}
-          label={controlProps.label}
+          label={controlLabel}
           labelFloated={labelFloated}
           labelView={effectiveLabelView}
           onFocusRequest={() => inputRef.current?.focus()}

@@ -51,7 +51,7 @@ describe("FieldShell", () => {
     expect(screen.getByRole("textbox", { name: "Сумма" })).toBeInTheDocument();
   });
 
-  it("delegates non-interactive shell and adornment clicks", async () => {
+  it("delegates only non-interactive adornment clicks", async () => {
     const user = userEvent.setup();
     const onFocusRequest = vi.fn();
     render(
@@ -66,9 +66,10 @@ describe("FieldShell", () => {
     );
 
     await user.click(screen.getByTestId("shell"));
+    expect(onFocusRequest).not.toHaveBeenCalled();
     await user.click(screen.getByText("₽"));
     await user.click(screen.getByText("kg"));
-    expect(onFocusRequest).toHaveBeenCalledTimes(3);
+    expect(onFocusRequest).toHaveBeenCalledTimes(2);
   });
 
   it("lets a full-size primary control own normal content clicks", async () => {

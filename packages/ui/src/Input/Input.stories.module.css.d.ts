@@ -1,5 +1,6 @@
 declare const styles: {
   readonly hitAreas: string;
+  readonly interactionAnatomy: string;
   readonly insetCase: string;
   readonly insetCaseLabel: string;
   readonly insetCases: string;

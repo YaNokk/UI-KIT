@@ -4,12 +4,16 @@
   --field-padding-inline: var(--ds-space-3);
   --field-control-padding-inline-end: var(--field-padding-inline);
   --field-control-padding-inline-start: var(--field-padding-inline);
+  --field-label-floating-block-start: var(--ds-space-0);
+  --field-label-resting-block-start: 50%;
+  --field-value-padding-block-end: var(--ds-space-0);
+  --field-value-padding-block-start: var(--ds-space-4);
 
   box-sizing: border-box;
   display: flex;
   align-items: stretch;
   min-width: 0;
-  gap: var(--field-gap);
+  gap: var(--ds-space-0);
   padding-inline: var(--ds-space-0);
   color: var(--ds-control-text);
   background-color: var(--ds-control-background);
@@ -77,12 +81,11 @@
 .inner .innerLabel {
   position: absolute;
   z-index: var(--ds-z-index-default);
-  inset-block-start: 50%;
+  inset-block-start: var(--field-label-resting-block-start);
   inset-inline-end: var(--field-control-padding-inline-end);
   inset-inline-start: var(--field-control-padding-inline-start);
   display: block;
   overflow: hidden;
-  pointer-events: none;
   color: var(--ds-text-secondary);
   font: inherit;
   text-overflow: ellipsis;
@@ -97,12 +100,17 @@
 }
 
 .inner .innerLabel > label {
-  pointer-events: auto;
+  display: block;
+  overflow: hidden;
+  font: inherit;
+  text-overflow: inherit;
+  white-space: inherit;
 }
 
 .inner.floated .innerLabel,
 .inner:focus-within .innerLabel {
-  inset-block-start: var(--ds-space-1);
+  block-size: var(--ds-line-height-caption);
+  inset-block-start: var(--field-label-floating-block-start);
   font: var(--ds-typography-caption);
   transform: translateY(0);
 }
@@ -130,11 +138,13 @@
 }
 
 .adornment[data-position="start"] {
+  padding-inline-end: var(--field-gap);
   padding-inline-start: var(--field-padding-inline);
 }
 
 .adornment[data-position="end"] {
   padding-inline-end: var(--field-padding-inline);
+  padding-inline-start: var(--field-gap);
 }
 
 .hasStartAdornment {
@@ -163,6 +173,10 @@
   height: var(--ds-size-control-md);
 }
 
+.inner.md {
+  height: var(--ds-size-control-lg);
+}
+
 .md {
   height: var(--ds-size-control-md);
   font: var(--ds-typography-body);
@@ -189,6 +203,16 @@
 
 .readOnly {
   background-color: var(--ds-background-subtle);
+}
+
+.root[data-field-textlike]:not(.disabled) .content,
+.root[data-field-textlike]:not(.disabled) .innerLabel,
+.root[data-field-textlike]:not(.disabled) .adornment {
+  cursor: text;
+}
+
+.root[data-field-textlike] [data-field-interactive] {
+  cursor: default;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -150,6 +150,30 @@ describe("Input native behavior", () => {
     expect(input).toHaveFocus();
   });
 
+  it("uses native label/htmlFor focus for outer and inner labels", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <Input id="outer-field" label="Outer semantic label" />
+        <Input id="inner-field" label="Inner semantic label" labelView="inner" />
+      </>
+    );
+
+    const outerInput = screen.getByRole("textbox", { name: "Outer semantic label" });
+    const innerInput = screen.getByRole("textbox", { name: "Inner semantic label" });
+    const outerLabel = screen.getByText("Outer semantic label", { selector: "label" });
+    const innerLabel = screen.getByText("Inner semantic label", { selector: "label" });
+
+    expect(outerLabel).toHaveAttribute("for", "outer-field");
+    expect(innerLabel).toHaveAttribute("for", "inner-field");
+    expect(outerInput).not.toHaveAttribute("label");
+    expect(innerInput).not.toHaveAttribute("label");
+    await user.click(outerLabel);
+    expect(outerInput).toHaveFocus();
+    await user.click(innerLabel);
+    expect(innerInput).toHaveFocus();
+  });
+
   it("floats an inner semantic label on focus and content", async () => {
     const user = userEvent.setup();
     const { rerender } = render(
@@ -162,7 +186,7 @@ describe("Input native behavior", () => {
     expect(shell).not.toHaveAttribute("data-label-floated");
     expect(input).not.toHaveAttribute("data-label-floated");
 
-    await user.click(shell);
+    await user.click(screen.getByText("Название", { selector: "label" }));
     expect(input).toHaveFocus();
     expect(shell).toHaveAttribute("data-label-floated");
 

@@ -94,3 +94,51 @@ export const ToggleHitArea: Story = {
     await expect(input).not.toHaveFocus();
   }
 };
+
+export const CursorAreas: Story = {
+  parameters: {
+    layout: "padded"
+  },
+  render: () => (
+    <div className={styles.insetMatrix}>
+      <PasswordInput
+        data-testid="password-cursor-input"
+        label="Password label"
+        labelView="inner"
+        value="secret"
+      />
+      <PasswordInput
+        data-testid="password-cursor-readonly"
+        label="Read-only password"
+        labelView="inner"
+        readOnly
+        value="secret"
+      />
+      <PasswordInput
+        data-testid="password-cursor-disabled"
+        disabled
+        label="Disabled password"
+        labelView="inner"
+        value="secret"
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId("password-cursor-input");
+    const label = canvas.getByText("Password label", { selector: "label" });
+    const shell = input.closest("[data-field-part=\"shell\"]");
+    if (!(shell instanceof HTMLElement)) {
+      throw new globalThis.Error("Password FieldShell was not rendered.");
+    }
+    const toggle = within(shell).getByRole("button", { name: "Показать пароль" });
+    const readOnly = canvas.getByTestId("password-cursor-readonly");
+    const disabled = canvas.getByTestId("password-cursor-disabled");
+
+    await expect(getComputedStyle(input).cursor).toBe("text");
+    await expect(getComputedStyle(label).cursor).toBe("text");
+    await expect(getComputedStyle(toggle).cursor).toBe("pointer");
+    await expect(getComputedStyle(readOnly).cursor).toBe("text");
+    await expect(getComputedStyle(disabled).cursor).toBe("not-allowed");
+  }
+};

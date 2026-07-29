@@ -42,7 +42,6 @@ export const FieldShell = forwardRef<HTMLDivElement, FieldShellProps>(
       label,
       labelFloated = false,
       labelView = "outer",
-      onClick,
       onFocusRequest,
       readOnly = false,
       size = "md",
@@ -51,8 +50,7 @@ export const FieldShell = forwardRef<HTMLDivElement, FieldShellProps>(
     },
     ref
   ) {
-    const handleClick = (event: MouseEvent<HTMLDivElement>) => {
-      onClick?.(event);
+    const handleAdornmentClick = (event: MouseEvent<HTMLSpanElement>) => {
       if (event.defaultPrevented || disabled || !onFocusRequest) return;
 
       const target = event.target;
@@ -90,7 +88,6 @@ export const FieldShell = forwardRef<HTMLDivElement, FieldShellProps>(
         data-label-view={labelView}
         data-readonly={readOnly ? "" : undefined}
         data-field-part="shell"
-        onClick={handleClick}
         ref={ref}
       >
         {startAdornment == null ? null : (
@@ -98,6 +95,7 @@ export const FieldShell = forwardRef<HTMLDivElement, FieldShellProps>(
             className={styles.adornment}
             data-field-part="start-adornment"
             data-position="start"
+            onClick={handleAdornmentClick}
           >
             {startAdornment}
           </span>
@@ -117,6 +115,7 @@ export const FieldShell = forwardRef<HTMLDivElement, FieldShellProps>(
             className={styles.adornment}
             data-field-part="end-adornment"
             data-position="end"
+            onClick={handleAdornmentClick}
           >
             {endAdornment}
           </span>

@@ -69,6 +69,16 @@
 - Input и PasswordInput используют одну geometry model; hit areas проверяются в browser/Storybook, не только JSDOM.
 - Click-to-focus и floating-label CSS реализуются в shared foundation, а не отдельно в specialized fields.
 - `FieldShell` остаётся совместимым с Select/Autocomplete и другими non-input controls.
+- Floating label/value vertical geometry является общей для всей field-family; `md` — основной calibration size.
+- Не задавайте отдельные vertical offsets в Input/PasswordInput: label и value должны сохранять явный baseline gap.
+- Native control остаётся full-height; adornments не меняют vertical label/value geometry.
+- Используйте logical block properties и canonical spacing tokens, затем проверяйте геометрию в Storybook/browser.
+- Field interaction сначала опирается на native HTML semantics; label click использует `label/htmlFor`, когда это возможно.
+- Shell-wide JS focus forwarding не является основной model; floating labels остаются semantic labels.
+- `cursor:text` — visual semantics, а не замена корректному DOM interaction.
+- Не используйте `pointer-events:none`, чтобы маскировать сломанные label/input hit areas.
+- Decorative adornments могут запрашивать focus через shared foundation; interactive adornments владеют pointer/keyboard behavior.
+- FieldShell не становится tabbable; главная Input/PasswordInput область работает нативно без shell JS.
 - Используйте только canonical layer names; произвольные z-index aliases запрещены.
 
 ## Добавление токена
