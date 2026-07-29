@@ -47,6 +47,37 @@ export const Currencies: Story = {
   )
 };
 
+export const CISCurrencies: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Representative Intl behavior coverage, not a product support registry. "
+          + "The repository contains no backend currency allow-list."
+      }
+    }
+  },
+  render: () => (
+    <div className="grid gap-3">
+      <Amount currency="RUB" locale="ru-RU" value={123456} />
+      <Amount currency="KZT" locale="kk-KZ" value={123456} />
+      <Amount currency="BYN" locale="be-BY" value={123456} />
+      <Amount currency="AMD" locale="hy-AM" value={123456} />
+      <Amount currency="UZS" locale="uz-UZ" value={123456} />
+    </div>
+  )
+};
+
+export const LocaleMatrix: Story = {
+  render: () => (
+    <div className="grid gap-3">
+      <Amount currency="KZT" locale="ru-RU" value={123456} />
+      <Amount currency="KZT" locale="kk-KZ" value={123456} />
+      <Amount currency="KZT" locale="en-US" value={123456} />
+    </div>
+  )
+};
+
 export const Negative: Story = {
   args: { value: -123456 }
 };

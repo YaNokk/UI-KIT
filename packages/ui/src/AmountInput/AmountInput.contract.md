@@ -33,6 +33,9 @@
   `Input`.
 - Changing locale reformats the same semantic value. Changing currency or
   minority reinterprets the same minor-unit integer; it does not convert money.
+- Currency and locale remain independent. Valid Intl currencies outside a
+  future product registry are formatted normally; invalid codes use the same
+  literal deterministic fallback as `Amount`.
 
 Maskito is internal. Its options and events are not public API. Future
 `NumberInput`, `QuantityInput` and `PercentInput` may reuse the numeric adapter,

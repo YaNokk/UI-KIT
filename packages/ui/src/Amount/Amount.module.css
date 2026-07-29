@@ -23,8 +23,7 @@
     color: inherit;
   }
 
-  .secondaryMinor .minor,
-  .secondaryMinor .currency {
+  .secondaryMinor .minor {
     color: var(--ds-text-secondary);
   }
 }

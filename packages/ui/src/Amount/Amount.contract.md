@@ -14,8 +14,9 @@
 - `size` remains a convenience typography preset. Component styles live in the
   components layer, so canonical `typo-*` utilities supplied through
   `className` override the preset.
-- Root color and typography inherit cleanly. `minorTone="secondary"` is the
-  only part-specific tone API.
+- Root color and typography inherit cleanly. `minorTone="secondary"` affects
+  minor digits only; currency remains inherited because monetary identity and
+  fractional precision are separate visual semantics.
 - Changing currency or minority reinterprets the same integer value under the
   new presentation configuration. It does not perform currency conversion.
 
@@ -27,3 +28,8 @@ props.
 The former global `emphasis` prop was removed before API freeze: it represented
 generic font weight rather than monetary semantics. Use a canonical typography
 utility such as `typo-body-strong` or `typo-heading-lg`.
+
+Currency, locale and minority are independent. Valid currency codes use Intl
+even when no product registry knows them. Invalid codes are displayed literally
+through the deterministic fallback and are never silently substituted.
+Changing currency never performs FX conversion.

@@ -66,4 +66,59 @@ describe("amount foundation", () => {
     expect(decimalStringToMinor(minorToDecimalString(value, 100), 100)).toBe(value);
     expect(() => minorToDecimalString(value + 1, 100)).toThrow(/safe integer/);
   });
+
+  it("formats representative CIS currencies without coupling currency to locale", () => {
+    const cases = [
+      ["RUB", "ru-RU"],
+      ["KZT", "kk-KZ"],
+      ["BYN", "be-BY"],
+      ["AMD", "hy-AM"],
+      ["UZS", "uz-UZ"]
+    ] as const;
+
+    for (const [currency, locale] of cases) {
+      const resolved = resolveAmountFormat({ currency, locale });
+      expect(resolved.currency).toBeTruthy();
+      expect(resolved.locale).toBe(locale);
+      expect(resolved.fractionDigits).toBe(
+        new Intl.NumberFormat(locale, {
+          currency,
+          style: "currency"
+        }).resolvedOptions().maximumFractionDigits
+      );
+    }
+  });
+
+  it("uses Intl for valid unregistered currencies and degrades invalid codes safely", () => {
+    const validUnknown = resolveAmountFormat({
+      currency: "CHF",
+      locale: "de-CH"
+    });
+    expect(validUnknown.currency).toBeTruthy();
+    expect(validUnknown.locale).toBe("de-CH");
+
+    const invalid = resolveAmountFormat({
+      currency: "not-a-currency",
+      locale: "en-US"
+    });
+    expect(invalid).toMatchObject({
+      currency: "not-a-currency",
+      currencyPosition: "suffix",
+      currencySeparator: " ",
+      fractionDigits: 2
+    });
+  });
+
+  it("keeps explicit minority authoritative over currency metadata", () => {
+    expect(resolveAmountFormat({
+      currency: "RUB",
+      locale: "ru-RU",
+      minority: 1
+    }).fractionDigits).toBe(0);
+    expect(resolveAmountFormat({
+      currency: "RUB",
+      locale: "ru-RU",
+      minority: 1000
+    }).fractionDigits).toBe(3);
+  });
 });

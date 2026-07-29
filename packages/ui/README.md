@@ -68,6 +68,14 @@ adapter и не входит в публичные типы.
 `Amount` поддерживает canonical `typo-*` utilities через `className`; utility
 переопределяет convenience preset `size`.
 
+Currency, locale и minority независимы. Репозиторий пока не содержит
+authoritative backend currency registry, поэтому UI использует Intl для любой
+валидной валюты и не объявляет географический allow-list. Некорректный code
+отображается буквально и не подменяется. Смена currency не выполняет FX.
+
+Архитектурное разделение locale/currency/phone region описано в
+`../../docs/formatting-foundation.md`.
+
 Generic icons импортируются статически из `lucide-react`. Компонент,
 владеющий icon-slot, задаёт размер, цвет через `currentColor` и decorative
 a11y treatment; см. `../../docs/icons-and-assets.md`.

@@ -1,5 +1,6 @@
 import { assertAmountValue, minorToDecimalString } from "./minorUnits";
 import { resolveAmountFormat } from "./currency";
+import { getNumberFormatter } from "../locale/numberFormat";
 import type { AmountFormatConfig, AmountParts, AmountValue } from "./types";
 
 export function getAmountParts(
@@ -17,7 +18,7 @@ export function getAmountParts(
     config.trimTrailingZeros
   );
   const [major = "0", minor = ""] = decimal.split(".");
-  const formattedMajor = new Intl.NumberFormat(resolved.locale, {
+  const formattedMajor = getNumberFormatter(resolved.locale, {
     maximumFractionDigits: 0,
     useGrouping: true
   }).format(Number(major));

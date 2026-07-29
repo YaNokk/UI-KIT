@@ -99,6 +99,14 @@
 - `Amount` композируется через canonical typography utilities/className; его default typography обязан оставаться overrideable.
 - Styling API `Amount` остаётся semantic и не принимает raw font/color/opacity props.
 - Импорт одного `Amount` не должен подтягивать Maskito editing payload.
+- Currency и locale — независимые концепции; не выводите одно из другого.
+- Product-supported currencies берутся только из backend/product requirements, а не из географического списка.
+- Запрещена архитектура `CIS → ru-RU`; locale остаётся независимой formatting configuration.
+- Explicit `minority` имеет приоритет над default currency precision.
+- Смена currency никогда не выполняет FX conversion.
+- Shared locale foundation хранит только formatting context/helpers, не phone/currency domain logic.
+- Future phone region/country независим от UI locale и принадлежит sibling `internal/phone`.
+- `Amount`/`AmountInput` безопасно используют Intl для неизвестной registry валидной валюты и deterministic literal fallback для invalid code.
 
 ## Добавление токена
 

@@ -61,6 +61,27 @@ export const Currencies: Story = {
   )
 };
 
+export const CISCurrencies: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Representative Intl behavior coverage; it does not declare the "
+          + "backend-supported currency registry."
+      }
+    }
+  },
+  render: () => (
+    <div className="grid gap-3">
+      <AmountInput currency="RUB" label="RUB · ru-RU" locale="ru-RU" value={123456} />
+      <AmountInput currency="KZT" label="KZT · kk-KZ" locale="kk-KZ" value={123456} />
+      <AmountInput currency="BYN" label="BYN · be-BY" locale="be-BY" value={123456} />
+      <AmountInput currency="AMD" label="AMD · hy-AM" locale="hy-AM" value={123456} />
+      <AmountInput currency="UZS" label="UZS · uz-UZ" locale="uz-UZ" value={123456} />
+    </div>
+  )
+};
+
 export const CurrencyAffix: Story = {
   args: {
     defaultValue: 123456,
@@ -77,13 +98,38 @@ export const CurrencyPositions: Story = {
   )
 };
 
-export const Locale: Story = {
+export const LocaleMatrix: Story = {
   render: () => (
     <div className="grid gap-3">
-      <AmountInput currency="EUR" label="German" locale="de-DE" value={123456} />
-      <AmountInput currency="EUR" label="English" locale="en-US" value={123456} />
+      <AmountInput currency="KZT" label="Russian locale" locale="ru-RU" value={123456} />
+      <AmountInput currency="KZT" label="Kazakh locale" locale="kk-KZ" value={123456} />
+      <AmountInput currency="KZT" label="English locale" locale="en-US" value={123456} />
     </div>
   )
+};
+
+function ControlledLocaleSwitchExample() {
+  const [locale, setLocale] = useState("ru-RU");
+  return (
+    <div className="grid gap-3">
+      <AmountInput
+        currency="KZT"
+        label="Locale-switchable amount"
+        locale={locale}
+        value={123456}
+      />
+      <button
+        onClick={() => setLocale((current) => current === "ru-RU" ? "en-US" : "ru-RU")}
+        type="button"
+      >
+        Switch locale
+      </button>
+    </div>
+  );
+}
+
+export const LocaleSwitch: Story = {
+  render: () => <ControlledLocaleSwitchExample />
 };
 
 export const CaretWithCurrency: Story = {
@@ -115,7 +161,7 @@ function ControlledCurrencySwitchExample() {
   );
 }
 
-export const ControlledCurrencySwitch: Story = {
+export const CurrencySwitch: Story = {
   render: () => <ControlledCurrencySwitchExample />
 };
 
