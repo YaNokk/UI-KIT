@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 const meta = {
-  title: "Icons/Custom",
+  title: "Foundations/Icons/Custom",
   tags: ["autodocs"],
   parameters: { layout: "padded" }
 } satisfies Meta;

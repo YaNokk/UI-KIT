@@ -79,6 +79,14 @@
 - Не используйте `pointer-events:none`, чтобы маскировать сломанные label/input hit areas.
 - Decorative adornments могут запрашивать focus через shared foundation; interactive adornments владеют pointer/keyboard behavior.
 - FieldShell не становится tabbable; главная Input/PasswordInput область работает нативно без shell JS.
+- Изменения pointer, focus и field geometry требуют проверки канонических stories в настоящем браузере; одного JSDOM недостаточно.
+- Cursor проверяется через computed style над input, label, decorative и interactive adornments, а focus/hit area — через реальные browser events и geometry.
+- Storybook MCP остаётся dev-only discovery layer: не добавляйте ради него публичные props, runtime dependencies или exports.
+- MCP/browser validation опирается на детерминированные stories; interactive adornments проверяются как реальные button/action элементы.
+- Optical text alignment в tight single-line controls может использовать text-box trimming только как progressive enhancement.
+- Не компенсируйте font metrics через pixel nudges, negative margins или asymmetric padding и не добавляйте trimming в global typography roles.
+- Trimming остаётся локальным для control visual foundation, пока одинаковая потребность не доказана в нескольких независимых control families.
+- Проверяйте в Storybook/browser кириллицу, descenders, числа, иконки, размеры и loading; fallback без text-box support должен оставаться визуально приемлемым.
 - Используйте только canonical layer names; произвольные z-index aliases запрещены.
 
 ## Добавление токена
@@ -95,3 +103,13 @@
 - Секреты и authenticated `.npmrc` запрещено коммитить; registry auth поступает только из CI/env.
 - Новые deep imports запрещены без явного subpath в `exports`.
 - Publish допускается только после validation, build, consumer и tree-shaking checks.
+
+## Designer/Codex workflow
+
+- Продуктовые эксперименты размещаются в `prototypes/**` и подчиняются
+  scoped-правилам `prototypes/AGENTS.md`.
+- `apps/**` и `packages/**` никогда не импортируют `prototypes/**`.
+- Promotion из prototype в `ui`, `patterns`, `retail-ui` или application —
+  отдельная задача нормализации, а не перемещение файлов.
+- Перед созданием primitive-like control проверяйте public exports, contracts,
+  stories и Storybook MCP, когда он доступен.

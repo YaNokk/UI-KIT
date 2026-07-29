@@ -3,6 +3,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 import { noIconAntiPatterns } from "./eslint-rules/no-icon-anti-patterns.mjs";
 import { noDesignLiterals } from "./eslint-rules/no-design-literals.mjs";
+import { noProductionPrototypeImports } from "./eslint-rules/no-production-prototype-imports.mjs";
 
 export default tseslint.config(
   {
@@ -30,6 +31,22 @@ export default tseslint.config(
         ...globals.browser,
         ...globals.node
       }
+    }
+  },
+  {
+    files: [
+      "apps/**/*.{js,mjs,cjs,ts,tsx,mts,mtsx}",
+      "packages/**/*.{js,mjs,cjs,ts,tsx,mts,mtsx}"
+    ],
+    plugins: {
+      architecture: {
+        rules: {
+          "no-production-prototype-imports": noProductionPrototypeImports
+        }
+      }
+    },
+    rules: {
+      "architecture/no-production-prototype-imports": "error"
     }
   },
   {

@@ -18,8 +18,7 @@ export const noIconAntiPatterns = {
       namespaceImport: "Use static named Lucide imports; namespace imports break module transparency.",
       literalColor: "Icon color belongs to a semantic currentColor context, not a Lucide color prop.",
       arbitrarySize: "The slot-owning component must set a canonical icon size.",
-      arbitraryStroke: "Use the design-system stroke baseline; do not set strokeWidth per icon.",
-      prototypeAsset: "Production packages must not import icon assets from prototypes."
+      arbitraryStroke: "Use the design-system stroke baseline; do not set strokeWidth per icon."
     }
   },
   create(context) {
@@ -27,13 +26,6 @@ export const noIconAntiPatterns = {
 
     return {
       ImportDeclaration(node) {
-        if (
-          typeof node.source.value === "string" &&
-          /(?:^|[/\\])prototypes?(?:[/\\]|$)/i.test(node.source.value)
-        ) {
-          context.report({ node, messageId: "prototypeAsset" });
-        }
-
         if (node.source.value !== LUCIDE_SOURCE) return;
 
         for (const specifier of node.specifiers) {

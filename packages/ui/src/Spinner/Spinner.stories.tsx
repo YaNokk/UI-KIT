@@ -20,7 +20,7 @@ const tones: SpinnerTone[] = [
 ];
 
 const meta = {
-  title: "Feedback/Spinner",
+  title: "Components/Spinner",
   component: Spinner,
   tags: ["autodocs"],
   args: {

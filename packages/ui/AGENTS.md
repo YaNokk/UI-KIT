@@ -14,3 +14,5 @@
 - Field interaction использует native input и `label/htmlFor` прежде shell JS; FieldShell не становится tabbable.
 - `cursor:text` не заменяет DOM semantics; не маскируйте label/input boundaries через `pointer-events:none`.
 - Decorative adornments могут делегировать focus, interactive adornments сохраняют собственные pointer/keyboard semantics.
+- Не добавляйте product/domain logic в generic UI только потому, что она нужна prototype; оформляйте promotion отдельной задачей.
+- `packages/ui` никогда не импортирует `prototypes/**`; promoted code получает нормализованный API, tokens, stories и tests.

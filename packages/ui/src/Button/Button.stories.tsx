@@ -13,6 +13,7 @@ import {
   within
 } from "storybook/test";
 import { Star } from "lucide-react";
+import { ButtonLink } from "../ButtonLink/ButtonLink";
 import { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from "./Button";
 
 function LoadingExample({
@@ -78,6 +79,15 @@ type Story = StoryObj<typeof meta>;
 
 const variants: ButtonVariant[] = ["primary", "secondary", "soft", "danger"];
 const sizes: ButtonSize[] = ["sm", "md", "lg"];
+const typographyLabels = [
+  "ABC",
+  "Купить",
+  "Продолжить",
+  "gypqj",
+  "ЁЙЦЩ",
+  "123 456",
+  "1 234,56"
+];
 
 export const Variants: Story = {
   args: {
@@ -109,6 +119,64 @@ export const Sizes: Story = {
       ))}
     </div>
   )
+};
+
+export const TypographyAlignment: Story = {
+  render: () => (
+    <div className="grid gap-6">
+      {sizes.map((size) => (
+        <section className="grid gap-3" key={size}>
+          <h2 className="typo-heading-sm">{size}</h2>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {typographyLabels.map((label) => (
+              <Button key={label} size={size} variant="secondary">
+                {label}
+              </Button>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <Button size={size} variant="primary">Текст</Button>
+            <Button size={size} startIcon={<Star />} variant="primary">
+              Начало
+            </Button>
+            <Button endIcon={<Star />} size={size} variant="primary">
+              Конец
+            </Button>
+            <Button
+              endIcon={<Star />}
+              size={size}
+              startIcon={<Star />}
+              variant="primary"
+            >
+              Обе иконки
+            </Button>
+            <Button loading size={size} startIcon={<Star />} variant="primary">
+              Загрузка
+            </Button>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <Button size={size} startIcon={<Star />} variant="soft">
+              Button
+            </Button>
+            <ButtonLink
+              href="#typography-alignment"
+              size={size}
+              startIcon={<Star />}
+              variant="soft"
+            >
+              ButtonLink
+            </ButtonLink>
+          </div>
+        </section>
+      ))}
+    </div>
+  ),
+  parameters: {
+    layout: "padded"
+  }
 };
 
 export const WithStartIcon: Story = {

@@ -45,6 +45,17 @@
   overflow-wrap: anywhere;
 }
 
+@supports (text-box-trim: trim-both) {
+  .label {
+    /*
+     * Tight single-line controls align visible glyph bounds rather than
+     * the full font line box when browser support is available.
+     */
+    text-box-trim: trim-both;
+    text-box-edge: cap alphabetic;
+  }
+}
+
 .icon {
   display: inline-flex;
   flex: none;

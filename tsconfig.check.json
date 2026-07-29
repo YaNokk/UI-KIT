@@ -14,7 +14,9 @@
     "apps/**/*.ts",
     "apps/**/*.tsx",
     "packages/**/*.ts",
-    "packages/**/*.tsx"
+    "packages/**/*.tsx",
+    "prototypes/**/*.ts",
+    "prototypes/**/*.tsx"
   ],
   "exclude": [
     "**/dist/**"

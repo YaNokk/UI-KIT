@@ -21,6 +21,7 @@
     "publish:local": "node scripts/publish-local.mjs",
     "release:check": "node scripts/verify-release-version.mjs",
     "storybook": "storybook dev -p 6006 -c apps/storybook/.storybook",
+    "storybook:mcp:check": "node scripts/verify-storybook-mcp.mjs",
     "build-storybook": "storybook build -c apps/storybook/.storybook -o storybook-static"
   },
   "devDependencies": {

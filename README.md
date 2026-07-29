@@ -9,6 +9,7 @@
 - `packages/patterns` — композиционный слой будущих product patterns;
 - `packages/design-system-registry` — authored registry и schemas;
 - `apps/storybook` — документация компонентов и brand/theme stress controls;
+- `prototypes` — изолированная experimental workspace дизайнера;
 - `fixtures/vite-react` — clean packed-package consumer.
 
 Публичные пакеты:
@@ -48,3 +49,14 @@ GitLab Package Registry только pipeline для SemVer-тегов.
 Настройка registry, локальная публикация, consumer authentication и требуемые
 environment variables описаны в
 [`docs/package-distribution.md`](docs/package-distribution.md).
+
+## Designer + Codex
+
+Prototype-процесс, безопасная работа с git и promotion описаны в:
+
+- [`docs/designer-codex-quickstart.md`](docs/designer-codex-quickstart.md);
+- [`docs/designer-workflow.md`](docs/designer-workflow.md);
+- [`docs/designer-production-pipeline.md`](docs/designer-production-pipeline.md).
+
+Scoped-ограничения experimental workspace находятся в
+[`prototypes/AGENTS.md`](prototypes/AGENTS.md).

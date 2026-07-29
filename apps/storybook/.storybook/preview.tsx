@@ -73,6 +73,17 @@ const preview: Preview = {
     controls: {
       expanded: true
     },
+    options: {
+      storySort: {
+        order: [
+          "Foundations",
+          "Components",
+          "Patterns",
+          "Retail",
+          "Prototypes"
+        ]
+      }
+    },
     layout: "fullscreen",
     viewport: {
       options: {
