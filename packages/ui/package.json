@@ -15,6 +15,14 @@
       "types": "./dist/DesignSystemProvider/index.d.ts",
       "import": "./dist/DesignSystemProvider/index.js"
     },
+    "./dialog": {
+      "types": "./dist/Dialog/index.d.ts",
+      "import": "./dist/Dialog/index.js"
+    },
+    "./drawer": {
+      "types": "./dist/Drawer/index.d.ts",
+      "import": "./dist/Drawer/index.js"
+    },
     "./amount": {
       "types": "./dist/Amount/index.d.ts",
       "import": "./dist/Amount/index.js"
@@ -30,6 +38,10 @@
     "./button-link": {
       "types": "./dist/ButtonLink/index.d.ts",
       "import": "./dist/ButtonLink/index.js"
+    },
+    "./bottom-sheet": {
+      "types": "./dist/BottomSheet/index.d.ts",
+      "import": "./dist/BottomSheet/index.js"
     },
     "./field-shell": {
       "types": "./dist/FieldShell/index.d.ts",
@@ -92,6 +104,7 @@
     "@maskito/core": "^4.0.1",
     "@maskito/kit": "^4.0.1",
     "@mypoint/tokens": "^0.1.0",
+    "@radix-ui/react-dialog": "1.1.23",
     "lucide-react": "^1.27.0"
   }
 }

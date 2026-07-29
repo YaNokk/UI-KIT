@@ -65,6 +65,13 @@ Forms и overlay foundations доступны как `Portal`/`PortalProvider`,
 primitive `FieldShell` — общей геометрией input-like controls. Specialized
 fields композируют эти foundations и не копируют Input styles.
 
+Controlled modal surfaces доступны как `Dialog`, `Drawer` и `BottomSheet`
+через root exports и subpaths `dialog`, `drawer`, `bottom-sheet`. Они требуют
+`open`, `onOpenChange` и `closeLabel`; Trigger/defaultOpen, raw z-index,
+placement, snap points и Radix types не входят в публичный API. Общие Portal,
+focus, hierarchy, ancestor invalidation, layer arbitration и document scroll
+lock описаны в `../../docs/modal-foundation.md`.
+
 ## Amount foundation
 
 `Amount` и `AmountInput` используют безопасное целое значение в минорных

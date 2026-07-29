@@ -74,7 +74,7 @@ export const FractionalStep: Story = {
   },
 };
 
-export const StepParity: Story = {
+export const KeyboardButtonParity: Story = {
   args: {
     maximumFractionDigits: 2,
     min: 0,
@@ -82,6 +82,51 @@ export const StepParity: Story = {
     value: 0.2,
   },
   render: (args) => <ControlledExample {...args} />,
+};
+
+export const StepAvailability: Story = {
+  render: () => (
+    <div style={{ display: "grid", gap: "var(--ds-space-3)" }}>
+      <QuantityInput
+        {...labels}
+        aria-label="Небезопасный шаг"
+        maximumFractionDigits={1}
+        step={0.1}
+        value={Number.MAX_SAFE_INTEGER / 10}
+      />
+      <QuantityInput
+        {...labels}
+        aria-label="Максимальная граница"
+        max={5}
+        value={5}
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const unsafeGroup = canvas.getByRole("group", {
+      name: "Небезопасный шаг",
+    });
+    const boundaryGroup = canvas.getByRole("group", {
+      name: "Максимальная граница",
+    });
+
+    await expect(
+      within(unsafeGroup).getByRole("button", {
+        name: "Увеличить количество",
+      }),
+    ).toBeDisabled();
+    await expect(
+      within(unsafeGroup).getByRole("button", {
+        name: "Уменьшить количество",
+      }),
+    ).toBeEnabled();
+    await expect(
+      within(boundaryGroup).getByRole("button", {
+        name: "Увеличить количество",
+      }),
+    ).toBeDisabled();
+  },
 };
 
 export const Controlled: Story = {

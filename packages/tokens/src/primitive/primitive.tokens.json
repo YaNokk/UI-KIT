@@ -133,6 +133,14 @@
       "compact": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
       "default": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },
       "comfortable": { "$type": "dimension", "$value": { "value": 56, "unit": "px" } }
+    },
+    "overlay": {
+      "dialog": {
+        "md": { "$type": "dimension", "$value": { "value": 500, "unit": "px" } }
+      },
+      "drawer": {
+        "md": { "$type": "dimension", "$value": { "value": 500, "unit": "px" } }
+      }
     }
   },
   "breakpoint": {

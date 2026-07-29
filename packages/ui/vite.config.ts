@@ -14,6 +14,12 @@ export default defineConfig({
         "DesignSystemProvider/index": fileURLToPath(
           new URL("./src/DesignSystemProvider/index.ts", import.meta.url)
         ),
+        "Dialog/index": fileURLToPath(
+          new URL("./src/Dialog/index.ts", import.meta.url)
+        ),
+        "Drawer/index": fileURLToPath(
+          new URL("./src/Drawer/index.ts", import.meta.url)
+        ),
         "Amount/index": fileURLToPath(
           new URL("./src/Amount/index.ts", import.meta.url)
         ),
@@ -25,6 +31,9 @@ export default defineConfig({
         ),
         "ButtonLink/index": fileURLToPath(
           new URL("./src/ButtonLink/index.ts", import.meta.url)
+        ),
+        "BottomSheet/index": fileURLToPath(
+          new URL("./src/BottomSheet/index.ts", import.meta.url)
         ),
         "FieldShell/index": fileURLToPath(
           new URL("./src/FieldShell/index.ts", import.meta.url)
@@ -70,7 +79,8 @@ export default defineConfig({
         || id === "react/jsx-runtime"
         || id === "@maskito/core"
         || id === "@maskito/kit"
-        || id === "@mypoint/tokens",
+        || id === "@mypoint/tokens"
+        || id === "@radix-ui/react-dialog",
       output: {
         preserveModules: true,
         preserveModulesRoot: sourceRoot,

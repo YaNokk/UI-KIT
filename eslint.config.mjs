@@ -74,5 +74,11 @@ export default tseslint.config(
         }
       ]
     }
+  },
+  {
+    files: ["packages/ui/src/internal/modal/ModalPrimitive.tsx"],
+    rules: {
+      "no-restricted-imports": "off"
+    }
   }
 );

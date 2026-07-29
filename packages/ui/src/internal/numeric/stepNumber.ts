@@ -10,6 +10,11 @@ export interface StepNumberOptions {
   allowNegative?: boolean;
 }
 
+interface StepEvaluation {
+  canStep: boolean;
+  nextValue: number | null;
+}
+
 const MAX_DECIMAL_PRECISION = 15;
 const MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
 
@@ -100,7 +105,7 @@ function safelyScale(
   return Number.isSafeInteger(roundedValue) ? roundedValue : null;
 }
 
-export function stepNumber({
+function evaluateStep({
   value,
   direction,
   step = 1,
@@ -108,7 +113,7 @@ export function stepNumber({
   max,
   maximumFractionDigits,
   allowNegative = true,
-}: StepNumberOptions) {
+}: StepNumberOptions): StepEvaluation {
   assertFiniteOption("value", value ?? undefined);
   assertFiniteOption("step", step);
   assertFiniteOption("min", min);
@@ -131,7 +136,7 @@ export function stepNumber({
   });
   const scale = 10 ** precision;
   if (!Number.isSafeInteger(scale)) {
-    return value;
+    return { canStep: false, nextValue: value };
   }
 
   const scaledValue =
@@ -148,7 +153,7 @@ export function stepNumber({
     scaledMin === null ||
     scaledMax === null
   ) {
-    return value;
+    return { canStep: false, nextValue: value };
   }
 
   let scaledCandidate: number;
@@ -163,22 +168,30 @@ export function stepNumber({
     }
   } else {
     if (scaledValue === undefined) {
-      return value;
+      return { canStep: false, nextValue: value };
     }
     scaledCandidate = scaledValue + direction * scaledStep;
   }
 
   if (!Number.isSafeInteger(scaledCandidate)) {
-    return value;
+    return { canStep: false, nextValue: value };
   }
 
   if (!allowNegative && min === undefined) {
     scaledCandidate = Math.max(0, scaledCandidate);
   }
 
-  return clamp(scaledCandidate, scaledMin, scaledMax) / scale;
+  const nextValue = clamp(scaledCandidate, scaledMin, scaledMax) / scale;
+  return {
+    canStep: !Object.is(nextValue, value),
+    nextValue,
+  };
+}
+
+export function stepNumber(options: StepNumberOptions) {
+  return evaluateStep(options).nextValue;
 }
 
 export function canStepNumber(options: StepNumberOptions) {
-  return !Object.is(stepNumber(options), options.value);
+  return evaluateStep(options).canStep;
 }

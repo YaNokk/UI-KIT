@@ -30,8 +30,10 @@ import { QuantityInput } from "@mypoint/retail-ui/quantity-input";
 
 - `min` опционален, `step` по умолчанию равен `1`,
   `maximumFractionDigits` — `0`. Для обычной корзины рекомендуется `min={1}`.
-- Кнопка на достигнутой границе disabled. `disabled` и `readOnly` отключают обе
-  кнопки, не меняя геометрию.
+- Кнопка disabled всегда, когда соответствующий шаг недоступен: на достигнутой
+  границе, при unsafe scaled arithmetic, а также в `disabled`/`readOnly`.
+  Availability берётся из того же evaluator, что выполняет шаг, поэтому
+  визуальное состояние не расходится с keyboard/actions behavior.
 - Кнопки и стрелки клавиатуры активируют один step engine из `NumberInput`;
   отдельной retail-арифметики нет. Композиция вызывает поддерживаемые
   типизированные `NumberInputActions.increment()`/`decrement()` через
@@ -44,7 +46,9 @@ import { QuantityInput } from "@mypoint/retail-ui/quantity-input";
 - Порядок blur намеренный: сначала `NumberInput` commit/clamp-ит editing value,
   затем вызывает consumer `onBlur`, после чего `QuantityInput` применяет
   retail-правило `null → min`.
-- Группа и каждая icon-only кнопка получают явные accessible names.
+- `role="group"` связывает поле и две sibling-кнопки в один quantity control;
+  группа и каждая icon-only кнопка получают явные accessible names. Имя группы
+  описывает весь контрол, а `increaseLabel`/`decreaseLabel` — отдельные actions.
 
 `QuantityInput` не вводит отдельную form serialization. `name` принадлежит
 видимому `NumberInput`, поэтому нативная форма отправляет локализованный текст.
@@ -64,3 +68,8 @@ desktop. На узкой поверхности средняя колонка м
 доступные step-действия. Встроенный stepper внутри поля отклонён: retail
 кнопки остаются самостоятельными siblings. MP UI KIT повлиял только на compact
 density и визуальную иерархию; токены и компоненты проекта имеют приоритет.
+
+Контракты `QuantityInput` и `QuantityInputProps` после этого прохода считаются
+замороженными для v1. Дальнейшее изменение требует продуктового сценария,
+исправления ошибки, accessibility-требования или изменения semantic value
+model.

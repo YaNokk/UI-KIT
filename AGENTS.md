@@ -182,3 +182,11 @@
 - `retail-ui` использует только публичные capabilities `NumberInput`.
 - Неподдерживаемый арифметический диапазон завершается детерминированным no-op
   и никогда не публикует молча повреждённое значение.
+- Визуальные step controls используют те же capability rules, что и stepping
+  evaluator; disabled-состояние `+/-` не расходится с реальной availability.
+- Spinbutton ARIA отражает текущее semantic editing state и не публикует stale
+  `aria-valuenow` для пустого или промежуточного значения.
+- Внутренние precision/safe-range constants остаются implementation details,
+  пока явно не повышены до публичного контракта.
+- Пока semantic value остаётся JS `number | null`, arbitrary-precision decimal
+  libraries не добавляются.

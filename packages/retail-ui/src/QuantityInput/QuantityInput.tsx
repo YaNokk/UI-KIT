@@ -8,6 +8,7 @@ import {
 } from "react";
 import { Minus, Plus } from "lucide-react";
 import {
+  canStepNumber,
   IconButton,
   NumberInput,
   type NumberInputActions,
@@ -104,21 +105,21 @@ export const QuantityInput = forwardRef<
     }
   };
 
+  const stepOptions = {
+    allowNegative,
+    maximumFractionDigits,
+    ...(max === undefined ? {} : { max }),
+    ...(min === undefined ? {} : { min }),
+    step,
+    value: effectiveValue,
+  };
   const unavailable = disabled || readOnly;
   const decrementDisabled =
     unavailable ||
-    (effectiveValue !== null &&
-      !allowNegative &&
-      min === undefined &&
-      effectiveValue <= 0) ||
-    (effectiveValue !== null &&
-      min !== undefined &&
-      effectiveValue <= min);
+    !canStepNumber({ ...stepOptions, direction: -1 });
   const incrementDisabled =
     unavailable ||
-    (effectiveValue !== null &&
-      max !== undefined &&
-      effectiveValue >= max);
+    !canStepNumber({ ...stepOptions, direction: 1 });
 
   return (
     <div

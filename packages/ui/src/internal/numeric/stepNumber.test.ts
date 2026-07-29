@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { stepNumber } from "./stepNumber";
+import { canStepNumber, stepNumber } from "./stepNumber";
 
 describe("stepNumber", () => {
   it("steps fractional values without binary floating-point artifacts", () => {
@@ -151,6 +151,111 @@ describe("stepNumber", () => {
         direction: 1,
         maximumFractionDigits: 0,
         step: 0.5,
+        value: 1,
+      }),
+    ).toThrow("step precision cannot exceed maximumFractionDigits");
+  });
+});
+
+describe("canStepNumber", () => {
+  it.each([
+    {
+      name: "integer increment",
+      options: { direction: 1 as const, value: 1 },
+    },
+    {
+      name: "integer decrement",
+      options: { direction: -1 as const, value: 1 },
+    },
+    {
+      name: "fractional increment",
+      options: {
+        direction: 1 as const,
+        maximumFractionDigits: 2,
+        step: 0.25,
+        value: 1.25,
+      },
+    },
+    {
+      name: "negative decrement",
+      options: {
+        direction: -1 as const,
+        min: -2,
+        value: -1,
+      },
+    },
+    {
+      name: "null with min",
+      options: {
+        direction: 1 as const,
+        min: 1,
+        value: null,
+      },
+    },
+  ])("matches a changing step for $name", ({ options }) => {
+    expect(canStepNumber(options)).toBe(true);
+    expect(stepNumber(options)).not.toBe(options.value);
+  });
+
+  it.each([
+    {
+      name: "max boundary",
+      options: { direction: 1 as const, max: 3, value: 3 },
+    },
+    {
+      name: "min boundary",
+      options: { direction: -1 as const, min: -3, value: -3 },
+    },
+    {
+      name: "non-negative boundary",
+      options: {
+        allowNegative: false,
+        direction: -1 as const,
+        value: 0,
+      },
+    },
+    {
+      name: "unsafe fractional candidate",
+      options: {
+        direction: 1 as const,
+        maximumFractionDigits: 1,
+        step: 0.1,
+        value: Number.MAX_SAFE_INTEGER / 10,
+      },
+    },
+    {
+      name: "unsafe scaled max",
+      options: {
+        direction: 1 as const,
+        max: Number.MAX_SAFE_INTEGER,
+        maximumFractionDigits: 1,
+        step: 0.1,
+        value: 1,
+      },
+    },
+    {
+      name: "unsafe high-precision value",
+      options: {
+        direction: 1 as const,
+        maximumFractionDigits: 15,
+        step: 0.000000000000001,
+        value: 10,
+      },
+    },
+  ])("matches an unchanged step for $name", ({ options }) => {
+    expect(canStepNumber(options)).toBe(false);
+    expect(stepNumber(options)).toBe(options.value);
+  });
+
+  it("preserves configuration errors", () => {
+    expect(() =>
+      canStepNumber({ direction: 1, step: 0, value: 1 }),
+    ).toThrow("step must be greater than 0");
+    expect(() =>
+      canStepNumber({
+        direction: 1,
+        maximumFractionDigits: 0,
+        step: 0.1,
         value: 1,
       }),
     ).toThrow("step precision cannot exceed maximumFractionDigits");

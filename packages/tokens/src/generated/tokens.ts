@@ -234,6 +234,14 @@ export const primitiveTokens = {
     "value": 56,
     "unit": "px"
   },
+  "size.overlay.dialog.md": {
+    "value": 500,
+    "unit": "px"
+  },
+  "size.overlay.drawer.md": {
+    "value": 500,
+    "unit": "px"
+  },
   "breakpoint.sm": {
     "value": 640,
     "unit": "px"

@@ -159,12 +159,70 @@ export const Actions: Story = {
   render: () => <StepParityExample />,
 };
 
-export const LargeValueBoundary: Story = {
+function SpinbuttonA11yExample() {
+  return (
+    <div style={{ display: "grid", gap: "var(--ds-space-3)" }}>
+      <ControlledExample
+        aria-label="Доступное число"
+        locale="en-US"
+        max={20}
+        min={0}
+        step={0.5}
+        value={12.5}
+      />
+      <ControlledExample
+        aria-label="Промежуточное число"
+        locale="ru-RU"
+        value={null}
+      />
+    </div>
+  );
+}
+
+export const SpinbuttonA11y: Story = {
+  render: () => <SpinbuttonA11yExample />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const valid = canvas.getByRole("spinbutton", {
+      name: "Доступное число",
+    });
+    const intermediate = canvas.getByRole("spinbutton", {
+      name: "Промежуточное число",
+    });
+
+    await expect(valid).toHaveAttribute("aria-valuenow", "12.5");
+    await expect(valid).toHaveAttribute("aria-valuemin", "0");
+    await expect(valid).toHaveAttribute("aria-valuemax", "20");
+    await expect(intermediate).not.toHaveAttribute("aria-valuenow");
+
+    await userEvent.type(intermediate, "1,");
+    await expect(intermediate).toHaveValue("1,");
+    await expect(intermediate).not.toHaveAttribute("aria-valuenow");
+
+    await userEvent.click(valid);
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(valid).toHaveValue("13");
+    await expect(valid).toHaveAttribute("aria-valuenow", "13");
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(valid).toHaveValue("12.5");
+  },
+};
+
+export const UnsafeStepBoundary: Story = {
   args: {
     hint:
       "Значение отображается, но небезопасный integer-scaled шаг выполняется как no-op.",
     maximumFractionDigits: 3,
     value: Number.MAX_SAFE_INTEGER,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole("spinbutton", { name: "Количество" });
+    const initialValue = input.getAttribute("value");
+
+    await userEvent.click(input);
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(input).toHaveValue(initialValue ?? "");
   },
 };
 

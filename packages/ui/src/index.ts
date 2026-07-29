@@ -5,6 +5,16 @@ export type {
   DesignSystemProviderProps
 } from "./DesignSystemProvider/index.js";
 export type { BrandInput, ThemeMode } from "@mypoint/tokens";
+export { BottomSheet } from "./BottomSheet/index.js";
+export type { BottomSheetProps } from "./BottomSheet/index.js";
+export { Dialog } from "./Dialog/index.js";
+export type { DialogProps } from "./Dialog/index.js";
+export { Drawer } from "./Drawer/index.js";
+export type { DrawerProps } from "./Drawer/index.js";
+export type {
+  ModalCloseReason,
+  ModalOpenChangeMeta
+} from "./internal/modal/types.js";
 export { Amount } from "./Amount/index.js";
 export type {
   AmountMinorTone,
@@ -63,6 +73,7 @@ export type {
   LinkTone
 } from "./Link/index.js";
 export { NumberInput } from "./NumberInput/index.js";
+export { canStepNumber } from "./NumberInput/index.js";
 export type {
   NumberInputActions,
   NumberInputChangeMeta,

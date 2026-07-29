@@ -66,6 +66,23 @@ describe("icon token contract", () => {
   });
 });
 
+describe("overlay size token contract", () => {
+  it("keeps Dialog and Drawer roles independent from breakpoints", () => {
+    expect(primitiveTokens["size.overlay.dialog.md"]).toEqual({
+      value: 500,
+      unit: "px"
+    });
+    expect(primitiveTokens["size.overlay.drawer.md"]).toEqual({
+      value: 500,
+      unit: "px"
+    });
+    expect(primitiveTokens["breakpoint.md"]).toEqual({
+      value: 768,
+      unit: "px"
+    });
+  });
+});
+
 describe("typography token contract", () => {
   it("exposes the complete compact role scale without color", () => {
     expect(Object.keys(typographyTokens)).toEqual([

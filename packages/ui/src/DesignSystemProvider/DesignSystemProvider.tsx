@@ -9,6 +9,7 @@ import {
   type ThemePreference
 } from "../theme/ThemeProvider";
 import { LocaleProvider } from "../internal/locale/LocaleContext";
+import { ModalRuntimeProvider } from "../internal/modal/ModalRuntime";
 import { PortalScopeProvider } from "../Portal/Portal";
 import styles from "./DesignSystemProvider.module.css";
 
@@ -42,7 +43,7 @@ function RuntimeScope({
   return (
     <LocaleProvider {...(locale === undefined ? {} : { locale })}>
       <PortalScopeProvider root={portalRoot}>
-        {children}
+        <ModalRuntimeProvider>{children}</ModalRuntimeProvider>
         <div
           className={styles.portalRoot}
           data-ds-portal-root=""

@@ -61,6 +61,25 @@ describe("QuantityInput", () => {
     ).toBeDisabled();
   });
 
+  it("disables only actions rejected by the shared safe-step evaluator", () => {
+    const value = Number.MAX_SAFE_INTEGER / 10;
+    render(
+      <QuantityInput
+        {...accessibleProps}
+        maximumFractionDigits={1}
+        step={0.1}
+        value={value}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Увеличить количество" }),
+    ).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Уменьшить количество" }),
+    ).toBeEnabled();
+  });
+
   it("uses decimal-safe fractional steps", async () => {
     const user = userEvent.setup();
     render(
@@ -208,6 +227,9 @@ describe("QuantityInput", () => {
     const { container } = render(
       <QuantityInput {...accessibleProps} max={10} value={2} />,
     );
+    expect(
+      screen.getByRole("group", { name: "Количество товара" }),
+    ).toBeInTheDocument();
     expect((await axe.run(container)).violations).toEqual([]);
   });
 });
