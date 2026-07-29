@@ -11,6 +11,14 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./amount": {
+      "types": "./dist/Amount/index.d.ts",
+      "import": "./dist/Amount/index.js"
+    },
+    "./amount-input": {
+      "types": "./dist/AmountInput/index.d.ts",
+      "import": "./dist/AmountInput/index.js"
+    },
     "./button": {
       "types": "./dist/Button/index.d.ts",
       "import": "./dist/Button/index.js"
@@ -73,6 +81,8 @@
     "react-dom": "^18.2.0 || ^19.0.0"
   },
   "dependencies": {
+    "@maskito/core": "^4.0.1",
+    "@maskito/kit": "^4.0.1",
     "@mypoint/tokens": "^0.1.0",
     "lucide-react": "^1.27.0"
   }

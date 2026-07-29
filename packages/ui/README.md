@@ -40,7 +40,8 @@ React и ReactDOM предоставляются consumer-приложением
 Компоненты доступны через root named exports и явные ESM subpaths:
 `@mypoint/ui/button`, `@mypoint/ui/button-link`,
 `@mypoint/ui/icon-button`, `@mypoint/ui/spinner`, `@mypoint/ui/text`, `@mypoint/ui/heading` и
-`@mypoint/ui/link`.
+`@mypoint/ui/link`. Monetary-компоненты также доступны через
+`@mypoint/ui/amount` и `@mypoint/ui/amount-input`.
 
 Forms и overlay foundations доступны как `Portal`/`PortalProvider`,
 `FormControl`, `FieldShell`, `Input` и `PasswordInput` с явными subpaths
@@ -48,6 +49,18 @@ Forms и overlay foundations доступны как `Portal`/`PortalProvider`,
 `FormControl` владеет label/helper/error semantics, а публичный advanced
 primitive `FieldShell` — общей геометрией input-like controls. Specialized
 fields композируют эти foundations и не копируют Input styles.
+
+## Amount foundation
+
+`Amount` и `AmountInput` используют безопасное целое значение в минорных
+единицах. Например, `123456` при `minority={100}` означает `1234.56`.
+Пустой `AmountInput` возвращает `null`, а `0` остаётся валидным значением.
+Валюта, точность и расположение символа определяются через `Intl`; явный
+`minority` имеет приоритет. Локаль по умолчанию — `ru-RU`.
+
+Форматированная строка поля не является публичным semantic value и доступна
+только как `meta.inputValue` в `onChange`. Maskito скрыт за внутренним numeric
+adapter и не входит в публичные типы.
 
 Generic icons импортируются статически из `lucide-react`. Компонент,
 владеющий icon-slot, задаёт размер, цвет через `currentColor` и decorative

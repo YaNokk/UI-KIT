@@ -19,6 +19,10 @@ const packages = [
     required: [
       "dist/index.js",
       "dist/index.d.ts",
+      "dist/Amount/index.js",
+      "dist/Amount/index.d.ts",
+      "dist/AmountInput/index.js",
+      "dist/AmountInput/index.d.ts",
       "dist/tokens.css",
       "dist/tailwind.css"
     ]

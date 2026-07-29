@@ -1,5 +1,18 @@
 import "@mypoint/tokens/tokens.css";
 
+export { Amount } from "./Amount/index.js";
+export type {
+  AmountEmphasis,
+  AmountMinorTone,
+  AmountProps,
+  AmountSize,
+  AmountValue
+} from "./Amount/index.js";
+export { AmountInput } from "./AmountInput/index.js";
+export type {
+  AmountInputChangeMeta,
+  AmountInputProps
+} from "./AmountInput/index.js";
 export { Button } from "./Button/index.js";
 export type {
   ButtonProps,

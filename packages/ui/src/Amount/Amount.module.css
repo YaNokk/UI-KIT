@@ -1,0 +1,31 @@
+.root {
+  display: inline;
+  color: var(--ds-text-primary);
+  white-space: nowrap;
+}
+
+.sm {
+  font: var(--ds-typography-body-sm);
+}
+
+.md {
+  font: var(--ds-typography-body);
+}
+
+.lg {
+  font: var(--ds-typography-body-lg);
+}
+
+.strong {
+  font-weight: var(--ds-font-weight-semibold);
+}
+
+.minor,
+.currency {
+  color: inherit;
+}
+
+.secondaryMinor .minor,
+.secondaryMinor .currency {
+  color: var(--ds-text-secondary);
+}

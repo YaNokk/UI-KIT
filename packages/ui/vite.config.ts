@@ -11,6 +11,12 @@ export default defineConfig({
     lib: {
       entry: {
         index: fileURLToPath(new URL("./src/index.ts", import.meta.url)),
+        "Amount/index": fileURLToPath(
+          new URL("./src/Amount/index.ts", import.meta.url)
+        ),
+        "AmountInput/index": fileURLToPath(
+          new URL("./src/AmountInput/index.ts", import.meta.url)
+        ),
         "Button/index": fileURLToPath(
           new URL("./src/Button/index.ts", import.meta.url)
         ),
@@ -56,6 +62,8 @@ export default defineConfig({
         id === "react"
         || id === "react-dom"
         || id === "react/jsx-runtime"
+        || id === "@maskito/core"
+        || id === "@maskito/kit"
         || id === "@mypoint/tokens",
       output: {
         preserveModules: true,

@@ -88,6 +88,11 @@
 - Trimming остаётся локальным для control visual foundation, пока одинаковая потребность не доказана в нескольких независимых control families.
 - Проверяйте в Storybook/browser кириллицу, descenders, числа, иконки, размеры и loading; fallback без text-box support должен оставаться визуально приемлемым.
 - Используйте только canonical layer names; произвольные z-index aliases запрещены.
+- Monetary display и monetary editing используют общие amount-domain helpers, но не общий React/editing state.
+- Maskito — внутренний numeric editing engine и не определяет публичный API компонентов.
+- Semantic value `AmountInput` отделён от форматированной DOM-строки; пустое значение — `null`, а `0` остаётся валидным.
+- Для преобразования минорных единиц используйте строковые операции, когда они безопаснее floating-point transforms.
+- Не добавляйте financial arithmetic в UI-KIT и не создавайте публичный `NumberInput` как побочный эффект monetary-задач.
 
 ## Добавление токена
 

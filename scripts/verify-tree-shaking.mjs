@@ -80,6 +80,18 @@ if (spinnerJavaScript.includes("data-loading")) {
   throw new Error("Button loading behavior survived the Spinner-only build.");
 }
 
+runBuild("tree-amount", "dist-tree-amount");
+const amountJavaScript = readOutput("dist-tree-amount", ".js");
+if (!amountJavaScript.includes("data-amount-part")) {
+  throw new Error("The used Amount implementation was not found.");
+}
+if (
+  amountJavaScript.toLowerCase().includes("maskito")
+  || amountJavaScript.includes("beforeinput")
+) {
+  throw new Error("Maskito editing code survived the Amount-only build.");
+}
+
 runBuild("lazy", "dist-lazy");
 const manifest = JSON.parse(
   readFileSync(resolve(consumerRoot, "dist-lazy", ".vite", "manifest.json"), "utf8")
@@ -106,5 +118,5 @@ if (!hasButtonLinkDynamicEntry) {
 }
 
 console.log(
-  "Tree-shaking passed: ButtonLink/IconButton/Spinner stayed independent, unused ThemeProvider and icon catalog were removed, CSS retained, dynamic subpaths split."
+  "Tree-shaking passed: Amount excluded Maskito; ButtonLink/IconButton/Spinner stayed independent, unused ThemeProvider and icon catalog were removed, CSS retained, dynamic subpaths split."
 );

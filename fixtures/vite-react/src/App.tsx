@@ -1,3 +1,5 @@
+import { Amount } from "@mypoint/ui/amount";
+import { AmountInput } from "@mypoint/ui/amount-input";
 import { Button as SubpathButton } from "@mypoint/ui/button";
 import { ButtonLink } from "@mypoint/ui/button-link";
 import { IconButton } from "@mypoint/ui/icon-button";
@@ -17,6 +19,13 @@ export function App() {
       <LinkButton>Повторить</LinkButton>
       <IconButton aria-label="Обновить" icon={<RefreshCw />} />
       <Spinner label="Загрузка заказов" tone="accent" />
+      <Amount currency="PLN" locale="pl-PL" value={123456} />
+      <AmountInput
+        currency="PLN"
+        label="Сумма"
+        locale="pl-PL"
+        value={123456}
+      />
     </ThemeProvider>
   );
 }

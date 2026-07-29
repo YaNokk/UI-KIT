@@ -1,0 +1,5 @@
+.currency {
+  color: var(--ds-text-secondary);
+  font: inherit;
+  white-space: nowrap;
+}
