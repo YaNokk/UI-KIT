@@ -116,6 +116,41 @@ describe("QuantityInput", () => {
     expect(
       screen.getByRole("spinbutton", { name: "Кнопочное количество" }),
     ).toHaveValue("0.3");
+
+    await user.click(keyboardInput);
+    await user.keyboard("{ArrowDown}");
+    await user.click(
+      screen.getByRole("button", {
+        name: "Уменьшить кнопочное количество",
+      }),
+    );
+    expect(keyboardInput).toHaveValue("0.2");
+    expect(
+      screen.getByRole("spinbutton", { name: "Кнопочное количество" }),
+    ).toHaveValue("0.2");
+  });
+
+  it("keeps fractional boundary actions aligned with the stepped value", async () => {
+    const user = userEvent.setup();
+    render(
+      <QuantityInput
+        {...accessibleProps}
+        defaultValue={1.25}
+        max={1.3}
+        maximumFractionDigits={2}
+        min={-1.3}
+        step={0.25}
+      />,
+    );
+
+    const input = screen.getByRole("spinbutton");
+    await user.click(
+      screen.getByRole("button", { name: "Увеличить количество" }),
+    );
+    expect(input).toHaveValue("1.3");
+    expect(
+      screen.getByRole("button", { name: "Увеличить количество" }),
+    ).toBeDisabled();
   });
 
   it("restores min on blur after an empty edit", async () => {

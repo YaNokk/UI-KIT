@@ -172,3 +172,13 @@
 - `QuantityInput` policy `null → min` принадлежит retail/domain слою и не
   переносится в generic `NumberInput`.
 - Не публикуйте `NumberStepper` без доказанного второго generic use case.
+- `NumberInput` v1 использует semantic `number | null`; arbitrary-precision
+  decimal library нельзя добавлять без проверки требований к самому semantic
+  value.
+- Decimal-safe stepping использует ограниченную integer-scaled арифметику с
+  явными guard-проверками `Number.MAX_SAFE_INTEGER`.
+- Native ref `NumberInput` и advanced composition API `actionsRef` являются
+  разными контрактами; `actionsRef` не заменяет controlled state management.
+- `retail-ui` использует только публичные capabilities `NumberInput`.
+- Неподдерживаемый арифметический диапазон завершается детерминированным no-op
+  и никогда не публикует молча повреждённое значение.

@@ -74,7 +74,7 @@ export const FractionalStep: Story = {
   },
 };
 
-export const KeyboardButtonParity: Story = {
+export const StepParity: Story = {
   args: {
     maximumFractionDigits: 2,
     min: 0,

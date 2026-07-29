@@ -2,14 +2,14 @@
 
 import "@testing-library/jest-dom/vitest";
 import { createRef, useState } from "react";
-import { cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axe from "axe-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DesignSystemProvider } from "../DesignSystemProvider";
 import {
   NumberInput,
-  type NumberInputStepActions,
+  type NumberInputActions,
 } from "./NumberInput";
 
 afterEach(cleanup);
@@ -57,15 +57,15 @@ describe("NumberInput", () => {
 
   it("shares the keyboard stepping path through typed composition actions", async () => {
     const user = userEvent.setup();
-    const actionsRef = createRef<NumberInputStepActions>();
+    const actionsRef = createRef<NumberInputActions>();
     render(
       <>
         <NumberInput
           aria-label="Шаг"
+          actionsRef={actionsRef}
           defaultValue={0.2}
           maximumFractionDigits={2}
           step={0.1}
-          stepActionsRef={actionsRef}
         />
         <button onClick={() => actionsRef.current?.increment()} type="button">
           Увеличить
@@ -83,6 +83,85 @@ describe("NumberInput", () => {
     expect(input).toHaveValue("0.2");
     await user.click(screen.getByRole("button", { name: "Уменьшить" }));
     expect(input).toHaveValue("0.1");
+  });
+
+  it("keeps actions current across props and separate from the native ref", () => {
+    const actionsRef = createRef<NumberInputActions>();
+    const inputRef = createRef<HTMLInputElement>();
+    const onChange = vi.fn();
+    const { rerender } = render(
+      <NumberInput
+        actionsRef={actionsRef}
+        aria-label="Составной контрол"
+        onChange={onChange}
+        ref={inputRef}
+        value={1}
+      />,
+    );
+
+    expect(inputRef.current).toBeInstanceOf(HTMLInputElement);
+    expect(actionsRef.current?.increment).toBeTypeOf("function");
+    act(() => actionsRef.current?.increment());
+    expect(onChange).toHaveBeenLastCalledWith(2, { inputValue: "2" });
+
+    rerender(
+      <NumberInput
+        actionsRef={actionsRef}
+        aria-label="Составной контрол"
+        onChange={onChange}
+        ref={inputRef}
+        step={0.5}
+        value={5}
+      />,
+    );
+    act(() => actionsRef.current?.decrement());
+    expect(onChange).toHaveBeenLastCalledWith(4.5, { inputValue: "4.5" });
+
+    onChange.mockClear();
+    rerender(
+      <NumberInput
+        actionsRef={actionsRef}
+        aria-label="Составной контрол"
+        onChange={onChange}
+        readOnly
+        ref={inputRef}
+        value={5}
+      />,
+    );
+    act(() => actionsRef.current?.increment());
+    expect(onChange).not.toHaveBeenCalled();
+
+    rerender(
+      <NumberInput
+        actionsRef={actionsRef}
+        aria-label="Составной контрол"
+        disabled
+        onChange={onChange}
+        ref={inputRef}
+        value={5}
+      />,
+    );
+    act(() => actionsRef.current?.decrement());
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("does not emit when a scaled step would leave the safe integer range", () => {
+    const actionsRef = createRef<NumberInputActions>();
+    const onChange = vi.fn();
+    const value = Number.MAX_SAFE_INTEGER / 10;
+    render(
+      <NumberInput
+        actionsRef={actionsRef}
+        aria-label="Большое значение"
+        maximumFractionDigits={1}
+        onChange={onChange}
+        step={0.1}
+        value={value}
+      />,
+    );
+
+    act(() => actionsRef.current?.increment());
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   it("keeps natural editing text and applies minimum fraction digits on blur", async () => {
@@ -117,6 +196,51 @@ describe("NumberInput", () => {
     await user.type(input, "2");
     expect(input).toHaveValue("1");
     expect(input).toHaveAttribute("aria-valuenow", "1");
+  });
+
+  it("omits aria-valuenow for empty and intermediate decimal editing", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <NumberInput
+        aria-label="Промежуточное число"
+        locale="ru-RU"
+        onChange={onChange}
+      />,
+    );
+    const input = screen.getByRole("spinbutton", {
+      name: "Промежуточное число",
+    });
+
+    expect(input).not.toHaveAttribute("aria-valuenow");
+    await user.type(input, "1,");
+    expect(input).toHaveValue("1,");
+    expect(input).not.toHaveAttribute("aria-valuenow");
+    expect(onChange).toHaveBeenLastCalledWith(null, { inputValue: "1," });
+  });
+
+  it("exposes numeric min/max ARIA and displays a large safe integer", () => {
+    render(
+      <NumberInput
+        aria-label="Диапазон"
+        locale="en-US"
+        max={Number.MAX_SAFE_INTEGER}
+        maximumFractionDigits={0}
+        min={-10}
+        value={Number.MAX_SAFE_INTEGER}
+      />,
+    );
+    const input = screen.getByRole("spinbutton", { name: "Диапазон" });
+    expect(input).toHaveAttribute("aria-valuemin", "-10");
+    expect(input).toHaveAttribute(
+      "aria-valuemax",
+      String(Number.MAX_SAFE_INTEGER),
+    );
+    expect(input).toHaveAttribute(
+      "aria-valuenow",
+      String(Number.MAX_SAFE_INTEGER),
+    );
+    expect(input).toHaveValue("9,007,199,254,740,991");
   });
 
   it("allows temporary out-of-range editing and clamps on blur", async () => {

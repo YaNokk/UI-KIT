@@ -1,6 +1,6 @@
 export { NumberInput } from "./NumberInput";
 export type {
   NumberInputChangeMeta,
+  NumberInputActions,
   NumberInputProps,
-  NumberInputStepActions,
 } from "./NumberInput";

@@ -10,8 +10,8 @@ import { Minus, Plus } from "lucide-react";
 import {
   IconButton,
   NumberInput,
+  type NumberInputActions,
   type NumberInputProps,
-  type NumberInputStepActions,
 } from "@mypoint/ui";
 import styles from "./QuantityInput.module.css";
 
@@ -64,7 +64,7 @@ export const QuantityInput = forwardRef<
   forwardedRef,
 ) {
   const controlled = value !== undefined;
-  const stepActionsRef = useRef<NumberInputStepActions | null>(null);
+  const actionsRef = useRef<NumberInputActions | null>(null);
   const [uncontrolledValue, setUncontrolledValue] = useState<number | null>(
     defaultValue,
   );
@@ -85,8 +85,8 @@ export const QuantityInput = forwardRef<
   );
 
   const stepValue = (direction: 1 | -1) => {
-    if (direction === 1) stepActionsRef.current?.increment();
-    else stepActionsRef.current?.decrement();
+    if (direction === 1) actionsRef.current?.increment();
+    else actionsRef.current?.decrement();
   };
 
   const setInputRef = useCallback(
@@ -107,6 +107,10 @@ export const QuantityInput = forwardRef<
   const unavailable = disabled || readOnly;
   const decrementDisabled =
     unavailable ||
+    (effectiveValue !== null &&
+      !allowNegative &&
+      min === undefined &&
+      effectiveValue <= 0) ||
     (effectiveValue !== null &&
       min !== undefined &&
       effectiveValue <= min);
@@ -133,6 +137,7 @@ export const QuantityInput = forwardRef<
       <NumberInput
         {...inputProps}
         allowNegative={allowNegative}
+        actionsRef={actionsRef}
         aria-label={ariaLabel}
         className={styles.input}
         disabled={disabled}
@@ -145,7 +150,6 @@ export const QuantityInput = forwardRef<
         ref={setInputRef}
         size="sm"
         step={step}
-        stepActionsRef={stepActionsRef}
         value={effectiveValue}
       />
       <IconButton

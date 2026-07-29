@@ -34,8 +34,9 @@ import { QuantityInput } from "@mypoint/retail-ui/quantity-input";
   кнопки, не меняя геометрию.
 - Кнопки и стрелки клавиатуры активируют один step engine из `NumberInput`;
   отдельной retail-арифметики нет. Композиция вызывает поддерживаемые
-  типизированные `increment()`/`decrement()` actions; DOM events и private
-  imports из `packages/ui/src/internal` не используются.
+  типизированные `NumberInputActions.increment()`/`decrement()` через
+  `actionsRef`; DOM events и private imports из `packages/ui/src/internal`
+  не используются. Native input ref остаётся отдельным контрактом.
 - После клика фокус остаётся на активированной кнопке. Press-and-hold в v1 не
   поддерживается.
 - Пустое значение разрешено во время редактирования. На blur оно

@@ -11,6 +11,7 @@ export interface StepNumberOptions {
 }
 
 const MAX_DECIMAL_PRECISION = 15;
+const MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
 
 function assertFiniteOption(name: string, value: number | undefined) {
   if (value !== undefined && !Number.isFinite(value)) {
@@ -77,6 +78,28 @@ function clamp(value: number, min?: number, max?: number) {
   );
 }
 
+function safelyScale(value: number, scale: number): number | null;
+function safelyScale(value: undefined, scale: number): undefined;
+function safelyScale(
+  value: number | undefined,
+  scale: number,
+): number | null | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const scaledValue = value * scale;
+  if (
+    !Number.isFinite(scaledValue) ||
+    Math.abs(scaledValue) > MAX_SAFE_INTEGER
+  ) {
+    return null;
+  }
+
+  const roundedValue = Math.round(scaledValue);
+  return Number.isSafeInteger(roundedValue) ? roundedValue : null;
+}
+
 export function stepNumber({
   value,
   direction,
@@ -107,9 +130,26 @@ export function stepNumber({
     maximumFractionDigits,
   });
   const scale = 10 ** precision;
-  const scaledStep = Math.round(step * scale);
-  const scaledMin = min === undefined ? undefined : Math.round(min * scale);
-  const scaledMax = max === undefined ? undefined : Math.round(max * scale);
+  if (!Number.isSafeInteger(scale)) {
+    return value;
+  }
+
+  const scaledValue =
+    value === null ? undefined : safelyScale(value, scale);
+  const scaledStep = safelyScale(step, scale);
+  const scaledMin =
+    min === undefined ? undefined : safelyScale(min, scale);
+  const scaledMax =
+    max === undefined ? undefined : safelyScale(max, scale);
+
+  if (
+    scaledValue === null ||
+    scaledStep === null ||
+    scaledMin === null ||
+    scaledMax === null
+  ) {
+    return value;
+  }
 
   let scaledCandidate: number;
 
@@ -122,7 +162,14 @@ export function stepNumber({
       scaledCandidate = allowNegative ? -scaledStep : 0;
     }
   } else {
-    scaledCandidate = Math.round(value * scale) + direction * scaledStep;
+    if (scaledValue === undefined) {
+      return value;
+    }
+    scaledCandidate = scaledValue + direction * scaledStep;
+  }
+
+  if (!Number.isSafeInteger(scaledCandidate)) {
+    return value;
   }
 
   if (!allowNegative && min === undefined) {

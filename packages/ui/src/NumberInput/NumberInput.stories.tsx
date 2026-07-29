@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Button } from "../Button/Button";
 import {
   NumberInput,
-  type NumberInputStepActions,
+  type NumberInputActions,
 } from "./NumberInput";
 
 const meta = {
@@ -122,17 +122,17 @@ export const Step: Story = {
 
 function StepParityExample() {
   const [value, setValue] = useState<number | null>(0.2);
-  const actionsRef = useRef<NumberInputStepActions | null>(null);
+  const actionsRef = useRef<NumberInputActions | null>(null);
 
   return (
     <div style={{ display: "grid", gap: "var(--ds-space-2)" }}>
       <NumberInput
+        actionsRef={actionsRef}
         aria-label="Проверка шага"
         label="Клавиатура и типизированные действия"
         maximumFractionDigits={2}
         onChange={setValue}
         step={0.1}
-        stepActionsRef={actionsRef}
         value={value}
       />
       <div style={{ display: "flex", gap: "var(--ds-space-2)" }}>
@@ -155,8 +155,17 @@ function StepParityExample() {
   );
 }
 
-export const StepParity: Story = {
+export const Actions: Story = {
   render: () => <StepParityExample />,
+};
+
+export const LargeValueBoundary: Story = {
+  args: {
+    hint:
+      "Значение отображается, но небезопасный integer-scaled шаг выполняется как no-op.",
+    maximumFractionDigits: 3,
+    value: Number.MAX_SAFE_INTEGER,
+  },
 };
 
 export const Locale: Story = {

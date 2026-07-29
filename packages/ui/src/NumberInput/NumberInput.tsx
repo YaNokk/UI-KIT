@@ -28,7 +28,7 @@ export interface NumberInputChangeMeta {
   inputValue: string;
 }
 
-export interface NumberInputStepActions {
+export interface NumberInputActions {
   decrement(): void;
   increment(): void;
 }
@@ -54,7 +54,7 @@ export interface NumberInputProps
   min?: number;
   onChange?: (value: number | null, meta: NumberInputChangeMeta) => void;
   step?: number;
-  stepActionsRef?: Ref<NumberInputStepActions>;
+  actionsRef?: Ref<NumberInputActions>;
   value?: number | null;
 }
 
@@ -68,6 +68,10 @@ function semanticNumber(inputValue: string, decimalSeparator: string, groupSepar
     return null;
   }
 
+  if (decimal.endsWith(".")) {
+    return null;
+  }
+
   const value = Number(decimal);
   return Number.isFinite(value) ? value : null;
 }
@@ -75,6 +79,7 @@ function semanticNumber(inputValue: string, decimalSeparator: string, groupSepar
 export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
   function NumberInput(
     {
+      actionsRef,
       allowNegative = false,
       defaultValue = null,
       disabled = false,
@@ -88,7 +93,6 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       onKeyDown,
       readOnly = false,
       step = 1,
-      stepActionsRef,
       value,
       ...inputProps
     },
@@ -209,6 +213,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
     const applyStep = useCallback(
       (direction: StepDirection) => {
+        const editingValue = currentEditingValue();
         const nextValue = stepNumber({
           allowNegative,
           direction,
@@ -216,8 +221,9 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           ...(max === undefined ? {} : { max }),
           ...(min === undefined ? {} : { min }),
           step,
-          value: currentEditingValue(),
+          value: editingValue,
         });
+        if (Object.is(nextValue, editingValue)) return;
         emitValue(nextValue, formatValue(nextValue));
       },
       [
@@ -240,7 +246,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     );
 
     useImperativeHandle(
-      stepActionsRef,
+      actionsRef,
       () => ({
         decrement: () => requestStep(-1),
         increment: () => requestStep(1),

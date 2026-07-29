@@ -16,7 +16,13 @@ describe("numeric editing foundation", () => {
     expect(parseNumericInput("1 234,5", config)).toBe("1234.5");
     expect(parseNumericInput("-", config)).toBeNull();
     expect(parseNumericInput("", config)).toBeNull();
+    expect(parseNumericInput("1,", config)).toBe("1.");
     expect(parseNumericInput("abc", config)).toBeNull();
+    expect(parseNumericInput("1e6", config)).toBeNull();
+    expect(parseNumericInput("1E-3", config)).toBeNull();
+    expect(parseNumericInput("-9 007 199 254 740 991", config)).toBe(
+      "-9007199254740991",
+    );
   });
 
   it("formats editing strings with locale separators", () => {
