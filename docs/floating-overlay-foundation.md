@@ -1,7 +1,7 @@
 # Floating overlay foundation
 
-Status: implementation baseline for private floating infrastructure,
-`Popover` v1, and responsive `Tooltip` v1.
+Status: v1.2 freeze baseline for private floating infrastructure, `Popover`
+v1, and responsive `Tooltip` v1 before Select.
 
 Architecture authority remains the current design system. Core DS is
 behavioral evidence only, the MP UI Kit is visual evidence only, and
@@ -26,16 +26,16 @@ implementation into the repository.
 | Compact trigger | Core mobile opens on click | Click interaction available | Native click semantics | Tooltip adapter | Tap/click opens immediately; hover branch is disabled |
 | Tooltip ARIA | Core source contains an unresolved accessibility TODO | `useRole("tooltip")` | React IDs and native ARIA | Floating Tooltip | `role=tooltip` and valid `aria-describedby`; tooltip never receives focus |
 | Sheet ARIA | Core passes broad BottomSheet props | Not applicable | BottomSheet dialog semantics | BottomSheet | Internal localized title and close label; content remains body, not duplicated |
-| Mobile title | Core leaves naming to BottomSheet props | Not applicable | Locale context and required modal title | Tooltip | Private generic localized “Tooltip” heading; no mobile-only public prop |
-| Popover role | Core is a positioning primitive | `useRole`, click/dismiss hooks | Public DS component conventions | Popover | Non-modal `dialog`, never `aria-modal` |
-| Outside dismiss | Core Tooltip listens on document; Core Popover delegates positioning only | `useDismiss` | Parent modal remains authoritative | Private foundation | Configurable for Popover; Tooltip floating closes without blocking page |
+| Mobile title | Core leaves naming to BottomSheet props | Not applicable | Locale context and required modal title | Tooltip | Private generic localized accessible title is visually hidden; no mobile-only public prop |
+| Popover role | Core is a positioning primitive | `useRole`, click/dismiss hooks | Public DS component conventions | Popover + private semantics | Public default is non-modal `dialog`; internal DS role supports listbox/menu/tooltip/no role |
+| Outside dismiss | Core Tooltip listens on document; Core Popover delegates positioning only | Event signals | Parent modal remains authoritative | Private foundation | Same-surface controls continue; modal guard is consumed after child dismiss |
 | Escape | Core desktop does not provide complete modal arbitration | Dismiss hooks plus DOM capture | ModalRuntime/Radix parent | Private foundation | Open floating child consumes first Escape; parent modal remains open |
 | Focus | Core leaves focus largely on trigger | Reference/floating prop getters | Native focus and ModalRuntime | Component | Tooltip keeps trigger focus; Popover has no trap or automatic focus transfer |
-| Placement | Core exposes Popper placements | `Placement`, offset/flip/shift | No public raw geometry | Private foundation | Popover exposes 12 semantic placements; Tooltip exposes four sides |
+| Placement | Core exposes Popper placements | Vendor placement accepted at final engine call | No public raw geometry | Private DS placement contract | Popover exposes 12 DS placements; Tooltip exposes a four-side DS subset |
 | Arrow | Core Popover supports arrow | `arrow()` middleware | Spacing/radius/surface tokens | Tooltip | Tooltip only in v1; private geometry |
-| Width matching | Core exposes anchor-width behavior | `size()` middleware | Component capability | Popover | Public boolean `matchTriggerWidth`; no raw width prop |
+| Width matching | Core exposes anchor-width behavior | `size()` middleware | Component capability | Popover | `matchTriggerWidth` means exact trigger width, viewport-constrained |
 | Portal | Core accepts portal-container callbacks | Floating UI does not require its Portal | Canonical DS Portal/provider host | DS Portal | Floating surfaces always render through DS Portal |
-| Layer | Core accepts raw z-index/stack context | Positioning is layer-agnostic | `ModalLayerContext`, `zIndex.popover` | Private floating layer adapter | Modal floating `+2…+6`; nested floating surfaces increment privately |
+| Layer | Core accepts raw z-index/stack context | Positioning is layer-agnostic | `ModalLayerContext`, `zIndex.popover` | Private floating layer adapter | Five modal floating layers `+2…+6`; overflow clamps and warns in DEV |
 | Modal nesting | Core uses independent stacks | Context is preserved through React portals | Modal parent/layer contexts | Current DS | Floating branches do not register; Tooltip sheet registers only through BottomSheet |
 | Scroll/guard/dim | Core mobile delegates to BottomSheet | None | ModalRuntime and BottomSheet | BottomSheet | Never duplicated in Tooltip |
 | SSR | Core exposes server match overrides | Hooks can render closed without DOM | Portal mounts after effect; `useSyncExternalStore` pattern | Resolver + Portal | Server snapshot is regular and closed; no DOM access or hydration mismatch |
@@ -76,6 +76,16 @@ There are no public breakpoint, pointer, presentation, BottomSheet, delay,
 offset, arrow, z-index, title, or close-label mechanics. Controlled and
 uncontrolled Tooltip modes use the same state transition boundary.
 
+Public `Popover` remains dialog-like for its current interactive-panel use
+cases, but this is not a universal foundation invariant. The private adapter
+accepts the DS-owned `FloatingSemanticRole` (`dialog`, `tooltip`, `listbox`,
+`menu`, or no role). A future Select can therefore own `listbox` semantics
+without a public Popover `role` prop or nested generic dialog semantics.
+
+`FloatingPlacement` is likewise DS-owned. Only the final call inside the
+Floating UI adapter converts it to the vendor placement type; public and
+private architectural inputs contain no Floating UI type.
+
 ## Responsive and SSR policy
 
 The resolver subscribes to `mediaQueries.belowMd` from `@mypoint/tokens`.
@@ -98,13 +108,38 @@ consume `ModalLayerContext.floatingLayer`; nested floating surfaces advance
 within the private reserved range. The next modal guard/surface therefore
 remain above all floating descendants.
 
+The practical supported modal depth is five simultaneous floating surfaces:
+`+2`, `+3`, `+4`, `+5`, and `+6`. A sixth surface requests `+7`, is
+deterministically clamped to `+6`, and emits one DEV warning containing the
+parent modal identity. Production does not crash or exceed the next modal
+guard. The clamp is a safety fallback, not support for arbitrary nesting.
+
 While an open floating child is present, its first Escape is consumed at the
 window capture boundary. A document-scoped activation stack ensures only the
 latest floating surface reacts, before a parent Dialog can process the same
-keyboard event. Outside press uses the same topmost arbitration; inside a
-modal, the dismissing press is consumed so the parent modal stays open.
+keyboard event. Outside press uses the same topmost arbitration with a target
+policy:
+
+- a control inside the same parent modal surface dismisses the floating child
+  and receives its original interaction exactly once;
+- a parent modal guard/backdrop dismisses the floating child and consumes that
+  pointer sequence, so the parent does not also close;
+- an unrelated higher modal surface is left alone;
+- ordinary page Popover dismissal continues to the page target.
+
 Floating Tooltip never traps or moves focus. Popover also remains non-modal
 and does not lock scroll or create a guard.
+
+`matchTriggerWidth` is frozen as exact inline-size equality with the reference
+width, after viewport constraints. This matches the public name and existing
+behavior. A future Select requirement for “minimum reference width with
+content growth” must introduce a separately named capability instead of
+silently changing this contract.
+
+Compact Tooltip keeps the localized generic label (`Tooltip`, `Подсказка`,
+`Кеңес`) as BottomSheet's accessible title but visually hides it. The shared
+informational content remains the visible body; focus containment and the
+localized close action are unchanged. No public mobile title prop is added.
 
 ## Blocking spike result
 
@@ -162,3 +197,25 @@ The production stories were checked in the browser at 390×844, 768×1024,
   effective guard/dim, two modal surfaces, and one runtime-owned document
   scroll lock. Closing the sheet returned focus inside the still-mounted
   Dialog.
+
+## v1.2 freeze corrections baseline
+
+The corrective browser regression confirmed:
+
+- one Save click inside the parent Dialog dismissed Popover and activated Save
+  exactly once; the Dialog remained open;
+- one parent guard click dismissed Popover without dismissing the Dialog;
+- trigger click toggled the open Popover once;
+- Drawer → Dialog → Popover produced two modal surfaces and floating layer
+  `510`, immediately above the child Dialog surface `509`;
+- five supported nested surfaces used `502…506`; the sixth stayed at `506`
+  and never crossed the next modal guard `508`;
+- desktop Dialog → Tooltip remained `501 → 502`, and first Escape left the
+  Dialog mounted;
+- mobile Dialog → Tooltip remained Dialog `501`, one guard `508`, sheet `509`;
+- the mobile sheet retained the accessible name “Tooltip” while its generic
+  title marker was visually hidden.
+
+An in-memory TypeScript declaration emit inspected the root, Popover, and
+Tooltip declarations. They contain no `@floating-ui/react`, `FloatingContext`,
+middleware, or BottomSheet internals.

@@ -333,6 +333,7 @@ export function ModalPrimitive({
                 <ModalLayerContext.Provider
                   value={{
                     floatingLayer: view.floatingLayer,
+                    modalId: id,
                     surfaceLayer: view.surfaceLayer
                   }}
                 >

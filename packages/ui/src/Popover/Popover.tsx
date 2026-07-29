@@ -2,7 +2,6 @@ import {
   type ReactElement,
   type ReactNode
 } from "react";
-import type { Placement } from "@floating-ui/react";
 import { Portal } from "../Portal/Portal";
 import { classNames } from "../shared/classNames";
 import {
@@ -10,21 +9,10 @@ import {
   useFloatingOverlay
 } from "../internal/floating/useFloatingOverlay";
 import { renderFloatingTrigger } from "../internal/floating/trigger";
+import type { FloatingPlacement } from "../internal/floating/types";
 import styles from "./Popover.module.css";
 
-export type PopoverPlacement =
-  | "top"
-  | "top-start"
-  | "top-end"
-  | "right"
-  | "right-start"
-  | "right-end"
-  | "bottom"
-  | "bottom-start"
-  | "bottom-end"
-  | "left"
-  | "left-start"
-  | "left-end";
+export type PopoverPlacement = FloatingPlacement;
 
 export interface PopoverProps {
   children: ReactNode;
@@ -56,7 +44,7 @@ export function Popover({
     matchTriggerWidth,
     onOpenChange,
     open,
-    placement: placement as Placement,
+    placement,
     role: "dialog"
   });
 

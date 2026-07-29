@@ -47,6 +47,88 @@ function InsideModal({ kind }: { kind: "dialog" | "drawer" }) {
   );
 }
 
+function OutsidePressPolicyHarness() {
+  const [dialogOpen, setDialogOpen] = useState(true);
+  const [popoverOpen, setPopoverOpen] = useState(true);
+  const [saveCount, setSaveCount] = useState(0);
+  return (
+    <Dialog
+      closeLabel="Закрыть Dialog"
+      onOpenChange={setDialogOpen}
+      open={dialogOpen}
+      title="Outside press policy"
+    >
+      <div className="grid gap-3">
+        <Popover
+          onOpenChange={setPopoverOpen}
+          open={popoverOpen}
+          trigger={<Button variant="secondary">Toggle Popover</Button>}
+        >
+          Floating child
+        </Popover>
+        <Button
+          onClick={() => setSaveCount((value) => value + 1)}
+          variant="primary"
+        >
+          Save
+        </Button>
+        <output aria-label="Save count">{saveCount}</output>
+      </div>
+    </Dialog>
+  );
+}
+
+function DrawerDialogPopover() {
+  const [drawerOpen, setDrawerOpen] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(true);
+  return (
+    <Drawer
+      closeLabel="Закрыть Drawer"
+      onOpenChange={setDrawerOpen}
+      open={drawerOpen}
+      title="Drawer root"
+    >
+      <Dialog
+        closeLabel="Закрыть Dialog"
+        onOpenChange={setDialogOpen}
+        open={dialogOpen}
+        title="Dialog child"
+      >
+        <PopoverHarness />
+      </Dialog>
+    </Drawer>
+  );
+}
+
+function FloatingDepthChain({ depth }: { depth: number }) {
+  return (
+    <Popover
+      onOpenChange={() => undefined}
+      open
+      trigger={<Button variant="secondary">{`Level ${depth}`}</Button>}
+    >
+      <div className="grid gap-2">
+        <Text as="p">{`Floating surface ${depth}`}</Text>
+        {depth < 5 ? <FloatingDepthChain depth={depth + 1} /> : null}
+      </div>
+    </Popover>
+  );
+}
+
+function FloatingDepthHarness() {
+  const [dialogOpen, setDialogOpen] = useState(true);
+  return (
+    <Dialog
+      closeLabel="Закрыть"
+      onOpenChange={setDialogOpen}
+      open={dialogOpen}
+      title="Floating depth"
+    >
+      <FloatingDepthChain depth={0} />
+    </Dialog>
+  );
+}
+
 function NestedPopovers() {
   const [parentOpen, setParentOpen] = useState(false);
   const [childOpen, setChildOpen] = useState(false);
@@ -143,9 +225,24 @@ export const InsideDialog: Story = {
   render: () => <InsideModal kind="dialog" />
 };
 
+export const OutsidePressPolicy: Story = {
+  args: {} as never,
+  render: () => <OutsidePressPolicyHarness />
+};
+
+export const InsideDrawerDialog: Story = {
+  args: {} as never,
+  render: () => <DrawerDialogPopover />
+};
+
 export const Nested: Story = {
   args: {} as never,
   render: () => <NestedPopovers />
+};
+
+export const FloatingDepth: Story = {
+  args: {} as never,
+  render: () => <FloatingDepthHarness />
 };
 
 export const Dark: Story = {

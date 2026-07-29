@@ -7,7 +7,6 @@ import {
   type ReactElement,
   type ReactNode
 } from "react";
-import type { Placement } from "@floating-ui/react";
 import { BottomSheet } from "../BottomSheet/BottomSheet";
 import { Portal } from "../Portal/Portal";
 import {
@@ -22,9 +21,13 @@ import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import {
   useTooltipPresentation
 } from "../internal/floating/useTooltipPresentation";
+import type { FloatingPlacement } from "../internal/floating/types";
 import styles from "./Tooltip.module.css";
 
-export type TooltipPlacement = "top" | "right" | "bottom" | "left";
+export type TooltipPlacement = Extract<
+  FloatingPlacement,
+  "top" | "right" | "bottom" | "left"
+>;
 
 export interface TooltipProps {
   children: ReactElement;
@@ -88,7 +91,7 @@ export function Tooltip({
     interactionEnabled: presentation === "floating",
     onOpenChange: setOpen,
     open: presentation === "floating" && effectiveOpen,
-    placement: placement as Placement,
+    placement,
     role: "tooltip",
     withArrow: true
   });
@@ -145,7 +148,7 @@ export function Tooltip({
             if (!nextOpen) setOpen(false);
           }}
           open={effectiveOpen}
-          title={labels.title}
+          title={<span className={styles.sheetTitle}>{labels.title}</span>}
         >
           {content}
         </BottomSheet>

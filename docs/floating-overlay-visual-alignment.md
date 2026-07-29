@@ -22,7 +22,7 @@ canonical design-system tokens and private component geometry.
 | Tooltip shadow | Subtle/medium floating elevation | `shadow.md` | Use existing elevation | `shadow.md` |
 | Tooltip arrow | Same color as surface | Inverse surface + component geometry | Private 8 px rotated square | `space.2`, `background.inverse` |
 | Sheet surface | Existing DS BottomSheet | Existing modal roles | Do not specialize/fork | BottomSheet |
-| Sheet title/body | Compact informational heading plus content | Existing Heading/Text and modal spacing | Use private localized title and shared content body | BottomSheet composition |
+| Sheet title/body | Compact informational content without a redundant generic heading | Existing modal title semantics and body spacing | Keep a private localized accessible title visually hidden; render shared content as body | Tooltip + BottomSheet composition |
 | Sheet footer | No action row for informational content | Optional modal footer | Omit | No footer |
 | Sheet safe area | Handle and safe-area bottom spacing | Existing BottomSheet | Reuse unchanged | BottomSheet |
 

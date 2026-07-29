@@ -23,9 +23,12 @@ import {
   useState
 } from "react";
 import { ModalLayerContext } from "../modal/ModalRuntime";
+import type {
+  FloatingPlacement,
+  FloatingSemanticRole
+} from "./types";
 
 type FloatingInteraction = "click" | "tooltip";
-type FloatingRole = "dialog" | "tooltip";
 
 export interface UseFloatingOverlayOptions {
   dismissOnEscape: boolean;
@@ -35,8 +38,8 @@ export interface UseFloatingOverlayOptions {
   matchTriggerWidth?: boolean;
   onOpenChange: (open: boolean) => void;
   open: boolean;
-  placement: Placement;
-  role: FloatingRole;
+  placement: FloatingPlacement;
+  role?: FloatingSemanticRole;
   withArrow?: boolean;
 }
 
@@ -44,7 +47,12 @@ const FLOATING_OFFSET = primitiveTokens["space.2"].value;
 const FLOATING_VIEWPORT_PADDING = primitiveTokens["space.2"].value;
 const TOOLTIP_OPEN_DELAY = 300;
 const TOOLTIP_CLOSE_DELAY = 100;
-const FloatingLayerContext = createContext<number | null>(null);
+interface FloatingLayerValue {
+  depth: number;
+  requestedLayer: number;
+}
+
+const FloatingLayerContext = createContext<FloatingLayerValue | null>(null);
 const activeFloatingOverlays = new WeakMap<Document, symbol[]>();
 
 export function useFloatingOverlay({
@@ -62,14 +70,43 @@ export function useFloatingOverlay({
   const modalLayer = useContext(ModalLayerContext);
   const inheritedLayer = useContext(FloatingLayerContext);
   const overlayToken = useRef(Symbol("floating-overlay"));
+  const warnedDepthOverflow = useRef(false);
   const [arrowElement, setArrowElement] = useState<HTMLElement | null>(null);
-  const layer = inheritedLayer
+  const requestedLayer = inheritedLayer?.requestedLayer
     ?? modalLayer?.floatingLayer
     ?? primitiveTokens["zIndex.popover"];
-  const maximumChildLayer = modalLayer
+  const maximumFloatingLayer = modalLayer
     ? modalLayer.surfaceLayer + 5
     : primitiveTokens["zIndex.modal"] - 1;
-  const childLayer = Math.min(layer + 1, maximumChildLayer);
+  const depth = inheritedLayer?.depth ?? 0;
+  const depthOverflow = Boolean(
+    modalLayer && requestedLayer > maximumFloatingLayer
+  );
+  const layer = Math.min(requestedLayer, maximumFloatingLayer);
+  const childLayer = {
+    depth: depth + 1,
+    requestedLayer: requestedLayer + 1
+  };
+
+  useEffect(() => {
+    if (!open) {
+      warnedDepthOverflow.current = false;
+      return;
+    }
+    if (
+      !depthOverflow
+      || warnedDepthOverflow.current
+      || process.env.NODE_ENV === "production"
+    ) {
+      return;
+    }
+    warnedDepthOverflow.current = true;
+    console.warn(
+      "Floating overlay depth exceeded the modal reserved layer range "
+        + `for modal ${modalLayer?.modalId ?? "unknown"}. `
+        + "The surface was clamped below the next modal guard."
+    );
+  }, [depthOverflow, modalLayer?.modalId, open]);
 
   const floating = useFloating({
     middleware: [
@@ -92,7 +129,7 @@ export function useFloatingOverlay({
     ],
     onOpenChange,
     open,
-    placement,
+    placement: placement as Placement,
     whileElementsMounted: autoUpdate
   });
   const click = useClick(floating.context, {
@@ -110,8 +147,8 @@ export function useFloatingOverlay({
     enabled: interactionEnabled && interaction === "tooltip"
   });
   const semantics = useRole(floating.context, {
-    enabled: interactionEnabled,
-    role
+    enabled: interactionEnabled && role !== undefined,
+    role: role ?? "dialog"
   });
   const interactions = useInteractions([
     click,
@@ -157,7 +194,29 @@ export function useFloatingOverlay({
       ) {
         return;
       }
-      if (modalLayer) {
+      const targetElement = target instanceof Element
+        ? target
+        : target.parentElement;
+      const targetModalSurface = targetElement?.closest(
+        "[data-modal-surface]"
+      );
+      const parentModalSurface = referenceElement instanceof Element
+        ? referenceElement.closest("[data-modal-surface]")
+        : null;
+      if (
+        targetModalSurface
+        && targetModalSurface !== parentModalSurface
+      ) {
+        return;
+      }
+      const mustConsume = Boolean(
+        modalLayer
+        && (
+          targetElement?.closest("[data-modal-guard]")
+          || targetModalSurface !== parentModalSurface
+        )
+      );
+      if (mustConsume) {
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation();
