@@ -187,7 +187,7 @@ export function useFloatingOverlay({
   useEffect(() => {
     activationEpoch.current += 1;
     const epoch = activationEpoch.current;
-    if (!open || (!dismissOnEscape && !dismissOnOutsidePress)) return;
+    if (!open) return;
     const token = overlayToken.current;
     let stack = activeFloatingOverlays.get(ownerDocument);
     if (!stack) {
@@ -288,14 +288,9 @@ export function useFloatingOverlay({
       const index = registeredStack.lastIndexOf(token);
       if (index >= 0) registeredStack.splice(index, 1);
     };
-  }, [
-    dismissOnEscape,
-    dismissOnOutsidePress,
-    floating.refs.floating,
-    floating.refs.reference,
-    open,
-    ownerDocument
-  ]);
+    // Only logical activation and document ownership re-register the overlay.
+    // Dismiss configuration and callbacks are read through latest-value refs.
+  }, [open, ownerDocument]);
 
   const arrowStyle = useMemo(
     () => ({

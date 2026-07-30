@@ -229,6 +229,148 @@ describe("useFloatingOverlay activation stack", () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
+
+  it("does not reactivate when dismissOnEscape changes while open", () => {
+    const onAOpenChange = vi.fn();
+    const onBOpenChange = vi.fn();
+
+    function Harness({ aEscape }: { aEscape: boolean }) {
+      return (
+        <>
+          <StatefulOverlay
+            key="A"
+            dismissOnEscape={aEscape}
+            label="A"
+            onOpenChange={onAOpenChange}
+          />
+          <StatefulOverlay key="B" label="B" onOpenChange={onBOpenChange} />
+        </>
+      );
+    }
+
+    const { rerender } = render(<Harness aEscape={false} />);
+    rerender(<Harness aEscape />);
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onBOpenChange).toHaveBeenCalledTimes(1);
+    expect(onBOpenChange).toHaveBeenCalledWith(false);
+    expect(onAOpenChange).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onAOpenChange).toHaveBeenCalledTimes(1);
+    expect(onAOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("does not reactivate when dismissOnOutsidePress changes while open", () => {
+    const onAOpenChange = vi.fn();
+    const onBOpenChange = vi.fn();
+
+    function Harness({ aOutsidePress }: { aOutsidePress: boolean }) {
+      return (
+        <>
+          <StatefulOverlay
+            key="A"
+            dismissOnOutsidePress={aOutsidePress}
+            label="A"
+            onOpenChange={onAOpenChange}
+          />
+          <StatefulOverlay key="B" label="B" onOpenChange={onBOpenChange} />
+        </>
+      );
+    }
+
+    const { rerender } = render(<Harness aOutsidePress />);
+    rerender(<Harness aOutsidePress={false} />);
+
+    fireEvent.pointerDown(document.body);
+    expect(onBOpenChange).toHaveBeenCalledTimes(1);
+    expect(onBOpenChange).toHaveBeenCalledWith(false);
+    expect(onAOpenChange).not.toHaveBeenCalled();
+
+    // A keeps ignoring outside press with its latest config, proving it was
+    // not reactivated above B by the dismiss prop change.
+    fireEvent.pointerDown(document.body);
+    expect(onAOpenChange).not.toHaveBeenCalled();
+  });
+
+  it("keeps the latest dismissOnEscape value without reordering", () => {
+    const onOpenChange = vi.fn();
+
+    function Harness({ dismissOnEscape }: { dismissOnEscape: boolean }) {
+      return (
+        <StatefulOverlay
+          dismissOnEscape={dismissOnEscape}
+          dismissOnOutsidePress={false}
+          label="Overlay"
+          onOpenChange={onOpenChange}
+        />
+      );
+    }
+
+    const { rerender } = render(<Harness dismissOnEscape={false} />);
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onOpenChange).not.toHaveBeenCalled();
+
+    rerender(<Harness dismissOnEscape />);
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("keeps the latest dismissOnOutsidePress value without reordering", () => {
+    const onOpenChange = vi.fn();
+
+    function Harness({ outsidePress }: { outsidePress: boolean }) {
+      return (
+        <StatefulOverlay
+          dismissOnEscape={false}
+          dismissOnOutsidePress={outsidePress}
+          label="Overlay"
+          onOpenChange={onOpenChange}
+        />
+      );
+    }
+
+    const { rerender } = render(<Harness outsidePress={false} />);
+    fireEvent.pointerDown(document.body);
+    expect(onOpenChange).not.toHaveBeenCalled();
+
+    rerender(<Harness outsidePress />);
+    fireEvent.pointerDown(document.body);
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("keeps activation order stable through dismiss config churn", () => {
+    const onAOpenChange = vi.fn();
+    const onBOpenChange = vi.fn();
+
+    function Harness({ churn }: { churn: number }) {
+      return (
+        <>
+          <StatefulOverlay
+            key="A"
+            dismissOnEscape={churn % 2 === 0}
+            dismissOnOutsidePress={churn % 3 === 0}
+            label="A"
+            onOpenChange={(next) => onAOpenChange(next, churn)}
+          />
+          <StatefulOverlay key="B" label="B" onOpenChange={onBOpenChange} />
+        </>
+      );
+    }
+
+    const { rerender } = render(<Harness churn={0} />);
+    rerender(<Harness churn={1} />);
+    rerender(<Harness churn={2} />);
+    rerender(<Harness churn={3} />);
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onBOpenChange).toHaveBeenCalledTimes(1);
+    expect(onBOpenChange).toHaveBeenCalledWith(false);
+    expect(onAOpenChange).not.toHaveBeenCalled();
+  });
+
   it("does not leave duplicate registrations under StrictMode replay", () => {
     const onAOpenChange = vi.fn();
     const onBOpenChange = vi.fn();

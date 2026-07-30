@@ -367,6 +367,111 @@ describe("Popover", () => {
       .toBeInTheDocument();
   });
 
+
+  it("keeps the latest Popover topmost in Dialog when A dismiss config rerenders", async () => {
+    const user = userEvent.setup();
+
+    function Harness({ aEscape }: { aEscape: boolean }) {
+      const [dialogOpen, setDialogOpen] = useState(true);
+      const [popoverAOpen, setPopoverAOpen] = useState(true);
+      const [popoverBOpen, setPopoverBOpen] = useState(true);
+      return (
+        <Dialog
+          closeLabel="Close Dialog"
+          onOpenChange={setDialogOpen}
+          open={dialogOpen}
+          title="Config Dialog"
+        >
+          <Popover
+            dismissOnEscape={aEscape}
+            onOpenChange={setPopoverAOpen}
+            open={popoverAOpen}
+            trigger={<button>Toggle A</button>}
+          >
+            Popover A surface
+          </Popover>
+          <Popover
+            onOpenChange={setPopoverBOpen}
+            open={popoverBOpen}
+            trigger={<button>Toggle B</button>}
+          >
+            Popover B surface
+          </Popover>
+        </Dialog>
+      );
+    }
+
+    const { rerender } = render(<Harness aEscape={false} />);
+    expect(await screen.findByText("Popover A surface")).toBeInTheDocument();
+    expect(await screen.findByText("Popover B surface")).toBeInTheDocument();
+
+    rerender(<Harness aEscape />);
+
+    await user.keyboard("{Escape}");
+    await waitFor(() => {
+      expect(screen.queryByText("Popover B surface")).not.toBeInTheDocument();
+    });
+    expect(screen.getByText("Popover A surface")).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Config Dialog" }))
+      .toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    await waitFor(() => {
+      expect(screen.queryByText("Popover A surface")).not.toBeInTheDocument();
+    });
+    expect(screen.getByRole("dialog", { name: "Config Dialog" }))
+      .toBeInTheDocument();
+  });
+
+  it("dismisses the latest Popover from a Dialog surface press after config churn", async () => {
+    const user = userEvent.setup();
+
+    function Harness({ aOutsidePress }: { aOutsidePress: boolean }) {
+      const [dialogOpen, setDialogOpen] = useState(true);
+      const [popoverAOpen, setPopoverAOpen] = useState(true);
+      const [popoverBOpen, setPopoverBOpen] = useState(true);
+      return (
+        <Dialog
+          closeLabel="Close Dialog"
+          onOpenChange={setDialogOpen}
+          open={dialogOpen}
+          title="Press Dialog"
+        >
+          <Popover
+            dismissOnOutsidePress={aOutsidePress}
+            onOpenChange={setPopoverAOpen}
+            open={popoverAOpen}
+            trigger={<button>Toggle A</button>}
+          >
+            Popover A surface
+          </Popover>
+          <Popover
+            onOpenChange={setPopoverBOpen}
+            open={popoverBOpen}
+            trigger={<button>Toggle B</button>}
+          >
+            Popover B surface
+          </Popover>
+          <button>Neutral surface control</button>
+        </Dialog>
+      );
+    }
+
+    const { rerender } = render(<Harness aOutsidePress />);
+    expect(await screen.findByText("Popover A surface")).toBeInTheDocument();
+    expect(await screen.findByText("Popover B surface")).toBeInTheDocument();
+
+    rerender(<Harness aOutsidePress={false} />);
+
+    await user.click(screen.getByRole("button", { name: "Neutral surface control" }));
+    await waitFor(() => {
+      expect(screen.queryByText("Popover B surface")).not.toBeInTheDocument();
+    });
+    expect(screen.getByText("Popover A surface")).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Press Dialog" }))
+      .toBeInTheDocument();
+  });
+
   it("does not render Portal DOM during SSR", () => {
     expect(() => renderToString(
       <Popover

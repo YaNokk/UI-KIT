@@ -1,7 +1,8 @@
 # Floating overlay foundation
 
-Status: v1.3 final hardening freeze for private floating infrastructure,
-`Popover` v1, and responsive `Tooltip` v1 before Select Foundation.
+Status: v1.3.1 dismiss lifecycle correction freezes private floating
+infrastructure, `Popover` v1, and responsive `Tooltip` v1 before Select
+Foundation.
 
 Architecture authority remains the current design system. Core DS is
 behavioral evidence only, the MP UI Kit is visual evidence only, and
@@ -267,3 +268,39 @@ Regression coverage added for the freeze:
 - close → reopen creates a new activation order;
 - Dialog with Popover A and Popover B (opened later): rerendering A keeps
   Escape order B → A while the Dialog stays mounted.
+
+## v1.3.1 dismiss lifecycle correction
+
+The activation/listener effect now depends only on logical lifecycle inputs —
+`open` and `ownerDocument` — so dismiss configuration can no longer
+unregister/re-register an open overlay:
+
+- **Dismiss configuration is event-time state.** `dismissOnEscape` and
+  `dismissOnOutsidePress` live in a latest-value ref that dismiss handlers
+  read when an event fires; they never drive registration lifetime.
+- **Config changes do not reactivate.** Toggling dismiss props, changing
+  `onOpenChange` identity, or rerendering while open never unregisters and
+  re-appends the overlay token, so activation order stays the logical open
+  order. `activationEpoch` increments only on logical open/close transitions
+  and `ownerDocument` migration.
+- **`ownerDocument` migration remains the only non-open/close
+  re-registration case.** Moving the reference element to another document
+  unregisters from the old stack and registers into the destination stack as a
+  genuine lifecycle transition.
+- **Registration is unconditional once open.** Listeners attach for every open
+  overlay (including ones that currently disable both dismiss policies), so a
+  later config toggle applies without touching stack position.
+
+Regression coverage added for the correction:
+
+- open A → open B → toggle A `dismissOnEscape` → Escape closes B first,
+  second Escape closes A;
+- open A → open B → toggle A `dismissOnOutsidePress` → outside press
+  arbitrates B first, then A;
+- latest `dismissOnEscape` / `dismissOnOutsidePress` values apply at event
+  time without reordering;
+- dismiss config churn plus new `onOpenChange` identity never moves A above
+  B;
+- nested Dialog with Popover A and later-opened Popover B: A config rerenders
+  keep Escape order B → A and outside-press arbitration on B while the Dialog
+  stays mounted.
