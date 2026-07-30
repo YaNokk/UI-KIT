@@ -1,7 +1,7 @@
 # Floating overlay foundation
 
-Status: v1.2 freeze baseline for private floating infrastructure, `Popover`
-v1, and responsive `Tooltip` v1 before Select.
+Status: v1.3 final hardening freeze for private floating infrastructure,
+`Popover` v1, and responsive `Tooltip` v1 before Select Foundation.
 
 Architecture authority remains the current design system. Core DS is
 behavioral evidence only, the MP UI Kit is visual evidence only, and
@@ -219,3 +219,51 @@ The corrective browser regression confirmed:
 An in-memory TypeScript declaration emit inspected the root, Popover, and
 Tooltip declarations. They contain no `@floating-ui/react`, `FloatingContext`,
 middleware, or BottomSheet internals.
+
+## v1.3 final hardening — activation stack lifetime
+
+The final hardening pass decoupled the document-scoped activation stack
+from React render lifecycles:
+
+- **Activation order is logical open order.** An overlay registers into the
+  `WeakMap<Document, symbol[]>` stack when it transitions to open, keeps its
+  position while it stays open, unregisters on close or unmount, and a later
+  `false → true` reopen creates a new activation order.
+- **Rerender does not reactivate.** Callback identity changes
+  (`onOpenChange` inline wrappers, consumer rerenders) no longer unregister
+  or re-register an open overlay; controlled rerenders cannot move an overlay
+  to the top of the stack.
+- **Latest callback semantics.** Dismiss handlers invoke the freshest
+  `onOpenChange` via a latest-value ref, so fixing stack lifetime does not
+  freeze stale closures. Dismiss configuration (`dismissOnEscape`,
+  `dismissOnOutsidePress`) is read at event time.
+- **Duplicate safety.** Registration defensively removes any stale token
+  entry before appending (with a DEV warning); React StrictMode effect replay
+  leaves at most one registration per active overlay instance, and unmount
+  removes the token exactly once.
+- **Topmost arbitration** is derived only from the logical activation stack —
+  never from DOM order, portal order, effect execution order, or z-index.
+- **ownerDocument migration** is a legitimate re-registration trigger: if the
+  reference element's document identity changes, the overlay unregisters from
+  the old document and registers into the new one.
+- **Cross-realm checks.** Outside-target classification resolves `Node` /
+  `Element` constructors from `ownerDocument.defaultView` instead of the
+  main window, so iframe or alternate-window nodes are handled by the correct
+  realm. Full cross-realm browser verification (an overlay positioned against
+  a real iframe document) remains an unsupported scenario and is not part of
+  the frozen contract; helper-level realm resolution is covered by unit
+  regression through the standard jsdom realm.
+
+Regression coverage added for the freeze:
+
+- open A → open B → rerender A with a new inline `onOpenChange` identity →
+  Escape closes B first, second Escape closes A;
+- identical setup for outside press — B arbitrates first;
+- rerender with a new callback implementation still invokes the latest
+  callback on dismiss;
+- dismiss configuration toggles apply at event time without re-registration;
+- StrictMode replay keeps a single registration and correct A < B order;
+- unmount cleanup removes the token exactly once;
+- close → reopen creates a new activation order;
+- Dialog with Popover A and Popover B (opened later): rerendering A keeps
+  Escape order B → A while the Dialog stays mounted.

@@ -55,6 +55,16 @@ interface FloatingLayerValue {
 const FloatingLayerContext = createContext<FloatingLayerValue | null>(null);
 const activeFloatingOverlays = new WeakMap<Document, symbol[]>();
 
+function isRealmNode(value: unknown, doc: Document): value is Node {
+  const view = doc.defaultView;
+  return Boolean(view) && value instanceof (view as typeof window).Node;
+}
+
+function isRealmElement(value: unknown, doc: Document): value is Element {
+  const view = doc.defaultView;
+  return Boolean(view) && value instanceof (view as typeof window).Element;
+}
+
 export function useFloatingOverlay({
   dismissOnEscape,
   dismissOnOutsidePress,
@@ -71,7 +81,18 @@ export function useFloatingOverlay({
   const inheritedLayer = useContext(FloatingLayerContext);
   const overlayToken = useRef(Symbol("floating-overlay"));
   const warnedDepthOverflow = useRef(false);
+  const activationEpoch = useRef(0);
   const [arrowElement, setArrowElement] = useState<HTMLElement | null>(null);
+  const onOpenChangeRef = useRef(onOpenChange);
+  const dismissConfigRef = useRef({ dismissOnEscape, dismissOnOutsidePress });
+  const modalSurfaceArbitrationRef = useRef(modalLayer !== null);
+
+  useEffect(() => {
+    onOpenChangeRef.current = onOpenChange;
+    dismissConfigRef.current = { dismissOnEscape, dismissOnOutsidePress };
+    modalSurfaceArbitrationRef.current = modalLayer !== null;
+  });
+
   const requestedLayer = inheritedLayer?.requestedLayer
     ?? modalLayer?.floatingLayer
     ?? primitiveTokens["zIndex.popover"];
@@ -157,22 +178,40 @@ export function useFloatingOverlay({
     semantics
   ]);
 
+  const referenceElement = floating.refs.reference.current;
+  const floatingElement = floating.refs.floating.current;
+  const ownerDocument = referenceElement && "ownerDocument" in referenceElement
+    ? referenceElement.ownerDocument
+    : floatingElement?.ownerDocument ?? document;
+
   useEffect(() => {
+    activationEpoch.current += 1;
+    const epoch = activationEpoch.current;
     if (!open || (!dismissOnEscape && !dismissOnOutsidePress)) return;
-    const reference = floating.refs.reference.current;
-    const ownerDocument = reference && "ownerDocument" in reference
-      ? reference.ownerDocument
-      : floating.refs.floating.current?.ownerDocument ?? document;
     const token = overlayToken.current;
-    const stack = activeFloatingOverlays.get(ownerDocument) ?? [];
-    if (!activeFloatingOverlays.has(ownerDocument)) {
+    let stack = activeFloatingOverlays.get(ownerDocument);
+    if (!stack) {
+      stack = [];
       activeFloatingOverlays.set(ownerDocument, stack);
     }
-    stack.push(token);
-    const isTopmost = () => stack.at(-1) === token;
+    const registeredStack = stack;
+    const existingIndex = registeredStack.lastIndexOf(token);
+    if (existingIndex >= 0) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(
+          "Floating overlay activation stack already contained this overlay "
+            + "token; removing the stale entry before registration."
+        );
+      }
+      registeredStack.splice(existingIndex, 1);
+    }
+    registeredStack.push(token);
+    const isTopmost = () => registeredStack.at(-1) === token;
+    const isCurrentActivation = () => activationEpoch.current === epoch;
     const handleEscape = (event: KeyboardEvent) => {
       if (
-        !dismissOnEscape
+        !isCurrentActivation()
+        || !dismissConfigRef.current.dismissOnEscape
         || event.key !== "Escape"
         || !isTopmost()
       ) {
@@ -181,27 +220,34 @@ export function useFloatingOverlay({
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
-      onOpenChange(false);
+      onOpenChangeRef.current(false);
     };
     const handleOutsidePress = (event: PointerEvent) => {
-      if (!dismissOnOutsidePress || !isTopmost()) return;
-      const target = event.target;
-      if (!(target instanceof Node)) return;
-      const referenceElement = floating.refs.reference.current;
       if (
-        (referenceElement instanceof Element && referenceElement.contains(target))
+        !isCurrentActivation()
+        || !dismissConfigRef.current.dismissOnOutsidePress
+        || !isTopmost()
+      ) {
+        return;
+      }
+      const target = event.target;
+      if (!isRealmNode(target, ownerDocument)) return;
+      const currentReference = floating.refs.reference.current;
+      if (
+        (isRealmElement(currentReference, ownerDocument)
+          && currentReference.contains(target))
         || floating.refs.floating.current?.contains(target)
       ) {
         return;
       }
-      const targetElement = target instanceof Element
+      const targetElement = isRealmElement(target, ownerDocument)
         ? target
         : target.parentElement;
       const targetModalSurface = targetElement?.closest(
         "[data-modal-surface]"
       );
-      const parentModalSurface = referenceElement instanceof Element
-        ? referenceElement.closest("[data-modal-surface]")
+      const parentModalSurface = isRealmElement(currentReference, ownerDocument)
+        ? currentReference.closest("[data-modal-surface]")
         : null;
       if (
         targetModalSurface
@@ -210,7 +256,7 @@ export function useFloatingOverlay({
         return;
       }
       const mustConsume = Boolean(
-        modalLayer
+        modalSurfaceArbitrationRef.current
         && (
           targetElement?.closest("[data-modal-guard]")
           || targetModalSurface !== parentModalSurface
@@ -221,7 +267,7 @@ export function useFloatingOverlay({
         event.stopPropagation();
         event.stopImmediatePropagation();
       }
-      onOpenChange(false);
+      onOpenChangeRef.current(false);
     };
     const ownerWindow = ownerDocument.defaultView;
     if (ownerWindow) {
@@ -230,8 +276,8 @@ export function useFloatingOverlay({
       return () => {
         ownerWindow.removeEventListener("keydown", handleEscape, true);
         ownerWindow.removeEventListener("pointerdown", handleOutsidePress, true);
-        const index = stack.lastIndexOf(token);
-        if (index >= 0) stack.splice(index, 1);
+        const index = registeredStack.lastIndexOf(token);
+        if (index >= 0) registeredStack.splice(index, 1);
       };
     }
     ownerDocument.addEventListener("keydown", handleEscape, true);
@@ -239,17 +285,16 @@ export function useFloatingOverlay({
     return () => {
       ownerDocument.removeEventListener("keydown", handleEscape, true);
       ownerDocument.removeEventListener("pointerdown", handleOutsidePress, true);
-      const index = stack.lastIndexOf(token);
-      if (index >= 0) stack.splice(index, 1);
+      const index = registeredStack.lastIndexOf(token);
+      if (index >= 0) registeredStack.splice(index, 1);
     };
   }, [
     dismissOnEscape,
     dismissOnOutsidePress,
     floating.refs.floating,
     floating.refs.reference,
-    modalLayer,
-    onOpenChange,
-    open
+    open,
+    ownerDocument
   ]);
 
   const arrowStyle = useMemo(

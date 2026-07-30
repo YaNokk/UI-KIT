@@ -313,6 +313,60 @@ describe("Popover", () => {
     );
   });
 
+  it("closes the latest activated Popover after a sibling rerenders", async () => {
+    const user = userEvent.setup();
+
+    function Harness({ marker }: { marker: number }) {
+      const [dialogOpen, setDialogOpen] = useState(true);
+      const [popoverAOpen, setPopoverAOpen] = useState(true);
+      const [popoverBOpen, setPopoverBOpen] = useState(true);
+      return (
+        <Dialog
+          closeLabel="Close Dialog"
+          onOpenChange={setDialogOpen}
+          open={dialogOpen}
+          title="Parent Dialog"
+        >
+          <Popover
+            onOpenChange={setPopoverAOpen}
+            open={popoverAOpen}
+            trigger={<button>{"Toggle A " + marker}</button>}
+          >
+            Popover A surface
+          </Popover>
+          <Popover
+            onOpenChange={setPopoverBOpen}
+            open={popoverBOpen}
+            trigger={<button>Toggle B</button>}
+          >
+            Popover B surface
+          </Popover>
+        </Dialog>
+      );
+    }
+
+    const { rerender } = render(<Harness marker={0} />);
+    expect(await screen.findByText("Popover A surface")).toBeInTheDocument();
+    expect(await screen.findByText("Popover B surface")).toBeInTheDocument();
+
+    rerender(<Harness marker={1} />);
+
+    await user.keyboard("{Escape}");
+    await waitFor(() => {
+      expect(screen.queryByText("Popover B surface")).not.toBeInTheDocument();
+    });
+    expect(screen.getByText("Popover A surface")).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Parent Dialog" }))
+      .toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    await waitFor(() => {
+      expect(screen.queryByText("Popover A surface")).not.toBeInTheDocument();
+    });
+    expect(screen.getByRole("dialog", { name: "Parent Dialog" }))
+      .toBeInTheDocument();
+  });
+
   it("does not render Portal DOM during SSR", () => {
     expect(() => renderToString(
       <Popover

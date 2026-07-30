@@ -1,11 +1,86 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { StrictMode, useState } from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { useFloatingOverlay } from "./useFloatingOverlay";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
+
+interface FixtureOptions {
+  dismissOnEscape?: boolean;
+  dismissOnOutsidePress?: boolean;
+  label: string;
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
+}
+
+function OverlayFixture({
+  dismissOnEscape = true,
+  dismissOnOutsidePress = true,
+  label,
+  onOpenChange,
+  open
+}: FixtureOptions) {
+  const floating = useFloatingOverlay({
+    dismissOnEscape,
+    dismissOnOutsidePress,
+    interaction: "click",
+    onOpenChange,
+    open,
+    placement: "bottom-start"
+  });
+
+  return (
+    <>
+      <button
+        {...floating.getReferenceProps()}
+        ref={floating.refs.setReference}
+        type="button"
+      >
+        {label} trigger
+      </button>
+      {open ? (
+        <div
+          {...floating.getFloatingProps()}
+          ref={floating.refs.setFloating}
+        >
+          {label} content
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+function StatefulOverlay({
+  dismissOnEscape = true,
+  dismissOnOutsidePress = true,
+  label,
+  onOpenChange
+}: {
+  dismissOnEscape?: boolean;
+  dismissOnOutsidePress?: boolean;
+  label: string;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [open, setOpen] = useState(true);
+  return (
+    <OverlayFixture
+      dismissOnEscape={dismissOnEscape}
+      dismissOnOutsidePress={dismissOnOutsidePress}
+      label={label}
+      onOpenChange={(next) => {
+        onOpenChange?.(next);
+        setOpen(next);
+      }}
+      open={open}
+    />
+  );
+}
 
 function SemanticFixture() {
   const floating = useFloatingOverlay({
@@ -43,5 +118,183 @@ describe("useFloatingOverlay semantics", () => {
     expect(screen.getByRole("listbox")).toBeInTheDocument();
     expect(screen.getByRole("option")).toBeInTheDocument();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+});
+
+describe("useFloatingOverlay activation stack", () => {
+  it("keeps logical activation order when an open overlay rerenders", () => {
+    const onAOpenChange = vi.fn();
+    const onBOpenChange = vi.fn();
+
+    function Harness({ marker }: { marker: number }) {
+      return (
+        <>
+          <StatefulOverlay
+            key="A"
+            label={"A " + marker}
+            onOpenChange={(next) => onAOpenChange(next, marker)}
+          />
+          <StatefulOverlay key="B" label="B" onOpenChange={onBOpenChange} />
+        </>
+      );
+    }
+
+    const { rerender } = render(<Harness marker={0} />);
+    rerender(<Harness marker={1} />);
+    rerender(<Harness marker={2} />);
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onBOpenChange).toHaveBeenCalledTimes(1);
+    expect(onBOpenChange).toHaveBeenCalledWith(false);
+    expect(onAOpenChange).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onAOpenChange).toHaveBeenCalledTimes(1);
+    expect(onAOpenChange).toHaveBeenCalledWith(false, 2);
+  });
+
+  it("arbitrates outside press by logical activation order, not rerenders", () => {
+    const onAOpenChange = vi.fn();
+    const onBOpenChange = vi.fn();
+
+    function Harness({ marker }: { marker: number }) {
+      return (
+        <>
+          <StatefulOverlay
+            key="A"
+            label={"A " + marker}
+            onOpenChange={(next) => onAOpenChange(next, marker)}
+          />
+          <StatefulOverlay key="B" label="B" onOpenChange={onBOpenChange} />
+        </>
+      );
+    }
+
+    const { rerender } = render(<Harness marker={0} />);
+    rerender(<Harness marker={1} />);
+
+    fireEvent.pointerDown(document.body);
+    expect(onBOpenChange).toHaveBeenCalledTimes(1);
+    expect(onBOpenChange).toHaveBeenCalledWith(false);
+    expect(onAOpenChange).not.toHaveBeenCalled();
+
+    fireEvent.pointerDown(document.body);
+    expect(onAOpenChange).toHaveBeenCalledTimes(1);
+    expect(onAOpenChange).toHaveBeenCalledWith(false, 1);
+  });
+
+  it("invokes the latest onOpenChange callback after rerender", () => {
+    const firstCallback = vi.fn();
+    const latestCallback = vi.fn();
+
+    function Harness({ latest }: { latest: boolean }) {
+      return (
+        <StatefulOverlay
+          label="Overlay"
+          onOpenChange={latest ? latestCallback : firstCallback}
+        />
+      );
+    }
+
+    const { rerender } = render(<Harness latest={false} />);
+    rerender(<Harness latest />);
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(latestCallback).toHaveBeenCalledTimes(1);
+    expect(latestCallback).toHaveBeenCalledWith(false);
+    expect(firstCallback).not.toHaveBeenCalled();
+  });
+
+  it("reads dismiss configuration at event time", () => {
+    const onOpenChange = vi.fn();
+
+    function Harness({ dismissOnEscape }: { dismissOnEscape: boolean }) {
+      return (
+        <StatefulOverlay
+          dismissOnEscape={dismissOnEscape}
+          dismissOnOutsidePress={false}
+          label="Overlay"
+          onOpenChange={onOpenChange}
+        />
+      );
+    }
+
+    const { rerender } = render(<Harness dismissOnEscape={false} />);
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onOpenChange).not.toHaveBeenCalled();
+
+    rerender(<Harness dismissOnEscape />);
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("does not leave duplicate registrations under StrictMode replay", () => {
+    const onAOpenChange = vi.fn();
+    const onBOpenChange = vi.fn();
+
+    render(
+      <StrictMode>
+        <StatefulOverlay label="A" onOpenChange={onAOpenChange} />
+        <StatefulOverlay label="B" onOpenChange={onBOpenChange} />
+      </StrictMode>
+    );
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onBOpenChange).toHaveBeenCalledTimes(1);
+    expect(onAOpenChange).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onAOpenChange).toHaveBeenCalledTimes(1);
+  });
+
+  it("removes an unmounted overlay registration exactly once", () => {
+    const onAOpenChange = vi.fn();
+    const onBOpenChange = vi.fn();
+
+    function Harness({ showB }: { showB: boolean }) {
+      return (
+        <>
+          <StatefulOverlay label="A" onOpenChange={onAOpenChange} />
+          {showB ? (
+            <StatefulOverlay label="B" onOpenChange={onBOpenChange} />
+          ) : null}
+        </>
+      );
+    }
+
+    const { rerender } = render(<Harness showB />);
+    rerender(<Harness showB={false} />);
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onAOpenChange).toHaveBeenCalledTimes(1);
+    expect(onAOpenChange).toHaveBeenCalledWith(false);
+    expect(onBOpenChange).not.toHaveBeenCalled();
+  });
+
+  it("creates a new activation order after close and reopen", () => {
+    const onAOpenChange = vi.fn();
+    const onBOpenChange = vi.fn();
+
+    function Harness({ aOpen }: { aOpen: boolean }) {
+      return (
+        <>
+          <OverlayFixture
+            label="A"
+            onOpenChange={onAOpenChange}
+            open={aOpen}
+          />
+          <StatefulOverlay label="B" onOpenChange={onBOpenChange} />
+        </>
+      );
+    }
+
+    const { rerender } = render(<Harness aOpen />);
+    rerender(<Harness aOpen={false} />);
+    rerender(<Harness aOpen />);
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onAOpenChange).toHaveBeenCalledTimes(1);
+    expect(onBOpenChange).not.toHaveBeenCalled();
   });
 });
