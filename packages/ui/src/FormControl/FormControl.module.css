@@ -4,6 +4,10 @@
   gap: var(--ds-space-1);
 }
 
+.block {
+  inline-size: 100%;
+}
+
 .label {
   color: var(--ds-text-primary);
   font: var(--ds-typography-body-sm);

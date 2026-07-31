@@ -1,6 +1,8 @@
 import { useState, type ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { DesignSystemProvider } from "../DesignSystemProvider/DesignSystemProvider";
 import type { SelectCollectionItem } from "../internal/select/collection";
+import fixtureStyles from "../internal/select/SelectStories.module.css";
 import { MultiSelect } from "./MultiSelect";
 
 const tagItems: SelectCollectionItem[] = [
@@ -11,6 +13,11 @@ const tagItems: SelectCollectionItem[] = [
   { value: "wholesale", label: "Опт", textValue: "Опт" },
   { value: "archived", label: "Архив", textValue: "Архив" }
 ];
+
+// eslint-disable-next-line design-system/no-design-literals -- Deliberate high-luminance runtime brand stress input.
+const lightSelectionBrand = { accentColor: "#facc15", foregroundColor: "#111827" };
+// eslint-disable-next-line design-system/no-design-literals -- Deliberate dark-mode runtime brand stress input.
+const darkSelectionBrand = { accentColor: "#7c3aed", foregroundColor: "#ffffff" };
 
 function MultiSelectHarness({
   items = tagItems,
@@ -62,8 +69,9 @@ export const SelectedTags: Story = {
 export const TagOverflow: Story = {
   args: {} as never,
   render: () => (
-    <div className="w-64">
+    <div className={fixtureStyles.width240}>
       <MultiSelectHarness
+        block
         initialValue={[
           "new",
           "priority",
@@ -137,8 +145,83 @@ export const SizesLoading: Story = {
   )
 };
 
-export const NarrowWidths = TagOverflow;
-export const ExactTriggerWidth = TagOverflow;
+export const InnerLabelEmpty: Story = {
+  args: {} as never,
+  render: () => <MultiSelectHarness labelView="inner" />
+};
+
+export const SelectedSm: Story = {
+  args: {} as never,
+  render: () => <MultiSelectHarness initialValue={["new", "priority"]} labelView="inner" size="sm" />
+};
+
+export const SelectedMd: Story = {
+  args: {} as never,
+  render: () => <MultiSelectHarness initialValue={["new", "priority"]} labelView="inner" size="md" />
+};
+
+export const SelectedLg: Story = {
+  args: {} as never,
+  render: () => <MultiSelectHarness initialValue={["new", "priority"]} labelView="inner" size="lg" />
+};
+
+export const Overflow: Story = {
+  args: {} as never,
+  render: () => <div className={fixtureStyles.width180}><MultiSelectHarness block initialValue={["new", "priority", "delivery", "retail", "wholesale", "archived"]} /></div>
+};
+
+export const OuterLabelChips: Story = {
+  args: {} as never,
+  render: () => <MultiSelectHarness initialValue={["new", "priority"]} labelView="outer" />
+};
+
+export const Block: Story = {
+  args: {} as never,
+  render: () => <div className={fixtureStyles.blockHost}><MultiSelectHarness block initialValue={["new", "priority"]} /></div>
+};
+
+export const WidthStability: Story = {
+  args: {} as never,
+  render: () => <div className={fixtureStyles.width240}><MultiSelectHarness block initialValue={["new", "priority", "delivery", "retail"]} /></div>
+};
+
+export const NarrowWidths: Story = {
+  args: {} as never,
+  render: () => (
+    <div className={fixtureStyles.row}>
+      <div className={fixtureStyles.width180}><MultiSelectHarness block initialValue={["new", "priority", "delivery"]} /></div>
+      <div className={fixtureStyles.width240}><MultiSelectHarness block initialValue={["new", "priority", "delivery"]} /></div>
+      <div className={fixtureStyles.width320}><MultiSelectHarness block initialValue={["new", "priority", "delivery"]} /></div>
+    </div>
+  )
+};
+
+export const ExactTriggerWidth: Story = {
+  args: {} as never,
+  render: () => <div className={fixtureStyles.width240}><MultiSelectHarness block /></div>
+};
+
+export const BrandSelectionLight: Story = {
+  args: {} as never,
+  render: () => (
+    <DesignSystemProvider brand={lightSelectionBrand} mode="light">
+      <div className={fixtureStyles.width320}>
+        <MultiSelectHarness block initialValue={["new", "priority"]} open />
+      </div>
+    </DesignSystemProvider>
+  )
+};
+
+export const BrandSelectionDark: Story = {
+  args: {} as never,
+  render: () => (
+    <DesignSystemProvider brand={darkSelectionBrand} mode="dark">
+      <div className={fixtureStyles.width320}>
+        <MultiSelectHarness block initialValue={["new", "priority"]} open />
+      </div>
+    </DesignSystemProvider>
+  )
+};
 
 export const Search: Story = {
   args: {} as never,

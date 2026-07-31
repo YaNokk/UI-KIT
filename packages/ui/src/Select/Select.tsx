@@ -55,6 +55,7 @@ export interface SelectProps<Value extends string = string> {
   disabled?: boolean;
   readOnly?: boolean;
   clearable?: boolean;
+  block?: boolean;
   size?: FieldSize;
   name?: string;
   id?: string;
@@ -87,6 +88,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
     disabled = false,
     readOnly = false,
     clearable = false,
+    block = false,
     size = "md",
     name,
     id,
@@ -247,6 +249,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
 
   const trigger = (
     <FormControl
+      block={block}
       className={className}
       controlId={id}
       describedBy={ariaDescribedBy}
@@ -353,6 +356,8 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
         focusTriggerRef={triggerRef}
         skipFocusRestoreRef={skipFocusRestoreRef}
         header={searchField}
+        initialFocusRef={searchable ? searchRef : undefined}
+        interactive={interactive}
       >
         <SelectListboxView<Value>
           activeRowId={state.activeRow?.rowId ?? null}

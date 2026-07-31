@@ -1,7 +1,9 @@
 import { useState, type ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Dialog } from "../Dialog/Dialog";
+import { DesignSystemProvider } from "../DesignSystemProvider/DesignSystemProvider";
 import type { SelectCollectionItem } from "../internal/select/collection";
+import fixtureStyles from "../internal/select/SelectStories.module.css";
 import { Select } from "./Select";
 
 const customerItems: SelectCollectionItem[] = [
@@ -49,13 +51,20 @@ const customerItems: SelectCollectionItem[] = [
   }
 ];
 
+// eslint-disable-next-line design-system/no-design-literals -- Deliberate high-luminance runtime brand stress input.
+const lightSelectionBrand = { accentColor: "#facc15", foregroundColor: "#111827" };
+// eslint-disable-next-line design-system/no-design-literals -- Deliberate dark-mode runtime brand stress input.
+const darkSelectionBrand = { accentColor: "#7c3aed", foregroundColor: "#ffffff" };
+
 function SelectHarness({
   items = customerItems,
+  initialValue = null,
   ...props
 }: Omit<ComponentProps<typeof Select>, "items" | "onChange" | "value"> & {
+  initialValue?: string | null;
   items?: SelectCollectionItem[];
 }) {
-  const [value, setValue] = useState<string | null>(null);
+  const [value, setValue] = useState<string | null>(initialValue);
   const [created, setCreated] = useState(false);
   const resolvedItems = items.map((item) =>
     item.type === "action"
@@ -203,14 +212,14 @@ export const SizesClearable: Story = {
 
 export const ExactTriggerWidth: Story = {
   args: {} as never,
-  render: () => <div className="w-64"><SelectHarness /></div>
+  render: () => <div className={fixtureStyles.width240}><SelectHarness block /></div>
 };
 
 export const LongOptionText: Story = {
   args: {} as never,
   render: () => (
-    <div className="w-64">
-      <SelectHarness items={[{
+    <div className={fixtureStyles.width240}>
+      <SelectHarness block items={[{
         value: "long",
         label: "Очень длинное название клиента, которое не должно расширять панель",
         textValue: "Очень длинное название клиента, которое не должно расширять панель"
@@ -219,7 +228,48 @@ export const LongOptionText: Story = {
   )
 };
 
-export const NarrowViewport = ExactTriggerWidth;
+export const InnerLabelSizes: Story = {
+  args: {} as never,
+  render: () => (
+    <div className={fixtureStyles.stack}>
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <SelectHarness initialValue="ivan" key={size} labelView="inner" size={size} />
+      ))}
+    </div>
+  )
+};
+
+export const Block: Story = {
+  args: {} as never,
+  render: () => <div className={fixtureStyles.blockHost}><SelectHarness block /></div>
+};
+
+export const NarrowViewport: Story = {
+  args: {} as never,
+  render: () => <div className={fixtureStyles.width180}><SelectHarness block /></div>
+};
+
+export const BrandSelectedLight: Story = {
+  args: {} as never,
+  render: () => (
+    <DesignSystemProvider brand={lightSelectionBrand} mode="light">
+      <div className={fixtureStyles.width320}>
+        <SelectHarness block initialValue="ivan" open />
+      </div>
+    </DesignSystemProvider>
+  )
+};
+
+export const BrandSelectedDark: Story = {
+  args: {} as never,
+  render: () => (
+    <DesignSystemProvider brand={darkSelectionBrand} mode="dark">
+      <div className={fixtureStyles.width320}>
+        <SelectHarness block initialValue="ivan" open />
+      </div>
+    </DesignSystemProvider>
+  )
+};
 
 export const Search: Story = {
   args: {} as never,

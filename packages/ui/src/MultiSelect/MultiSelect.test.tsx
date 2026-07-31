@@ -293,4 +293,24 @@ describe("MultiSelect", () => {
     expect(search).toHaveValue("");
     expect(screen.getAllByRole("option")).toHaveLength(4);
   });
+
+  it("keeps readOnly trigger focusable without opening or removing values", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <ControlledMulti
+        items={baseItems}
+        onChange={onChange}
+        readOnly
+        value={["a", "b"]}
+      />
+    );
+    const trigger = screen.getByRole("button", { name: /Теги/ });
+
+    await user.click(trigger);
+    expect(trigger).toHaveFocus();
+    await user.keyboard("{Enter}{Backspace}");
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });

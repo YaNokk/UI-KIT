@@ -6,9 +6,11 @@ declare const styles: {
   readonly tagLabel: string;
   readonly tagRemove: string;
   readonly activeTag: string;
+  readonly disabledTag: string;
   readonly srOnly: string;
   readonly overflow: string;
   readonly placeholder: string;
+  readonly compactSummary: string;
   readonly sizer: string;
   readonly measureTag: string;
 };

@@ -28,6 +28,8 @@ export interface SelectPanelProps {
   onOpenChange: (open: boolean) => void;
   children: ReactNode;
   header?: ReactNode;
+  initialFocusRef?: RefObject<HTMLElement | null> | undefined;
+  interactive?: boolean | undefined;
   listboxId: string;
   messages: SelectMessages;
   multiple: boolean;
@@ -43,6 +45,8 @@ export function SelectPanel({
   onOpenChange,
   children,
   header,
+  initialFocusRef,
+  interactive = true,
   messages,
   multiple,
   panelClassName
@@ -74,7 +78,7 @@ export function SelectPanel({
     dismissOnEscape: true,
     dismissOnOutsidePress: true,
     interaction: "click",
-    interactionEnabled: presentation === "popover",
+    interactionEnabled: presentation === "popover" && interactive,
     matchTriggerWidth: true,
     onOpenChange,
     open: presentation === "popover" && open,
@@ -91,7 +95,7 @@ export function SelectPanel({
     trigger,
     floating.getReferenceProps,
     setTriggerNode,
-    presentation === "sheet"
+    presentation === "sheet" && interactive
       ? { onClick: () => onOpenChange(!open) }
       : {}
   );
@@ -133,6 +137,7 @@ export function SelectPanel({
               {messages.done}
             </Button>
           ) : undefined}
+          {...(initialFocusRef === undefined ? {} : { initialFocusRef })}
           onOpenChange={(nextOpen) => {
             if (!nextOpen) onOpenChange(false);
           }}

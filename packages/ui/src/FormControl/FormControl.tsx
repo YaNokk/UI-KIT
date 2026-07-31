@@ -20,6 +20,7 @@ export interface FormControlRenderProps {
 export interface FormControlProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "color" | "style"> {
   children: (props: FormControlRenderProps) => ReactNode;
+  block?: boolean | undefined;
   controlId?: string | undefined;
   describedBy?: string | undefined;
   disabled?: boolean | undefined;
@@ -34,6 +35,7 @@ export interface FormControlProps
 export const FormControl = forwardRef<HTMLDivElement, FormControlProps>(
   function FormControl(
     {
+      block = false,
       children,
       className,
       controlId,
@@ -68,7 +70,7 @@ export const FormControl = forwardRef<HTMLDivElement, FormControlProps>(
     return (
       <div
         {...nativeProps}
-        className={classNames(styles.root, className)}
+        className={classNames(styles.root, block && styles.block, className)}
         data-disabled={disabled ? "" : undefined}
         data-invalid={invalid ? "" : undefined}
         data-label-view={labelView}

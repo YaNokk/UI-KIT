@@ -485,4 +485,16 @@ describe("Select", () => {
     await user.click(screen.getByRole("button", { name: /Клиент/ }));
     expect(await screen.findAllByRole("option")).toHaveLength(4);
   });
+
+  it("keeps readOnly trigger focusable without opening from pointer or keyboard", async () => {
+    const user = userEvent.setup();
+    render(<ControlledSelect items={baseItems} readOnly />);
+    const trigger = screen.getByRole("button", { name: /Клиент/ });
+
+    await user.click(trigger);
+    expect(trigger).toHaveFocus();
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    await user.keyboard("{Enter}{ArrowDown}");
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
 });

@@ -66,13 +66,13 @@
 }
 
 @media (hover: hover) {
-  .row:not(.disabledRow):hover {
+  .row:not(.disabledRow, .selected):hover {
     background: var(--ds-background-interactive-hover);
   }
 }
 
 .active {
-  background: var(--ds-background-interactive);
+  background: var(--ds-background-interactive-active);
 }
 
 @media (hover: hover) {
@@ -81,8 +81,19 @@
   }
 }
 
-.selected {
-  color: var(--ds-text-primary);
+.selected:not(.disabledRow) {
+  color: var(--ds-action-soft-foreground);
+  background: var(--ds-background-selected);
+}
+
+@media (hover: hover) {
+  .selected:not(.disabledRow):hover {
+    background: var(--ds-action-soft-background-hover);
+  }
+}
+
+.selected.active:not(.disabledRow) {
+  background: var(--ds-action-soft-background-active);
 }
 
 .selectedMarker {
@@ -118,9 +129,9 @@
 }
 
 .checkboxMarkerChecked {
-  color: var(--ds-icon-on-accent);
-  background: var(--ds-brand-accent);
-  border-color: var(--ds-brand-accent);
+  color: var(--ds-action-primary-foreground);
+  background: var(--ds-action-primary-background);
+  border-color: var(--ds-action-primary-background);
 }
 
 .checkboxMarker > svg {

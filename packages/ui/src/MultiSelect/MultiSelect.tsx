@@ -58,6 +58,7 @@ export interface MultiSelectProps<Value extends string = string> {
   disabled?: boolean;
   readOnly?: boolean;
   clearable?: boolean;
+  block?: boolean;
   size?: FieldSize;
   name?: string;
   id?: string;
@@ -97,6 +98,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
     disabled = false,
     readOnly = false,
     clearable = false,
+    block = false,
     size = "md",
     name,
     id,
@@ -152,6 +154,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   const skipFocusRestoreRef = useRef(false);
   const viewportRef = useRef<HTMLSpanElement | null>(null);
   const sizerRef = useRef<HTMLSpanElement | null>(null);
+  const searchRef = useRef<HTMLInputElement | null>(null);
   const listboxRef = useRef<HTMLDivElement | null>(null);
 
   useImperativeHandle(ref, () => triggerRef.current as HTMLElement, []);
@@ -303,6 +306,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
         }
       }}
       placeholder={searchProps?.placeholder ?? messages.searchPlaceholder}
+      ref={searchRef}
       size="sm"
       startAdornment={<Search />}
       value={search.query}
@@ -325,22 +329,27 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
         setVisibleCount(value.length);
         return;
       }
-      const computed = window.getComputedStyle(sizer);
-      const gap = parseFloat(computed.columnGap || "0") || 4;
+      const tag = sizer.querySelector<HTMLElement>("[data-measure-tag]");
+      const label = sizer.querySelector<HTMLElement>("[data-measure-label]");
+      const overflow = sizer.querySelector<HTMLElement>("[data-measure-overflow]");
+      if (!tag || !label || !overflow) return;
+      const gap = parseFloat(window.getComputedStyle(sizer).columnGap) || 0;
 
-      const measureWidth = (text: string) => {
-        sizer.textContent = text;
-        return sizer.offsetWidth;
+      const measureTagWidth = (text: string) => {
+        label.textContent = text;
+        return tag.getBoundingClientRect().width;
       };
 
-      const overflowWidth = (count: number) =>
-        measureWidth("+" + count) + gap;
+      const overflowWidth = (count: number) => {
+        overflow.textContent = "+" + count;
+        return overflow.getBoundingClientRect().width + gap;
+      };
 
       let used = 0;
       let fitted = 0;
       for (let index = 0; index < value.length; index += 1) {
         const entry = displayByValue.get(value[index] as Value);
-        const tagWidth = measureWidth(entry?.textValue ?? "") + gap + 24;
+        const tagWidth = measureTagWidth(entry?.textValue ?? "") + gap;
         const remaining = value.length - index - 1;
         const reserve = remaining > 0 ? overflowWidth(remaining) : 0;
         if (used + tagWidth + reserve <= available) {
@@ -364,11 +373,13 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
     setVisibleCount((count) => Math.min(count, value.length));
   }, [value.length]);
 
-  const visibleTags = value.slice(0, visibleCount);
+  const compactInnerSummary = labelView === "inner" && size === "sm";
+  const visibleTags = compactInnerSummary ? [] : value.slice(0, visibleCount);
   const overflowCount = value.length - visibleTags.length;
 
   const trigger = (
     <FormControl
+      block={block}
       className={className}
       controlId={id}
       describedBy={ariaDescribedBy}
@@ -459,6 +470,10 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                 <span aria-hidden="true" className={styles.placeholder}>
                   {placeholder}
                 </span>
+              ) : compactInnerSummary ? (
+                <span aria-hidden="true" className={styles.compactSummary}>
+                  {messages.selectedCount(value.length)}
+                </span>
               ) : (
                 <>
                   {visibleTags.map((entry) => {
@@ -467,6 +482,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                       <span
                         className={classNames(
                           styles.tag,
+                          disabled && styles.disabledTag,
                           value.indexOf(entry) === activeTagIndex && styles.activeTag
                         )}
                         key={entry}
@@ -510,7 +526,15 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
               className={styles.sizer}
               ref={sizerRef}
             >
-              <span className={styles.measureTag} />
+              <span className={classNames(styles.tag, styles.measureTag)} data-measure-tag="">
+                <span className={styles.tagLabel} data-measure-label="" />
+                {interactive ? (
+                  <span className={styles.tagRemove}>
+                    <X aria-hidden="true" />
+                  </span>
+                ) : null}
+              </span>
+              <span className={styles.overflow} data-measure-overflow="" />
             </span>
           </span>
         </FieldShell>
@@ -533,6 +557,8 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
         focusTriggerRef={triggerRef}
         skipFocusRestoreRef={skipFocusRestoreRef}
         header={searchField}
+        initialFocusRef={searchable ? searchRef : undefined}
+        interactive={interactive}
       >
         <SelectListboxView<Value>
           activeRowId={state.activeRow?.rowId ?? null}

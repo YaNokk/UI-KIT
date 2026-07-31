@@ -37,9 +37,10 @@
   padding-block: 0;
   padding-inline: var(--ds-space-2) var(--ds-space-1);
   block-size: var(--ds-space-5);
-  color: var(--ds-text-primary);
+  color: var(--ds-action-soft-foreground);
   font: var(--ds-typography-body-sm);
-  background: var(--ds-background-interactive);
+  background: var(--ds-action-soft-background);
+  border: var(--ds-border-width-default) solid var(--ds-brand-accent-border);
   border-radius: var(--ds-radius-md);
 }
 
@@ -57,12 +58,18 @@
   inline-size: var(--ds-space-5);
   block-size: var(--ds-space-5);
   padding: var(--ds-space-0);
-  color: var(--ds-icon-secondary);
+  color: var(--ds-action-soft-foreground);
   background: transparent;
   border: none;
   border-radius: var(--ds-radius-sm);
   cursor: pointer;
   pointer-events: auto;
+}
+
+@media (hover: hover) {
+  .tagRemove:hover {
+    background: var(--ds-action-soft-background-hover);
+  }
 }
 
 .tagRemove > svg {
@@ -71,8 +78,15 @@
 }
 
 .activeTag {
+  background: var(--ds-action-soft-background-active);
   outline: var(--ds-focus-ring-width) solid var(--ds-focus-ring);
   outline-offset: calc(-1 * var(--ds-focus-ring-width));
+}
+
+.disabledTag {
+  color: var(--ds-text-disabled);
+  background: var(--ds-control-background-disabled);
+  border-color: var(--ds-border-subtle);
 }
 
 .srOnly {
@@ -104,17 +118,24 @@
   white-space: nowrap;
 }
 
+.compactSummary {
+  overflow: hidden;
+  color: var(--ds-text-accent);
+  font: var(--ds-typography-body-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .sizer {
   position: absolute;
   visibility: hidden;
   pointer-events: none;
-  block-size: 0;
-  overflow: hidden;
+  display: inline-flex;
+  gap: var(--ds-space-1);
+  inline-size: max-content;
   white-space: nowrap;
 }
 
 .measureTag {
-  display: inline-block;
-  padding-inline: var(--ds-space-2) var(--ds-space-1);
-  font: var(--ds-typography-body-sm);
+  flex: none;
 }

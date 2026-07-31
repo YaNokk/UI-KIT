@@ -1,0 +1,28 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-4);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--ds-space-4);
+}
+
+.width180 {
+  inline-size: 180px;
+}
+
+.width240 {
+  inline-size: 240px;
+}
+
+.width320 {
+  inline-size: 320px;
+}
+
+.blockHost {
+  inline-size: min(100%, 480px);
+}
