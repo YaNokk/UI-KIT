@@ -20,9 +20,15 @@ const storybookCsfTransform: Plugin = {
   name: "storybook-csf-transform-windows-compat",
   enforce: "pre",
   async transform(code, id) {
-    if (!normalizePath(id).includes(
-      "/packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx"
-    )) {
+    const normalizedId = normalizePath(id);
+    if (
+      !normalizedId.includes(
+        "/packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx"
+      )
+      && !normalizedId.includes(
+        "/packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx"
+      )
+    ) {
       return undefined;
     }
 
@@ -32,7 +38,8 @@ const storybookCsfTransform: Plugin = {
       fileName: id,
       previewLevelTags: [],
       stories: [
-        "../../../packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx"
+        "../../../packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx",
+        "../../../packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx"
       ],
       tagsFilter: { include: ["test"], exclude: [], skip: [] }
     });
@@ -88,7 +95,8 @@ export default defineConfig({
     name: "storybook",
     fileParallelism: false,
     include: [
-      "packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx"
+      "packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx",
+      "packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx"
     ],
     browser: {
       enabled: true,

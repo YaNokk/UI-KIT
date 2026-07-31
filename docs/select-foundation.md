@@ -78,7 +78,7 @@ Select (single):
 
 - выбор option → `onChange(value)` → presentation закрывается;
 - `clearable` → clear через `onChange(null)`; clear недоступен при
-  `disabled`/`required`; clear не открывает Select.
+  `disabled`/`readOnly`/`required`; clear не открывает Select.
 
 MultiSelect (multi):
 
@@ -89,6 +89,9 @@ MultiSelect (multi):
   открывает Select;
 - Backspace на сфокусированном trigger удаляет последнее выбранное
   значение; отдельные Tab-стопы на тегах в v1 не делаются.
+- `readOnly` остаётся focusable, но pointer/Enter/Space/tap не открывают
+  presentation; clear, chip remove, keyboard remove и selection changes
+  недоступны. Даже controlled `open=true` не раскрывает readOnly control.
 
 Action row: Enter/Space/pointer выполняет `onSelect` ровно один раз,
 selection не меняется, presentation закрывается; дальнейший Dialog —
@@ -149,6 +152,15 @@ collectionState?: {
 - Никаких публичных `presentation`/`breakpoint`/`isMobile` props и
   raw breakpoint literals.
 
+Panel height остаётся приватной частью presentation. Floating UI записывает
+доступную высоту в regular surface; Search и hoisted Action region являются
+фиксированными flex-частями, а list region заполняет остаток. Для обычной
+коллекции единственный scroll owner — listbox viewport. При virtualized
+коллекции внешний listbox не scrollable, и scrolling полностью принадлежит
+`VList`. В BottomSheet Select-композиция переводит modal body в bounded flex
+host без собственного overflow, поэтому там также скроллится только listbox
+или `VList`. Публичных height props нет.
+
 ## Virtualization
 
 - Движок — `virtua` (приватно; типы virtua не попадают в публичные
@@ -165,6 +177,9 @@ collectionState?: {
   keyboard-navigation остаётся collection-driven. При виртуализации id active
   row публикуется только после подтверждения монтирования через наблюдение за DOM,
   а не после фиксированного `requestAnimationFrame`.
+- После filter/items refresh активная identity сохраняется, пока остаётся
+  видимой и enabled; иначе выбирается первый enabled visible option, а при
+  отсутствии вариантов active становится `null`.
 
 ## MultiSelect trigger tags
 
@@ -174,6 +189,11 @@ collectionState?: {
 - Видимые теги вычисляются по доступной ширине (ResizeObserver),
   резервируется место под `+N`; при экстремально узкой ширине
   допускается только `+N`.
+- Hidden sizer использует те же chip/label/remove/overflow классы, что и
+  видимый UI. Доступная ширина берётся из реального tag viewport после того,
+  как FieldShell зарезервировал clear/spinner/chevron adornments; raw width
+  guesses отсутствуют. Empty selection и inner `sm`/`md` summary не создают
+  measurement DOM и не подключают ResizeObserver.
 - Никакого публичного `maxTags`.
 - Tag remove — private compact button с accessible name `Remove {item}`, клик не
   открывает Select (stopPropagation).
@@ -193,6 +213,10 @@ collectionState?: {
   listbox: это исключает запрещённое смешивание button внутри listbox.
   Он не входит в option keyboard order, не получает `aria-selected` и не
   является value. Tab перемещает focus между Search, Action и listbox.
+- Все Action items hoist-ятся в фиксированный верхний Action region независимо
+  от позиции во входном массиве. Disabled Action использует native
+  `button[disabled]`. Commit сначала закрывает Select, затем ровно один раз
+  вызывает callback, не меняя selection и не сортируя options.
 - Trigger: button semantics, `aria-haspopup="listbox"`,
   `aria-expanded`, `aria-controls`; active descendant принадлежит listbox.
 - Status rows: `role="status"` для loading/empty, `role="alert"` для error;
@@ -206,16 +230,22 @@ collectionState?: {
 допускают локальный override; произвольное сообщение/error/retry передаётся
 через `collectionState`.
 
-## Search v1.1
+## Search v1.2
 
 - `searchable` добавляет Search внутри Popover и BottomSheet; закрытый trigger
   остаётся не редактируемым.
 - Uncontrolled query фильтрует только options по `Option.textValue`; пустые
   группы скрываются, Action остаётся видимым.
-- `searchProps.value` вместе с `searchProps.onChange` включает external mode:
-  consumer передаёт подготовленные items, DS не фильтрует их повторно и не
-  владеет debounce/fetch/cache/abort.
-- При открытии focus получает Search. ArrowDown переводит focus в listbox,
+- Без `searchProps.value` query хранится локально и фильтрует Option.textValue.
+  При наличии `searchProps.value` он является единственным source of truth и
+  включает external mode: consumer передаёт подготовленные items, DS не
+  фильтрует их повторно и не зеркалит value в local state.
+- `value` без `onChange` выдаёт DEV warning и остаётся controlled read-only
+  query, а не переключается в local mode.
+- При открытии focus получает Search через explicit `initialFocusRef` в
+  BottomSheet и через SelectPanel focus lifecycle в Popover; `autoFocus` не
+  является механизмом контракта. В non-searchable mode explicit target —
+  listbox. ArrowDown переводит focus в listbox,
   Enter выбирает active option, Escape закрывает presentation.
 - Query сбрасывается после single selection, после каждого multi toggle и при
   любом закрытии. В controlled mode сброс запрашивается через `onChange("")`.
@@ -225,6 +255,7 @@ collectionState?: {
 
 Single Select использует один hidden input. MultiSelect создаёт отдельный hidden
 input с одинаковым `name` для каждого значения; comma-join не используется.
+Контракт проверяется через реальный `FormData.getAll(name)`.
 
 ## Что не входит в v1.1
 
@@ -235,8 +266,16 @@ virtualization knobs.
 
 ## Browser freeze baseline
 
-Перед public API freeze проверяются в настоящем браузере: точная ширина Popover,
-виртуализация и mounted `aria-activedescendant`, единый scroll owner в
-BottomSheet, tag overflow на узких ширинах, click/keyboard tag remove,
-наружное закрытие и Escape в Dialog. Эта матрица повторяется при bump
-`@floating-ui/react`, `virtua`, Modal/BottomSheet или Responsive Foundations.
+Frozen v1 browser baseline — Chromium. Команда `npm run test:storybook`
+запускается в `.github/workflows/ui-tests.yml` и использует настоящие Storybook
+viewport presets `390x844`, `768x1024`, `1440x900`. Gate покрывает bounded
+Popover/BottomSheet, единственный scroll owner, explicit search focus и focus
+return, readOnly, controlled search, width/chip stability, 10k virtualization и
+mounted `aria-activedescendant`; тот же набор выполняется с forced-colors.
+
+Public freeze сохраняет существующие `searchable`, `searchProps`,
+`collectionState`, `block`, `clearable`, `readOnly`, `selectedItem` /
+`selectedItems`, `items`, `open` / `onOpenChange`. Virtualization, height,
+debounce/fetch, presentation/isMobile и Search override публично не добавлены.
+Матрица повторяется при bump `@floating-ui/react`, `virtua`, Modal/BottomSheet
+или Responsive Foundations.

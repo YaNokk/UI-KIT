@@ -2,6 +2,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  min-block-size: 0;
   overflow: hidden;
   color: var(--ds-text-primary);
   background: var(--ds-background-surface-raised);
@@ -13,8 +14,15 @@
 
 .sheetBody {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   min-block-size: 0;
+  overflow: hidden;
+}
+
+:global([data-modal-scroll-container]):has(> .sheetBody) {
+  display: flex;
+  overflow: hidden;
 }
 
 .header {

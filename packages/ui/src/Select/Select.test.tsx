@@ -486,15 +486,93 @@ describe("Select", () => {
     expect(await screen.findAllByRole("option")).toHaveLength(4);
   });
 
+  it("keeps a controlled search value as the only query source", async () => {
+    const user = userEvent.setup();
+    const onSearchChange = vi.fn();
+    render(
+      <ControlledSelect
+        items={baseItems}
+        searchable
+        searchProps={{ value: "server", onChange: onSearchChange }}
+      />
+    );
+
+    await user.click(screen.getByRole("button", { name: /Клиент/ }));
+    const search = await screen.findByRole("textbox", { name: "Поиск по вариантам" });
+    await user.type(search, " next");
+    expect(onSearchChange).toHaveBeenCalled();
+    expect(search).toHaveValue("server");
+
+    await user.keyboard("{Escape}");
+    expect(onSearchChange).toHaveBeenLastCalledWith("");
+  });
+
+  it("DEV warns and exposes value-without-onChange as read-only external search", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const user = userEvent.setup();
+    render(
+      <ControlledSelect
+        items={baseItems}
+        searchable
+        searchProps={{ value: "server" }}
+      />
+    );
+
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining("controlled and read-only")
+    );
+    await user.click(screen.getByRole("button", { name: /Клиент/ }));
+    expect(await screen.findByRole("textbox", { name: "Поиск по вариантам" }))
+      .toHaveAttribute("readonly");
+    expect(screen.getAllByRole("option")).toHaveLength(4);
+  });
+
+  it("uses native disabled semantics for hoisted actions", async () => {
+    const user = userEvent.setup();
+    render(
+      <ControlledSelect
+        items={[
+          {
+            type: "action",
+            disabled: true,
+            id: "disabled-action",
+            label: "Недоступное действие",
+            onSelect: () => undefined,
+            textValue: "Недоступное действие"
+          },
+          ...baseItems
+        ]}
+      />
+    );
+
+    await user.click(screen.getByRole("button", { name: /Клиент/ }));
+    expect(await screen.findByRole("button", { name: "Недоступное действие" }))
+      .toBeDisabled();
+  });
+
   it("keeps readOnly trigger focusable without opening from pointer or keyboard", async () => {
     const user = userEvent.setup();
-    render(<ControlledSelect items={baseItems} readOnly />);
+    const onChange = vi.fn();
+    render(
+      <ControlledSelect
+        clearable
+        items={baseItems}
+        onChange={onChange}
+        open
+        readOnly
+        value="a"
+      />
+    );
     const trigger = screen.getByRole("button", { name: /Клиент/ });
 
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("button", { name: "Очистить выбор" }))
+      .not.toBeInTheDocument();
     await user.click(trigger);
     expect(trigger).toHaveFocus();
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     await user.keyboard("{Enter}{ArrowDown}");
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(onChange).not.toHaveBeenCalled();
   });
 });

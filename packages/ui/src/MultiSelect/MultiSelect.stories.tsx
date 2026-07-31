@@ -14,6 +14,15 @@ const tagItems: SelectCollectionItem[] = [
   { value: "archived", label: "Архив", textValue: "Архив" }
 ];
 
+const manyTagItems: SelectCollectionItem[] = Array.from(
+  { length: 20 },
+  (_, index) => ({
+    value: `tag-${index + 1}`,
+    label: `Тег ${index + 1}`,
+    textValue: `Тег ${index + 1}`
+  })
+);
+
 // eslint-disable-next-line design-system/no-design-literals -- Deliberate high-luminance runtime brand stress input.
 const lightSelectionBrand = { accentColor: "#facc15", foregroundColor: "#111827" };
 // eslint-disable-next-line design-system/no-design-literals -- Deliberate dark-mode runtime brand stress input.
@@ -238,7 +247,25 @@ export const Block: Story = {
 
 export const WidthStability: Story = {
   args: {} as never,
-  render: () => <div className={fixtureStyles.width240}><MultiSelectHarness block initialValue={["new", "priority", "delivery", "retail"]} /></div>
+  render: () => (
+    <div className={fixtureStyles.stack}>
+      {[0, 1, 5, 20].map((count) => (
+        <div className={fixtureStyles.width320} key={count}>
+          <MultiSelectHarness
+            block
+            clearable
+            initialValue={manyTagItems.slice(0, count).map((item) =>
+              item.type === "option" ? item.value : ""
+            )}
+            items={manyTagItems}
+          />
+        </div>
+      ))}
+      <div className={fixtureStyles.blockHost}>
+        <MultiSelectHarness block initialValue={["new", "priority"]} />
+      </div>
+    </div>
+  )
 };
 
 export const NarrowWidths: Story = {
@@ -248,6 +275,50 @@ export const NarrowWidths: Story = {
       <div className={fixtureStyles.width180}><MultiSelectHarness block initialValue={["new", "priority", "delivery"]} /></div>
       <div className={fixtureStyles.width240}><MultiSelectHarness block initialValue={["new", "priority", "delivery"]} /></div>
       <div className={fixtureStyles.width320}><MultiSelectHarness block initialValue={["new", "priority", "delivery"]} /></div>
+    </div>
+  )
+};
+
+export const Narrow180: Story = {
+  args: {} as never,
+  render: () => (
+    <div className={fixtureStyles.width180}>
+      <MultiSelectHarness block clearable initialValue={["new", "priority", "delivery", "retail"]} />
+    </div>
+  )
+};
+
+export const Narrow240: Story = {
+  args: {} as never,
+  render: () => (
+    <div className={fixtureStyles.width240}>
+      <MultiSelectHarness block clearable initialValue={["new", "priority", "delivery", "retail"]} />
+    </div>
+  )
+};
+
+export const Narrow320: Story = {
+  args: {} as never,
+  render: () => (
+    <div className={fixtureStyles.width320}>
+      <MultiSelectHarness block clearable initialValue={["new", "priority", "delivery", "retail"]} />
+    </div>
+  )
+};
+
+export const ChipMeasurement: Story = {
+  args: {} as never,
+  render: () => (
+    <div className={fixtureStyles.row}>
+      <div className={fixtureStyles.width180}>
+        <MultiSelectHarness block clearable initialValue={["new", "priority", "delivery", "retail", "wholesale"]} />
+      </div>
+      <div className={fixtureStyles.width240}>
+        <MultiSelectHarness block collectionState={{ status: "refreshing" }} initialValue={["new", "priority", "delivery", "retail", "wholesale"]} />
+      </div>
+      <div className={fixtureStyles.width320}>
+        <MultiSelectHarness block initialValue={["new", "priority", "delivery", "retail", "wholesale"]} labelView="inner" size="lg" />
+      </div>
     </div>
   )
 };
@@ -311,10 +382,52 @@ export const SearchActionRow: Story = {
 };
 
 export const SearchMobileBottomSheet: Story = {
-  ...Search,
-  parameters: { viewport: { defaultViewport: "mobile1" } }
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "mobile" } },
+  render: () => <MultiSelectHarness searchable />
 };
 
-export const LoadingInTrigger = SizesLoading;
-export const TagKeyboardRemoval = SizesWithTags;
-export const DesignerReference = SizesWithTags;
+export const ReadOnly: Story = {
+  args: {} as never,
+  render: () => (
+    <MultiSelectHarness clearable initialValue={["new", "priority"]} readOnly />
+  )
+};
+
+export const MobileSearchFocus: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "mobile" } },
+  render: () => <MultiSelectHarness open searchable />
+};
+
+export const VirtualizedLargeList: Story = {
+  args: {} as never,
+  render: () => (
+    <MultiSelectHarness
+      items={Array.from({ length: 10000 }, (_, index) => ({
+        value: `virtual-${index}`,
+        label: `Вариант ${index + 1}`,
+        textValue: `Вариант ${index + 1}`
+      }))}
+      open
+      searchable
+    />
+  )
+};
+
+export const LoadingInTrigger: Story = {
+  args: {} as never,
+  render: () => (
+    <MultiSelectHarness collectionState={{ status: "loading" }} items={[]} />
+  )
+};
+
+export const TagKeyboardRemoval: Story = {
+  args: {} as never,
+  render: () => <MultiSelectHarness initialValue={["new", "priority"]} />
+};
+
+export const DesignerReference: Story = {
+  args: {} as never,
+  render: () => <MultiSelectHarness initialValue={["new", "priority"]} />
+};

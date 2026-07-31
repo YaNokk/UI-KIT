@@ -88,6 +88,24 @@ function SelectHarness({
   );
 }
 
+function ControlledSearchSelect() {
+  const [query, setQuery] = useState("");
+  const preparedItems = customerItems.filter((item) => {
+    if (item.type !== "group") return true;
+    return item.items.some((option) =>
+      option.textValue.toLocaleLowerCase().includes(query.toLocaleLowerCase())
+    );
+  });
+
+  return (
+    <SelectHarness
+      items={preparedItems}
+      searchable
+      searchProps={{ onChange: setQuery, value: query }}
+    />
+  );
+}
+
 const meta = {
   title: "Components/Select",
   component: Select,
@@ -262,6 +280,21 @@ export const LongOptionText: Story = {
   )
 };
 
+export const PanelAvailableHeight: Story = {
+  args: {} as never,
+  render: () => (
+    <SelectHarness
+      items={Array.from({ length: 120 }, (_, index) => ({
+        value: `height-${index}`,
+        label: `Клиент ${index + 1}`,
+        textValue: `Клиент ${index + 1}`
+      }))}
+      open
+      searchable
+    />
+  )
+};
+
 export const InnerLabelSizes: Story = {
   args: {} as never,
   render: () => (
@@ -310,6 +343,16 @@ export const Search: Story = {
   render: () => <SelectHarness searchable />
 };
 
+export const SearchUncontrolled: Story = {
+  args: {} as never,
+  render: () => <SelectHarness open searchable />
+};
+
+export const SearchControlled: Story = {
+  args: {} as never,
+  render: () => <ControlledSearchSelect />
+};
+
 export const SearchLoading: Story = {
   args: {} as never,
   render: () => (
@@ -330,11 +373,55 @@ export const SearchActionRow: Story = {
 };
 
 export const SearchMobileBottomSheet: Story = {
-  ...Search,
-  parameters: { viewport: { defaultViewport: "mobile1" } }
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "mobile" } },
+  render: () => <SelectHarness searchable />
 };
 
-export const LoadingInTrigger = CollectionLoading;
-export const RichOptions = RichGroupsAndAction;
-export const Groups = RichGroupsAndAction;
-export const DesignerReference = RichGroupsAndAction;
+export const ReadOnly: Story = {
+  args: {} as never,
+  render: () => <SelectHarness clearable initialValue="ivan" readOnly />
+};
+
+export const MobileSearchFocus: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "mobile" } },
+  render: () => <SelectHarness open searchable />
+};
+
+export const VirtualizedLargeList: Story = {
+  args: {} as never,
+  render: () => (
+    <SelectHarness
+      items={Array.from({ length: 10000 }, (_, index) => ({
+        value: `virtual-${index}`,
+        label: `Вариант ${index + 1}`,
+        textValue: `Вариант ${index + 1}`
+      }))}
+      open
+      searchable
+    />
+  )
+};
+
+export const LoadingInTrigger: Story = {
+  args: {} as never,
+  render: () => (
+    <SelectHarness collectionState={{ status: "loading" }} items={[]} />
+  )
+};
+
+export const RichOptions: Story = {
+  args: {} as never,
+  render: () => <SelectHarness />
+};
+
+export const Groups: Story = {
+  args: {} as never,
+  render: () => <SelectHarness />
+};
+
+export const DesignerReference: Story = {
+  args: {} as never,
+  render: () => <SelectHarness />
+};

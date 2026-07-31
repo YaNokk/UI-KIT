@@ -127,17 +127,26 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
     };
   }, [resolvedLocale, clearLabel, emptyMessage, loadingMessage]);
 
+  const interactive = !disabled && !readOnly;
   const isControlledOpen = controlledOpen !== undefined;
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
-  const open = isControlledOpen ? controlledOpen : uncontrolledOpen;
+  const requestedOpen = isControlledOpen ? controlledOpen : uncontrolledOpen;
+  const open = interactive ? requestedOpen : false;
 
   const setOpen = useCallback(
     (nextOpen: boolean) => {
+      if (nextOpen && !interactive) return;
       if (!isControlledOpen) setUncontrolledOpen(nextOpen);
       onOpenChange?.(nextOpen);
     },
-    [isControlledOpen, onOpenChange]
+    [interactive, isControlledOpen, onOpenChange]
   );
+
+  useEffect(() => {
+    if (interactive || !requestedOpen) return;
+    if (!isControlledOpen) setUncontrolledOpen(false);
+    onOpenChange?.(false);
+  }, [interactive, isControlledOpen, onOpenChange, requestedOpen]);
 
   const search = useSelectSearch(items, searchable, searchProps);
   const state = useSelectState<Value>({
@@ -202,9 +211,12 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   );
 
   const invalid = error != null;
-  const interactive = !disabled && !readOnly;
   const compactInnerSummary = labelView === "inner" && size !== "lg";
-  const showClear = clearable && !disabled && !required && value.length > 0;
+  const showClear = clearable
+    && !disabled
+    && !readOnly
+    && !required
+    && value.length > 0;
   const loading = collectionState?.status === "loading";
   const refreshing = collectionState?.status === "refreshing";
   const [activeTagIndex, setActiveTagIndex] = useState<number | null>(null);
@@ -290,7 +302,6 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   const searchField = searchable ? (
     <Input
       aria-label={messages.search}
-      autoFocus
       onChange={(event) => search.setQuery(event.currentTarget.value)}
       onKeyDown={(event) => {
         if (event.key === "Escape") {
@@ -307,6 +318,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
         }
       }}
       placeholder={searchProps?.placeholder ?? messages.searchPlaceholder}
+      readOnly={search.queryReadOnly}
       ref={searchRef}
       size="sm"
       startAdornment={<Search />}
@@ -320,7 +332,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   const [visibleCount, setVisibleCount] = useState(value.length);
 
   useLayoutEffect(() => {
-    if (compactInnerSummary) {
+    if (compactInnerSummary || value.length === 0) {
       setVisibleCount(0);
       return;
     }
@@ -540,7 +552,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                 </>
               )}
             </span>
-            {compactInnerSummary ? null : (
+            {compactInnerSummary || value.length === 0 ? null : (
               <span
                 aria-hidden="true"
                 className={styles.sizer}
@@ -578,7 +590,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
         focusTriggerRef={triggerRef}
         skipFocusRestoreRef={skipFocusRestoreRef}
         header={searchField}
-        initialFocusRef={searchable ? searchRef : undefined}
+        initialFocusRef={searchable ? searchRef : listboxRef}
         interactive={interactive}
       >
         <SelectListboxView<Value>
@@ -605,7 +617,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                 ? loadingMessage
                 : state.statusMessage
           }
-          autoFocus={!searchable}
+          autoFocus={false}
           tabbable={searchable}
           ref={listboxRef}
         />

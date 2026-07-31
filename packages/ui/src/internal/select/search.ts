@@ -53,17 +53,29 @@ export function useSelectSearch<Value extends string>(
   searchProps?: SelectSearchProps
 ) {
   const controlledQuery = searchProps?.value;
-  const external = controlledQuery !== undefined && searchProps?.onChange !== undefined;
-  const [query, setQueryState] = useState(controlledQuery ?? "");
+  const onQueryChange = searchProps?.onChange;
+  const controlled = controlledQuery !== undefined;
+  const external = controlled;
+  const queryReadOnly = controlled && onQueryChange === undefined;
+  const [internalQuery, setInternalQuery] = useState("");
+  const query = controlled ? controlledQuery : internalQuery;
 
   useEffect(() => {
-    if (controlledQuery !== undefined) setQueryState(controlledQuery);
-  }, [controlledQuery]);
+    if (
+      queryReadOnly
+      && process.env.NODE_ENV !== "production"
+    ) {
+      console.warn(
+        "[Select] searchProps.value was provided without searchProps.onChange; "
+          + "the search query is controlled and read-only."
+      );
+    }
+  }, [queryReadOnly]);
 
   const setQuery = useCallback((nextQuery: string) => {
-    setQueryState(nextQuery);
-    searchProps?.onChange?.(nextQuery);
-  }, [searchProps]);
+    if (!controlled) setInternalQuery(nextQuery);
+    onQueryChange?.(nextQuery);
+  }, [controlled, onQueryChange]);
 
   const resetQuery = useCallback(() => setQuery(""), [setQuery]);
   const visibleItems = useMemo(
@@ -73,5 +85,13 @@ export function useSelectSearch<Value extends string>(
     [external, items, query, searchProps?.filter, searchable]
   );
 
-  return { external, query, resetQuery, setQuery, visibleItems };
+  return {
+    controlled,
+    external,
+    query,
+    queryReadOnly,
+    resetQuery,
+    setQuery,
+    visibleItems
+  };
 }

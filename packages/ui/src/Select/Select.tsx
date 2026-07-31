@@ -2,6 +2,7 @@ import { ChevronDown, Search, X } from "lucide-react";
 import {
   forwardRef,
   useCallback,
+  useEffect,
   useId,
   useImperativeHandle,
   useMemo,
@@ -117,17 +118,26 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
     };
   }, [resolvedLocale, clearLabel, emptyMessage, loadingMessage]);
 
+  const interactive = !disabled && !readOnly;
   const isControlledOpen = controlledOpen !== undefined;
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
-  const open = isControlledOpen ? controlledOpen : uncontrolledOpen;
+  const requestedOpen = isControlledOpen ? controlledOpen : uncontrolledOpen;
+  const open = interactive ? requestedOpen : false;
 
   const setOpen = useCallback(
     (nextOpen: boolean) => {
+      if (nextOpen && !interactive) return;
       if (!isControlledOpen) setUncontrolledOpen(nextOpen);
       onOpenChange?.(nextOpen);
     },
-    [isControlledOpen, onOpenChange]
+    [interactive, isControlledOpen, onOpenChange]
   );
+
+  useEffect(() => {
+    if (interactive || !requestedOpen) return;
+    if (!isControlledOpen) setUncontrolledOpen(false);
+    onOpenChange?.(false);
+  }, [interactive, isControlledOpen, onOpenChange, requestedOpen]);
 
   const search = useSelectSearch(items, searchable, searchProps);
   const state = useSelectState<Value>({
@@ -173,8 +183,11 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
   );
 
   const invalid = error != null;
-  const interactive = !disabled && !readOnly;
-  const showClear = clearable && !disabled && !required && value !== null;
+  const showClear = clearable
+    && !disabled
+    && !readOnly
+    && !required
+    && value !== null;
   const loading = collectionState?.status === "loading";
   const refreshing = collectionState?.status === "refreshing";
 
@@ -223,7 +236,6 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
   const searchField = searchable ? (
     <Input
       aria-label={messages.search}
-      autoFocus
       onChange={(event) => search.setQuery(event.currentTarget.value)}
       onKeyDown={(event) => {
         if (event.key === "Escape") {
@@ -240,6 +252,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
         }
       }}
       placeholder={searchProps?.placeholder ?? messages.searchPlaceholder}
+      readOnly={search.queryReadOnly}
       ref={searchRef}
       size="sm"
       startAdornment={<Search />}
@@ -357,7 +370,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
         focusTriggerRef={triggerRef}
         skipFocusRestoreRef={skipFocusRestoreRef}
         header={searchField}
-        initialFocusRef={searchable ? searchRef : undefined}
+        initialFocusRef={searchable ? searchRef : listboxRef}
         interactive={interactive}
       >
         <SelectListboxView<Value>
@@ -384,7 +397,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
                 ? loadingMessage
                 : state.statusMessage
           }
-          autoFocus={!searchable}
+          autoFocus={false}
           tabbable={searchable}
           ref={listboxRef}
         />

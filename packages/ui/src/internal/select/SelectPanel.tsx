@@ -74,6 +74,12 @@ export function SelectPanel({
     if (open) onOpenChange(false);
   }, [presentation, open, onOpenChange]);
 
+  useEffect(() => {
+    if (presentation !== "popover" || !open || !initialFocusRef) return;
+    const frame = requestAnimationFrame(() => initialFocusRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [initialFocusRef, open, presentation]);
+
   const floating = useFloatingOverlay({
     dismissOnEscape: true,
     dismissOnOutsidePress: true,

@@ -158,13 +158,13 @@ function SelectListboxViewInner<Value extends string>(
     if (row.type === "action") {
       return (
         <button
-          aria-disabled={row.disabled ? true : undefined}
           className={classNames(
             styles.row,
             active && styles.active,
             row.disabled && styles.disabledRow
           )}
           data-row-id={row.rowId}
+          disabled={row.disabled}
           id={listboxId + "-" + row.rowId}
           key={row.rowId}
           onMouseEnter={() => {
@@ -315,7 +315,7 @@ function SelectListboxViewInner<Value extends string>(
       // VList owns the one scroll container. Group labels stay as flattened
       // contextual rows here; direct rendering below keeps native ARIA groups.
       return (
-      <VList ref={virtualRef} style={{ blockSize: "100%" }}>
+      <VList data-select-scroll-owner="virtual" ref={virtualRef}>
           {optionRows.map(renderRow)}
       </VList>
       );
@@ -358,7 +358,7 @@ function SelectListboxViewInner<Value extends string>(
   })();
 
   return (
-    <div className={styles.root}>
+    <div className={styles.root} data-select-list-root="">
       {actionRows.length > 0 ? (
         <div className={styles.actions}>
           {actionRows.map(renderNavigableRow)}
@@ -374,6 +374,8 @@ function SelectListboxViewInner<Value extends string>(
           styles.scroll,
           virtualized && styles.virtualScrollHost
         )}
+        data-select-scroll-owner={virtualized ? undefined : "listbox"}
+        data-select-virtualized={virtualized ? "" : undefined}
         id={listboxId}
         onKeyDown={onKeyDown}
         ref={setListboxNode}

@@ -1,13 +1,16 @@
 .root {
   box-sizing: border-box;
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   min-block-size: 0;
+  overflow: hidden;
   outline: none;
 }
 
 .scroll {
   box-sizing: border-box;
+  flex: 1 1 auto;
   overflow-y: auto;
   overscroll-behavior: contain;
   min-block-size: 0;
@@ -17,7 +20,14 @@
 }
 
 .virtualScrollHost {
+  display: flex;
+  flex-direction: column;
   overflow-y: hidden;
+}
+
+.virtualScrollHost > * {
+  flex: 1 1 auto;
+  min-block-size: 0;
 }
 
 .actions {

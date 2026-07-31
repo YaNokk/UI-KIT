@@ -297,6 +297,23 @@ describe("MultiSelect", () => {
     expect(inputs.map((input) => input.value)).toEqual(["a,b", "d"]);
   });
 
+  it("submits repeated hidden values through FormData", () => {
+    const { container } = render(
+      <form>
+        <ControlledMulti items={baseItems} name="tags" value={["a", "d"]} />
+      </form>
+    );
+    const form = container.querySelector("form");
+    if (!form) throw new Error("Form fixture was not rendered.");
+    expect(new FormData(form).getAll("tags")).toEqual(["a", "d"]);
+  });
+
+  it("does not mount chip measurement DOM for an empty selection", () => {
+    const { container } = render(<ControlledMulti items={baseItems} value={[]} />);
+    expect(container.querySelector("[data-measure-tag]")).toBeNull();
+    expect(container.querySelector("[data-measure-overflow]")).toBeNull();
+  });
+
   it("announces selected labels and supports tag keyboard removal", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
@@ -327,13 +344,20 @@ describe("MultiSelect", () => {
     render(
       <ControlledMulti
         items={baseItems}
+        clearable
         onChange={onChange}
+        open
         readOnly
         value={["a", "b"]}
       />
     );
     const trigger = screen.getByRole("button", { name: /Теги/ });
 
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("button", { name: "Очистить выбор" }))
+      .not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Убрать/ }))
+      .not.toBeInTheDocument();
     await user.click(trigger);
     expect(trigger).toHaveFocus();
     await user.keyboard("{Enter}{Backspace}");
