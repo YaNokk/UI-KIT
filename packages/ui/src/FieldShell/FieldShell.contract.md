@@ -24,6 +24,19 @@ the shared shell, while focus or an owner-supplied floated state reveals the
 placeholder/value in the lower band. Adornments remain centered in the full
 shell and presentation states do not change these vertical baselines.
 
+The optical freeze defines every inner variable explicitly per size. `sm`
+uses `space-1` label top, caption line height, `space-3` content top and no
+content bottom inset. `md` uses `space-1`, caption line height, `space-4` and
+no bottom inset. `lg` uses `space-1`, caption line height, `space-4` and a
+`space-1` bottom inset. Consumers center content only inside this resulting
+lower zone; they do not introduce their own vertical offsets.
+
+MultiSelect freezes inner selected presentation by requested size: `sm` and
+`md` use a textual localized summary, while `lg` uses a single row of chips
+plus `+N` overflow. Available width may change only the visible chip count in
+`lg`, never the presentation policy. Outer-label MultiSelect continues to use
+the normal chip/overflow presentation.
+
 `onFocusRequest` is invoked only by non-interactive start/end adornment columns.
 Their visual gap is internal logical padding, so the root needs no click
 delegation. Native controls own the inner-label hit area because the positioned

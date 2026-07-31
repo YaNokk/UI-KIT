@@ -117,7 +117,7 @@
 
 .inner.floated .innerLabel,
 .inner:focus-within .innerLabel {
-  block-size: var(--ds-line-height-caption);
+  block-size: var(--field-inner-label-line-height);
   inset-block-start: var(--field-inner-label-top);
   font: var(--ds-typography-caption);
   line-height: var(--field-inner-label-line-height);
@@ -173,13 +173,21 @@
   --field-gap: var(--ds-space-1);
   --field-icon-size: var(--ds-size-icon-sm);
   --field-padding-inline: var(--ds-space-2);
+  --field-inner-content-bottom: var(--ds-space-0);
   --field-inner-content-top: var(--ds-space-3);
+  --field-inner-label-line-height: var(--ds-line-height-caption);
+  --field-inner-label-top: var(--ds-space-1);
 
   height: var(--ds-size-control-sm);
   font: var(--ds-typography-body-sm);
 }
 
 .md {
+  --field-inner-content-bottom: var(--ds-space-0);
+  --field-inner-content-top: var(--ds-space-4);
+  --field-inner-label-line-height: var(--ds-line-height-caption);
+  --field-inner-label-top: var(--ds-space-1);
+
   height: var(--ds-size-control-md);
   font: var(--ds-typography-body);
 }
@@ -188,6 +196,9 @@
   --field-icon-size: var(--ds-size-icon-lg);
   --field-padding-inline: var(--ds-space-4);
   --field-inner-content-bottom: var(--ds-space-1);
+  --field-inner-content-top: var(--ds-space-4);
+  --field-inner-label-line-height: var(--ds-line-height-caption);
+  --field-inner-label-top: var(--ds-space-1);
 
   height: var(--ds-size-control-lg);
   font: var(--ds-typography-body-lg);

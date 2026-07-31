@@ -28,3 +28,48 @@
   color: var(--ds-text-secondary);
   font: var(--ds-typography-body-sm);
 }
+
+.matrixScroller {
+  overflow-x: auto;
+}
+
+.matrix {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.75fr) repeat(3, minmax(240px, 1fr));
+  gap: var(--ds-space-3);
+  min-inline-size: 920px;
+}
+
+.matrixHeader,
+.matrixLabel {
+  align-self: center;
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-body-sm);
+}
+
+.matrixHeader {
+  font-weight: var(--ds-font-weight-medium);
+}
+
+.viewport390,
+.viewport768,
+.viewport1440 {
+  box-sizing: border-box;
+  overflow: auto;
+  padding: var(--ds-space-4);
+}
+
+.viewport390 {
+  inline-size: 390px;
+  block-size: 844px;
+}
+
+.viewport768 {
+  inline-size: 768px;
+  block-size: 1024px;
+}
+
+.viewport1440 {
+  inline-size: 1440px;
+  block-size: 900px;
+}

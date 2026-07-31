@@ -373,7 +373,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
     setVisibleCount((count) => Math.min(count, value.length));
   }, [value.length]);
 
-  const compactInnerSummary = labelView === "inner" && size === "sm";
+  const compactInnerSummary = labelView === "inner" && size !== "lg";
   const visibleTags = compactInnerSummary ? [] : value.slice(0, visibleCount);
   const overflowCount = value.length - visibleTags.length;
 
@@ -465,7 +465,17 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                 </span>
               ) : null}
             </button>
-            <span className={styles.tagViewport} ref={viewportRef}>
+            <span
+              className={styles.tagViewport}
+              data-field-selection-presentation={
+                value.length === 0
+                  ? "empty"
+                  : compactInnerSummary
+                    ? "summary"
+                    : "chips"
+              }
+              ref={viewportRef}
+            >
               {value.length === 0 ? (
                 <span
                   aria-hidden="true"

@@ -61,9 +61,11 @@ fills that box with `width/height: 100%`. Its own inline padding provides value
 alignment, so center, upper, lower and inline-edge content clicks use native
 pointer, caret, selection and mobile-keyboard behavior rather than `.focus()`.
 
-The FieldShell root has no focus-forwarding click handler. Outer/inner
-`<label htmlFor>` clicks and all content-area input interactions use native
-browser behavior. `onFocusRequest` remains only on decorative start/end
+The FieldShell root has no focus-forwarding click handler. Outer
+`<label htmlFor>` clicks use native association. The positioned inner label is
+pointer-transparent, so its physical area resolves to the underlying native or
+input-like control: Input focuses and Select/MultiSelect opens through their
+normal interaction. `onFocusRequest` remains only on decorative start/end
 adornment columns. Their visual gap is logical padding inside those columns,
 not a separate shell pointer boundary. Explicit `data-field-interactive`
 regions retain their own action/focus behavior.
@@ -74,23 +76,33 @@ uses the canonical disabled cursor. Password visibility keeps IconButton
 pointer/keyboard semantics. Cursor CSS communicates affordance but does not
 emulate focus.
 
-Outer heights remain 32/40/48. Inner `sm` uses the existing 40px control token
-because caption 11/16 plus bodySm 13/18 cannot fit accessibly in a 32px shell.
-Inner `md` and `lg` use the existing 48px control token: `md` is the primary
-floating-label calibration size, while `lg` preserves the larger value role.
-No new size token is introduced.
+Outer and inner fields both preserve the requested 32/40/48 height. Inner
+placement never promotes `sm` or `md` to a larger control token and introduces
+no new public size.
 
-The inner label is absolutely positioned over the full-size input instead of
-consuming a normal-flow row. Only floated value alignment changes through
-native input padding; its hit-area dimensions do not change. Input and
-PasswordInput share this exact content/native-control chain.
+The inner label is absolutely positioned instead of consuming a normal-flow
+row. FieldShell applies floated padding to its shared control region, producing
+an upper label band and a lower content band without shrinking the native hit
+area. Input, PasswordInput, NumberInput, AmountInput, Select and MultiSelect
+center their value only inside that lower region and do not own vertical
+offsets.
 
-FieldShell also owns the shared vertical variables for resting/floating label
-block-start and floated value block padding. The calibrated values are:
-resting label at 50%, floating label at `space-0`, value padding-block-start at
-`space-4`, and padding-block-end at `space-0`. The resulting approximate
-line-box gaps are 2px/5px/3px for inner `sm`/`md`/`lg`. Adornments and field
-states do not override these variables.
+The optical freeze declares every vertical variable per size. `sm` uses a
+`space-1` label top, caption line height, `space-3` content top and no bottom
+inset. `md` uses `space-1`, caption line height, `space-4` and no bottom inset.
+`lg` uses `space-1`, caption line height, `space-4` and `space-1` bottom inset.
+Resting labels remain at 50%. Adornments stay centered in the complete shell,
+and error, disabled, readOnly and loading states do not alter geometry.
+
+Placeholder suppression belongs to FieldShell for both native
+`::placeholder` and custom `[data-field-placeholder]` content. Resting empty
+inner fields hide it; focus/open reveals it; a value floats the label and keeps
+the value visible. Outer-label fields preserve normal placeholder behavior.
+
+MultiSelect has a deterministic inner presentation policy: `sm` and `md` use
+a localized textual selection summary, while `lg` uses one-row chips plus `+N`
+overflow. Width affects only the number of visible `lg` chips. Outer-label
+MultiSelect continues to use chips and overflow.
 
 Value, placeholder and positioned inner label resolve their inline start/end
 from the same internal geometry variables. The canonical inline padding is

@@ -75,6 +75,33 @@ describe("MultiSelect", () => {
     expect(trigger.parentElement).toHaveTextContent("Бета");
   });
 
+  it.each([
+    ["sm", "summary"],
+    ["md", "summary"],
+    ["lg", "chips"]
+  ] as const)(
+    "freezes inner %s selected presentation as %s",
+    (size, presentation) => {
+      const { container } = render(
+        <ControlledMulti
+          items={baseItems}
+          labelView="inner"
+          size={size}
+          value={["a", "b"]}
+        />
+      );
+      const viewport = container.querySelector(
+        `[data-field-selection-presentation="${presentation}"]`
+      );
+      expect(viewport).toBeInTheDocument();
+      expect(screen.queryAllByRole("button", { name: /Убрать/ })).toHaveLength(
+        presentation === "chips" ? 2 : 0
+      );
+      expect(screen.getByRole("button", { name: /Теги/ }))
+        .toHaveAccessibleDescription("Выбрано 2: Альфа, Бета");
+    }
+  );
+
   it("tag remove deletes value and does not open the select", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();

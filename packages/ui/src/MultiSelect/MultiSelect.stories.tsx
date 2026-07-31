@@ -165,6 +165,62 @@ export const SelectedLg: Story = {
   render: () => <MultiSelectHarness initialValue={["new", "priority"]} labelView="inner" size="lg" />
 };
 
+export const InnerSmSummary: Story = {
+  args: {} as never,
+  render: () => (
+    <div className={fixtureStyles.width320}>
+      <MultiSelectHarness
+        block
+        initialValue={["new", "priority", "delivery"]}
+        labelView="inner"
+        size="sm"
+      />
+    </div>
+  )
+};
+
+export const InnerMdSummary: Story = {
+  args: {} as never,
+  render: () => (
+    <div className={fixtureStyles.width320}>
+      <MultiSelectHarness
+        block
+        initialValue={["new", "priority", "delivery"]}
+        labelView="inner"
+        size="md"
+      />
+    </div>
+  )
+};
+
+export const InnerLgChips: Story = {
+  args: {} as never,
+  render: () => (
+    <div className={fixtureStyles.width320}>
+      <MultiSelectHarness
+        block
+        initialValue={["new", "priority", "delivery"]}
+        labelView="inner"
+        size="lg"
+      />
+    </div>
+  )
+};
+
+export const InnerLabelOverflow: Story = {
+  args: {} as never,
+  render: () => (
+    <div className={fixtureStyles.width180}>
+      <MultiSelectHarness
+        block
+        initialValue={["new", "priority", "delivery", "retail"]}
+        labelView="inner"
+        size="lg"
+      />
+    </div>
+  )
+};
+
 export const Overflow: Story = {
   args: {} as never,
   render: () => <div className={fixtureStyles.width180}><MultiSelectHarness block initialValue={["new", "priority", "delivery", "retail", "wholesale", "archived"]} /></div>
