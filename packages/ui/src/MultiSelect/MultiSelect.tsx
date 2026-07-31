@@ -22,7 +22,7 @@ import type { FieldLabelView, FieldSize } from "../shared/field";
 import { classNames } from "../shared/classNames";
 import {
   type SelectCollectionItem,
-  type SelectNavigableRow,
+  type SelectInteractiveRow,
   type SelectOption,
   normalizeSelectCollection
 } from "../internal/select/collection";
@@ -164,6 +164,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   const viewportRef = useRef<HTMLSpanElement | null>(null);
   const sizerRef = useRef<HTMLSpanElement | null>(null);
   const searchRef = useRef<HTMLInputElement | null>(null);
+  const firstEnabledActionRef = useRef<HTMLButtonElement | null>(null);
   const listboxRef = useRef<HTMLDivElement | null>(null);
 
   useImperativeHandle(ref, () => triggerRef.current as HTMLElement, []);
@@ -209,6 +210,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
     () => new Set(value),
     [value]
   );
+  const hasEnabledActions = state.collection.actionFocusItems.length > 0;
 
   const invalid = error != null;
   const compactInnerSummary = labelView === "inner" && size !== "lg";
@@ -228,9 +230,10 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   }, [search.resetQuery, setOpen]);
 
   const commit = useCallback(
-    (row: SelectNavigableRow<Value>) => {
+    (row: SelectInteractiveRow<Value>) => {
       if (row.disabled) return;
       if (row.type === "action") {
+        skipFocusRestoreRef.current = true;
         handleOpenChange(false);
         row.action.onSelect();
         return;
@@ -581,7 +584,6 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
         <input key={entry} name={name} type="hidden" value={entry} />
       )) : null}
       <SelectPanel
-        listboxId={listboxId}
         messages={messages}
         multiple
         onOpenChange={handleOpenChange}
@@ -590,7 +592,11 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
         focusTriggerRef={triggerRef}
         skipFocusRestoreRef={skipFocusRestoreRef}
         header={searchField}
-        initialFocusRef={searchable ? searchRef : listboxRef}
+        initialFocusRef={searchable
+          ? searchRef
+          : hasEnabledActions
+            ? firstEnabledActionRef
+            : listboxRef}
         interactive={interactive}
       >
         <SelectListboxView<Value>
@@ -598,11 +604,9 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
           listboxId={listboxId}
           messages={messages}
           multiple
+          firstEnabledActionRef={firstEnabledActionRef}
           onHoverRow={(row) => state.setActiveRow(row)}
-          onKeyDown={(event) => {
-            if (event.key === "Tab") skipFocusRestoreRef.current = true;
-            state.handleListKeyDown(event, commit);
-          }}
+          onKeyDown={(event) => state.handleListKeyDown(event, commit)}
           onPickRow={commit}
           onRetry={state.onRetry}
           rows={state.collection.rows}
@@ -618,7 +622,6 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                 : state.statusMessage
           }
           autoFocus={false}
-          tabbable={searchable}
           ref={listboxRef}
         />
       </SelectPanel>

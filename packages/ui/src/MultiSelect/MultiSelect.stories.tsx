@@ -431,3 +431,48 @@ export const DesignerReference: Story = {
   args: {} as never,
   render: () => <MultiSelectHarness initialValue={["new", "priority"]} />
 };
+
+const actionTagItems: SelectCollectionItem[] = [
+  {
+    type: "action",
+    id: "create-tag",
+    label: "Создать тег",
+    textValue: "Создать тег",
+    onSelect: () => undefined
+  },
+  ...tagItems
+];
+
+export const ActionKeyboardNonSearchable: Story = {
+  args: {} as never,
+  render: () => <MultiSelectHarness items={actionTagItems} />
+};
+
+export const ActionKeyboardSearchable: Story = {
+  args: {} as never,
+  render: () => <MultiSelectHarness items={actionTagItems} searchable />
+};
+
+export const InternalTabOrder: Story = {
+  args: {} as never,
+  render: () => <MultiSelectHarness items={actionTagItems} searchable />
+};
+
+export const GroupedLargeNoVirtualization: Story = {
+  args: {} as never,
+  render: () => (
+    <MultiSelectHarness
+      items={Array.from({ length: 6 }, (_, groupIndex) => ({
+        type: "group" as const,
+        id: `large-group-${groupIndex}`,
+        label: `Группа ${groupIndex + 1}`,
+        items: Array.from({ length: 100 }, (_, optionIndex) => ({
+          value: `group-${groupIndex}-option-${optionIndex}`,
+          label: `Вариант ${groupIndex + 1}.${optionIndex + 1}`,
+          textValue: `Вариант ${groupIndex + 1}.${optionIndex + 1}`
+        }))
+      }))}
+      open
+    />
+  )
+};

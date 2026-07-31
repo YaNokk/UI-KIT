@@ -12,7 +12,8 @@ import {
   normalizeSelectCollection,
   type SelectCollection,
   type SelectCollectionItem,
-  type SelectNavigableRow
+  type SelectInteractiveRow,
+  type SelectOptionRow
 } from "./collection";
 import { createTypeaheadMatcher } from "./typeahead";
 import type { SelectCollectionState } from "./types";
@@ -28,7 +29,7 @@ export type SelectResolvedStatus =
   | "error";
 
 export type SelectCommit<Value extends string> = (
-  row: SelectNavigableRow<Value>
+  row: SelectInteractiveRow<Value>
 ) => void;
 
 export interface UseSelectStateOptions<Value extends string> {
@@ -46,8 +47,8 @@ export interface SelectStateController<Value extends string> {
   onRetry: (() => void) | undefined;
   open: boolean;
   requestOpenChange: (open: boolean) => void;
-  activeRow: SelectNavigableRow<Value> | null;
-  setActiveRow: (row: SelectNavigableRow<Value> | null) => void;
+  activeRow: SelectOptionRow<Value> | null;
+  setActiveRow: (row: SelectOptionRow<Value> | null) => void;
   openWithSelection: (
     preferredValues: readonly Value[],
     fromEnd?: boolean
@@ -75,10 +76,7 @@ export function useSelectState<Value extends string>({
     () => normalizeSelectCollection(items),
     [items]
   );
-  const navigableOptions = useMemo(
-    () => collection.navigableRows.filter((row) => row.type === "option"),
-    [collection]
-  );
+  const optionNavigationRows = collection.optionNavigationRows;
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const typeaheadBuffer = useRef("");
   const typeaheadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -93,13 +91,13 @@ export function useSelectState<Value extends string>({
   const activeRow = useMemo(() => {
     if (activeRowId === null) return null;
     return (
-        navigableOptions.find((row) => row.rowId === activeRowId)
+        optionNavigationRows.find((row) => row.rowId === activeRowId)
         ?? null
     );
-  }, [navigableOptions, activeRowId]);
+  }, [optionNavigationRows, activeRowId]);
 
   const setActiveRow = useCallback(
-    (row: SelectNavigableRow<Value> | null) => {
+    (row: SelectOptionRow<Value> | null) => {
       setActiveRowId(row?.rowId ?? null);
     },
     []
@@ -113,31 +111,31 @@ export function useSelectState<Value extends string>({
   );
 
   const findInitialActiveRow = useCallback(
-    (preferredValues: readonly Value[]): SelectNavigableRow<Value> | null => {
+    (preferredValues: readonly Value[]): SelectOptionRow<Value> | null => {
       for (const value of preferredValues) {
         const row = collection.optionRowByValue.get(value);
         if (row && !row.disabled) return row;
       }
       return (
-        navigableOptions[0] ?? null
+        optionNavigationRows[0] ?? null
       );
-    }, [collection, navigableOptions]
+    }, [collection, optionNavigationRows]
   );
 
   const openWithSelection = useCallback(
     (preferredValues: readonly Value[], fromEnd = false) => {
       const initial = fromEnd
-        ? (navigableOptions.at(-1) ?? null)
+        ? (optionNavigationRows.at(-1) ?? null)
         : findInitialActiveRow(preferredValues);
       setActiveRowId(initial?.rowId ?? null);
       if (!open) requestOpenChange(true);
     },
-    [findInitialActiveRow, navigableOptions, open, requestOpenChange]
+    [findInitialActiveRow, optionNavigationRows, open, requestOpenChange]
   );
 
   const moveActive = useCallback(
     (direction: 1 | -1 | "first" | "last") => {
-      const rows = navigableOptions;
+      const rows = optionNavigationRows;
       if (rows.length === 0) return;
       let nextIndex: number;
       const currentIndex = activeRow
@@ -154,7 +152,7 @@ export function useSelectState<Value extends string>({
       }
       setActiveRowId(rows[nextIndex]?.rowId ?? null);
     },
-    [activeRow, navigableOptions]
+    [activeRow, optionNavigationRows]
   );
 
   const clearTypeahead = useCallback(() => {
@@ -169,22 +167,22 @@ export function useSelectState<Value extends string>({
 
   useEffect(() => {
     if (open && activeRowId === null) {
-      setActiveRowId(navigableOptions[0]?.rowId ?? null);
+      setActiveRowId(optionNavigationRows[0]?.rowId ?? null);
     }
-  }, [activeRowId, navigableOptions, open]);
+  }, [activeRowId, optionNavigationRows, open]);
 
   // Deterministic active-row reconciliation when the collection refreshes:
   // preserve identity if still enabled, otherwise move to the first option.
   useEffect(() => {
     if (activeRowId === null) return;
-    const stillExists = navigableOptions.some(
+    const stillExists = optionNavigationRows.some(
       (row) => row.rowId === activeRowId
     );
     if (stillExists) return;
     setActiveRowId(
-      navigableOptions[0]?.rowId ?? null
+      optionNavigationRows[0]?.rowId ?? null
     );
-  }, [navigableOptions, activeRowId]);
+  }, [optionNavigationRows, activeRowId]);
 
   const handleTypeaheadChar = useCallback(
     (char: string) => {
@@ -232,9 +230,6 @@ export function useSelectState<Value extends string>({
           event.preventDefault();
           if (activeRow) commit(activeRow);
           return;
-        case "Tab":
-          requestOpenChange(false);
-          return;
         default:
           if (
             event.key.length === 1
@@ -247,7 +242,7 @@ export function useSelectState<Value extends string>({
           }
       }
     },
-    [activeRow, handleTypeaheadChar, moveActive, requestOpenChange]
+    [activeRow, handleTypeaheadChar, moveActive]
   );
 
   const handleTriggerKeyDown = useCallback(

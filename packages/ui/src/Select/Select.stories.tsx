@@ -425,3 +425,54 @@ export const DesignerReference: Story = {
   args: {} as never,
   render: () => <SelectHarness />
 };
+
+export const ActionKeyboardNonSearchable: Story = {
+  args: {} as never,
+  render: () => <SelectHarness />
+};
+
+export const ActionKeyboardSearchable: Story = {
+  args: {} as never,
+  render: () => <SelectHarness searchable />
+};
+
+export const ActionDisabled: Story = {
+  args: {} as never,
+  render: () => (
+    <SelectHarness items={[
+      {
+        type: "action",
+        id: "disabled-create",
+        label: "Создание недоступно",
+        textValue: "Создание недоступно",
+        disabled: true,
+        onSelect: () => undefined
+      },
+      { value: "ivan", label: "Иван Иванов", textValue: "Иван Иванов" }
+    ]} />
+  )
+};
+
+export const InternalTabOrder: Story = {
+  args: {} as never,
+  render: () => <SelectHarness searchable />
+};
+
+export const GroupedLargeNoVirtualization: Story = {
+  args: {} as never,
+  render: () => (
+    <SelectHarness
+      items={Array.from({ length: 6 }, (_, groupIndex) => ({
+        type: "group" as const,
+        id: `large-group-${groupIndex}`,
+        label: `Группа ${groupIndex + 1}`,
+        items: Array.from({ length: 100 }, (_, optionIndex) => ({
+          value: `group-${groupIndex}-option-${optionIndex}`,
+          label: `Вариант ${groupIndex + 1}.${optionIndex + 1}`,
+          textValue: `Вариант ${groupIndex + 1}.${optionIndex + 1}`
+        }))
+      }))}
+      open
+    />
+  )
+};

@@ -31,6 +31,20 @@ const virtualItems: SelectCollectionItem[] = Array.from(
   })
 );
 
+const groupedLargeItems: SelectCollectionItem[] = Array.from(
+  { length: 6 },
+  (_, groupIndex) => ({
+    type: "group",
+    id: `browser-group-${groupIndex}`,
+    label: `Группа ${groupIndex + 1}`,
+    items: Array.from({ length: 100 }, (_, optionIndex) => ({
+      value: `browser-${groupIndex}-${optionIndex}`,
+      label: `Вариант ${groupIndex + 1}.${optionIndex + 1}`,
+      textValue: `Вариант ${groupIndex + 1}.${optionIndex + 1}`
+    }))
+  })
+);
+
 function SelectFixture({ searchable = false }: { searchable?: boolean }) {
   const [value, setValue] = useState<string | null>(null);
   return (
@@ -168,6 +182,108 @@ function ActionToDialogFixture() {
   );
 }
 
+function SelectActionFocusFixture({
+  allActionsDisabled = false,
+  searchable
+}: {
+  allActionsDisabled?: boolean;
+  searchable: boolean;
+}) {
+  const [value, setValue] = useState<string | null>("alpha");
+  const [calls, setCalls] = useState(0);
+  const items: SelectCollectionItem[] = [
+    {
+      type: "action",
+      id: "disabled-create",
+      label: "Недоступное действие",
+      textValue: "Недоступное действие",
+      disabled: true,
+      onSelect: () => setCalls((count) => count + 100)
+    },
+    ...(!allActionsDisabled ? [{
+      type: "action",
+      id: "create",
+      label: "Создать клиента",
+      textValue: "Создать клиента",
+      onSelect: () => setCalls((count) => count + 1)
+    } satisfies SelectCollectionItem] : []),
+    ...baseItems
+  ];
+  return (
+    <>
+      <Select
+        items={items}
+        label="Action focus Select"
+        locale="ru-RU"
+        onChange={setValue}
+        searchable={searchable}
+        value={value}
+      />
+      <output aria-label="Select action calls">{calls}</output>
+      <output aria-label="Select value">{value}</output>
+    </>
+  );
+}
+
+function MultiActionFocusFixture({ searchable }: { searchable: boolean }) {
+  const [value, setValue] = useState<string[]>(["alpha"]);
+  const [calls, setCalls] = useState(0);
+  const items: SelectCollectionItem[] = [
+    {
+      type: "action",
+      id: "disabled-create",
+      label: "Недоступное действие",
+      textValue: "Недоступное действие",
+      disabled: true,
+      onSelect: () => setCalls((count) => count + 100)
+    },
+    {
+      type: "action",
+      id: "create",
+      label: "Создать тег",
+      textValue: "Создать тег",
+      onSelect: () => setCalls((count) => count + 1)
+    },
+    ...baseItems
+  ];
+  return (
+    <>
+      <MultiSelect
+        items={items}
+        label="Action focus MultiSelect"
+        locale="ru-RU"
+        onChange={setValue}
+        searchable={searchable}
+        value={value}
+      />
+      <output aria-label="MultiSelect action calls">{calls}</output>
+      <output aria-label="MultiSelect value">{value.join(",")}</output>
+    </>
+  );
+}
+
+function GroupedLargeFixture({ multiple }: { multiple: boolean }) {
+  const [selectValue, setSelectValue] = useState<string | null>(null);
+  const [multiValue, setMultiValue] = useState<string[]>([]);
+  return multiple ? (
+    <MultiSelect
+      items={groupedLargeItems}
+      label="Grouped MultiSelect"
+      locale="ru-RU"
+      onChange={setMultiValue}
+      value={multiValue}
+    />
+  ) : (
+    <Select
+      items={groupedLargeItems}
+      label="Grouped Select"
+      locale="ru-RU"
+      onChange={setSelectValue}
+      value={selectValue}
+    />
+  );
+}
+
 const meta = {
   title: "Fields/SelectMultiSelectBrowserRegression",
   component: Select,
@@ -216,7 +332,7 @@ export const MobileSelectSearchFocus: Story = {
     await userEvent.click(trigger);
 
     const search = await body.findByRole("textbox", { name: "Поиск по вариантам" });
-    await expect(search).toHaveFocus();
+    await waitFor(() => expect(search).toHaveFocus());
     const sheet = document.querySelector<HTMLElement>(
       "[data-modal-kind=\"bottom-sheet\"]"
     );
@@ -321,7 +437,7 @@ export const VirtualizedMountedActiveDescendant: Story = {
     const search = await body.findByRole("textbox", { name: "Поиск по вариантам" });
     await userEvent.type(search, "{ArrowDown}");
     const listbox = body.getByRole("listbox");
-    await expect(listbox).toHaveFocus();
+    await waitFor(() => expect(listbox).toHaveFocus());
     await userEvent.keyboard("{End}");
     await waitFor(() => {
       const activeId = listbox.getAttribute("aria-activedescendant");
@@ -358,5 +474,167 @@ export const HoistedActionToDialog: Story = {
       .toBeInTheDocument();
     await expect(canvasElement.querySelector("output")).toHaveTextContent("1");
     await expect(trigger).toHaveTextContent("Альфа");
+  }
+};
+
+export const PopoverSelectInternalFocus: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <SelectActionFocusFixture searchable />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Action focus Select" }));
+    const search = await body.findByRole("textbox", { name: "Поиск по вариантам" });
+    const action = body.getByRole("button", { name: "Создать клиента" });
+    const disabledAction = body.getByRole("button", { name: "Недоступное действие" });
+    const listbox = body.getByRole("listbox");
+    await waitFor(() => expect(search).toHaveFocus());
+    await expect(disabledAction).toBeDisabled();
+    await userEvent.tab();
+    await expect(action).toHaveFocus();
+    await expect(listbox).toBeInTheDocument();
+    await userEvent.tab();
+    await expect(listbox).toHaveFocus();
+    await userEvent.tab({ shift: true });
+    await expect(action).toHaveFocus();
+    await userEvent.tab({ shift: true });
+    await expect(search).toHaveFocus();
+    await userEvent.tab();
+    await expect(action).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(canvas.getByLabelText("Select action calls")).toHaveTextContent("1");
+    await expect(canvas.getByLabelText("Select value")).toHaveTextContent("alpha");
+  }
+};
+
+export const SheetSelectActionKeyboard: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "mobile" } },
+  render: () => <SelectActionFocusFixture searchable={false} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Action focus Select" }));
+    const action = await body.findByRole("button", { name: "Создать клиента" });
+    await expect(action).toHaveFocus();
+    await expect(body.getByRole("button", { name: "Недоступное действие" }))
+      .toBeDisabled();
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(canvas.getByLabelText("Select action calls")).toHaveTextContent("1");
+    await expect(canvas.getByLabelText("Select value")).toHaveTextContent("alpha");
+  }
+};
+
+export const PopoverMultiSelectActionKeyboard: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "tablet" } },
+  render: () => <MultiActionFocusFixture searchable={false} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Action focus MultiSelect" }));
+    const action = await body.findByRole("button", { name: "Создать тег" });
+    await expect(action).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(canvas.getByLabelText("MultiSelect action calls")).toHaveTextContent("1");
+    await expect(canvas.getByLabelText("MultiSelect value")).toHaveTextContent("alpha");
+  }
+};
+
+export const SheetMultiSelectInternalFocus: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "mobile" } },
+  render: () => <MultiActionFocusFixture searchable />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Action focus MultiSelect" }));
+    const search = await body.findByRole("textbox", { name: "Поиск по вариантам" });
+    const action = body.getByRole("button", { name: "Создать тег" });
+    const listbox = body.getByRole("listbox");
+    await expect(search).toHaveFocus();
+    await userEvent.tab();
+    await expect(action).toHaveFocus();
+    await userEvent.tab();
+    await expect(listbox).toHaveFocus();
+    await userEvent.tab({ shift: true });
+    await expect(action).toHaveFocus();
+    await userEvent.tab({ shift: true });
+    await expect(search).toHaveFocus();
+    await expect(listbox).toBeInTheDocument();
+  }
+};
+
+export const GroupedLargeSelectSemantics: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <GroupedLargeFixture multiple={false} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Grouped Select" }));
+    const listbox = await body.findByRole("listbox");
+    await expect(listbox).not.toHaveAttribute("data-select-virtualized");
+    await expect(within(listbox).getAllByRole("group")).toHaveLength(6);
+    await expect(listbox.querySelectorAll("[data-select-scroll-owner]")).toHaveLength(0);
+    await expect(listbox).toHaveAttribute("data-select-scroll-owner", "listbox");
+  }
+};
+
+export const GroupedLargeMultiSelectSemantics: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "tablet" } },
+  render: () => <GroupedLargeFixture multiple />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Grouped MultiSelect" }));
+    const listbox = await body.findByRole("listbox");
+    await expect(listbox).not.toHaveAttribute("data-select-virtualized");
+    await expect(within(listbox).getAllByRole("group")).toHaveLength(6);
+    await expect(listbox).toHaveAttribute("data-select-scroll-owner", "listbox");
+  }
+};
+
+export const PopoverClosesOnActualFocusExit: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <SelectFixture searchable />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Клиент" }));
+    const search = await body.findByRole("textbox", { name: "Поиск по вариантам" });
+    const listbox = body.getByRole("listbox");
+    await waitFor(() => expect(search).toHaveFocus());
+    await userEvent.tab();
+    await expect(listbox).toHaveFocus();
+    await expect(listbox).toBeInTheDocument();
+    await userEvent.tab();
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+  }
+};
+
+export const AllDisabledActionsInitialListboxFocus: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "tablet" } },
+  render: () => <SelectActionFocusFixture allActionsDisabled searchable={false} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Action focus Select" }));
+    const disabledAction = await body.findByRole("button", {
+      name: "Недоступное действие"
+    });
+    const listbox = body.getByRole("listbox");
+    await expect(disabledAction).toBeDisabled();
+    await waitFor(() => expect(listbox).toHaveFocus());
+    await userEvent.click(disabledAction);
+    await expect(canvas.getByLabelText("Select action calls")).toHaveTextContent("0");
+    await expect(listbox).toBeInTheDocument();
   }
 };

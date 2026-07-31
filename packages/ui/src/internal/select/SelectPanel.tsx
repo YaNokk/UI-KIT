@@ -3,6 +3,7 @@ import {
   useRef,
   type ReactElement,
   type ReactNode,
+  type FocusEvent,
   type MutableRefObject,
   type RefObject
 } from "react";
@@ -30,7 +31,6 @@ export interface SelectPanelProps {
   header?: ReactNode;
   initialFocusRef?: RefObject<HTMLElement | null> | undefined;
   interactive?: boolean | undefined;
-  listboxId: string;
   messages: SelectMessages;
   multiple: boolean;
   panelClassName?: string | undefined;
@@ -54,6 +54,7 @@ export function SelectPanel({
   const presentation = useSelectPresentation();
   const previousPresentation = useRef(presentation);
   const previousOpen = useRef(open);
+  const popoverFocusOutReady = useRef(false);
 
   useEffect(() => {
     if (previousOpen.current && !open) {
@@ -75,9 +76,20 @@ export function SelectPanel({
   }, [presentation, open, onOpenChange]);
 
   useEffect(() => {
-    if (presentation !== "popover" || !open || !initialFocusRef) return;
-    const frame = requestAnimationFrame(() => initialFocusRef.current?.focus());
-    return () => cancelAnimationFrame(frame);
+    popoverFocusOutReady.current = false;
+    if (presentation !== "popover" || !open) return;
+    let readyFrame = 0;
+    const focusFrame = requestAnimationFrame(() => {
+      initialFocusRef?.current?.focus();
+      readyFrame = requestAnimationFrame(() => {
+        popoverFocusOutReady.current = true;
+      });
+    });
+    return () => {
+      cancelAnimationFrame(focusFrame);
+      cancelAnimationFrame(readyFrame);
+      popoverFocusOutReady.current = false;
+    };
   }, [initialFocusRef, open, presentation]);
 
   const floating = useFloatingOverlay({
@@ -106,6 +118,16 @@ export function SelectPanel({
       : {}
   );
 
+  const handlePopoverFocusOut = (event: FocusEvent<HTMLDivElement>) => {
+    if (!popoverFocusOutReady.current) return;
+    const nextTarget = event.relatedTarget;
+    if (nextTarget instanceof Node && event.currentTarget.contains(nextTarget)) {
+      return;
+    }
+    if (skipFocusRestoreRef) skipFocusRestoreRef.current = true;
+    onOpenChange(false);
+  };
+
   return (
     <>
       {renderedTrigger}
@@ -113,7 +135,7 @@ export function SelectPanel({
         <Portal>
           <FloatingLayerContext.Provider value={floating.childLayer}>
             <div
-              {...floating.getFloatingProps()}
+              {...floating.getFloatingProps({ onBlur: handlePopoverFocusOut })}
               className={classNames(styles.popoverSurface, panelClassName)}
               data-floating-overlay=""
               data-select-surface=""

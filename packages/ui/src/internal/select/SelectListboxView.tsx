@@ -6,14 +6,17 @@ import {
   useRef,
   useState,
   type KeyboardEventHandler,
-  type ReactNode
+  type ReactNode,
+  type RefObject
 } from "react";
 import { VList, type VListHandle } from "virtua";
 import { Button } from "../../Button/Button";
 import { Spinner } from "../../Spinner/Spinner";
 import { classNames } from "../../shared/classNames";
 import type {
-  SelectNavigableRow,
+  SelectActionRow,
+  SelectInteractiveRow,
+  SelectOptionRow,
   SelectRow
 } from "./collection";
 import type { SelectResolvedStatus } from "./useSelectState";
@@ -33,10 +36,10 @@ export interface SelectListboxViewProps<Value extends string> {
   messages: SelectMessages;
   listboxId: string;
   onKeyDown: KeyboardEventHandler<HTMLDivElement>;
-  onHoverRow: (row: SelectNavigableRow<Value>) => void;
-  onPickRow: (row: SelectNavigableRow<Value>) => void;
+  onHoverRow: (row: SelectOptionRow<Value>) => void;
+  onPickRow: (row: SelectInteractiveRow<Value>) => void;
+  firstEnabledActionRef?: RefObject<HTMLButtonElement | null>;
   autoFocus?: boolean;
-  tabbable?: boolean;
 }
 
 interface RowContentSlots {
@@ -81,17 +84,18 @@ function SelectListboxViewInner<Value extends string>(
     onKeyDown,
     onHoverRow,
     onPickRow,
-    autoFocus = true,
-    tabbable = false
+    firstEnabledActionRef,
+    autoFocus = true
   }: SelectListboxViewProps<Value>,
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
   const virtualRef = useRef<VListHandle>(null);
   const listboxRef = useRef<HTMLDivElement>(null);
   const actionRows = useMemo(
-    () => rows.filter((row): row is SelectNavigableRow<Value> & { type: "action" } => row.type === "action"),
+    () => rows.filter((row): row is SelectActionRow => row.type === "action"),
     [rows]
   );
+  const firstEnabledActionId = actionRows.find((row) => !row.disabled)?.rowId;
   const optionRows = useMemo(
     () => rows.filter((row) => row.type !== "action"),
     [rows]
@@ -104,6 +108,7 @@ function SelectListboxViewInner<Value extends string>(
   }, [optionRows, activeRowId]);
   const virtualized =
     optionRows.length > VIRTUALIZATION_THRESHOLD
+    && !optionRows.some((row) => row.type === "group-header")
     && typeof ResizeObserver === "function"
     && typeof ResizeObserver.prototype?.observe === "function";
   const [mountedActiveId, setMountedActiveId] = useState<string | null>(null);
@@ -153,7 +158,7 @@ function SelectListboxViewInner<Value extends string>(
     if (autoFocus) listboxRef.current?.focus();
   }, [autoFocus]);
 
-  const renderNavigableRow = (row: SelectNavigableRow<Value>) => {
+  const renderInteractiveRow = (row: SelectInteractiveRow<Value>) => {
     const active = row.rowId === activeRowId;
     if (row.type === "action") {
       return (
@@ -167,12 +172,12 @@ function SelectListboxViewInner<Value extends string>(
           disabled={row.disabled}
           id={listboxId + "-" + row.rowId}
           key={row.rowId}
-          onMouseEnter={() => {
-            if (!row.disabled) onHoverRow(row);
-          }}
           onClick={() => {
             if (!row.disabled) onPickRow(row);
           }}
+          ref={row.rowId === firstEnabledActionId
+            ? firstEnabledActionRef
+            : undefined}
           type="button"
         >
           <RowContent
@@ -254,7 +259,7 @@ function SelectListboxViewInner<Value extends string>(
         </div>
       );
     }
-    return renderNavigableRow(row);
+    return renderInteractiveRow(row);
   };
 
   const statusRow = (() => {
@@ -326,14 +331,14 @@ function SelectListboxViewInner<Value extends string>(
       const row = optionRows[index];
       if (!row) continue;
       if (row.type !== "group-header") {
-        content.push(renderNavigableRow(row));
+        content.push(renderInteractiveRow(row));
         continue;
       }
       const children: ReactNode[] = [];
       let nextIndex = index + 1;
       let child = optionRows[nextIndex];
       while (child?.type === "option" && child.groupId === row.groupId) {
-        children.push(renderNavigableRow(child));
+        children.push(renderInteractiveRow(child));
         nextIndex += 1;
         child = optionRows[nextIndex];
       }
@@ -361,7 +366,7 @@ function SelectListboxViewInner<Value extends string>(
     <div className={styles.root} data-select-list-root="">
       {actionRows.length > 0 ? (
         <div className={styles.actions}>
-          {actionRows.map(renderNavigableRow)}
+          {actionRows.map(renderInteractiveRow)}
         </div>
       ) : null}
       {status === "refreshing" ? statusRow : null}
@@ -380,7 +385,7 @@ function SelectListboxViewInner<Value extends string>(
         onKeyDown={onKeyDown}
         ref={setListboxNode}
         role="listbox"
-        tabIndex={tabbable ? 0 : -1}
+        tabIndex={0}
       >
         {optionContent}
       </div>

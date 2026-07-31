@@ -70,7 +70,8 @@ Cache никогда не перетирается текущей страниц
 - DEV-валидация предупреждает о дубликатах value/id, пустых
   `textValue`, вложенных группах (вложенность игнорируется flatten);
 - навигация работает по коллекции, а не по смонтированному DOM:
-  `navigableRows` содержит только enabled Option и enabled Action.
+  `optionNavigationRows` содержит только enabled Option, а
+  `actionFocusItems` отдельно описывает enabled Action для нативного Tab-order.
 
 ## Selection semantics
 
@@ -101,8 +102,8 @@ selection не меняется, presentation закрывается; дальн
 
 - Закрытый trigger: Enter/Space/ArrowDown открывают; ArrowUp открывает и
   активирует последний navigable row.
-- Открытый список: ArrowDown/ArrowUp/Home/End/Enter/Space, Escape
-  закрывает, Tab закрывает и уходит по tab-order.
+- Открытый listbox: ArrowDown/ArrowUp/Home/End/Enter/Space; Escape закрывает.
+  Tab не перехватывается listbox и остаётся обычной focus-навигацией.
 - Начальный active: выбранный enabled option, иначе первый enabled
   option; ведущий Action автоматически не подсвечивается, пока есть
   обычный option.
@@ -110,8 +111,9 @@ selection не меняется, presentation закрывается; дальн
 - Typeahead: не редактируемый, по обязательному `textValue`,
   case-insensitive, locale-aware (`localeCompare` sensitivity base),
   буфер сбрасывается по приватному таймауту, wrap-around включён;
-  actions участвуют по `textValue`. Публичного search/query API в v1
-  нет — это зона будущего Autocomplete.
+  Action не участвуют в listbox typeahead и активируются собственным native
+  button. Публичного search/query API в v1 нет — это зона будущего
+  Autocomplete.
 
 ## Data state model
 
@@ -169,8 +171,12 @@ host без собственного overflow, поэтому там также 
   напрямую.
 - Navigation/selection ссылаются на identity rows; active row
   прокручивается в видимую область через `VListHandle.scrollToIndex`.
-- Поддерживаются variable-height rich rows, group headers, action rows,
-  disabled rows.
+- Flat large collections поддерживают variable-height rich rows и disabled
+  rows. Action всегда вынесены из виртуализируемой области.
+- Если коллекция содержит Group, v1 намеренно отключает виртуализацию и
+  использует обычный semantic `role="group"` rendering. Это сохраняет a11y
+  ценой рендера всей большой grouped-коллекции; отдельный spike для accessible
+  grouped virtualization не блокирует v1.
 - a11y: после открытия focus переходит на listbox; его
   `aria-activedescendant` указывает только на смонтированный active Option.
   Для Action этот атрибут отсутствует, потому что Action не option;
@@ -205,14 +211,20 @@ host без собственного overflow, поэтому там также 
 ## A11y model
 
 - list: один `role="listbox"`; multi: `aria-multiselectable="true"`.
-- option: `role="option"` + `aria-selected`; direct-rendered groups:
-  `role="group"` с `aria-labelledby` на heading. В virtualized mode headers
-  остаются contextual flattened rows: это versioned degradation, которую
-  повторно проверяем при обновлении `virtua`.
+- option: `role="option"` + `aria-selected`; groups всегда рендерятся через
+  `role="group"` с `aria-labelledby` на heading и в v1 не виртуализируются.
 - Action — отдельный sibling `role="button"`, а не интерактивный потомок
   listbox: это исключает запрещённое смешивание button внутри listbox.
   Он не входит в option keyboard order, не получает `aria-selected` и не
   является value. Tab перемещает focus между Search, Action и listbox.
+- Внутренний порядок focus regions: Search → enabled Action в declared order
+  → listbox → optional Done footer. Action hoist-ятся из произвольных позиций
+  входной коллекции в выделенный верхний region.
+- Initial focus: searchable → Search; non-searchable с enabled Action → первый
+  enabled Action; иначе → listbox. Disabled Action нативно пропускаются.
+- Non-modal Popover не создаёт focus trap: внутренние Tab/Shift+Tab сохраняют
+  панель открытой, а реальный focus-out из всей surface закрывает её без
+  принудительного возврата на trigger. BottomSheet сохраняет modal containment.
 - Все Action items hoist-ятся в фиксированный верхний Action region независимо
   от позиции во входном массиве. Disabled Action использует native
   `button[disabled]`. Commit сначала закрывает Select, затем ровно один раз
@@ -242,10 +254,10 @@ host без собственного overflow, поэтому там также 
   фильтрует их повторно и не зеркалит value в local state.
 - `value` без `onChange` выдаёт DEV warning и остаётся controlled read-only
   query, а не переключается в local mode.
-- При открытии focus получает Search через explicit `initialFocusRef` в
+- При открытии searchable focus получает Search через explicit `initialFocusRef` в
   BottomSheet и через SelectPanel focus lifecycle в Popover; `autoFocus` не
-  является механизмом контракта. В non-searchable mode explicit target —
-  listbox. ArrowDown переводит focus в listbox,
+  является механизмом контракта. В non-searchable mode target — первый enabled
+  Action, если он есть, иначе listbox. ArrowDown переводит focus в listbox,
   Enter выбирает active option, Escape закрывает presentation.
 - Query сбрасывается после single selection, после каждого multi toggle и при
   любом закрытии. В controlled mode сброс запрашивается через `onChange("")`.
@@ -272,6 +284,10 @@ viewport presets `390x844`, `768x1024`, `1440x900`. Gate покрывает boun
 Popover/BottomSheet, единственный scroll owner, explicit search focus и focus
 return, readOnly, controlled search, width/chip stability, 10k virtualization и
 mounted `aria-activedescendant`; тот же набор выполняется с forced-colors.
+Accessibility freeze также проверяет Search → Action → listbox и обратный
+Shift+Tab, disabled Action, Action → Dialog, фактический Popover focus-out,
+Popover/BottomSheet для Select и MultiSelect, а также отказ от virtualization
+для больших grouped collections с сохранением semantic groups.
 
 Public freeze сохраняет существующие `searchable`, `searchProps`,
 `collectionState`, `block`, `clearable`, `readOnly`, `selectedItem` /
@@ -279,3 +295,5 @@ Public freeze сохраняет существующие `searchable`, `searchP
 debounce/fetch, presentation/isMobile и Search override публично не добавлены.
 Матрица повторяется при bump `@floating-ui/react`, `virtua`, Modal/BottomSheet
 или Responsive Foundations.
+
+Select v1 — frozen. MultiSelect v1 — frozen.

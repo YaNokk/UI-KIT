@@ -39,7 +39,6 @@ export interface SelectOptionRow<Value extends string = string> {
   type: "option";
   rowId: string;
   rowIndex: number;
-  navigableIndex: number;
   groupId?: string;
   option: SelectOption<Value>;
   disabled: boolean;
@@ -49,7 +48,6 @@ export interface SelectActionRow {
   type: "action";
   rowId: string;
   rowIndex: number;
-  navigableIndex: number;
   action: SelectAction;
   disabled: boolean;
 }
@@ -58,7 +56,6 @@ export interface SelectGroupHeaderRow {
   type: "group-header";
   rowId: string;
   rowIndex: number;
-  navigableIndex: -1;
   groupId: string;
   label: ReactNode;
 }
@@ -68,13 +65,14 @@ export type SelectRow<Value extends string = string> =
   | SelectActionRow
   | SelectGroupHeaderRow;
 
-export type SelectNavigableRow<Value extends string = string> =
+export type SelectInteractiveRow<Value extends string = string> =
   | SelectOptionRow<Value>
   | SelectActionRow;
 
 export interface SelectCollection<Value extends string = string> {
   rows: SelectRow<Value>[];
-  navigableRows: SelectNavigableRow<Value>[];
+  optionNavigationRows: SelectOptionRow<Value>[];
+  actionFocusItems: SelectActionRow[];
   optionRowByValue: Map<Value, SelectOptionRow<Value>>;
   optionCount: number;
 }
@@ -100,16 +98,12 @@ export function normalizeSelectCollection<Value extends string>(
   items: readonly SelectCollectionItem<Value>[]
 ): SelectCollection<Value> {
   const rows: SelectRow<Value>[] = [];
-  const navigableRows: SelectNavigableRow<Value>[] = [];
+  const optionNavigationRows: SelectOptionRow<Value>[] = [];
+  const actionFocusItems: SelectActionRow[] = [];
   const optionRowByValue = new Map<Value, SelectOptionRow<Value>>();
   const seenOptionValues = new Set<Value>();
   const seenActionIds = new Set<string>();
   const seenGroupIds = new Set<string>();
-
-  const pushNavigable = <Row extends SelectNavigableRow<Value>>(row: Row) => {
-    rows.push(row);
-    if (!row.disabled) navigableRows.push(row);
-  };
 
   const pushOption = (
     option: SelectOption<Value>,
@@ -135,13 +129,13 @@ export function normalizeSelectCollection<Value extends string>(
       type: "option",
       rowId: "option:" + option.value,
       rowIndex: rows.length,
-      navigableIndex: navigableRows.length,
       ...(groupId !== undefined ? { groupId } : {}),
       option: { ...option, type: "option" },
       disabled: option.disabled === true
     };
     optionRowByValue.set(option.value, row);
-    pushNavigable(row);
+    rows.push(row);
+    if (!row.disabled) optionNavigationRows.push(row);
   };
 
   const pushAction = (action: SelectAction) => {
@@ -164,11 +158,11 @@ export function normalizeSelectCollection<Value extends string>(
       type: "action",
       rowId: "action:" + action.id,
       rowIndex: rows.length,
-      navigableIndex: navigableRows.length,
       action,
       disabled: action.disabled === true
     };
-    pushNavigable(row);
+    rows.push(row);
+    if (!row.disabled) actionFocusItems.push(row);
   };
 
   for (const item of items) {
@@ -188,7 +182,6 @@ export function normalizeSelectCollection<Value extends string>(
         type: "group-header",
         rowId: "group:" + item.id,
         rowIndex: rows.length,
-        navigableIndex: -1,
         groupId: item.id,
         label: item.label
       });
@@ -209,7 +202,8 @@ export function normalizeSelectCollection<Value extends string>(
 
   return {
     rows,
-    navigableRows,
+    optionNavigationRows,
+    actionFocusItems,
     optionRowByValue,
     optionCount: optionRowByValue.size
   };

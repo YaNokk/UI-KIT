@@ -21,7 +21,7 @@ import type { FieldLabelView, FieldSize } from "../shared/field";
 import { classNames } from "../shared/classNames";
 import {
   type SelectCollectionItem,
-  type SelectNavigableRow,
+  type SelectInteractiveRow,
   type SelectOption,
   normalizeSelectCollection
 } from "../internal/select/collection";
@@ -153,6 +153,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
   const skipFocusRestoreRef = useRef(false);
   const shellRef = useRef<HTMLDivElement | null>(null);
   const searchRef = useRef<HTMLInputElement | null>(null);
+  const firstEnabledActionRef = useRef<HTMLButtonElement | null>(null);
   const listboxRef = useRef<HTMLDivElement | null>(null);
 
   useImperativeHandle(ref, () => triggerRef.current as HTMLElement, []);
@@ -181,6 +182,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
     () => new Set<Value>(value === null ? [] : [value]),
     [value]
   );
+  const hasEnabledActions = state.collection.actionFocusItems.length > 0;
 
   const invalid = error != null;
   const showClear = clearable
@@ -197,9 +199,10 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
   }, [search.resetQuery, setOpen]);
 
   const commit = useCallback(
-    (row: SelectNavigableRow<Value>) => {
+    (row: SelectInteractiveRow<Value>) => {
       if (row.disabled) return;
       if (row.type === "action") {
+        skipFocusRestoreRef.current = true;
         handleOpenChange(false);
         row.action.onSelect();
         return;
@@ -361,7 +364,6 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
         <input name={name} type="hidden" value={value ?? ""} />
       ) : null}
       <SelectPanel
-        listboxId={listboxId}
         messages={messages}
         multiple={false}
         onOpenChange={handleOpenChange}
@@ -370,7 +372,11 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
         focusTriggerRef={triggerRef}
         skipFocusRestoreRef={skipFocusRestoreRef}
         header={searchField}
-        initialFocusRef={searchable ? searchRef : listboxRef}
+        initialFocusRef={searchable
+          ? searchRef
+          : hasEnabledActions
+            ? firstEnabledActionRef
+            : listboxRef}
         interactive={interactive}
       >
         <SelectListboxView<Value>
@@ -378,11 +384,9 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
           listboxId={listboxId}
           messages={messages}
           multiple={false}
+          firstEnabledActionRef={firstEnabledActionRef}
           onHoverRow={(row) => state.setActiveRow(row)}
-          onKeyDown={(event) => {
-            if (event.key === "Tab") skipFocusRestoreRef.current = true;
-            state.handleListKeyDown(event, commit);
-          }}
+          onKeyDown={(event) => state.handleListKeyDown(event, commit)}
           onPickRow={commit}
           onRetry={state.onRetry}
           rows={state.collection.rows}
@@ -398,7 +402,6 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
                 : state.statusMessage
           }
           autoFocus={false}
-          tabbable={searchable}
           ref={listboxRef}
         />
       </SelectPanel>

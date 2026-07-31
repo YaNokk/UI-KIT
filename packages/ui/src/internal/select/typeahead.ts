@@ -1,6 +1,6 @@
 import type {
   SelectCollection,
-  SelectNavigableRow
+  SelectOptionRow
 } from "./collection";
 
 export function createTypeaheadMatcher(locale: string) {
@@ -19,10 +19,8 @@ export function createTypeaheadMatcher(locale: string) {
     collection: SelectCollection<string>,
     query: string,
     afterRowId: string | null
-  ): SelectNavigableRow<string> | null {
-    const candidates = collection.navigableRows.filter(
-      (row) => row.type === "option"
-    );
+  ): SelectOptionRow<string> | null {
+    const candidates = collection.optionNavigationRows;
     const total = candidates.length;
     if (total === 0 || query.length === 0) return null;
 
@@ -36,7 +34,7 @@ export function createTypeaheadMatcher(locale: string) {
     for (let step = 0; step < total; step += 1) {
       const row = candidates[(start + step) % total];
       if (!row) continue;
-      const textValue = row.type === "option" ? row.option.textValue : "";
+      const textValue = row.option.textValue;
       if (startsWith(textValue, query)) return row;
     }
     return null;
