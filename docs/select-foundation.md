@@ -112,8 +112,12 @@ selection не меняется, presentation закрывается; дальн
   case-insensitive, locale-aware (`localeCompare` sensitivity base),
   буфер сбрасывается по приватному таймауту, wrap-around включён;
   Action не участвуют в listbox typeahead и активируются собственным native
-  button. Публичного search/query API в v1 нет — это зона будущего
-  Autocomplete.
+  button. Select и MultiSelect поддерживают optional Search внутри открытого
+  Popover/BottomSheet через `searchable` и `searchProps`; закрытый trigger
+  остаётся нередактируемым.
+- ArrowUp/ArrowDown/Home/End и typeahead принадлежат только option listbox.
+  Action не участвуют в arrow navigation: из сфокусированного Action переход
+  в listbox выполняется через Tab, а `ArrowDown → first option` не входит в v1.
 
 ## Data state model
 
@@ -246,6 +250,10 @@ host без собственного overflow, поэтому там также 
 
 - `searchable` добавляет Search внутри Popover и BottomSheet; закрытый trigger
   остаётся не редактируемым.
+- Searchable Select остаётся выбором известного Option: query живёт внутри
+  overlay и не является главным состоянием закрытого field. Будущий
+  Autocomplete/Combobox имеет editable trigger и primary query state; это
+  другая семантика компонента.
 - Uncontrolled query фильтрует только options по `Option.textValue`; пустые
   группы скрываются, Action остаётся видимым.
 - Без `searchProps.value` query хранится локально и фильтрует Option.textValue.
@@ -260,7 +268,9 @@ host без собственного overflow, поэтому там также 
   Action, если он есть, иначе listbox. ArrowDown переводит focus в listbox,
   Enter выбирает active option, Escape закрывает presentation.
 - Query сбрасывается после single selection, после каждого multi toggle и при
-  любом закрытии. В controlled mode сброс запрашивается через `onChange("")`.
+  любом закрытии presentation. Single selection закрывает presentation и
+  сбрасывает query; MultiSelect остаётся открытым и сбрасывает query после
+  toggle. В controlled mode каждый сброс запрашивается через `onChange("")`.
 - `No options` и `No results` — разные локализованные состояния.
 
 ## Form serialization
@@ -295,5 +305,18 @@ Public freeze сохраняет существующие `searchable`, `searchP
 debounce/fetch, presentation/isMobile и Search override публично не добавлены.
 Матрица повторяется при bump `@floating-ui/react`, `virtua`, Modal/BottomSheet
 или Responsive Foundations.
+
+## v1 frozen baseline
+
+- Select и MultiSelect поддерживают optional Search внутри overlay; закрытый
+  trigger остаётся нередактируемым.
+- Searchable Select не является Autocomplete/Combobox.
+- Action — отдельный native focus region; disabled Action исключён из Tab-order
+  и не вызывается.
+- Listbox arrow navigation и typeahead работают только по Option.
+- Flat large collection может использовать `virtua`; grouped collection
+  сохраняет regular semantic `role="group"` rendering без virtualization.
+- Action region отделён от options и никогда не виртуализируется вместе с ними.
+- Regular presentation использует Popover, compact — BottomSheet.
 
 Select v1 — frozen. MultiSelect v1 — frozen.

@@ -317,8 +317,8 @@ function SelectListboxViewInner<Value extends string>(
       return null;
     }
     if (virtualized) {
-      // VList owns the one scroll container. Group labels stay as flattened
-      // contextual rows here; direct rendering below keeps native ARIA groups.
+      // Only flat option collections reach this branch. Grouped collections
+      // use the regular role="group" rendering below.
       return (
       <VList data-select-scroll-owner="virtual" ref={virtualRef}>
           {optionRows.map(renderRow)}

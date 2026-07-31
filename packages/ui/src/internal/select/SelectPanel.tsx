@@ -16,6 +16,7 @@ import {
   useFloatingOverlay
 } from "../floating/useFloatingOverlay";
 import { renderFloatingTrigger } from "../floating/trigger";
+import { isFocusWithinElement } from "./focusContainment";
 import { useSelectPresentation } from "./useSelectPresentation";
 import type { SelectMessages } from "./types";
 import styles from "./SelectPanel.module.css";
@@ -120,10 +121,7 @@ export function SelectPanel({
 
   const handlePopoverFocusOut = (event: FocusEvent<HTMLDivElement>) => {
     if (!popoverFocusOutReady.current) return;
-    const nextTarget = event.relatedTarget;
-    if (nextTarget instanceof Node && event.currentTarget.contains(nextTarget)) {
-      return;
-    }
+    if (isFocusWithinElement(event.currentTarget, event.relatedTarget)) return;
     if (skipFocusRestoreRef) skipFocusRestoreRef.current = true;
     onOpenChange(false);
   };
