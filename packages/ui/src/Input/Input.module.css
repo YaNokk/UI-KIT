@@ -18,18 +18,9 @@
   outline: 0;
 }
 
-.input[data-label-view="inner"][data-label-floated] {
-  padding-block-end: var(--field-value-padding-block-end);
-  padding-block-start: var(--field-value-padding-block-start);
-}
-
 .input::placeholder {
   color: var(--ds-control-placeholder);
   opacity: 1;
-}
-
-.input[data-label-view="inner"]:not([data-label-floated])::placeholder {
-  color: transparent;
 }
 
 .input:disabled {

@@ -467,7 +467,11 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
             </button>
             <span className={styles.tagViewport} ref={viewportRef}>
               {value.length === 0 ? (
-                <span aria-hidden="true" className={styles.placeholder}>
+                <span
+                  aria-hidden="true"
+                  className={styles.placeholder}
+                  data-field-placeholder=""
+                >
                   {placeholder}
                 </span>
               ) : compactInnerSummary ? (

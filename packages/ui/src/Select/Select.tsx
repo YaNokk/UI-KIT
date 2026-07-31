@@ -332,6 +332,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
                 styles.valueText,
                 displayOption === null && styles.placeholder
               )}
+              data-field-placeholder={displayOption === null ? "" : undefined}
             >
               {displayOption === null ? placeholder : displayOption.label}
             </span>

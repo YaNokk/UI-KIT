@@ -4,10 +4,11 @@
   --field-padding-inline: var(--ds-space-3);
   --field-control-padding-inline-end: var(--field-padding-inline);
   --field-control-padding-inline-start: var(--field-padding-inline);
-  --field-label-floating-block-start: var(--ds-space-0);
+  --field-inner-content-bottom: var(--ds-space-0);
+  --field-inner-content-top: var(--ds-space-4);
+  --field-inner-label-line-height: var(--ds-line-height-caption);
+  --field-inner-label-top: var(--ds-space-1);
   --field-label-resting-block-start: 50%;
-  --field-value-padding-block-end: var(--ds-space-0);
-  --field-value-padding-block-start: var(--ds-space-4);
 
   box-sizing: border-box;
   display: flex;
@@ -70,6 +71,12 @@
   height: 100%;
 }
 
+.inner.floated .control,
+.inner:focus-within .control {
+  padding-block-end: var(--field-inner-content-bottom);
+  padding-block-start: var(--field-inner-content-top);
+}
+
 .innerLabel {
   display: none;
 }
@@ -92,6 +99,7 @@
   transform: translateY(-50%);
   transform-origin: top center;
   white-space: nowrap;
+  pointer-events: none;
   transition:
     color var(--ds-motion-fast),
     font var(--ds-motion-fast),
@@ -110,8 +118,9 @@
 .inner.floated .innerLabel,
 .inner:focus-within .innerLabel {
   block-size: var(--ds-line-height-caption);
-  inset-block-start: var(--field-label-floating-block-start);
+  inset-block-start: var(--field-inner-label-top);
   font: var(--ds-typography-caption);
+  line-height: var(--field-inner-label-line-height);
   transform: translateY(0);
 }
 
@@ -164,17 +173,10 @@
   --field-gap: var(--ds-space-1);
   --field-icon-size: var(--ds-size-icon-sm);
   --field-padding-inline: var(--ds-space-2);
+  --field-inner-content-top: var(--ds-space-3);
 
   height: var(--ds-size-control-sm);
   font: var(--ds-typography-body-sm);
-}
-
-.inner.sm {
-  height: var(--ds-size-control-md);
-}
-
-.inner.md {
-  height: var(--ds-size-control-lg);
 }
 
 .md {
@@ -185,9 +187,19 @@
 .lg {
   --field-icon-size: var(--ds-size-icon-lg);
   --field-padding-inline: var(--ds-space-4);
+  --field-inner-content-bottom: var(--ds-space-1);
 
   height: var(--ds-size-control-lg);
   font: var(--ds-typography-body-lg);
+}
+
+.inner:not(.floated):not(:focus-within)
+  [data-field-part="native-control"]::placeholder {
+  color: transparent;
+}
+
+.inner:not(.floated):not(:focus-within) [data-field-placeholder] {
+  visibility: hidden;
 }
 
 .disabled {
