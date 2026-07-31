@@ -169,6 +169,8 @@ collectionState?: {
 ## MultiSelect trigger tags
 
 - Одна визуальная строка, height bounded; теги не переносятся.
+- При `labelView="inner"` размеры `sm`/`md` показывают локализованный текстовый
+  summary и не запускают chip measurement/ResizeObserver; `lg` сохраняет chips.
 - Видимые теги вычисляются по доступной ширине (ResizeObserver),
   резервируется место под `+N`; при экстремально узкой ширине
   допускается только `+N`.

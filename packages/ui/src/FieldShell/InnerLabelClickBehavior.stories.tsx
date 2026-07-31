@@ -58,6 +58,7 @@ type Story = StoryObj<typeof meta>;
 
 export const PointerTransparentLabel: Story = {
   args: {} as never,
+  tags: ["test"],
   render: () => <ClickTargets />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

@@ -203,6 +203,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
 
   const invalid = error != null;
   const interactive = !disabled && !readOnly;
+  const compactInnerSummary = labelView === "inner" && size !== "lg";
   const showClear = clearable && !disabled && !required && value.length > 0;
   const loading = collectionState?.status === "loading";
   const refreshing = collectionState?.status === "refreshing";
@@ -319,6 +320,10 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   const [visibleCount, setVisibleCount] = useState(value.length);
 
   useLayoutEffect(() => {
+    if (compactInnerSummary) {
+      setVisibleCount(0);
+      return;
+    }
     const viewport = viewportRef.current;
     const sizer = sizerRef.current;
     if (!viewport || !sizer) return;
@@ -367,13 +372,12 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
     const observer = new ResizeObserver(measure);
     observer.observe(viewport);
     return () => observer.disconnect();
-  }, [displayByValue, value]);
+  }, [compactInnerSummary, displayByValue, value]);
 
   useEffect(() => {
     setVisibleCount((count) => Math.min(count, value.length));
   }, [value.length]);
 
-  const compactInnerSummary = labelView === "inner" && size !== "lg";
   const visibleTags = compactInnerSummary ? [] : value.slice(0, visibleCount);
   const overflowCount = value.length - visibleTags.length;
 
@@ -499,6 +503,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                           disabled && styles.disabledTag,
                           value.indexOf(entry) === activeTagIndex && styles.activeTag
                         )}
+                        data-field-chip=""
                         key={entry}
                       >
                         <span aria-hidden="true" className={styles.tagLabel}>
@@ -535,21 +540,23 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                 </>
               )}
             </span>
-            <span
-              aria-hidden="true"
-              className={styles.sizer}
-              ref={sizerRef}
-            >
-              <span className={classNames(styles.tag, styles.measureTag)} data-measure-tag="">
-                <span className={styles.tagLabel} data-measure-label="" />
-                {interactive ? (
-                  <span className={styles.tagRemove}>
-                    <X aria-hidden="true" />
-                  </span>
-                ) : null}
+            {compactInnerSummary ? null : (
+              <span
+                aria-hidden="true"
+                className={styles.sizer}
+                ref={sizerRef}
+              >
+                <span className={classNames(styles.tag, styles.measureTag)} data-measure-tag="">
+                  <span className={styles.tagLabel} data-measure-label="" />
+                  {interactive ? (
+                    <span className={styles.tagRemove}>
+                      <X aria-hidden="true" />
+                    </span>
+                  ) : null}
+                </span>
+                <span className={styles.overflow} data-measure-overflow="" />
               </span>
-              <span className={styles.overflow} data-measure-overflow="" />
-            </span>
+            )}
           </span>
         </FieldShell>
       )}

@@ -87,22 +87,32 @@ area. Input, PasswordInput, NumberInput, AmountInput, Select and MultiSelect
 center their value only inside that lower region and do not own vertical
 offsets.
 
-The optical freeze declares every vertical variable per size. `sm` uses a
-`space-1` label top, caption line height, `space-3` content top and no bottom
-inset. `md` uses `space-1`, caption line height, `space-4` and no bottom inset.
-`lg` uses `space-1`, caption line height, `space-4` and `space-1` bottom inset.
-Resting labels remain at 50%. Adornments stay centered in the complete shell,
-and error, disabled, readOnly and loading states do not alter geometry.
+The optical freeze derives the content start from the shared label top, compact
+caption line height and an explicit label/content gap. `md` and `lg` use a
+positive `space-1` gap, so their label and value line boxes form separate bands;
+`lg` additionally keeps `space-1` of bottom breathing room. `sm=32` is an
+explicit compact policy: it keeps the public body-sm value role, uses a
+`-space-1` optical gap and permits at most 4px of label/value rectangle overlap.
+That tolerance is intentional, browser-asserted and is not a hidden size or a
+new typography role. Resting labels remain at 50%. Adornments stay centered in
+the complete shell, and error, disabled, readOnly and loading states do not
+alter geometry.
 
 Placeholder suppression belongs to FieldShell for both native
 `::placeholder` and custom `[data-field-placeholder]` content. Resting empty
 inner fields hide it; focus/open reveals it; a value floats the label and keeps
 the value visible. Outer-label fields preserve normal placeholder behavior.
+Chromium forced-colors replaces transparent placeholder colors unless the
+resting placeholder pseudo-element opts out; the scoped forced-colors rule is
+therefore limited to that hidden state and does not override active system
+colors.
 
 MultiSelect has a deterministic inner presentation policy: `sm` and `md` use
 a localized textual selection summary, while `lg` uses one-row chips plus `+N`
 overflow. Width affects only the number of visible `lg` chips. Outer-label
-MultiSelect continues to use chips and overflow.
+MultiSelect continues to use chips and overflow. Compact inner summary mode
+does not create the chip sizing DOM, attach its ResizeObserver or perform chip
+overflow measurement.
 
 Value, placeholder and positioned inner label resolve their inline start/end
 from the same internal geometry variables. The canonical inline padding is
@@ -110,3 +120,27 @@ from the same internal geometry variables. The canonical inline padding is
 adornments consume space in the flex layout and clear only their corresponding
 content-side inset, so neither direction-specific offsets nor runtime text/icon
 measurement are required.
+
+## Optical and responsive browser verification
+
+Fixed `OpticalContainer390/768/1440` stories calibrate layout inside a wrapper;
+they are not responsive tests. The separate responsive stories set the real
+Storybook viewport to `390x844`, `768x1024` and `1440x900` and assert that the
+Select resolver chooses BottomSheet below `md` and Popover from `md` upward.
+
+The browser regression story measures rendered rectangles for the priority
+fixtures: sm Input with value allows the documented 4px optical tolerance;
+md Select with value and lg MultiSelect chips allow only 0.5px rounding
+tolerance. It also covers label-area hit-testing, placeholder hide/restore,
+Select/MultiSelect opening, focused long placeholders and a real Chromium
+forced-colors context.
+
+Run the required browser gate with:
+
+```sh
+npm run test:storybook
+```
+
+The same command runs in `.github/workflows/ui-tests.yml`. JSDOM remains useful
+for state and ARIA coverage but is not accepted as geometry or hit-testing
+evidence.

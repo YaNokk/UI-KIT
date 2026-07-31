@@ -12,6 +12,7 @@
   padding-inline-start: var(--field-control-padding-inline-start);
   color: inherit;
   font: inherit;
+  text-overflow: ellipsis;
   cursor: text;
   background: transparent;
   border: 0;

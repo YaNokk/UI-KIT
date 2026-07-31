@@ -1,5 +1,6 @@
 import { useState, type ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within } from "storybook/test";
 import { Dialog } from "../Dialog/Dialog";
 import { DesignSystemProvider } from "../DesignSystemProvider/DesignSystemProvider";
 import type { SelectCollectionItem } from "../internal/select/collection";
@@ -100,6 +101,39 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {} as never,
   render: () => <SelectHarness />
+};
+
+export const LongPlaceholderResting: Story = {
+  args: {} as never,
+  tags: ["test"],
+  render: () => (
+    <div className={fixtureStyles.width240}>
+      <SelectHarness block placeholder="Очень длинный placeholder закрытого Select" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const trigger = within(canvasElement).getByRole("button", { name: /Клиент/ });
+    const placeholder = trigger.querySelector<HTMLElement>("[data-field-placeholder]");
+    if (!placeholder) throw new Error("Select placeholder was not rendered.");
+    await expect(getComputedStyle(placeholder).visibility).toBe("hidden");
+  }
+};
+
+export const LongPlaceholderFocused: Story = {
+  args: {} as never,
+  tags: ["test"],
+  render: () => (
+    <div className={fixtureStyles.width240}>
+      <SelectHarness block open placeholder="Очень длинный placeholder открытого Select" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const trigger = within(canvasElement).getByRole("button", { name: /Клиент/ });
+    const placeholder = trigger.querySelector<HTMLElement>("[data-field-placeholder]");
+    if (!placeholder) throw new Error("Select placeholder was not rendered.");
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(getComputedStyle(placeholder).visibility).toBe("visible");
+  }
 };
 
 export const RichGroupsAndAction: Story = {

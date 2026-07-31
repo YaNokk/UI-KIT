@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Search } from "lucide-react";
+import { expect, within } from "storybook/test";
 import { AmountInput } from "../AmountInput/AmountInput";
 import { Input } from "../Input/Input";
 import { MultiSelect } from "../MultiSelect/MultiSelect";
@@ -97,7 +98,6 @@ function SizeSection({ size }: { size: FieldSize }) {
 
 const matrixRows = [
   "empty",
-  "focused",
   "value",
   "long-label",
   "long-placeholder",
@@ -115,7 +115,6 @@ type MatrixRow = (typeof matrixRows)[number];
 
 const matrixLabels: Record<MatrixRow, string> = {
   empty: "Empty resting",
-  focused: "Focused empty",
   value: "Value",
   "long-label": "Long label",
   "long-placeholder": "Long placeholder",
@@ -130,17 +129,6 @@ const matrixLabels: Record<MatrixRow, string> = {
 };
 
 function MatrixField({ row, size }: { row: MatrixRow; size: FieldSize }) {
-  if (row === "focused") {
-    return (
-      <Input
-        autoFocus={size === "lg"}
-        label="Поле в фокусе"
-        labelView="inner"
-        placeholder="Введите значение"
-        size={size}
-      />
-    );
-  }
   if (row === "long-label") {
     return <Input defaultValue="Значение" label="Очень длинная внутренняя подпись поля без переноса" labelView="inner" size={size} />;
   }
@@ -190,6 +178,62 @@ function MatrixField({ row, size }: { row: MatrixRow; size: FieldSize }) {
       size={size}
       {...(row === "value" ? { defaultValue: "Значение" } : {})}
     />
+  );
+}
+
+function FocusedInput({ size }: { size: FieldSize }) {
+  const ref = useRef<HTMLInputElement | null>(null);
+  useEffect(() => ref.current?.focus(), []);
+  return (
+    <Input
+      label={`Focused ${size}`}
+      labelView="inner"
+      placeholder="Длинный placeholder для focused-состояния"
+      ref={ref}
+      size={size}
+    />
+  );
+}
+
+function OpenSelect({ size }: { size: FieldSize }) {
+  return (
+    <Select
+      block
+      items={options}
+      label={`Open Select ${size}`}
+      labelView="inner"
+      onChange={() => undefined}
+      open
+      placeholder="Длинный placeholder открытого Select"
+      size={size}
+      value={null}
+    />
+  );
+}
+
+function OpenMultiSelect({ size }: { size: FieldSize }) {
+  return (
+    <MultiSelect
+      block
+      items={options}
+      label={`Open MultiSelect ${size}`}
+      labelView="inner"
+      onChange={() => undefined}
+      open
+      placeholder="Выберите несколько вариантов"
+      size={size}
+      value={[]}
+    />
+  );
+}
+
+function GeometryAssertionsFixture() {
+  return (
+    <div className={styles.grid}>
+      <Input defaultValue="Значение" label="Geometry Input sm" labelView="inner" size="sm" />
+      <Select block items={options} label="Geometry Select md" labelView="inner" onChange={() => undefined} size="md" value="alpha" />
+      <MultiSelect block items={options} label="Geometry MultiSelect lg" labelView="inner" onChange={() => undefined} size="lg" value={["alpha", "beta"]} />
+    </div>
   );
 }
 
@@ -271,17 +315,116 @@ export const OpticalFreezeMatrix: Story = {
   )
 };
 
-export const CalibrationMobile390x844: Story = {
+export const OpticalContainer390: Story = {
   args: {} as never,
   render: () => <div className={styles.viewport390}><CalibrationGrid /></div>
 };
 
-export const CalibrationTablet768x1024: Story = {
+export const OpticalContainer768: Story = {
   args: {} as never,
   render: () => <div className={styles.viewport768}><CalibrationGrid /></div>
 };
 
-export const CalibrationDesktop1440x900: Story = {
+export const OpticalContainer1440: Story = {
   args: {} as never,
   render: () => <div className={styles.viewport1440}><CalibrationGrid /></div>
+};
+
+export const ResponsiveViewportMobile: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "mobile" } },
+  render: () => <CalibrationGrid />
+};
+
+export const ResponsiveViewportTablet: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "tablet" } },
+  render: () => <CalibrationGrid />
+};
+
+export const ResponsiveViewportDesktop: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <CalibrationGrid />
+};
+
+export const FocusedSm: Story = {
+  args: {} as never,
+  render: () => <FocusedInput size="sm" />
+};
+
+export const FocusedMd: Story = {
+  args: {} as never,
+  render: () => <FocusedInput size="md" />
+};
+
+export const FocusedLg: Story = {
+  args: {} as never,
+  render: () => <FocusedInput size="lg" />
+};
+
+export const OpenEmptySelectSm: Story = {
+  args: {} as never,
+  render: () => <OpenSelect size="sm" />
+};
+
+export const OpenEmptySelectMd: Story = {
+  args: {} as never,
+  render: () => <OpenSelect size="md" />
+};
+
+export const OpenEmptySelectLg: Story = {
+  args: {} as never,
+  render: () => <OpenSelect size="lg" />
+};
+
+export const OpenEmptyMultiSelectSm: Story = {
+  args: {} as never,
+  render: () => <OpenMultiSelect size="sm" />
+};
+
+export const OpenEmptyMultiSelectMd: Story = {
+  args: {} as never,
+  render: () => <OpenMultiSelect size="md" />
+};
+
+export const OpenEmptyMultiSelectLg: Story = {
+  args: {} as never,
+  render: () => <OpenMultiSelect size="lg" />
+};
+
+export const GeometryAssertions: Story = {
+  args: {} as never,
+  tags: ["test"],
+  render: () => <GeometryAssertionsFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const assertBands = (
+      control: HTMLElement,
+      value: HTMLElement,
+      tolerance: number
+    ) => {
+      const shell = control.closest<HTMLElement>("[data-field-part=\"shell\"]");
+      const label = shell?.querySelector<HTMLElement>("[data-field-part=\"inner-label\"]");
+      if (!shell || !label) throw new Error("Inner field geometry was not rendered.");
+      const labelRect = label.getBoundingClientRect();
+      const valueRect = value.getBoundingClientRect();
+      expect(labelRect.bottom).toBeLessThanOrEqual(valueRect.top + tolerance);
+    };
+
+    const input = canvas.getByRole("textbox", { name: "Geometry Input sm" });
+    assertBands(input, input, 4.5);
+    expect(input.closest("[data-field-part=\"shell\"]")?.getBoundingClientRect().height).toBe(32);
+
+    const select = canvas.getByRole("button", { name: "Geometry Select md" });
+    assertBands(select, select, 0.5);
+    expect(select.closest("[data-field-part=\"shell\"]")?.getBoundingClientRect().height).toBe(40);
+
+    const multi = canvas.getByRole("button", { name: "Geometry MultiSelect lg" });
+    const chip = multi.closest("[data-field-part=\"shell\"]")
+      ?.querySelector<HTMLElement>("[data-field-chip]");
+    if (!chip) throw new Error("MultiSelect chip was not rendered.");
+    assertBands(multi, chip, 0.5);
+    expect(multi.closest("[data-field-part=\"shell\"]")?.getBoundingClientRect().height).toBe(48);
+  }
 };

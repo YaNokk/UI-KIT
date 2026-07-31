@@ -26,6 +26,39 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const LongPlaceholderResting: Story = {
+  tags: ["test"],
+  args: {
+    label: "Описание",
+    labelView: "inner",
+    placeholder: "Очень длинный placeholder, который должен оставаться скрытым в resting-состоянии"
+  },
+  play: async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole("textbox", { name: "Описание" });
+    await expect(input.closest("[data-label-floated]")).toBeNull();
+    await expect(getComputedStyle(input, "::placeholder").color)
+      .toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
+  }
+};
+
+export const LongPlaceholderFocused: Story = {
+  tags: ["test"],
+  args: {
+    autoFocus: true,
+    label: "Описание",
+    labelView: "inner",
+    placeholder: "Очень длинный placeholder, который должен обрезаться без пересечения с label"
+  },
+  play: async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole("textbox", { name: "Описание" });
+    await expect(input).toHaveFocus();
+    await expect(input.closest("[data-label-floated]")).not.toBeNull();
+    await expect(getComputedStyle(input, "::placeholder").color)
+      .not.toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
+  }
+};
+
 export const Sizes: Story = {
   args: {
     labelView: "outer"
