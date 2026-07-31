@@ -16,3 +16,9 @@
   flex-direction: column;
   min-block-size: 0;
 }
+
+.header {
+  flex: none;
+  padding: var(--ds-space-2);
+  padding-block-end: var(--ds-space-1);
+}

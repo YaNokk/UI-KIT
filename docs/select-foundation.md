@@ -116,7 +116,7 @@ selection не меняется, presentation закрывается; дальн
 
 ```ts
 collectionState?: {
-  status: "ready" | "loading" | "loading-more" | "error";
+  status: "ready" | "loading" | "refreshing" | "loading-more" | "error";
   message?: ReactNode;
   onRetry?: () => void;
 };
@@ -124,6 +124,8 @@ collectionState?: {
 
 - `empty` выводится из `ready` + отсутствия options;
 - initial loading — status row со Spinner, без fake options;
+- refreshing — выбранное значение и существующие rows сохраняются, progress
+  отображается компактно в trigger и panel;
 - loading-more — существующие rows остаются интерактивными, loader в
   конце списка;
 - empty/error status rows не navigable; action rows остаются доступными;
@@ -135,8 +137,8 @@ collectionState?: {
 
 - regular → private floating surface без собственного ARIA role (и без
   `role="dialog"`); единственный `role="listbox"` принадлежит listbox
-  внутри surface. Width policy: min-width = trigger width,
-  max-width ограничена viewport через floating size middleware;
+  внутри surface. Width policy: inline-size = trigger width,
+  max-inline-size ограничена доступной шириной floating middleware;
   публичный контракт `matchTriggerWidth` не меняется.
 - compact (generated `mediaQueries.belowMd`, Responsive Foundations) →
   BottomSheet/ModalRuntime; single закрывает по выбору, multi остаётся
@@ -161,7 +163,8 @@ collectionState?: {
   `aria-activedescendant` указывает только на смонтированный active Option.
   Для Action этот атрибут отсутствует, потому что Action не option;
   keyboard-navigation остаётся collection-driven. При виртуализации id active
-  row публикуется только после монтирования строки.
+  row публикуется только после подтверждения монтирования через наблюдение за DOM,
+  а не после фиксированного `requestAnimationFrame`.
 
 ## MultiSelect trigger tags
 
@@ -170,8 +173,12 @@ collectionState?: {
   резервируется место под `+N`; при экстремально узкой ширине
   допускается только `+N`.
 - Никакого публичного `maxTags`.
-- Tag remove — кнопка с accessible name `Remove {item}`, клик не
+- Tag remove — private compact button с accessible name `Remove {item}`, клик не
   открывает Select (stopPropagation).
+- ArrowLeft/ArrowRight выбирают активный тег; Delete/Backspace удаляют его,
+  Backspace без активного тега удаляет последний. Remove controls исключены из
+  обычного Tab order.
+- Trigger связан с локализованным visually-hidden summary выбранных значений.
 
 ## A11y model
 
@@ -182,8 +189,8 @@ collectionState?: {
   повторно проверяем при обновлении `virtua`.
 - Action — отдельный sibling `role="button"`, а не интерактивный потомок
   listbox: это исключает запрещённое смешивание button внутри listbox.
-  Он сохраняет единый collection-driven keyboard order, но не получает
-  `aria-selected` и не является value.
+  Он не входит в option keyboard order, не получает `aria-selected` и не
+  является value. Tab перемещает focus между Search, Action и listbox.
 - Trigger: button semantics, `aria-haspopup="listbox"`,
   `aria-expanded`, `aria-controls`; active descendant принадлежит listbox.
 - Status rows: `role="status"` для loading/empty, `role="alert"` для error;
@@ -197,16 +204,36 @@ collectionState?: {
 допускают локальный override; произвольное сообщение/error/retry передаётся
 через `collectionState`.
 
-## Что не входит в v1
+## Search v1.1
+
+- `searchable` добавляет Search внутри Popover и BottomSheet; закрытый trigger
+  остаётся не редактируемым.
+- Uncontrolled query фильтрует только options по `Option.textValue`; пустые
+  группы скрываются, Action остаётся видимым.
+- `searchProps.value` вместе с `searchProps.onChange` включает external mode:
+  consumer передаёт подготовленные items, DS не фильтрует их повторно и не
+  владеет debounce/fetch/cache/abort.
+- При открытии focus получает Search. ArrowDown переводит focus в listbox,
+  Enter выбирает active option, Escape закрывает presentation.
+- Query сбрасывается после single selection, после каждого multi toggle и при
+  любом закрытии. В controlled mode сброс запрашивается через `onChange("")`.
+- `No options` и `No results` — разные локализованные состояния.
+
+## Form serialization
+
+Single Select использует один hidden input. MultiSelect создаёт отдельный hidden
+input с одинаковым `name` для каждого значения; comma-join не используется.
+
+## Что не входит в v1.1
 
 Autocomplete, creatable tags, remote fetch/pagination API, filter
 Apply/Cancel, nested groups, menu semantics, DatePicker, editable search
-в trigger, object values, публичные renderer-props, публичные
+в trigger/Autocomplete, object values, публичные renderer-props, публичные
 virtualization knobs.
 
 ## Browser freeze baseline
 
-Перед public API freeze проверяются в настоящем браузере: Popover min-width,
+Перед public API freeze проверяются в настоящем браузере: точная ширина Popover,
 виртуализация и mounted `aria-activedescendant`, единый scroll owner в
 BottomSheet, tag overflow на узких ширинах, click/keyboard tag remove,
 наружное закрытие и Escape в Dialog. Эта матрица повторяется при bump

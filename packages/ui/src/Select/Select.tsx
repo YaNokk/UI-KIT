@@ -1,4 +1,4 @@
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown, Search, X } from "lucide-react";
 import {
   forwardRef,
   useCallback,
@@ -14,17 +14,24 @@ import {
 import { FieldShell } from "../FieldShell/FieldShell";
 import { FormControl } from "../FormControl/FormControl";
 import { IconButton } from "../IconButton/IconButton";
+import { Input } from "../Input/Input";
+import { Spinner } from "../Spinner/Spinner";
 import type { FieldLabelView, FieldSize } from "../shared/field";
 import { classNames } from "../shared/classNames";
 import {
   type SelectCollectionItem,
   type SelectNavigableRow,
-  type SelectOption
+  type SelectOption,
+  normalizeSelectCollection
 } from "../internal/select/collection";
 import { resolveSelectMessages } from "../internal/select/messages";
 import { SelectListboxView } from "../internal/select/SelectListboxView";
 import { SelectPanel } from "../internal/select/SelectPanel";
-import type { SelectCollectionState } from "../internal/select/types";
+import type {
+  SelectCollectionState,
+  SelectSearchProps
+} from "../internal/select/types";
+import { useSelectSearch } from "../internal/select/search";
 import { useSelectState } from "../internal/select/useSelectState";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import styles from "../internal/select/SelectTrigger.module.css";
@@ -35,6 +42,8 @@ export interface SelectProps<Value extends string = string> {
   items: readonly SelectCollectionItem<Value>[];
   selectedItem?: SelectOption<Value> | undefined;
   collectionState?: SelectCollectionState | undefined;
+  searchable?: boolean;
+  searchProps?: SelectSearchProps;
   open?: boolean | undefined;
   onOpenChange?: ((open: boolean) => void) | undefined;
   placeholder?: ReactNode;
@@ -65,6 +74,8 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
     items,
     selectedItem,
     collectionState,
+    searchable = false,
+    searchProps,
     open: controlledOpen,
     onOpenChange,
     placeholder,
@@ -116,8 +127,9 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
     [isControlledOpen, onOpenChange]
   );
 
+  const search = useSelectSearch(items, searchable, searchProps);
   const state = useSelectState<Value>({
-    items,
+    items: search.visibleItems,
     collectionState,
     open,
     onOpenChange: setOpen,
@@ -126,29 +138,14 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
 
   const listboxId = useId();
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const floatingReferenceRef = useRef<HTMLElement | null>(null);
   const skipFocusRestoreRef = useRef(false);
   const shellRef = useRef<HTMLDivElement | null>(null);
+  const searchRef = useRef<HTMLInputElement | null>(null);
+  const listboxRef = useRef<HTMLDivElement | null>(null);
 
   useImperativeHandle(ref, () => triggerRef.current as HTMLElement, []);
 
-  // Trigger width drives the private popover min-width policy without
-  // changing the frozen generic Popover contract.
-  const updateTriggerInlineSize = useCallback(() => {
-    const reference = floatingReferenceRef.current;
-    if (!reference || typeof reference.getBoundingClientRect !== "function") {
-      return;
-    }
-    const width = reference.getBoundingClientRect().width;
-    if (width > 0) {
-      reference.style.setProperty(
-        "--select-trigger-inline-size",
-        width + "px"
-      );
-    }
-  }, []);
-
-  const collection = state.collection;
+  const collection = useMemo(() => normalizeSelectCollection(items), [items]);
   const displayOption = useMemo(() => {
     if (value === null) return null;
     const inCollection = collection.optionRowByValue.get(value);
@@ -176,19 +173,25 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
   const invalid = error != null;
   const interactive = !disabled && !readOnly;
   const showClear = clearable && !disabled && !required && value !== null;
+  const loading = collectionState?.status === "loading";
+  const refreshing = collectionState?.status === "refreshing";
+
+  const handleOpenChange = useCallback((nextOpen: boolean) => {
+    if (!nextOpen) search.resetQuery();
+    setOpen(nextOpen);
+  }, [search.resetQuery, setOpen]);
 
   const commit = useCallback(
     (row: SelectNavigableRow<Value>) => {
       if (row.disabled) return;
       if (row.type === "action") {
+        handleOpenChange(false);
         row.action.onSelect();
-        setOpen(false);
         return;
       }
       onChange(row.option.value);
-      setOpen(false);
-    },
-    [onChange, setOpen]
+      handleOpenChange(false);
+    }, [handleOpenChange, onChange]
   );
 
   const handleTriggerKeyDown = (event: KeyboardEvent) => {
@@ -215,10 +218,32 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
     onChange(null);
   };
 
-  const handleOpenChange = (nextOpen: boolean) => {
-    if (nextOpen) updateTriggerInlineSize();
-    setOpen(nextOpen);
-  };
+  const searchField = searchable ? (
+    <Input
+      aria-label={messages.search}
+      autoFocus
+      onChange={(event) => search.setQuery(event.currentTarget.value)}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          handleOpenChange(false);
+        } else if (event.key === "ArrowDown") {
+          event.preventDefault();
+          if (!state.activeRow) state.moveActive("first");
+          listboxRef.current?.focus();
+        } else if (event.key === "Enter" && state.activeRow) {
+          event.preventDefault();
+          commit(state.activeRow);
+        }
+      }}
+      placeholder={searchProps?.placeholder ?? messages.searchPlaceholder}
+      ref={searchRef}
+      size="sm"
+      startAdornment={<Search />}
+      value={search.query}
+    />
+  ) : null;
 
   const trigger = (
     <FormControl
@@ -238,7 +263,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
           disabled={disabled}
           endAdornment={
             <span className={styles.actions} data-field-interactive="">
-              {showClear ? (
+              {showClear && !loading ? (
                 <IconButton
                   aria-label={messages.clear}
                   disabled={disabled}
@@ -252,7 +277,13 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
                   variant="ghost"
                 />
               ) : null}
-              <span
+              {loading || refreshing ? (
+                <Spinner
+                  size={size === "lg" ? "md" : "sm"}
+                  tone="secondary"
+                />
+              ) : null}
+              {!loading ? <span
                 aria-hidden="true"
                 className={classNames(
                   styles.chevron,
@@ -260,7 +291,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
                 )}
               >
                 <ChevronDown />
-              </span>
+              </span> : null}
             </span>
           }
           invalid={invalid}
@@ -277,6 +308,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
             aria-controls={open ? listboxId : undefined}
             aria-expanded={open}
             aria-haspopup="listbox"
+            aria-busy={loading || refreshing ? true : undefined}
             aria-label={ariaLabel}
             className={styles.value}
             data-field-part="native-control"
@@ -320,7 +352,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
         trigger={trigger}
         focusTriggerRef={triggerRef}
         skipFocusRestoreRef={skipFocusRestoreRef}
-        triggerRef={floatingReferenceRef}
+        header={searchField}
       >
         <SelectListboxView<Value>
           activeRowId={state.activeRow?.rowId ?? null}
@@ -340,10 +372,15 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
           statusMessage={
             state.status === "empty" && emptyMessage != null
               ? emptyMessage
+              : state.status === "empty" && search.query.length > 0
+                ? messages.noResults
               : state.status === "loading" && loadingMessage != null
                 ? loadingMessage
                 : state.statusMessage
           }
+          autoFocus={!searchable}
+          tabbable={searchable}
+          ref={listboxRef}
         />
       </SelectPanel>
     </>

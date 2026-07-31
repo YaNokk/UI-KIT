@@ -443,4 +443,46 @@ describe("Select", () => {
       expect.stringContaining('Duplicate option value "a"')
     );
   });
+
+  it("search filters options and keeps action outside listbox semantics", async () => {
+    const user = userEvent.setup();
+    render(
+      <ControlledSelect
+        items={[
+          {
+            type: "action",
+            id: "create",
+            label: "Создать клиента",
+            textValue: "Создать клиента",
+            onSelect: () => undefined
+          },
+          ...baseItems
+        ]}
+        searchable
+      />
+    );
+
+    await user.click(screen.getByRole("button", { name: /Клиент/ }));
+    const search = await screen.findByRole("textbox", { name: "Поиск по вариантам" });
+    expect(search).toHaveFocus();
+    await user.type(search, "Бета");
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+    expect(screen.getByRole("option", { name: /Бета/ })).toBeInTheDocument();
+    const action = screen.getByRole("button", { name: "Создать клиента" });
+    expect(screen.getByRole("listbox")).not.toContainElement(action);
+  });
+
+  it("controlled external search does not filter prepared items again", async () => {
+    const user = userEvent.setup();
+    const onSearchChange = vi.fn();
+    render(
+      <ControlledSelect
+        items={baseItems}
+        searchable
+        searchProps={{ value: "нет совпадений", onChange: onSearchChange }}
+      />
+    );
+    await user.click(screen.getByRole("button", { name: /Клиент/ }));
+    expect(await screen.findAllByRole("option")).toHaveLength(4);
+  });
 });

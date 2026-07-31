@@ -27,6 +27,7 @@ export interface SelectPanelProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: ReactNode;
+  header?: ReactNode;
   listboxId: string;
   messages: SelectMessages;
   multiple: boolean;
@@ -41,6 +42,7 @@ export function SelectPanel({
   open,
   onOpenChange,
   children,
+  header,
   messages,
   multiple,
   panelClassName
@@ -73,6 +75,7 @@ export function SelectPanel({
     dismissOnOutsidePress: true,
     interaction: "click",
     interactionEnabled: presentation === "popover",
+    matchTriggerWidth: true,
     onOpenChange,
     open: presentation === "popover" && open,
     placement: "bottom-start",
@@ -87,7 +90,10 @@ export function SelectPanel({
   const renderedTrigger = renderFloatingTrigger(
     trigger,
     floating.getReferenceProps,
-    setTriggerNode
+    setTriggerNode,
+    presentation === "sheet"
+      ? { onClick: () => onOpenChange(!open) }
+      : {}
   );
 
   return (
@@ -104,10 +110,12 @@ export function SelectPanel({
               ref={floating.refs.setFloating}
               style={{
                 ...floating.floatingStyles,
-                minInlineSize: "var(--select-trigger-inline-size, auto)",
                 zIndex: floating.layer
               }}
             >
+              {header == null ? null : (
+                <div className={styles.header}>{header}</div>
+              )}
               {children}
             </div>
           </FloatingLayerContext.Provider>
@@ -132,6 +140,9 @@ export function SelectPanel({
           title={messages.sheetTitle}
         >
           <div className={styles.sheetBody} data-select-surface="">
+            {header == null ? null : (
+              <div className={styles.header}>{header}</div>
+            )}
             {children}
           </div>
         </BottomSheet>

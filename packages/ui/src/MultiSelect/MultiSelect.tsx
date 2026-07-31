@@ -1,4 +1,4 @@
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown, Search, X } from "lucide-react";
 import {
   forwardRef,
   useCallback,
@@ -16,17 +16,24 @@ import {
 import { FieldShell } from "../FieldShell/FieldShell";
 import { FormControl } from "../FormControl/FormControl";
 import { IconButton } from "../IconButton/IconButton";
+import { Input } from "../Input/Input";
+import { Spinner } from "../Spinner/Spinner";
 import type { FieldLabelView, FieldSize } from "../shared/field";
 import { classNames } from "../shared/classNames";
-import type {
-  SelectCollectionItem,
-  SelectNavigableRow,
-  SelectOption
+import {
+  type SelectCollectionItem,
+  type SelectNavigableRow,
+  type SelectOption,
+  normalizeSelectCollection
 } from "../internal/select/collection";
 import { resolveSelectMessages } from "../internal/select/messages";
 import { SelectListboxView } from "../internal/select/SelectListboxView";
 import { SelectPanel } from "../internal/select/SelectPanel";
-import type { SelectCollectionState } from "../internal/select/types";
+import type {
+  SelectCollectionState,
+  SelectSearchProps
+} from "../internal/select/types";
+import { useSelectSearch } from "../internal/select/search";
 import { useSelectState } from "../internal/select/useSelectState";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import triggerStyles from "../internal/select/SelectTrigger.module.css";
@@ -38,6 +45,8 @@ export interface MultiSelectProps<Value extends string = string> {
   items: readonly SelectCollectionItem<Value>[];
   selectedItems?: readonly SelectOption<Value>[] | undefined;
   collectionState?: SelectCollectionState | undefined;
+  searchable?: boolean;
+  searchProps?: SelectSearchProps;
   open?: boolean | undefined;
   onOpenChange?: ((open: boolean) => void) | undefined;
   placeholder?: ReactNode;
@@ -75,6 +84,8 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
     items,
     selectedItems,
     collectionState,
+    searchable = false,
+    searchProps,
     open: controlledOpen,
     onOpenChange,
     placeholder,
@@ -126,8 +137,9 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
     [isControlledOpen, onOpenChange]
   );
 
+  const search = useSelectSearch(items, searchable, searchProps);
   const state = useSelectState<Value>({
-    items,
+    items: search.visibleItems,
     collectionState,
     open,
     onOpenChange: setOpen,
@@ -135,29 +147,16 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   });
 
   const listboxId = useId();
+  const selectedSummaryId = useId();
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const floatingReferenceRef = useRef<HTMLElement | null>(null);
   const skipFocusRestoreRef = useRef(false);
   const viewportRef = useRef<HTMLSpanElement | null>(null);
   const sizerRef = useRef<HTMLSpanElement | null>(null);
+  const listboxRef = useRef<HTMLDivElement | null>(null);
 
   useImperativeHandle(ref, () => triggerRef.current as HTMLElement, []);
 
-  const updateTriggerInlineSize = useCallback(() => {
-    const reference = floatingReferenceRef.current;
-    if (!reference || typeof reference.getBoundingClientRect !== "function") {
-      return;
-    }
-    const width = reference.getBoundingClientRect().width;
-    if (width > 0) {
-      reference.style.setProperty(
-        "--select-trigger-inline-size",
-        width + "px"
-      );
-    }
-  }, []);
-
-  const collection = state.collection;
+  const collection = useMemo(() => normalizeSelectCollection(items), [items]);
   const cacheByValue = useMemo(() => {
     const map = new Map<Value, SelectOption<Value>>();
     for (const option of selectedItems ?? []) map.set(option.value, option);
@@ -202,13 +201,22 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   const invalid = error != null;
   const interactive = !disabled && !readOnly;
   const showClear = clearable && !disabled && !required && value.length > 0;
+  const loading = collectionState?.status === "loading";
+  const refreshing = collectionState?.status === "refreshing";
+  const [activeTagIndex, setActiveTagIndex] = useState<number | null>(null);
+
+  const handleOpenChange = useCallback((nextOpen: boolean) => {
+    if (!nextOpen) search.resetQuery();
+    if (nextOpen) setActiveTagIndex(null);
+    setOpen(nextOpen);
+  }, [search.resetQuery, setOpen]);
 
   const commit = useCallback(
     (row: SelectNavigableRow<Value>) => {
       if (row.disabled) return;
       if (row.type === "action") {
+        handleOpenChange(false);
         row.action.onSelect();
-        setOpen(false);
         return;
       }
       const optionValue = row.option.value;
@@ -216,9 +224,9 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
         ? value.filter((entry) => entry !== optionValue)
         : [...value, optionValue];
       onChange(nextValues);
+      search.resetQuery();
       // Multi stays open by design.
-    },
-    [onChange, selectedValues, setOpen, value]
+    }, [handleOpenChange, onChange, search.resetQuery, selectedValues, value]
   );
 
   const removeValue = useCallback(
@@ -230,13 +238,28 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
 
   const handleTriggerKeyDown = (event: KeyboardEvent) => {
     if (!interactive) return;
+    if (!open && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+      if (value.length === 0) return;
+      event.preventDefault();
+      setActiveTagIndex((current) => {
+        if (current === null) return event.key === "ArrowLeft" ? value.length - 1 : 0;
+        const delta = event.key === "ArrowLeft" ? -1 : 1;
+        return (current + delta + value.length) % value.length;
+      });
+      return;
+    }
     if (
       !open
       && (event.key === "Backspace" || event.key === "Delete")
       && value.length > 0
     ) {
+      if (activeTagIndex === null && event.key === "Delete") return;
       event.preventDefault();
-      removeValue(value[value.length - 1] as Value);
+      const removeIndex = activeTagIndex ?? value.length - 1;
+      removeValue(value[removeIndex] as Value);
+      setActiveTagIndex(
+        value.length <= 1 ? null : Math.min(removeIndex, value.length - 2)
+      );
       return;
     }
     if (!open) {
@@ -260,10 +283,31 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
     onChange([]);
   };
 
-  const handleOpenChange = (nextOpen: boolean) => {
-    if (nextOpen) updateTriggerInlineSize();
-    setOpen(nextOpen);
-  };
+  const searchField = searchable ? (
+    <Input
+      aria-label={messages.search}
+      autoFocus
+      onChange={(event) => search.setQuery(event.currentTarget.value)}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          handleOpenChange(false);
+        } else if (event.key === "ArrowDown") {
+          event.preventDefault();
+          if (!state.activeRow) state.moveActive("first");
+          listboxRef.current?.focus();
+        } else if (event.key === "Enter" && state.activeRow) {
+          event.preventDefault();
+          commit(state.activeRow);
+        }
+      }}
+      placeholder={searchProps?.placeholder ?? messages.searchPlaceholder}
+      size="sm"
+      startAdornment={<Search />}
+      value={search.query}
+    />
+  ) : null;
 
   // Tag overflow: fit as many tags as the trigger width allows, reserving
   // room for the "+N" indicator. Measurement runs against a hidden sizer so
@@ -341,7 +385,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
           disabled={disabled}
           endAdornment={
             <span className={triggerStyles.actions} data-field-interactive="">
-              {showClear ? (
+              {showClear && !loading ? (
                 <IconButton
                   aria-label={messages.clear}
                   disabled={disabled}
@@ -355,7 +399,13 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                   variant="ghost"
                 />
               ) : null}
-              <span
+              {loading || refreshing ? (
+                <Spinner
+                  size={size === "lg" ? "md" : "sm"}
+                  tone="secondary"
+                />
+              ) : null}
+              {!loading ? <span
                 aria-hidden="true"
                 className={classNames(
                   triggerStyles.chevron,
@@ -363,7 +413,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                 )}
               >
                 <ChevronDown />
-              </span>
+              </span> : null}
             </span>
           }
           invalid={invalid}
@@ -378,8 +428,14 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
             <button
               {...controlProps}
               aria-controls={open ? listboxId : undefined}
+              aria-describedby={value.length > 0
+                ? [controlProps["aria-describedby"], selectedSummaryId]
+                  .filter(Boolean)
+                  .join(" ")
+                : controlProps["aria-describedby"]}
               aria-expanded={open}
               aria-haspopup="listbox"
+              aria-busy={loading || refreshing ? true : undefined}
               aria-label={ariaLabel}
               className={classNames(triggerStyles.value, styles.openTrigger)}
               data-field-part="native-control"
@@ -389,7 +445,15 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                 triggerRef.current = node;
               }}
               type="button"
-            />
+            >
+              {value.length > 0 ? (
+                <span className={styles.srOnly} id={selectedSummaryId}>
+                  {messages.selectedSummary(value.map((entry) =>
+                    displayByValue.get(entry)?.textValue ?? String(entry)
+                  ))}
+                </span>
+              ) : null}
+            </button>
             <span className={styles.tagViewport} ref={viewportRef}>
               {value.length === 0 ? (
                 <span aria-hidden="true" className={styles.placeholder}>
@@ -400,17 +464,23 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                   {visibleTags.map((entry) => {
                     const display = displayByValue.get(entry);
                     return (
-                      <span className={styles.tag} key={entry}>
+                      <span
+                        className={classNames(
+                          styles.tag,
+                          value.indexOf(entry) === activeTagIndex && styles.activeTag
+                        )}
+                        key={entry}
+                      >
                         <span aria-hidden="true" className={styles.tagLabel}>
                           {display?.label}
                         </span>
                         {interactive ? (
-                          <IconButton
+                          <button
                             aria-label={messages.remove(
                               display?.textValue ?? String(entry)
                             )}
                             className={styles.tagRemove}
-                            icon={<X />}
+                            type="button"
                             onClick={(event) => {
                               event.stopPropagation();
                               removeValue(entry);
@@ -419,10 +489,10 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                               event.preventDefault();
                               event.stopPropagation();
                             }}
-                            size="sm"
                             tabIndex={-1}
-                            variant="ghost"
-                          />
+                          >
+                            <X aria-hidden="true" />
+                          </button>
                         ) : null}
                       </span>
                     );
@@ -450,9 +520,9 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
 
   return (
     <>
-      {name ? (
-        <input name={name} type="hidden" value={value.join(",")} />
-      ) : null}
+      {name ? value.map((entry) => (
+        <input key={entry} name={name} type="hidden" value={entry} />
+      )) : null}
       <SelectPanel
         listboxId={listboxId}
         messages={messages}
@@ -462,7 +532,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
         trigger={trigger}
         focusTriggerRef={triggerRef}
         skipFocusRestoreRef={skipFocusRestoreRef}
-        triggerRef={floatingReferenceRef}
+        header={searchField}
       >
         <SelectListboxView<Value>
           activeRowId={state.activeRow?.rowId ?? null}
@@ -482,10 +552,15 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
           statusMessage={
             state.status === "empty" && emptyMessage != null
               ? emptyMessage
+              : state.status === "empty" && search.query.length > 0
+                ? messages.noResults
               : state.status === "loading" && loadingMessage != null
                 ? loadingMessage
                 : state.statusMessage
           }
+          autoFocus={!searchable}
+          tabbable={searchable}
+          ref={listboxRef}
         />
       </SelectPanel>
     </>

@@ -16,12 +16,26 @@
   outline: none;
 }
 
+.virtualScrollHost {
+  overflow-y: hidden;
+}
+
 .actions {
   display: flex;
   flex-direction: column;
   gap: var(--ds-space-1);
   padding: var(--ds-space-1);
   padding-block-end: var(--ds-space-0);
+}
+
+.refreshing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-2);
+  padding-block: var(--ds-space-1);
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-caption);
 }
 
 .groupHeader {

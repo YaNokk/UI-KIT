@@ -141,12 +141,13 @@ export const LongCollection: Story = {
   args: {} as never,
   render: () => (
     <SelectHarness
-      items={Array.from({ length: 80 }, (_, index) => ({
+      items={Array.from({ length: 10000 }, (_, index) => ({
         value: `customer-${index}`,
         label: `Клиент ${index + 1}`,
         textValue: `Клиент ${index + 1}`,
         description: "Проверка прокрутки и typeahead"
       }))}
+      searchable
     />
   )
 };
@@ -167,3 +168,89 @@ export const InsideDialog: Story = {
     );
   }
 };
+
+export const Sizes: Story = {
+  args: {} as never,
+  render: () => (
+    <div className="flex w-80 flex-col gap-4">
+      <SelectHarness size="sm" />
+      <SelectHarness size="md" />
+      <SelectHarness size="lg" />
+    </div>
+  )
+};
+
+export const SizesLoading: Story = {
+  args: {} as never,
+  render: () => (
+    <div className="flex w-80 flex-col gap-4">
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <SelectHarness
+          collectionState={{ status: "loading" }}
+          items={[]}
+          key={size}
+          size={size}
+        />
+      ))}
+    </div>
+  )
+};
+
+export const SizesClearable: Story = {
+  args: {} as never,
+  render: () => <SelectHarness clearable />
+};
+
+export const ExactTriggerWidth: Story = {
+  args: {} as never,
+  render: () => <div className="w-64"><SelectHarness /></div>
+};
+
+export const LongOptionText: Story = {
+  args: {} as never,
+  render: () => (
+    <div className="w-64">
+      <SelectHarness items={[{
+        value: "long",
+        label: "Очень длинное название клиента, которое не должно расширять панель",
+        textValue: "Очень длинное название клиента, которое не должно расширять панель"
+      }]} />
+    </div>
+  )
+};
+
+export const NarrowViewport = ExactTriggerWidth;
+
+export const Search: Story = {
+  args: {} as never,
+  render: () => <SelectHarness searchable />
+};
+
+export const SearchLoading: Story = {
+  args: {} as never,
+  render: () => (
+    <SelectHarness collectionState={{ status: "loading" }} items={[]} searchable />
+  )
+};
+
+export const SearchRefreshing: Story = {
+  args: {} as never,
+  render: () => (
+    <SelectHarness collectionState={{ status: "refreshing" }} searchable />
+  )
+};
+
+export const SearchActionRow: Story = {
+  args: {} as never,
+  render: () => <SelectHarness searchable />
+};
+
+export const SearchMobileBottomSheet: Story = {
+  ...Search,
+  parameters: { viewport: { defaultViewport: "mobile1" } }
+};
+
+export const LoadingInTrigger = CollectionLoading;
+export const RichOptions = RichGroupsAndAction;
+export const Groups = RichGroupsAndAction;
+export const DesignerReference = RichGroupsAndAction;

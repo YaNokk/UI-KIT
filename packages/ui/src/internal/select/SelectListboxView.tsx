@@ -35,6 +35,8 @@ export interface SelectListboxViewProps<Value extends string> {
   onKeyDown: KeyboardEventHandler<HTMLDivElement>;
   onHoverRow: (row: SelectNavigableRow<Value>) => void;
   onPickRow: (row: SelectNavigableRow<Value>) => void;
+  autoFocus?: boolean;
+  tabbable?: boolean;
 }
 
 interface RowContentSlots {
@@ -78,7 +80,9 @@ function SelectListboxViewInner<Value extends string>(
     listboxId,
     onKeyDown,
     onHoverRow,
-    onPickRow
+    onPickRow,
+    autoFocus = true,
+    tabbable = false
   }: SelectListboxViewProps<Value>,
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
@@ -104,14 +108,19 @@ function SelectListboxViewInner<Value extends string>(
     && typeof ResizeObserver.prototype?.observe === "function";
   const [mountedActiveId, setMountedActiveId] = useState<string | null>(null);
 
-  // Keep the active row scrolled into view. With virtualization the target
-  // row may not be mounted yet; aria-activedescendant is deferred one frame
-  // so virtua can mount it first.
+  const setListboxNode = (node: HTMLDivElement | null) => {
+    listboxRef.current = node;
+    if (typeof ref === "function") ref(node);
+    else if (ref) ref.current = node;
+  };
+
+  // Publish aria-activedescendant only after the virtual row actually exists.
   useEffect(() => {
     if (activeRowIndex < 0 || activeRowId === null) {
       setMountedActiveId(null);
       return;
     }
+    setMountedActiveId(null);
     if (virtualized) {
       virtualRef.current?.scrollToIndex(activeRowIndex, { align: "nearest" });
     } else if (typeof document !== "undefined") {
@@ -122,21 +131,33 @@ function SelectListboxViewInner<Value extends string>(
         row.scrollIntoView?.({ block: "nearest" });
       }
     }
-    const frame = requestAnimationFrame(() => {
-      setMountedActiveId(activeRowId);
+    const listbox = listboxRef.current;
+    const targetId = listboxId + "-" + activeRowId;
+    const publishWhenMounted = () => {
+      const target = document.getElementById(targetId);
+      if (listbox && target && listbox.contains(target)) {
+        setMountedActiveId(activeRowId);
+        return true;
+      }
+      return false;
+    };
+    if (publishWhenMounted() || typeof MutationObserver === "undefined") return;
+    const observer = new MutationObserver(() => {
+      if (publishWhenMounted()) observer.disconnect();
     });
-    return () => cancelAnimationFrame(frame);
+    if (listbox) observer.observe(listbox, { childList: true, subtree: true });
+    return () => observer.disconnect();
   }, [activeRowId, activeRowIndex, virtualized, listboxId]);
 
   useEffect(() => {
-    listboxRef.current?.focus();
-  }, []);
+    if (autoFocus) listboxRef.current?.focus();
+  }, [autoFocus]);
 
   const renderNavigableRow = (row: SelectNavigableRow<Value>) => {
     const active = row.rowId === activeRowId;
     if (row.type === "action") {
       return (
-        <div
+        <button
           aria-disabled={row.disabled ? true : undefined}
           className={classNames(
             styles.row,
@@ -146,14 +167,13 @@ function SelectListboxViewInner<Value extends string>(
           data-row-id={row.rowId}
           id={listboxId + "-" + row.rowId}
           key={row.rowId}
-          onMouseDown={(event) => event.preventDefault()}
           onMouseEnter={() => {
             if (!row.disabled) onHoverRow(row);
           }}
           onClick={() => {
             if (!row.disabled) onPickRow(row);
           }}
-          role="button"
+          type="button"
         >
           <RowContent
             description={row.action.description}
@@ -161,7 +181,7 @@ function SelectListboxViewInner<Value extends string>(
             leading={row.action.leading}
             trailing={row.action.trailing}
           />
-        </div>
+        </button>
       );
     }
 
@@ -174,7 +194,7 @@ function SelectListboxViewInner<Value extends string>(
           selected && styles.checkboxMarkerChecked
         )}
       >
-        {selected ? <Check strokeWidth={2.5} /> : null}
+        {selected ? <Check /> : null}
       </span>
     ) : (
       <span
@@ -253,6 +273,14 @@ function SelectListboxViewInner<Value extends string>(
         </div>
       );
     }
+    if (status === "refreshing") {
+      return (
+        <div className={styles.refreshing} role="status">
+          <Spinner size="sm" tone="secondary" />
+          <span>{statusMessage ?? messages.loading}</span>
+        </div>
+      );
+    }
     if (status === "error") {
       return (
         <div>
@@ -295,7 +323,8 @@ function SelectListboxViewInner<Value extends string>(
 
     const content: ReactNode[] = [];
     for (let index = 0; index < optionRows.length; index += 1) {
-      const row = optionRows[index]!;
+      const row = optionRows[index];
+      if (!row) continue;
       if (row.type !== "group-header") {
         content.push(renderNavigableRow(row));
         continue;
@@ -329,28 +358,32 @@ function SelectListboxViewInner<Value extends string>(
   })();
 
   return (
-    <div className={styles.root} ref={ref}>
+    <div className={styles.root}>
       {actionRows.length > 0 ? (
         <div className={styles.actions}>
           {actionRows.map(renderNavigableRow)}
         </div>
       ) : null}
+      {status === "refreshing" ? statusRow : null}
       <div
         aria-activedescendant={
           mountedActiveId ? listboxId + "-" + mountedActiveId : undefined
         }
         aria-multiselectable={multiple ? true : undefined}
-        className={styles.scroll}
+        className={classNames(
+          styles.scroll,
+          virtualized && styles.virtualScrollHost
+        )}
         id={listboxId}
         onKeyDown={onKeyDown}
-        ref={listboxRef}
+        ref={setListboxNode}
         role="listbox"
-        tabIndex={-1}
+        tabIndex={tabbable ? 0 : -1}
       >
         {optionContent}
       </div>
       {loadingMoreRow}
-      {statusRow}
+      {status === "refreshing" ? null : statusRow}
     </div>
   );
 }

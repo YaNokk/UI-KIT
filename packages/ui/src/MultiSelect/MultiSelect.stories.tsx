@@ -100,3 +100,82 @@ export const RemoteSelectedTags: Story = {
     />
   )
 };
+
+export const Sizes: Story = {
+  args: {} as never,
+  render: () => (
+    <div className="flex w-80 flex-col gap-4">
+      <MultiSelectHarness size="sm" />
+      <MultiSelectHarness size="md" />
+      <MultiSelectHarness size="lg" />
+    </div>
+  )
+};
+
+export const SizesWithTags: Story = {
+  args: {} as never,
+  render: () => (
+    <div className="flex w-80 flex-col gap-4">
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <MultiSelectHarness
+          initialValue={["new", "priority"]}
+          key={size}
+          size={size}
+        />
+      ))}
+    </div>
+  )
+};
+
+export const SizesLoading: Story = {
+  args: {} as never,
+  render: () => (
+    <MultiSelectHarness
+      collectionState={{ status: "loading" }}
+      initialValue={["new", "priority"]}
+    />
+  )
+};
+
+export const NarrowWidths = TagOverflow;
+export const ExactTriggerWidth = TagOverflow;
+
+export const Search: Story = {
+  args: {} as never,
+  render: () => <MultiSelectHarness searchable />
+};
+
+export const SearchLoading: Story = {
+  args: {} as never,
+  render: () => (
+    <MultiSelectHarness collectionState={{ status: "loading" }} items={[]} searchable />
+  )
+};
+
+export const SearchActionRow: Story = {
+  args: {} as never,
+  render: () => (
+    <MultiSelectHarness
+      items={[
+        {
+          type: "action",
+          id: "create",
+          label: "Создать тег",
+          textValue: "Создать тег",
+          onSelect: () => undefined
+        },
+        ...tagItems
+      ]}
+      searchable
+    />
+  )
+};
+
+export const SearchMobileBottomSheet: Story = {
+  ...Search,
+  parameters: { viewport: { defaultViewport: "mobile1" } }
+};
+
+export const LoadingInTrigger = SizesLoading;
+export const TagKeyboardRemoval = SizesWithTags;
+export const DesignerReference = SizesWithTags;

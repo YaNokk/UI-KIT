@@ -1,7 +1,9 @@
 declare const styles: {
   readonly root: string;
   readonly scroll: string;
+  readonly virtualScrollHost: string;
   readonly actions: string;
+  readonly refreshing: string;
   readonly groupHeader: string;
   readonly row: string;
   readonly active: string;

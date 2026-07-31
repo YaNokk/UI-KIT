@@ -5,6 +5,8 @@ declare const styles: {
   readonly tag: string;
   readonly tagLabel: string;
   readonly tagRemove: string;
+  readonly activeTag: string;
+  readonly srOnly: string;
   readonly overflow: string;
   readonly placeholder: string;
   readonly sizer: string;

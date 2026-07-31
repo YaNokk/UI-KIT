@@ -252,4 +252,45 @@ describe("MultiSelect", () => {
     await user.click(trigger);
     expect(await screen.findByRole("status")).toHaveTextContent("Загрузка");
   });
+
+  it("serializes each selected value into its own hidden input", () => {
+    const { container } = render(
+      <ControlledMulti
+        items={baseItems}
+        name="tags"
+        selectedItems={[
+          { value: "a,b", label: "Альфа, Бета", textValue: "Альфа, Бета" }
+        ]}
+        value={["a,b", "d"]}
+      />
+    );
+    const inputs = Array.from(
+      container.querySelectorAll<HTMLInputElement>('input[type="hidden"][name="tags"]')
+    );
+    expect(inputs.map((input) => input.value)).toEqual(["a,b", "d"]);
+  });
+
+  it("announces selected labels and supports tag keyboard removal", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <ControlledMulti items={baseItems} onChange={onChange} value={["a", "b"]} />
+    );
+    const trigger = screen.getByRole("button", { name: /Теги/ });
+    expect(trigger).toHaveAccessibleDescription("Выбрано 2: Альфа, Бета");
+    trigger.focus();
+    await user.keyboard("{ArrowLeft}{Delete}");
+    expect(onChange).toHaveBeenCalledWith(["a"]);
+  });
+
+  it("search filters options and resets after a toggle", async () => {
+    const user = userEvent.setup();
+    render(<ControlledMulti items={baseItems} searchable />);
+    await user.click(screen.getByRole("button", { name: /Теги/ }));
+    const search = await screen.findByRole("textbox", { name: "Поиск по вариантам" });
+    await user.type(search, "Бета");
+    await user.click(screen.getByRole("option", { name: /Бета/ }));
+    expect(search).toHaveValue("");
+    expect(screen.getAllByRole("option")).toHaveLength(4);
+  });
 });

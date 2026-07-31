@@ -22,6 +22,7 @@ const TYPEAHEAD_RESET_MS = 700;
 export type SelectResolvedStatus =
   | "ready"
   | "loading"
+  | "refreshing"
   | "loading-more"
   | "empty"
   | "error";
@@ -59,6 +60,7 @@ export interface SelectStateController<Value extends string> {
     event: KeyboardEvent,
     commit: SelectCommit<Value>
   ) => void;
+  moveActive: (direction: 1 | -1 | "first" | "last") => void;
 }
 
 export function useSelectState<Value extends string>({
@@ -72,6 +74,10 @@ export function useSelectState<Value extends string>({
   const collection = useMemo(
     () => normalizeSelectCollection(items),
     [items]
+  );
+  const navigableOptions = useMemo(
+    () => collection.navigableRows.filter((row) => row.type === "option"),
+    [collection]
   );
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const typeaheadBuffer = useRef("");
@@ -87,10 +93,10 @@ export function useSelectState<Value extends string>({
   const activeRow = useMemo(() => {
     if (activeRowId === null) return null;
     return (
-      collection.navigableRows.find((row) => row.rowId === activeRowId)
+        navigableOptions.find((row) => row.rowId === activeRowId)
         ?? null
     );
-  }, [collection, activeRowId]);
+  }, [navigableOptions, activeRowId]);
 
   const setActiveRow = useCallback(
     (row: SelectNavigableRow<Value> | null) => {
@@ -113,28 +119,25 @@ export function useSelectState<Value extends string>({
         if (row && !row.disabled) return row;
       }
       return (
-        collection.navigableRows.find((row) => row.type === "option")
-          ?? collection.navigableRows[0]
-          ?? null
+        navigableOptions[0] ?? null
       );
-    },
-    [collection]
+    }, [collection, navigableOptions]
   );
 
   const openWithSelection = useCallback(
     (preferredValues: readonly Value[], fromEnd = false) => {
       const initial = fromEnd
-        ? (collection.navigableRows.at(-1) ?? null)
+        ? (navigableOptions.at(-1) ?? null)
         : findInitialActiveRow(preferredValues);
       setActiveRowId(initial?.rowId ?? null);
       if (!open) requestOpenChange(true);
     },
-    [collection, findInitialActiveRow, open, requestOpenChange]
+    [findInitialActiveRow, navigableOptions, open, requestOpenChange]
   );
 
   const moveActive = useCallback(
     (direction: 1 | -1 | "first" | "last") => {
-      const rows = collection.navigableRows;
+      const rows = navigableOptions;
       if (rows.length === 0) return;
       let nextIndex: number;
       const currentIndex = activeRow
@@ -151,7 +154,7 @@ export function useSelectState<Value extends string>({
       }
       setActiveRowId(rows[nextIndex]?.rowId ?? null);
     },
-    [activeRow, collection]
+    [activeRow, navigableOptions]
   );
 
   const clearTypeahead = useCallback(() => {
@@ -164,20 +167,24 @@ export function useSelectState<Value extends string>({
 
   useEffect(() => clearTypeahead, [clearTypeahead]);
 
+  useEffect(() => {
+    if (open && activeRowId === null) {
+      setActiveRowId(navigableOptions[0]?.rowId ?? null);
+    }
+  }, [activeRowId, navigableOptions, open]);
+
   // Deterministic active-row reconciliation when the collection refreshes:
   // preserve identity if still enabled, otherwise move to the first option.
   useEffect(() => {
     if (activeRowId === null) return;
-    const stillExists = collection.navigableRows.some(
+    const stillExists = navigableOptions.some(
       (row) => row.rowId === activeRowId
     );
     if (stillExists) return;
     setActiveRowId(
-      collection.navigableRows.find((row) => row.type === "option")?.rowId
-        ?? collection.navigableRows[0]?.rowId
-        ?? null
+      navigableOptions[0]?.rowId ?? null
     );
-  }, [collection, activeRowId]);
+  }, [navigableOptions, activeRowId]);
 
   const handleTypeaheadChar = useCallback(
     (char: string) => {
@@ -194,7 +201,7 @@ export function useSelectState<Value extends string>({
       const match = matcher(
         collection as SelectCollection<string>,
         typeaheadBuffer.current,
-        activeRow ? activeRow.navigableIndex : null
+        activeRow?.rowId ?? null
       );
       if (match) setActiveRowId(match.rowId);
     },
@@ -277,6 +284,7 @@ export function useSelectState<Value extends string>({
     setActiveRow,
     openWithSelection,
     handleTriggerKeyDown,
-    handleListKeyDown: handleOpenKeyDown
+    handleListKeyDown: handleOpenKeyDown,
+    moveActive
   };
 }

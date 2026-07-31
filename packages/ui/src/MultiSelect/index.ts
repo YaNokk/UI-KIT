@@ -8,5 +8,6 @@ export type {
 } from "../internal/select/collection";
 export type {
   SelectCollectionState,
-  SelectCollectionStatus
+  SelectCollectionStatus,
+  SelectSearchProps
 } from "../internal/select/types";
