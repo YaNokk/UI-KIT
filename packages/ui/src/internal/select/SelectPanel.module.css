@@ -1,0 +1,18 @@
+.popoverSurface {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--ds-text-primary);
+  background: var(--ds-background-surface-raised);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-lg);
+  box-shadow: var(--ds-shadow-md);
+  outline: none;
+}
+
+.sheetBody {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+}

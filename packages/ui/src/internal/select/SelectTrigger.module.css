@@ -1,0 +1,73 @@
+.value {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-inline-size: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  padding-block: 0;
+  padding-inline: var(--field-control-padding-inline-start)
+    var(--field-control-padding-inline-end);
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.value:disabled {
+  color: var(--ds-text-disabled);
+  cursor: not-allowed;
+}
+
+.valueLeading {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  color: var(--ds-icon-secondary);
+}
+
+.valueText {
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.placeholder {
+  color: var(--ds-control-placeholder);
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+}
+
+.chevron {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ds-control-icon);
+  transition: transform var(--ds-motion-fast);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.chevron > svg {
+  inline-size: var(--ds-size-icon-md);
+  block-size: var(--ds-size-icon-md);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}

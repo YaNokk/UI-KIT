@@ -11,6 +11,26 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./amount": {
+      "types": "./dist/Amount/index.d.ts",
+      "import": "./dist/Amount/index.js"
+    },
+    "./amount-input": {
+      "types": "./dist/AmountInput/index.d.ts",
+      "import": "./dist/AmountInput/index.js"
+    },
+    "./bottom-sheet": {
+      "types": "./dist/BottomSheet/index.d.ts",
+      "import": "./dist/BottomSheet/index.js"
+    },
+    "./button": {
+      "types": "./dist/Button/index.d.ts",
+      "import": "./dist/Button/index.js"
+    },
+    "./button-link": {
+      "types": "./dist/ButtonLink/index.d.ts",
+      "import": "./dist/ButtonLink/index.js"
+    },
     "./design-system-provider": {
       "types": "./dist/DesignSystemProvider/index.d.ts",
       "import": "./dist/DesignSystemProvider/index.js"
@@ -22,26 +42,6 @@
     "./drawer": {
       "types": "./dist/Drawer/index.d.ts",
       "import": "./dist/Drawer/index.js"
-    },
-    "./amount": {
-      "types": "./dist/Amount/index.d.ts",
-      "import": "./dist/Amount/index.js"
-    },
-    "./amount-input": {
-      "types": "./dist/AmountInput/index.d.ts",
-      "import": "./dist/AmountInput/index.js"
-    },
-    "./button": {
-      "types": "./dist/Button/index.d.ts",
-      "import": "./dist/Button/index.js"
-    },
-    "./button-link": {
-      "types": "./dist/ButtonLink/index.d.ts",
-      "import": "./dist/ButtonLink/index.js"
-    },
-    "./bottom-sheet": {
-      "types": "./dist/BottomSheet/index.d.ts",
-      "import": "./dist/BottomSheet/index.js"
     },
     "./field-shell": {
       "types": "./dist/FieldShell/index.d.ts",
@@ -71,6 +71,10 @@
       "types": "./dist/modal/index.d.ts",
       "import": "./dist/modal/index.js"
     },
+    "./multi-select": {
+      "types": "./dist/MultiSelect/index.d.ts",
+      "import": "./dist/MultiSelect/index.js"
+    },
     "./number-input": {
       "types": "./dist/NumberInput/index.d.ts",
       "import": "./dist/NumberInput/index.js"
@@ -87,10 +91,15 @@
       "types": "./dist/Portal/index.d.ts",
       "import": "./dist/Portal/index.js"
     },
+    "./select": {
+      "types": "./dist/Select/index.d.ts",
+      "import": "./dist/Select/index.js"
+    },
     "./spinner": {
       "types": "./dist/Spinner/index.d.ts",
       "import": "./dist/Spinner/index.js"
     },
+    "./styles.css": "./dist/styles.css",
     "./text": {
       "types": "./dist/Text/index.d.ts",
       "import": "./dist/Text/index.js"
@@ -98,8 +107,7 @@
     "./tooltip": {
       "types": "./dist/Tooltip/index.d.ts",
       "import": "./dist/Tooltip/index.js"
-    },
-    "./styles.css": "./dist/styles.css"
+    }
   },
   "sideEffects": [
     "*.css",
@@ -118,6 +126,7 @@
     "@maskito/kit": "^4.0.1",
     "@mypoint/tokens": "^0.1.0",
     "@radix-ui/react-dialog": "1.1.23",
-    "lucide-react": "^1.27.0"
+    "lucide-react": "^1.27.0",
+    "virtua": "^0.41.5"
   }
 }

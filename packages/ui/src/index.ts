@@ -82,6 +82,18 @@ export type {
 } from "./NumberInput/index.js";
 export { PasswordInput } from "./PasswordInput/index.js";
 export type { PasswordInputProps } from "./PasswordInput/index.js";
+export { Select } from "./Select/index.js";
+export type {
+  SelectAction,
+  SelectCollectionItem,
+  SelectCollectionState,
+  SelectCollectionStatus,
+  SelectGroup,
+  SelectOption,
+  SelectProps
+} from "./Select/index.js";
+export { MultiSelect } from "./MultiSelect/index.js";
+export type { MultiSelectProps } from "./MultiSelect/index.js";
 export { Popover } from "./Popover/index.js";
 export type {
   PopoverPlacement,

@@ -1,0 +1,85 @@
+.multiControl {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  min-inline-size: 0;
+  block-size: 100%;
+}
+
+.openTrigger {
+  position: absolute;
+  inset: 0;
+}
+
+.tagViewport {
+  position: relative;
+  z-index: var(--ds-z-index-default);
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--ds-space-1);
+  min-inline-size: 0;
+  overflow: hidden;
+  block-size: 100%;
+  pointer-events: none;
+}
+
+.tag {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: var(--ds-space-1);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding-block: 0;
+  padding-inline: var(--ds-space-2) var(--ds-space-1);
+  block-size: var(--ds-space-5);
+  color: var(--ds-text-primary);
+  font: var(--ds-typography-body-sm);
+  background: var(--ds-background-interactive);
+  border-radius: var(--ds-radius-md);
+}
+
+.tagLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tagRemove {
+  color: var(--ds-icon-secondary);
+  pointer-events: auto;
+}
+
+.overflow {
+  flex: none;
+  padding-inline: var(--ds-space-1);
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-body-sm);
+  white-space: nowrap;
+}
+
+.placeholder {
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  color: var(--ds-control-placeholder);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sizer {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  block-size: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.measureTag {
+  display: inline-block;
+  padding-inline: var(--ds-space-2) var(--ds-space-1);
+  font: var(--ds-typography-body-sm);
+}

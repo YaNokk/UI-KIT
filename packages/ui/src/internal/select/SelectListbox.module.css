@@ -1,0 +1,190 @@
+.root {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  outline: none;
+}
+
+.scroll {
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-block-size: 0;
+  max-block-size: inherit;
+  padding: var(--ds-space-1);
+  outline: none;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-1);
+  padding-block-end: var(--ds-space-0);
+}
+
+.groupHeader {
+  padding-block: var(--ds-space-1);
+  padding-inline: var(--ds-space-3);
+  color: var(--ds-text-tertiary);
+  font: var(--ds-typography-caption);
+  user-select: none;
+}
+
+.row {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  inline-size: 100%;
+  min-inline-size: 0;
+  padding-block: var(--ds-space-2);
+  padding-inline: var(--ds-space-3);
+  color: var(--ds-text-primary);
+  font: var(--ds-typography-body);
+  text-align: start;
+  background: transparent;
+  border: none;
+  border-radius: var(--ds-radius-md);
+  cursor: pointer;
+  user-select: none;
+}
+
+@media (hover: hover) {
+  .row:not(.disabledRow):hover {
+    background: var(--ds-background-interactive-hover);
+  }
+}
+
+.active {
+  background: var(--ds-background-interactive);
+}
+
+@media (hover: hover) {
+  .active:not(.disabledRow):hover {
+    background: var(--ds-background-interactive-hover);
+  }
+}
+
+.selected {
+  color: var(--ds-text-primary);
+}
+
+.selectedMarker {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--ds-size-icon-md);
+  block-size: var(--ds-size-icon-md);
+  color: var(--ds-icon-accent);
+  visibility: hidden;
+}
+
+.selectedMarkerVisible {
+  visibility: visible;
+}
+
+.selectedMarker > svg {
+  inline-size: var(--ds-size-icon-md);
+  block-size: var(--ds-size-icon-md);
+}
+
+.checkboxMarker {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--ds-size-icon-md);
+  block-size: var(--ds-size-icon-md);
+  color: var(--ds-icon-accent);
+  border: var(--ds-border-width-default) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-sm);
+}
+
+.checkboxMarkerChecked {
+  color: var(--ds-icon-on-accent);
+  background: var(--ds-brand-accent);
+  border-color: var(--ds-brand-accent);
+}
+
+.checkboxMarker > svg {
+  inline-size: var(--ds-size-icon-sm);
+  block-size: var(--ds-size-icon-sm);
+}
+
+.leading {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  color: var(--ds-icon-secondary);
+}
+
+.body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.description {
+  overflow: hidden;
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-caption);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trailing {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-caption);
+}
+
+.disabledRow {
+  color: var(--ds-text-disabled);
+  cursor: default;
+}
+
+.disabledRow .description,
+.disabledRow .trailing,
+.disabledRow .leading {
+  color: var(--ds-icon-disabled);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-2);
+  padding-block: var(--ds-space-4);
+  padding-inline: var(--ds-space-3);
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-body-sm);
+  text-align: center;
+}
+
+.statusError {
+  color: var(--ds-text-danger);
+}
+
+.statusActions {
+  display: flex;
+  justify-content: center;
+  padding-block-end: var(--ds-space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row {
+    transition: none;
+  }
+}

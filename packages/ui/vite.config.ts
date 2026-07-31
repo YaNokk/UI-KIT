@@ -62,6 +62,12 @@ export default defineConfig({
         "PasswordInput/index": fileURLToPath(
           new URL("./src/PasswordInput/index.ts", import.meta.url)
         ),
+        "Select/index": fileURLToPath(
+          new URL("./src/Select/index.ts", import.meta.url)
+        ),
+        "MultiSelect/index": fileURLToPath(
+          new URL("./src/MultiSelect/index.ts", import.meta.url)
+        ),
         "Portal/index": fileURLToPath(
           new URL("./src/Portal/index.ts", import.meta.url)
         ),
@@ -83,7 +89,8 @@ export default defineConfig({
         || id === "@maskito/core"
         || id === "@maskito/kit"
         || id === "@mypoint/tokens"
-        || id === "@radix-ui/react-dialog",
+        || id === "@radix-ui/react-dialog"
+        || id === "virtua",
       output: {
         preserveModules: true,
         preserveModulesRoot: sourceRoot,

@@ -17,6 +17,18 @@ export default defineConfig({
         ),
       },
       {
+        find: /^@mypoint\/ui\/select$/,
+        replacement: fileURLToPath(
+          new URL("./packages/ui/src/Select/index.ts", import.meta.url),
+        ),
+      },
+      {
+        find: /^@mypoint\/ui\/multi-select$/,
+        replacement: fileURLToPath(
+          new URL("./packages/ui/src/MultiSelect/index.ts", import.meta.url),
+        ),
+      },
+      {
         find: /^@mypoint\/ui$/,
         replacement: fileURLToPath(
           new URL("./packages/ui/src/index.ts", import.meta.url),
