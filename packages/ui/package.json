@@ -35,6 +35,14 @@
       "types": "./dist/ButtonLink/index.d.ts",
       "import": "./dist/ButtonLink/index.js"
     },
+    "./checkbox": {
+      "types": "./dist/Checkbox/index.d.ts",
+      "import": "./dist/Checkbox/index.js"
+    },
+    "./checkbox-group": {
+      "types": "./dist/CheckboxGroup/index.d.ts",
+      "import": "./dist/CheckboxGroup/index.js"
+    },
     "./design-system-provider": {
       "types": "./dist/DesignSystemProvider/index.d.ts",
       "import": "./dist/DesignSystemProvider/index.js"
@@ -91,6 +99,14 @@
       "types": "./dist/Popover/index.d.ts",
       "import": "./dist/Popover/index.js"
     },
+    "./radio": {
+      "types": "./dist/Radio/index.d.ts",
+      "import": "./dist/Radio/index.js"
+    },
+    "./radio-group": {
+      "types": "./dist/RadioGroup/index.d.ts",
+      "import": "./dist/RadioGroup/index.js"
+    },
     "./portal": {
       "types": "./dist/Portal/index.d.ts",
       "import": "./dist/Portal/index.js"
@@ -106,6 +122,10 @@
     "./status-indicator": {
       "types": "./dist/StatusIndicator/index.d.ts",
       "import": "./dist/StatusIndicator/index.js"
+    },
+    "./switch": {
+      "types": "./dist/Switch/index.d.ts",
+      "import": "./dist/Switch/index.js"
     },
     "./system-color": {
       "types": "./dist/system-color/index.d.ts",

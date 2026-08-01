@@ -37,6 +37,18 @@ export type {
   ButtonSize,
   ButtonVariant
 } from "./Button/index.js";
+export { Checkbox } from "./Checkbox/index.js";
+export type {
+  CheckboxProps,
+  ChoiceControlAlign,
+  ChoiceControlPosition,
+  ChoiceControlSize
+} from "./Checkbox/index.js";
+export { CheckboxGroup } from "./CheckboxGroup/index.js";
+export type {
+  CheckboxGroupOption,
+  CheckboxGroupProps
+} from "./CheckboxGroup/index.js";
 export { ButtonLink } from "./ButtonLink/index.js";
 export type { ButtonLinkProps } from "./ButtonLink/index.js";
 export { Heading } from "./Heading/index.js";
@@ -85,6 +97,13 @@ export type {
 } from "./NumberInput/index.js";
 export { PasswordInput } from "./PasswordInput/index.js";
 export type { PasswordInputProps } from "./PasswordInput/index.js";
+export { Radio } from "./Radio/index.js";
+export type { RadioProps } from "./Radio/index.js";
+export { RadioGroup } from "./RadioGroup/index.js";
+export type {
+  RadioGroupOption,
+  RadioGroupProps
+} from "./RadioGroup/index.js";
 export { Select } from "./Select/index.js";
 export type {
   SelectAction,
@@ -118,6 +137,8 @@ export type {
   StatusIndicatorProps,
   StatusIndicatorSize
 } from "./StatusIndicator/index.js";
+export { Switch } from "./Switch/index.js";
+export type { SwitchProps } from "./Switch/index.js";
 export { Tag } from "./Tag/index.js";
 export type {
   RemovableTagProps,

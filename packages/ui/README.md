@@ -66,6 +66,12 @@ React и ReactDOM предоставляются consumer-приложением
 `@mypoint/ui/system-color`. Monetary-компоненты также доступны через
 `@mypoint/ui/amount` и `@mypoint/ui/amount-input`.
 
+Choice controls доступны через root exports и subpaths `checkbox`,
+`checkbox-group`, `radio`, `radio-group` и `switch`. Они всегда сохраняют
+нативный input в DOM; `CheckboxGroup` отправляет повторяющиеся values одного
+`name`, а `Switch` использует native checkbox с `role="switch"`. Полный
+контракт описан в `../../docs/choice-controls.md`.
+
 Forms и overlay foundations доступны как `Portal`/`PortalProvider`,
 `FormControl`, `FieldShell`, `Input` и `PasswordInput` с явными subpaths
 `portal`, `form-control`, `field-shell`, `input` и `password-input`.

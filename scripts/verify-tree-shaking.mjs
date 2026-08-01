@@ -58,6 +58,18 @@ const iconJavaScript = readOutput("dist-tree-icon", ".js");
 if (!iconJavaScript.includes("data-loading") || !iconJavaScript.includes("aria-hidden")) {
   throw new Error("The used IconButton implementation or Lucide icon was not found.");
 }
+
+runBuild("tree-checkbox", "dist-tree-checkbox");
+const checkboxJavaScript = readOutput("dist-tree-checkbox", ".js");
+if (
+  !checkboxJavaScript.includes("Tree-shaken checkbox")
+  || !checkboxJavaScript.includes("checkbox")
+) {
+  throw new Error("The used Checkbox implementation was not found.");
+}
+if (checkboxJavaScript.includes("role=\"switch\"") || checkboxJavaScript.includes("radio-group-")) {
+  throw new Error("Unused Switch or RadioGroup behavior survived the Checkbox-only build.");
+}
 if (iconJavaScript.includes("Trash2") || iconJavaScript.includes("CashRegister")) {
   throw new Error("Unused icon catalog entries survived the Lucide-only build.");
 }
