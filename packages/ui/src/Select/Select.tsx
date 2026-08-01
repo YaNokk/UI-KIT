@@ -38,6 +38,12 @@ import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import styles from "../internal/select/SelectTrigger.module.css";
 import { controlTextClassNames } from "../internal/single-line-control-typography/singleLineControlTypography";
 
+const textRoleNames: Record<FieldSize, string> = {
+  sm: "controlTextSm",
+  md: "controlTextMd",
+  lg: "controlTextLg"
+};
+
 export interface SelectProps<Value extends string = string> {
   value: Value | null;
   onChange: (value: Value | null) => void;
@@ -355,6 +361,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
               <span
                 className={classNames(styles.valueLabel, controlTextClassNames[size])}
                 data-control-text=""
+                data-control-text-role={textRoleNames[size]}
               >{displayOption === null ? placeholder : displayOption.label}</span>
             </span>
           </button>

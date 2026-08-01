@@ -57,6 +57,8 @@ describe("Select", () => {
     expect(trigger.querySelector("[data-control-text-clip]")).toContainElement(
       trigger.querySelector("[data-control-text]")
     );
+    expect(trigger.querySelector("[data-control-text]"))
+      .toHaveAttribute("data-control-text-role", "controlTextMd");
 
     await user.click(trigger);
     const listbox = await screen.findByRole("listbox");
@@ -66,6 +68,8 @@ describe("Select", () => {
     expect(listbox.querySelector("[data-control-text-clip]")).toContainElement(
       listbox.querySelector("[data-choice-control-label]")
     );
+    expect(listbox.querySelector("[data-choice-control-label]"))
+      .toHaveAttribute("data-control-text-role", "choiceControlLabel");
     // trigger keeps a single role with expanded state
     expect(trigger).toHaveAttribute("aria-expanded", "true");
   });

@@ -75,6 +75,8 @@ describe("MultiSelect", () => {
     expect(trigger.parentElement).toHaveTextContent("Бета");
     expect(container.querySelector("[data-field-chip] [data-control-text-clip]"))
       .toContainElement(container.querySelector("[data-field-chip] [data-compact-control-text]"));
+    expect(container.querySelector("[data-field-chip] [data-compact-control-text]"))
+      .toHaveAttribute("data-control-text-role", "compactControlTextMd");
   });
 
   it.each([

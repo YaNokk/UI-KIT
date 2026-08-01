@@ -11,6 +11,16 @@ const geometryAllowlist = new Set([
 const textSelector = /(label|text|value|summary|placeholder|overflow|badge|tag)/i;
 const suspiciousDeclaration = /\b(?:transform\s*:\s*translateY|inset-block-start\s*:|top\s*:|padding-top\s*:)/i;
 const unsafeTrimming = /\b(?:text-box-trim|text-box-edge)\s*:/i;
+const opticalProperty = /--control-text-optical-offset\s*:/i;
+const calibratedRoles = {
+  controlTextSm: "-0.25px",
+  controlTextMd: "-0.25px",
+  controlTextLg: "-0.5px",
+  compactControlTextSm: "-0.5px",
+  compactControlTextMd: "-0.25px",
+  counterText: "-0.5px",
+  choiceControlLabel: "-0.25px"
+};
 
 async function collect(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -29,7 +39,23 @@ for (const file of await collect(root)) {
   if (unsafeTrimming.test(source)) {
     violations.push(`${relative}: unsafe glyph trimming`);
   }
-  if (relative === sharedFoundation || geometryAllowlist.has(relative)) continue;
+  if (relative === sharedFoundation) {
+    for (const [role, expectedValue] of Object.entries(calibratedRoles)) {
+      const blocks = [...source.matchAll(new RegExp(`\\.${role}\\s*\\{([^{}]*)\\}`, "g"))]
+        .map((match) => match[1] ?? "");
+      const value = blocks
+        .map((block) => block.match(/--control-text-optical-offset\s*:\s*([^;]+);/)?.[1]?.trim())
+        .find((candidate) => candidate !== undefined);
+      if (value !== expectedValue) {
+        violations.push(`${relative}: ${role} must keep the approved ${expectedValue} optical offset`);
+      }
+    }
+    continue;
+  }
+  if (opticalProperty.test(source)) {
+    violations.push(`${relative}: optical offset property is owned by the shared foundation`);
+  }
+  if (geometryAllowlist.has(relative)) continue;
   for (const match of source.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
     const [, selector, declarations] = match;
     if (!textSelector.test(selector) || /\.arrow\b/.test(selector)) continue;

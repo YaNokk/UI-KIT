@@ -1,6 +1,6 @@
 .matrix {
   display: grid;
-  gap: var(--ds-space-4);
+  gap: var(--ds-space-5);
   color: var(--ds-text-primary);
 }
 
@@ -9,34 +9,48 @@
   font: var(--ds-typography-body-sm);
 }
 
-.row {
+.roleSection,
+.auditSection {
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr);
-  align-items: center;
-  gap: var(--ds-space-4);
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
+  border-radius: var(--ds-radius-lg);
 }
 
-.cells,
-.weights {
+.roleHeader {
+  display: grid;
+  grid-template-columns: 180px 110px 110px minmax(240px, 1fr);
+  gap: var(--ds-space-3);
+  align-items: baseline;
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-body-sm);
+}
+
+.roleHeader strong {
+  color: var(--ds-text-primary);
+  font: var(--ds-typography-label);
+}
+
+.cells {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--ds-space-3);
 }
 
-.weights {
-  flex-direction: column;
-  align-items: flex-start;
-}
-
 .guide {
   position: relative;
   display: inline-flex;
   align-items: center;
+  outline: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  outline-offset: var(--ds-space-1);
 }
 
-.guide::after {
+.guide::after,
+.choicePreview::after {
   position: absolute;
+  z-index: var(--ds-layer-content);
   inset-inline: calc(-1 * var(--ds-space-1));
   inset-block-start: 50%;
   border-block-start: var(--ds-border-width-default) solid var(--ds-border-danger);
@@ -45,13 +59,38 @@
 }
 
 .selectCell {
+  display: block;
   inline-size: 320px;
 }
 
-.selectGrid {
+.multiGrid {
   display: grid;
+  gap: var(--ds-space-3);
+}
+
+.choicePreview {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
   gap: var(--ds-space-2);
-  inline-size: 320px;
+  min-block-size: var(--ds-size-icon-md);
+  outline: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  outline-offset: var(--ds-space-1);
+}
+
+.choiceIndicator {
+  box-sizing: border-box;
+  inline-size: var(--ds-size-icon-md);
+  block-size: var(--ds-size-icon-md);
+  border: var(--ds-border-width-default) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-sm);
+}
+
+.auditSection {
+  grid-template-columns: max-content minmax(240px, 1fr) max-content;
+  align-items: center;
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-body-sm);
 }
 
 .fallback {
@@ -66,7 +105,8 @@
 }
 
 @media (--ds-below-md) {
-  .row {
+  .roleHeader,
+  .auditSection {
     grid-template-columns: 1fr;
   }
 }

@@ -19,6 +19,16 @@ function TestIcon() {
 }
 
 describe("Button native semantics", () => {
+  it.each([
+    ["sm", "controlTextSm"],
+    ["md", "controlTextMd"],
+    ["lg", "controlTextLg"]
+  ] as const)("maps %s to the exact typography role %s", (size, role) => {
+    const { container } = render(<Button size={size} variant="primary">Label</Button>);
+    expect(container.querySelector("[data-control-text]"))
+      .toHaveAttribute("data-control-text-role", role);
+  });
+
   it("renders a native button with safe defaults and forwards its ref", () => {
     const ref = { current: null as HTMLButtonElement | null };
 

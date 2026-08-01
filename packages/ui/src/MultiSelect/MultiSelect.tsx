@@ -503,11 +503,19 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                   data-control-text-clip=""
                   data-field-placeholder=""
                 >
-                  <span className={compactControlTextClassNames.md} data-compact-control-text="">{placeholder}</span>
+                  <span
+                    className={compactControlTextClassNames.md}
+                    data-compact-control-text=""
+                    data-control-text-role="compactControlTextMd"
+                  >{placeholder}</span>
                 </span>
               ) : compactInnerSummary ? (
                 <span aria-hidden="true" className={styles.compactSummary} data-control-text-clip="">
-                  <span className={compactControlTextClassNames.md} data-compact-control-text="">{messages.selectedCount(value.length)}</span>
+                  <span
+                    className={compactControlTextClassNames.md}
+                    data-compact-control-text=""
+                    data-control-text-role="compactControlTextMd"
+                  >{messages.selectedCount(value.length)}</span>
                 </span>
               ) : (
                 <>
@@ -524,7 +532,11 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                         key={entry}
                       >
                         <span aria-hidden="true" className={styles.tagLabel} data-control-text-clip="">
-                          <span className={classNames(styles.labelText, compactControlTextClassNames.md)} data-compact-control-text="">{display?.label}</span>
+                          <span
+                            className={classNames(styles.labelText, compactControlTextClassNames.md)}
+                            data-compact-control-text=""
+                            data-control-text-role="compactControlTextMd"
+                          >{display?.label}</span>
                         </span>
                         {interactive ? (
                           <button
@@ -550,7 +562,11 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                     );
                   })}
                   {overflowCount > 0 ? (
-                    <span aria-hidden="true" className={classNames(styles.overflow, compactControlTextClassNames.md)}>
+                    <span
+                      aria-hidden="true"
+                      className={classNames(styles.overflow, compactControlTextClassNames.md)}
+                      data-control-text-role="compactControlTextMd"
+                    >
                       {"+" + overflowCount}
                     </span>
                   ) : null}

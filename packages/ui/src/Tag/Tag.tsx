@@ -46,6 +46,11 @@ const sizeClassNames: Record<TagSize, string> = {
   md: styles.md
 };
 
+const textRoleNames: Record<TagSize, string> = {
+  sm: "compactControlTextSm",
+  md: "compactControlTextMd"
+};
+
 export function Tag(props: TagProps) {
   const {
     children,
@@ -74,6 +79,7 @@ export function Tag(props: TagProps) {
         <span
           className={classNames(styles.label, compactControlTextClassNames[size])}
           data-compact-control-text=""
+          data-control-text-role={textRoleNames[size]}
         >{children}</span>
       </span>
       {isRemovable ? (

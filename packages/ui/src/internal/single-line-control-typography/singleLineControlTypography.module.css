@@ -5,36 +5,48 @@
 .compactControlTextMd,
 .counterText,
 .choiceControlLabel {
-  --control-text-optical-offset: var(--ds-space-0);
-
   position: relative;
   inset-block-start: var(--control-text-optical-offset);
 }
 
 .controlTextSm {
+  --control-text-optical-offset: -0.25px;
+
   font: var(--ds-typography-control-text-sm);
 }
 
 .controlTextMd {
+  --control-text-optical-offset: -0.25px;
+
   font: var(--ds-typography-control-text-md);
 }
 
 .controlTextLg {
+  --control-text-optical-offset: -0.5px;
+
   font: var(--ds-typography-control-text-lg);
 }
 
 .compactControlTextSm {
+  --control-text-optical-offset: -0.5px;
+
   font: var(--ds-typography-compact-control-text-sm);
 }
 
 .compactControlTextMd {
+  --control-text-optical-offset: -0.25px;
+
   font: var(--ds-typography-compact-control-text-md);
 }
 
 .counterText {
+  --control-text-optical-offset: -0.5px;
+
   font: var(--ds-typography-counter-text);
 }
 
 .choiceControlLabel {
+  --control-text-optical-offset: -0.25px;
+
   font: var(--ds-typography-choice-control-label);
 }

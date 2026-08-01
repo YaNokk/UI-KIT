@@ -11,6 +11,14 @@ import { Tag } from "./Tag";
 afterEach(cleanup);
 
 describe("Tag modes", () => {
+  it.each([
+    ["sm", "compactControlTextSm"],
+    ["md", "compactControlTextMd"]
+  ] as const)("maps %s to the exact typography role %s", (size, role) => {
+    render(<Tag size={size}>Label</Tag>);
+    expect(screen.getByText("Label")).toHaveAttribute("data-control-text-role", role);
+  });
+
   it("renders a static non-focusable span", () => {
     render(<Tag color="green">Выполнен</Tag>);
     const label = screen.getByText("Выполнен");

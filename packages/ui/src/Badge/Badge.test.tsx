@@ -13,6 +13,8 @@ describe("Badge", () => {
     const { container } = render(<Badge>{0}</Badge>);
     expect(screen.getByText("0")).toBeInTheDocument();
     expect(container.querySelector("[data-counter-text]")).toHaveTextContent("0");
+    expect(container.querySelector("[data-counter-text]"))
+      .toHaveAttribute("data-control-text-role", "counterText");
     expect(container.querySelector("[data-control-text-clip]")).toContainElement(
       container.querySelector("[data-counter-text]")
     );

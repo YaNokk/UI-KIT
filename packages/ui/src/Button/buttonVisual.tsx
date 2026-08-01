@@ -27,6 +27,12 @@ const sizeClassNames: Record<ButtonSize, string> = {
   lg: styles.lg
 };
 
+const textRoleNames: Record<ButtonSize, string> = {
+  sm: "controlTextSm",
+  md: "controlTextMd",
+  lg: "controlTextLg"
+};
+
 interface ButtonVisualClassNameOptions {
   className?: string | undefined;
   fullWidth?: boolean;
@@ -75,6 +81,7 @@ export function ButtonVisualContent({
       <span
         className={classNames(styles.label, controlTextClassNames[size])}
         data-control-text=""
+        data-control-text-role={textRoleNames[size]}
       >{children}</span>
 
       {endIcon !== undefined && endIcon !== null ? (
