@@ -15,9 +15,23 @@ bottom + border <= field height`. Every size has a non-zero bottom inset.
 The compact 32px size uses an explicit compact caption line and value line;
 there is no negative label/content gap.
 
-Field values use `fieldValueTextSm`, `fieldValueTextMd` and
-`fieldValueTextLg`. The large role is deliberately 16px. MultiSelect chips
-and `+N` use `compactChipText` and are not field values.
+Field values use the `fieldValueTextSm`, `fieldValueTextMd` and
+`fieldValueTextLg` typography roles. The large role is deliberately 16px.
+Internally, `fieldValueTypographyClassNames` applies those roles and wrapped
+field values may additionally use `fieldValueOpticalClassNames`. MultiSelect
+chips and `+N` use `compactChipText` and are not field values.
+
+Native editors consume field-value typography only. Their caret, selection,
+placeholder and value alignment comes from the explicit FieldShell line-height
+and content bands. Wrapped Select and MultiSelect display spans may combine the
+same typography with the private optical wrapper; the native input must never
+receive `position`, inset or translation from typography calibration.
+
+Browser regressions validate caret/selection APIs, placeholder/value line
+geometry, descenders and the fixed heights at 100% and 125% zoom. Native
+browser/password-manager autofill painting cannot be deterministically invoked
+from Storybook automation; the input keeps native autocomplete semantics and
+the same typography-only editor geometry for that state.
 
 Token admission: the missing reusable role was form field content, which could
 not use Button `controlText*` without coupling form geometry to action labels.

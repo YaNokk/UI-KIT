@@ -2,6 +2,10 @@ declare const styles: {
   readonly multiControl: string;
   readonly openTrigger: string;
   readonly tagViewport: string;
+  readonly triggerStatus: string;
+  readonly statusLoadingCompact: string;
+  readonly statusRefreshingCompact: string;
+  readonly statusRefreshingLarge: string;
   readonly tag: string;
   readonly tagLabel: string;
   readonly labelText: string;

@@ -6,10 +6,16 @@ export const controlTextClassNames: Record<"sm" | "md" | "lg", string> = {
   lg: styles.controlTextLg
 };
 
-export const fieldValueTextClassNames: Record<"sm" | "md" | "lg", string> = {
-  sm: styles.fieldValueTextSm,
-  md: styles.fieldValueTextMd,
-  lg: styles.fieldValueTextLg
+export const fieldValueTypographyClassNames: Record<"sm" | "md" | "lg", string> = {
+  sm: styles.fieldValueTypographySm,
+  md: styles.fieldValueTypographyMd,
+  lg: styles.fieldValueTypographyLg
+};
+
+export const fieldValueOpticalClassNames: Record<"sm" | "md" | "lg", string> = {
+  sm: styles.fieldValueOpticalSm,
+  md: styles.fieldValueOpticalMd,
+  lg: styles.fieldValueOpticalLg
 };
 
 export const compactChipTextClassName = styles.compactChipText;

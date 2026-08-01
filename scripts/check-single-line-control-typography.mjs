@@ -13,6 +13,10 @@ const suspiciousDeclaration = /\b(?:transform\s*:\s*translateY|inset-block-start
 const unsafeTrimming = /\b(?:text-box-trim|text-box-edge)\s*:/i;
 const opticalProperty = /--control-text-optical-offset\s*:/i;
 const calibratedRoles = {
+  fieldValueOpticalSm: "-0.25px",
+  fieldValueOpticalMd: "-0.25px",
+  fieldValueOpticalLg: "-0.5px",
+  compactChipText: "-0.25px",
   controlTextSm: "-0.25px",
   controlTextMd: "-0.25px",
   controlTextLg: "-0.5px",

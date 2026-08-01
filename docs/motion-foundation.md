@@ -9,7 +9,7 @@ Semantic roles:
 | Role | Mapping | Consumers |
 | --- | --- | --- |
 | `motion.control.state` | fast + standard | border, background and color state |
-| `motion.control.label` | normal + emphasized | FieldShell label transform/color |
+| `motion.control.label` | normal + standard | FieldShell label transform/color |
 | `motion.control.indicator` | fast + standard | Select chevron |
 | `motion.overlay.enter` | normal + enter | overlay entry |
 | `motion.overlay.exit` | fast + exit | overlay exit |
@@ -23,3 +23,7 @@ Token admission: shared state, label, indicator and overlay timing was the
 missing semantic layer; primitive durations alone could not describe intent.
 Motion has no light/dark aliases, is unaffected by runtime brand and does not
 change by breakpoint. Reduced motion changes semantic durations only.
+
+Floating form labels must use the non-overshooting `standard` easing. The
+`emphasized` primitive remains reserved for a future documented semantic role;
+overshoot, bounce and component-local easing are forbidden for field labels.

@@ -7,8 +7,11 @@ declare const styles: {
   readonly controlTextSm: string;
   readonly counterText: string;
   readonly choiceControlLabel: string;
-  readonly fieldValueTextLg: string;
-  readonly fieldValueTextMd: string;
-  readonly fieldValueTextSm: string;
+  readonly fieldValueOpticalLg: string;
+  readonly fieldValueOpticalMd: string;
+  readonly fieldValueOpticalSm: string;
+  readonly fieldValueTypographyLg: string;
+  readonly fieldValueTypographyMd: string;
+  readonly fieldValueTypographySm: string;
 };
 export default styles;

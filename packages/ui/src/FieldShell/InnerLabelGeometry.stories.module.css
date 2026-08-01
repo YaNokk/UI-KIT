@@ -59,6 +59,22 @@
   padding: var(--ds-space-4);
 }
 
+.nativeEditorGrid,
+.stateGrid {
+  display: grid;
+  gap: var(--ds-space-4);
+  inline-size: min(100%, 720px);
+}
+
+.nativeEditorGrid > div {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.zoom125 {
+  zoom: 1.25;
+}
+
 .viewport390 {
   inline-size: 390px;
   block-size: 844px;

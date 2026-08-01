@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { Input } from "../Input/Input";
 import { MultiSelect } from "../MultiSelect/MultiSelect";
+import { PasswordInput } from "../PasswordInput/PasswordInput";
 import { Select } from "../Select/Select";
 import { FieldShell } from "./FieldShell";
 import styles from "./InnerLabelGeometry.stories.module.css";
@@ -70,6 +71,92 @@ function GeometryFixture() {
       />
     </div>
   );
+}
+
+function NativeEditorFixture({ zoom = false }: { zoom?: boolean }) {
+  return (
+    <div className={zoom ? styles.zoom125 : undefined}>
+      <div className={styles.nativeEditorGrid}>
+        {(["sm", "md", "lg"] as const).map((size) => (
+          <div data-native-editor-row={size} key={size}>
+            <Input
+              autoComplete="name"
+              defaultValue="gjpqy Уцщ ӘҒҚҢӨҰҮҺІ 99+ ₸"
+              label={`Native value ${size}`}
+              labelView="inner"
+              size={size}
+            />
+            <Input
+              label={`Native placeholder ${size}`}
+              labelView="inner"
+              placeholder="gjpqy Уцщ ӘҒҚҢӨҰҮҺІ 99+ ₸"
+              size={size}
+            />
+            <PasswordInput
+              defaultValue="gjpqy99+"
+              label={`Password value ${size}`}
+              labelView="inner"
+              size={size}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function LabelStateFixture() {
+  const [value, setValue] = useState("");
+  return (
+    <div className={styles.stateGrid}>
+      <Input
+        label="Interactive label"
+        labelView="inner"
+        onChange={(event) => setValue(event.currentTarget.value)}
+        placeholder="Pending gjpqy"
+        value={value}
+      />
+      <button onClick={() => setValue("")} type="button">Clear blurred value</button>
+      <Input error="Invalid" label="Invalid label" labelView="inner" value="99+" readOnly />
+      <Input disabled label="Disabled label" labelView="inner" value="Disabled" />
+      <Input label="ReadOnly label" labelView="inner" value="ReadOnly" readOnly />
+      <div dir="rtl">
+        <Input label="RTL label" labelView="inner" value="gjpqy" readOnly />
+      </div>
+    </div>
+  );
+}
+
+async function verifyNativeEditors(canvasElement: HTMLElement, scale = 1) {
+  const canvas = within(canvasElement);
+  const heights = { sm: 32, md: 40, lg: 48 } as const;
+  for (const size of ["sm", "md", "lg"] as const) {
+    const valueInput = canvas.getByRole<HTMLInputElement>("textbox", {
+      name: `Native value ${size}`
+    });
+    const placeholderInput = canvas.getByRole<HTMLInputElement>("textbox", {
+      name: `Native placeholder ${size}`
+    });
+    for (const input of [valueInput, placeholderInput]) {
+      const computed = getComputedStyle(input);
+      expect(input).toHaveAttribute("data-field-value-typography");
+      expect(input).not.toHaveAttribute("data-field-value-optical");
+      expect(computed.position).toBe("static");
+      expect(computed.insetBlockStart).toBe("auto");
+      expect(computed.transform).toBe("none");
+      expect(input.scrollHeight).toBeLessThanOrEqual(input.clientHeight);
+    }
+    expect(getComputedStyle(valueInput).lineHeight)
+      .toBe(getComputedStyle(placeholderInput).lineHeight);
+    valueInput.focus();
+    valueInput.setSelectionRange(0, valueInput.value.length);
+    expect(valueInput.selectionStart).toBe(0);
+    expect(valueInput.selectionEnd).toBe(valueInput.value.length);
+    const shell = valueInput.closest<HTMLElement>("[data-field-part=\"shell\"]");
+    if (!shell) throw new Error("Native editor shell was not rendered.");
+    expect(Math.round(shell.getBoundingClientRect().height))
+      .toBe(Math.round(heights[size] * scale));
+  }
 }
 
 function LongInput({ focused = false }: { focused?: boolean }) {
@@ -166,7 +253,7 @@ export const PointerAndPlaceholder: Story = {
       selectRect.left + selectRect.width / 2,
       selectRect.top + selectRect.height / 2
     );
-    await expect(selectHit).toBe(select);
+    await expect(select.contains(selectHit)).toBe(true);
     await userEvent.click(selectHit as HTMLElement);
     await expect(select).toHaveAttribute("aria-expanded", "true");
     await expect(getComputedStyle(selectPlaceholder).visibility).toBe("visible");
@@ -204,6 +291,18 @@ export const GeometryAssertions: Story = {
         .toEqual(["color", "transform"]);
       expect(labelStyle.transitionProperty).not.toContain("font");
       expect(labelStyle.transitionProperty).not.toContain("inset-block-start");
+      expect(
+        labelStyle.transitionTimingFunction
+          .match(/cubic-bezier\([^)]*\)/g)
+          ?.map((value) => value.trim())
+      )
+        .toEqual([
+          "cubic-bezier(0.2, 0, 0, 1)",
+          "cubic-bezier(0.2, 0, 0, 1)"
+        ]);
+      const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      expect(labelStyle.transitionDuration.split(",").map((value) => value.trim()))
+        .toEqual(reducedMotion ? ["0s", "0s"] : ["0.18s", "0.18s"]);
       return shell;
     };
 
@@ -218,6 +317,54 @@ export const GeometryAssertions: Story = {
       ?.querySelector<HTMLElement>("[data-field-chip]");
     if (!chip) throw new Error("MultiSelect chip was not rendered.");
     await expect(assertBands(multi, chip, 0.5).getBoundingClientRect().height).toBe(48);
+  }
+};
+
+export const NativeEditorGeometry: Story = {
+  args: {} as never,
+  render: () => <NativeEditorFixture />,
+  play: async ({ canvasElement }) => verifyNativeEditors(canvasElement)
+};
+
+export const NativeEditorGeometryZoom125: Story = {
+  args: {} as never,
+  render: () => <NativeEditorFixture zoom />,
+  play: async ({ canvasElement }) => verifyNativeEditors(canvasElement, 1.25)
+};
+
+export const LabelStateAndDirection: Story = {
+  args: {} as never,
+  render: () => <LabelStateFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const interactive = canvas.getByRole("textbox", { name: "Interactive label" });
+    const shell = interactive.closest<HTMLElement>("[data-field-part=\"shell\"]");
+    if (!shell) throw new Error("Interactive FieldShell was not rendered.");
+    expect(shell).not.toHaveAttribute("data-label-floated");
+
+    await userEvent.click(interactive);
+    expect(shell).toHaveAttribute("data-label-floated");
+    interactive.blur();
+    await waitFor(() => expect(shell).not.toHaveAttribute("data-label-floated"));
+    await userEvent.click(interactive);
+    await userEvent.type(interactive, "gjpqy");
+    interactive.blur();
+    expect(shell).toHaveAttribute("data-label-floated");
+    await userEvent.click(canvas.getByRole("button", { name: "Clear blurred value" }));
+    await waitFor(() => expect(shell).not.toHaveAttribute("data-label-floated"));
+
+    for (const name of ["Invalid label", "Disabled label", "ReadOnly label"]) {
+      expect(canvas.getByRole("textbox", { name })
+        .closest("[data-field-part=\"shell\"]"))
+        .toHaveAttribute("data-label-floated");
+    }
+    const rtlInput = canvas.getByRole("textbox", { name: "RTL label" });
+    const rtlLabel = rtlInput.closest("[data-field-part=\"shell\"]")
+      ?.querySelector<HTMLElement>("[data-field-part=\"inner-label\"]");
+    if (!rtlLabel) throw new Error("RTL label was not rendered.");
+    const rtlOriginX = parseFloat(getComputedStyle(rtlLabel).transformOrigin);
+    expect(Math.abs(rtlOriginX - rtlLabel.getBoundingClientRect().width))
+      .toBeLessThanOrEqual(0.5);
   }
 };
 

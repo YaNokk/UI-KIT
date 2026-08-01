@@ -11,6 +11,7 @@ import {
   useState,
   type KeyboardEvent,
   type MouseEvent,
+  type ReactElement,
   type ReactNode
 } from "react";
 import { FieldShell } from "../FieldShell/FieldShell";
@@ -40,7 +41,8 @@ import triggerStyles from "../internal/select/SelectTrigger.module.css";
 import styles from "./MultiSelect.module.css";
 import {
   compactChipTextClassName,
-  fieldValueTextClassNames
+  fieldValueOpticalClassNames,
+  fieldValueTypographyClassNames
 } from "../internal/single-line-control-typography/singleLineControlTypography";
 
 const fieldValueRoleNames: Record<FieldSize, string> = {
@@ -170,6 +172,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   const listboxId = useId();
   const selectedSummaryId = useId();
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const shellRef = useRef<HTMLDivElement | null>(null);
   const skipFocusRestoreRef = useRef(false);
   const viewportRef = useRef<HTMLSpanElement | null>(null);
   const sizerRef = useRef<HTMLSpanElement | null>(null);
@@ -231,6 +234,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
     && value.length > 0;
   const loading = collectionState?.status === "loading";
   const refreshing = collectionState?.status === "refreshing";
+  const showClearButton = showClear && !loading;
   const [activeTagIndex, setActiveTagIndex] = useState<number | null>(null);
 
   const handleOpenChange = useCallback((nextOpen: boolean) => {
@@ -406,6 +410,52 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   const visibleTags = compactInnerSummary ? [] : value.slice(0, visibleCount);
   const overflowCount = value.length - visibleTags.length;
 
+  const renderPanel = (triggerElement: ReactElement) => (
+    <SelectPanel
+      dismissBoundaryRef={shellRef}
+      messages={messages}
+      multiple
+      onOpenChange={handleOpenChange}
+      open={open}
+      trigger={triggerElement}
+      focusTriggerRef={triggerRef}
+      skipFocusRestoreRef={skipFocusRestoreRef}
+      header={searchField}
+      initialFocusRef={searchable
+        ? searchRef
+        : hasEnabledActions
+          ? firstEnabledActionRef
+          : listboxRef}
+      interactive={interactive}
+    >
+      <SelectListboxView<Value>
+        activeRowId={state.activeRow?.rowId ?? null}
+        listboxId={listboxId}
+        messages={messages}
+        multiple
+        firstEnabledActionRef={firstEnabledActionRef}
+        onHoverRow={(row) => state.setActiveRow(row)}
+        onKeyDown={(event) => state.handleListKeyDown(event, commit)}
+        onPickRow={commit}
+        onRetry={state.onRetry}
+        rows={state.collection.rows}
+        selectedValues={selectedValues}
+        status={state.status}
+        statusMessage={
+          state.status === "empty" && emptyMessage != null
+            ? emptyMessage
+            : state.status === "empty" && search.query.length > 0
+              ? messages.noResults
+            : state.status === "loading" && loadingMessage != null
+              ? loadingMessage
+              : state.statusMessage
+        }
+        autoFocus={false}
+        ref={listboxRef}
+      />
+    </SelectPanel>
+  );
+
   const trigger = (
     <FormControl
       block={block}
@@ -423,11 +473,11 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
       {({ label: controlLabel, ...controlProps }) => (
         <FieldShell
           disabled={disabled}
-          endAdornment={
+          endAdornment={showClearButton ? (
             <span className={triggerStyles.actions} data-field-interactive="">
-              {showClear && !loading ? (
                 <IconButton
                   aria-label={messages.clear}
+                  data-multiselect-clear=""
                   disabled={disabled}
                   icon={<X />}
                   onClick={handleClear}
@@ -438,34 +488,24 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                   size="sm"
                   variant="ghost"
                 />
-              ) : null}
-              {loading || refreshing ? (
-                <Spinner
-                  size={size === "lg" ? "md" : "sm"}
-                  tone="secondary"
-                />
-              ) : null}
-              {!loading ? <span
-                aria-hidden="true"
-                className={classNames(
-                  triggerStyles.chevron,
-                  open && triggerStyles.chevronOpen
-                )}
-              >
-                <ChevronDown />
-              </span> : null}
             </span>
-          }
+          ) : undefined}
           invalid={invalid}
           label={controlLabel}
           labelFloated={open || value.length > 0}
           labelView={labelView}
           onFocusRequest={() => triggerRef.current?.focus()}
           readOnly={readOnly}
+          ref={shellRef}
           size={size}
         >
-          <span className={styles.multiControl}>
-            <button
+          <span className={classNames(
+            styles.multiControl,
+            loading && size !== "lg" && styles.statusLoadingCompact,
+            refreshing && size !== "lg" && styles.statusRefreshingCompact,
+            refreshing && size === "lg" && styles.statusRefreshingLarge
+          )}>
+            {renderPanel(<button
               {...controlProps}
               aria-controls={open ? listboxId : undefined}
               aria-describedby={value.length > 0
@@ -478,6 +518,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
               aria-busy={loading || refreshing ? true : undefined}
               aria-label={ariaLabel}
               className={classNames(triggerStyles.value, styles.openTrigger)}
+              data-multiselect-trigger=""
               data-field-part="native-control"
               disabled={disabled}
               onKeyDown={handleTriggerKeyDown}
@@ -493,7 +534,26 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                   ))}
                 </span>
               ) : null}
-            </button>
+              <span aria-hidden="true" className={styles.triggerStatus}>
+                {loading || refreshing ? (
+                  <Spinner
+                    data-select-spinner=""
+                    size={size === "lg" ? "md" : "sm"}
+                    tone="secondary"
+                  />
+                ) : null}
+                {!loading ? <span
+                  aria-hidden="true"
+                  className={classNames(
+                    triggerStyles.chevron,
+                    open && triggerStyles.chevronOpen
+                  )}
+                  data-multiselect-chevron=""
+                >
+                  <ChevronDown />
+                </span> : null}
+              </span>
+            </button>)}
             <span
               className={styles.tagViewport}
               data-field-selection-presentation={
@@ -513,15 +573,25 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                   data-field-placeholder=""
                 >
                   <span
-                    className={fieldValueTextClassNames[size]}
+                    className={classNames(
+                      fieldValueTypographyClassNames[size],
+                      fieldValueOpticalClassNames[size]
+                    )}
                     data-control-text-role={fieldValueRoleNames[size]}
+                    data-field-value-optical=""
+                    data-field-value-typography=""
                   >{placeholder}</span>
                 </span>
               ) : compactInnerSummary ? (
                 <span aria-hidden="true" className={styles.compactSummary} data-control-text-clip="">
                   <span
-                    className={fieldValueTextClassNames[size]}
+                    className={classNames(
+                      fieldValueTypographyClassNames[size],
+                      fieldValueOpticalClassNames[size]
+                    )}
                     data-control-text-role={fieldValueRoleNames[size]}
+                    data-field-value-optical=""
+                    data-field-value-typography=""
                   >{messages.selectedCount(value.length)}</span>
                 </span>
               ) : (
@@ -551,6 +621,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                               display?.textValue ?? String(entry)
                             )}
                             className={styles.tagRemove}
+                            data-field-chip-remove=""
                             type="button"
                             onClick={(event) => {
                               event.stopPropagation();
@@ -608,48 +679,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
       {name ? value.map((entry) => (
         <input key={entry} name={name} type="hidden" value={entry} />
       )) : null}
-      <SelectPanel
-        messages={messages}
-        multiple
-        onOpenChange={handleOpenChange}
-        open={open}
-        trigger={trigger}
-        focusTriggerRef={triggerRef}
-        skipFocusRestoreRef={skipFocusRestoreRef}
-        header={searchField}
-        initialFocusRef={searchable
-          ? searchRef
-          : hasEnabledActions
-            ? firstEnabledActionRef
-            : listboxRef}
-        interactive={interactive}
-      >
-        <SelectListboxView<Value>
-          activeRowId={state.activeRow?.rowId ?? null}
-          listboxId={listboxId}
-          messages={messages}
-          multiple
-          firstEnabledActionRef={firstEnabledActionRef}
-          onHoverRow={(row) => state.setActiveRow(row)}
-          onKeyDown={(event) => state.handleListKeyDown(event, commit)}
-          onPickRow={commit}
-          onRetry={state.onRetry}
-          rows={state.collection.rows}
-          selectedValues={selectedValues}
-          status={state.status}
-          statusMessage={
-            state.status === "empty" && emptyMessage != null
-              ? emptyMessage
-              : state.status === "empty" && search.query.length > 0
-                ? messages.noResults
-              : state.status === "loading" && loadingMessage != null
-                ? loadingMessage
-                : state.statusMessage
-          }
-          autoFocus={false}
-          ref={listboxRef}
-        />
-      </SelectPanel>
+      {trigger}
     </>
   );
 }) as <Value extends string = string>(

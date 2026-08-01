@@ -29,6 +29,7 @@ export interface SelectPanelProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: ReactNode;
+  dismissBoundaryRef?: RefObject<HTMLElement | null> | undefined;
   header?: ReactNode;
   initialFocusRef?: RefObject<HTMLElement | null> | undefined;
   interactive?: boolean | undefined;
@@ -45,6 +46,7 @@ export function SelectPanel({
   open,
   onOpenChange,
   children,
+  dismissBoundaryRef,
   header,
   initialFocusRef,
   interactive = true,
@@ -97,6 +99,7 @@ export function SelectPanel({
   const floating = useFloatingOverlay({
     dismissOnEscape: true,
     dismissOnOutsidePress: true,
+    dismissBoundaryRef,
     interaction: "click",
     interactionEnabled: presentation === "popover" && interactive,
     matchTriggerWidth: true,

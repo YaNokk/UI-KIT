@@ -9,7 +9,7 @@ import {
 } from "react";
 import { FieldShell } from "../FieldShell/FieldShell";
 import { FormControl } from "../FormControl/FormControl";
-import { fieldValueTextClassNames } from "../internal/single-line-control-typography/singleLineControlTypography";
+import { fieldValueTypographyClassNames } from "../internal/single-line-control-typography/singleLineControlTypography";
 import { classNames } from "../shared/classNames";
 import type { FieldLabelView, FieldSize } from "../shared/field";
 import styles from "./Input.module.css";
@@ -128,8 +128,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           <input
             {...nativeProps}
             {...controlProps}
-            className={classNames(styles.input, fieldValueTextClassNames[size])}
+            className={classNames(styles.input, fieldValueTypographyClassNames[size])}
             data-control-text-role={fieldValueRoleNames[size]}
+            data-field-value-typography=""
             data-field-part="native-control"
             data-label-floated={labelFloated ? "" : undefined}
             data-label-view={effectiveLabelView}

@@ -53,6 +53,9 @@ describe("Select", () => {
     render(<ControlledSelect items={baseItems} />);
 
     const trigger = screen.getByRole("button", { name: /Клиент/ });
+    expect(trigger).toHaveAttribute("data-select-trigger");
+    expect(trigger.querySelector("[data-select-chevron]"))
+      .toHaveAttribute("aria-hidden", "true");
     expect(trigger).toHaveTextContent("Выберите клиента");
     expect(trigger.querySelector("[data-control-text-clip]")).toContainElement(
       trigger.querySelector("[data-control-text]")
@@ -151,7 +154,10 @@ describe("Select", () => {
       <ControlledSelect clearable items={baseItems} onChange={onChange} value="a" />
     );
 
-    await user.click(screen.getByRole("button", { name: "Очистить выбор" }));
+    const clear = screen.getByRole("button", { name: "Очистить выбор" });
+    expect(clear).toHaveAttribute("data-select-clear");
+    expect(screen.getByRole("button", { name: /Клиент/ })).not.toContainElement(clear);
+    await user.click(clear);
     expect(onChange).toHaveBeenCalledWith(null);
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
@@ -295,6 +301,10 @@ describe("Select", () => {
       />
     );
     await user.click(screen.getByRole("button", { name: /Клиент/ }));
+    const trigger = screen.getByRole("button", { name: /Клиент/ });
+    expect(trigger).toHaveAttribute("aria-busy", "true");
+    expect(trigger.querySelector("[data-select-spinner]"))
+      .toHaveAttribute("aria-hidden", "true");
     expect(await screen.findByRole("status")).toHaveTextContent("Загрузка");
     expect(screen.queryAllByRole("option")).toHaveLength(0);
   });

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { User } from "lucide-react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { Dialog } from "../../Dialog/Dialog";
 import { Input } from "../../Input/Input";
@@ -311,6 +312,199 @@ function TriggerToggleFixture() {
   );
 }
 
+function UncontrolledTriggerToggleFixture() {
+  const [value, setValue] = useState<string | null>(null);
+  return (
+    <div>
+      <Select
+        items={baseItems}
+        label="Uncontrolled trigger toggle"
+        onChange={setValue}
+        value={value}
+      />
+      <button type="button">Uncontrolled outside target</button>
+    </div>
+  );
+}
+
+function DisabledFixture() {
+  return (
+    <div className={styles.stack}>
+      <Select
+        disabled
+        items={baseItems}
+        label="Disabled Select"
+        onChange={() => undefined}
+        value={null}
+      />
+      <MultiSelect
+        disabled
+        items={baseItems}
+        label="Disabled MultiSelect"
+        onChange={() => undefined}
+        value={[]}
+      />
+    </div>
+  );
+}
+
+function SelectTriggerHitRegionFixture() {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState<string | null>("alpha");
+  const transitions = useRef<boolean[]>([]);
+  const [refreshingOpen, setRefreshingOpen] = useState(false);
+  const refreshingTransitions = useRef<boolean[]>([]);
+  return (
+    <div className={styles.stack}>
+      <div className={styles.width320}>
+        <Select
+          block
+          clearable
+          items={baseItems}
+          label="Hit region Select"
+          locale="ru-RU"
+          onChange={setValue}
+          onOpenChange={(nextOpen) => {
+            transitions.current.push(nextOpen);
+            setOpen(nextOpen);
+          }}
+          open={open}
+          searchable
+          value={value}
+        />
+      </div>
+      <button onClick={() => setValue("alpha")} type="button">Reset Select value</button>
+      <output aria-label="Hit region Select value">{value ?? "null"}</output>
+      <output aria-label="Hit region Select transitions">
+        {transitions.current.map(String).join(",")}
+      </output>
+      <div className={styles.width320}>
+        <Select
+          block
+          collectionState={{ status: "refreshing" }}
+          items={baseItems}
+          label="Refreshing hit region Select"
+          onChange={() => undefined}
+          onOpenChange={(nextOpen) => {
+            refreshingTransitions.current.push(nextOpen);
+            setRefreshingOpen(nextOpen);
+          }}
+          open={refreshingOpen}
+          value="alpha"
+        />
+      </div>
+      <output aria-label="Refreshing Select transitions">
+        {refreshingTransitions.current.map(String).join(",")}
+      </output>
+      <div className={styles.width320}>
+        <Select
+          block
+          items={baseItems}
+          label="Placeholder hit region Select"
+          onChange={() => undefined}
+          placeholder="Choose a client"
+          value={null}
+        />
+      </div>
+    </div>
+  );
+}
+
+function MultiSelectTriggerHitRegionFixture() {
+  const [summaryOpen, setSummaryOpen] = useState(false);
+  const [summaryValue, setSummaryValue] = useState<string[]>([]);
+  const summaryTransitions = useRef<boolean[]>([]);
+  const [chipsOpen, setChipsOpen] = useState(false);
+  const [chipsValue, setChipsValue] = useState<string[]>(["alpha", "beta"]);
+  const chipsTransitions = useRef<boolean[]>([]);
+  return (
+    <div className={styles.stack}>
+      <div className={styles.width320}>
+        <MultiSelect
+          block
+          items={baseItems}
+          label="Summary hit region MultiSelect"
+          labelView="inner"
+          locale="ru-RU"
+          onChange={setSummaryValue}
+          onOpenChange={(nextOpen) => {
+            summaryTransitions.current.push(nextOpen);
+            setSummaryOpen(nextOpen);
+          }}
+          open={summaryOpen}
+          placeholder="Choose tags"
+          value={summaryValue}
+        />
+      </div>
+      <button onClick={() => setSummaryValue(["alpha", "beta"])} type="button">
+        Set summary values
+      </button>
+      <output aria-label="Summary MultiSelect transitions">
+        {summaryTransitions.current.map(String).join(",")}
+      </output>
+      <div className={styles.width320}>
+        <MultiSelect
+          block
+          clearable
+          items={baseItems}
+          label="Chips hit region MultiSelect"
+          locale="ru-RU"
+          onChange={setChipsValue}
+          onOpenChange={(nextOpen) => {
+            chipsTransitions.current.push(nextOpen);
+            setChipsOpen(nextOpen);
+          }}
+          open={chipsOpen}
+          value={chipsValue}
+        />
+      </div>
+      <output aria-label="Chips MultiSelect value">{chipsValue.join(",")}</output>
+      <output aria-label="Chips MultiSelect transitions">
+        {chipsTransitions.current.map(String).join(",")}
+      </output>
+    </div>
+  );
+}
+
+function TriggerHitRegionGeometryFixture() {
+  const longItem: SelectCollectionItem = {
+    value: "long",
+    label: "Pending gjpqy Черновик ӘҒҚҢӨҰҮҺІ 99+ ₸",
+    textValue: "Pending gjpqy Черновик ӘҒҚҢӨҰҮҺІ 99+ ₸",
+    leading: <User aria-hidden="true" />
+  };
+  return (
+    <div className={styles.stack}>
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <div className={styles.width320} data-trigger-geometry-row={size} key={size}>
+          <Select
+            block
+            clearable
+            collectionState={{ status: "refreshing" }}
+            items={[longItem]}
+            label={`Geometry Select ${size}`}
+            labelView={size === "md" ? "outer" : "inner"}
+            onChange={() => undefined}
+            selectedItem={longItem}
+            size={size}
+            value="long"
+          />
+          <MultiSelect
+            block
+            clearable
+            items={baseItems}
+            label={`Geometry MultiSelect ${size}`}
+            labelView={size === "md" ? "outer" : "inner"}
+            onChange={() => undefined}
+            size={size}
+            value={["alpha", "beta"]}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function FieldValueTypographyFixture() {
   const roles = {
     sm: "fieldValueTextSm",
@@ -352,6 +546,18 @@ function FieldValueTypographyFixture() {
   );
 }
 
+function resolveVisualHitTarget(target: HTMLElement, trigger: HTMLElement) {
+  const rect = target.getBoundingClientRect();
+  const hit = target.ownerDocument.elementFromPoint(
+    rect.left + rect.width / 2,
+    rect.top + rect.height / 2
+  );
+  if (!(hit instanceof HTMLElement) || !trigger.contains(hit)) {
+    throw new Error("Visual target does not resolve to its owning trigger.");
+  }
+  return hit;
+}
+
 const meta = {
   title: "Fields/SelectMultiSelectBrowserRegression",
   component: Select,
@@ -377,6 +583,7 @@ export const TriggerToggle: Story = {
     await userEvent.click(trigger);
     await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
     await expect(transitions).toHaveTextContent("true,false");
+    await expect(trigger).toHaveFocus();
 
     await userEvent.click(trigger);
     const listbox = await body.findByRole("listbox");
@@ -387,15 +594,310 @@ export const TriggerToggle: Story = {
     await expect(transitions).toHaveTextContent("true,false,true,false");
 
     await userEvent.click(trigger);
-    await userEvent.click(canvas.getByRole("button", { name: "Outside target" }));
+    const outside = canvas.getByRole("button", { name: "Outside target" });
+    await userEvent.click(outside);
     await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(outside).toHaveFocus();
 
     await userEvent.click(trigger);
     await userEvent.keyboard("{Escape}");
     await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(trigger).toHaveFocus();
     await expect(transitions).toHaveTextContent(
       "true,false,true,false,true,false,true,false"
     );
+  }
+};
+
+export const TriggerHitRegion: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <SelectTriggerHitRegionFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole("button", { name: "Hit region Select" });
+    const transitions = canvas.getByLabelText("Hit region Select transitions");
+    const valueOutput = canvas.getByLabelText("Hit region Select value");
+    const valueText = trigger.querySelector<HTMLElement>("[data-control-text]");
+    const chevron = trigger.querySelector<HTMLElement>("[data-select-chevron]");
+    if (!valueText || !chevron) throw new Error("Select trigger anatomy is incomplete.");
+    await expect(trigger).toHaveAttribute("data-select-trigger");
+    await expect(chevron).toHaveAttribute("aria-hidden", "true");
+    expect(trigger.querySelector("button")).toBeNull();
+
+    const clear = canvas.getByRole("button", { name: "Очистить выбор" });
+    await expect(clear).toHaveAttribute("data-select-clear");
+    await userEvent.click(clear);
+    await expect(valueOutput).toHaveTextContent("null");
+    await expect(body.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(transitions.textContent).toBe("");
+
+    await userEvent.click(canvas.getByRole("button", { name: "Reset Select value" }));
+    await userEvent.click(valueText);
+    await expect(await body.findByRole("textbox")).toHaveFocus();
+    await expect(transitions).toHaveTextContent("true");
+    await userEvent.click(canvas.getByRole("button", { name: "Очистить выбор" }));
+    await expect(valueOutput).toHaveTextContent("null");
+    await expect(body.getByRole("listbox")).toBeInTheDocument();
+    await expect(transitions).toHaveTextContent("true");
+    await userEvent.click(chevron);
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(transitions).toHaveTextContent("true,false");
+
+    await userEvent.click(canvas.getByRole("button", { name: "Reset Select value" }));
+    await userEvent.click(chevron);
+    await expect(await body.findByRole("textbox")).toHaveFocus();
+    await userEvent.click(chevron);
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(transitions).toHaveTextContent("true,false,true,false");
+
+    await userEvent.click(valueText);
+    await body.findByRole("listbox");
+    await userEvent.click(valueText);
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(transitions).toHaveTextContent("true,false,true,false,true,false");
+
+    await userEvent.click(valueText);
+    const search = await body.findByRole("textbox");
+    await expect(search).toHaveFocus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(body.getByRole("listbox")).toHaveFocus();
+    await userEvent.click(chevron);
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(transitions).toHaveTextContent(
+      "true,false,true,false,true,false,true,false"
+    );
+
+    const refreshingTrigger = canvas.getByRole("button", {
+      name: "Refreshing hit region Select"
+    });
+    const spinner = refreshingTrigger.querySelector<HTMLElement>("[data-select-spinner]");
+    const refreshingChevron = refreshingTrigger.querySelector<HTMLElement>(
+      "[data-select-chevron]"
+    );
+    if (!spinner || !refreshingChevron) {
+      throw new Error("Refreshing trigger status is incomplete.");
+    }
+    await expect(refreshingTrigger).toHaveAttribute("aria-busy", "true");
+    await expect(spinner).toHaveAttribute("aria-hidden", "true");
+    expect(spinner.tabIndex).toBe(-1);
+    await userEvent.click(spinner);
+    await expect(await body.findByRole("listbox")).toBeInTheDocument();
+    await userEvent.click(refreshingChevron);
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(canvas.getByLabelText("Refreshing Select transitions"))
+      .toHaveTextContent("true,false");
+
+    const placeholderTrigger = canvas.getByRole("button", {
+      name: "Placeholder hit region Select"
+    });
+    const placeholder = placeholderTrigger.querySelector<HTMLElement>(
+      "[data-field-placeholder]"
+    );
+    const placeholderChevron = placeholderTrigger.querySelector<HTMLElement>(
+      "[data-select-chevron]"
+    );
+    if (!placeholder || !placeholderChevron) {
+      throw new Error("Placeholder trigger anatomy is incomplete.");
+    }
+    await userEvent.click(placeholder);
+    await expect(await body.findByRole("listbox")).toBeInTheDocument();
+    await userEvent.click(placeholderChevron);
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+  }
+};
+
+export const MultiSelectTriggerHitRegion: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <MultiSelectTriggerHitRegionFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const summaryTrigger = canvas.getByRole("button", {
+      name: "Summary hit region MultiSelect"
+    });
+    const summaryTransitions = canvas.getByLabelText("Summary MultiSelect transitions");
+    const placeholder = summaryTrigger.closest("[data-field-part=\"shell\"]")
+      ?.querySelector<HTMLElement>("[data-field-placeholder]");
+    const summaryChevron = summaryTrigger.querySelector<HTMLElement>(
+      "[data-multiselect-chevron]"
+    );
+    if (!placeholder || !summaryChevron) {
+      throw new Error("MultiSelect placeholder anatomy is incomplete.");
+    }
+    await expect(summaryTrigger).toHaveAttribute("data-multiselect-trigger");
+    expect(summaryTrigger.querySelector("button")).toBeNull();
+    await userEvent.click(resolveVisualHitTarget(placeholder, summaryTrigger));
+    await expect(await body.findByRole("listbox")).toBeInTheDocument();
+    await userEvent.click(summaryChevron);
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(summaryTransitions).toHaveTextContent("true,false");
+
+    await userEvent.click(canvas.getByRole("button", { name: "Set summary values" }));
+    const summary = summaryTrigger.closest("[data-field-part=\"shell\"]")
+      ?.querySelector<HTMLElement>("[data-field-selection-presentation=\"summary\"]");
+    if (!summary) throw new Error("MultiSelect summary was not rendered.");
+    await userEvent.click(resolveVisualHitTarget(summary, summaryTrigger));
+    await expect(await body.findByRole("listbox")).toBeInTheDocument();
+    await userEvent.click(summaryChevron);
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(summaryTransitions).toHaveTextContent("true,false,true,false");
+
+    const chipsTrigger = canvas.getByRole("button", {
+      name: "Chips hit region MultiSelect"
+    });
+    const chipsShell = chipsTrigger.closest("[data-field-part=\"shell\"]");
+    const chipsTransitions = canvas.getByLabelText("Chips MultiSelect transitions");
+    const chipsValue = canvas.getByLabelText("Chips MultiSelect value");
+    const firstRemove = canvas.getByRole("button", { name: "Убрать Альфа" });
+    await expect(firstRemove).toHaveAttribute("data-field-chip-remove");
+    await userEvent.click(firstRemove);
+    await expect(chipsValue).toHaveTextContent("beta");
+    expect(chipsTransitions.textContent).toBe("");
+    await expect(body.queryByRole("listbox")).not.toBeInTheDocument();
+
+    const chipBody = chipsShell?.querySelector<HTMLElement>(
+      "[data-field-chip] [data-control-text-clip]"
+    );
+    const chipsChevron = chipsTrigger.querySelector<HTMLElement>(
+      "[data-multiselect-chevron]"
+    );
+    if (!chipBody || !chipsChevron) throw new Error("MultiSelect chip anatomy is incomplete.");
+    await userEvent.click(resolveVisualHitTarget(chipBody, chipsTrigger));
+    await expect(await body.findByRole("listbox")).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Убрать Бета" }));
+    expect(chipsValue.textContent).toBe("");
+    await expect(body.getByRole("listbox")).toBeInTheDocument();
+    await expect(chipsTransitions).toHaveTextContent("true");
+    await userEvent.click(chipsChevron);
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(chipsTransitions).toHaveTextContent("true,false");
+  }
+};
+
+export const TriggerHitRegionGeometry: Story = {
+  args: {} as never,
+  render: () => <TriggerHitRegionGeometryFixture />,
+  play: async ({ canvasElement }) => {
+    const heights = { sm: 32, md: 40, lg: 48 } as const;
+    for (const size of ["sm", "md", "lg"] as const) {
+      const row = canvasElement.querySelector<HTMLElement>(
+        `[data-trigger-geometry-row="${size}"]`
+      );
+      if (!row) throw new Error(`Missing ${size} trigger geometry row.`);
+      const shells = row.querySelectorAll<HTMLElement>("[data-field-part=\"shell\"]");
+      expect(shells).toHaveLength(2);
+      for (const shell of shells) {
+        expect(Math.round(shell.getBoundingClientRect().height)).toBe(heights[size]);
+      }
+      const selectTrigger = row.querySelector<HTMLElement>("[data-select-trigger]");
+      const multiTrigger = row.querySelector<HTMLElement>("[data-multiselect-trigger]");
+      if (!selectTrigger || !multiTrigger) throw new Error("Trigger markers are missing.");
+      const selectChevron = selectTrigger.querySelector<HTMLElement>(
+        "[data-select-chevron]"
+      );
+      const selectClear = row.querySelector<HTMLElement>("[data-select-clear]");
+      const multiClear = row.querySelector<HTMLElement>("[data-multiselect-clear]");
+      const valueClip = selectTrigger.querySelector<HTMLElement>(
+        "[data-control-text-clip]"
+      );
+      expect(selectChevron).not.toBeNull();
+      expect(selectTrigger.querySelector("[data-select-spinner]")).not.toBeNull();
+      expect(multiTrigger.querySelector("[data-multiselect-chevron]")).not.toBeNull();
+      expect(selectTrigger.querySelector("button")).toBeNull();
+      expect(multiTrigger.querySelector("button")).toBeNull();
+      expect(selectClear).not.toBeNull();
+      expect(multiClear).not.toBeNull();
+      expect(selectTrigger.querySelector("[data-select-clear]")).toBeNull();
+      expect(multiTrigger.querySelector("[data-multiselect-clear]")).toBeNull();
+      expect(Math.round(selectChevron?.getBoundingClientRect().width ?? 0)).toBe(20);
+      expect(valueClip?.scrollWidth).toBeGreaterThan(valueClip?.clientWidth ?? 0);
+      expect(selectTrigger.getBoundingClientRect().right)
+        .toBeLessThanOrEqual(selectClear?.getBoundingClientRect().left ?? 0);
+      expect(multiTrigger.getBoundingClientRect().right)
+        .toBeLessThanOrEqual(multiClear?.getBoundingClientRect().left ?? 0);
+    }
+  }
+};
+
+export const UncontrolledTriggerToggle: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <UncontrolledTriggerToggleFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole("button", {
+      name: "Uncontrolled trigger toggle"
+    });
+
+    await userEvent.click(trigger);
+    await expect(await body.findByRole("listbox")).toBeInTheDocument();
+    await userEvent.click(trigger);
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(trigger).toHaveFocus();
+
+    await userEvent.click(trigger);
+    const outside = canvas.getByRole("button", {
+      name: "Uncontrolled outside target"
+    });
+    await userEvent.click(outside);
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(outside).toHaveFocus();
+
+    await userEvent.click(trigger);
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(trigger).toHaveFocus();
+  }
+};
+
+export const CompactBottomSheetPresentation: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "mobile" } },
+  render: () => <SelectFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const document = canvasElement.ownerDocument;
+    const body = within(document.body);
+    const trigger = canvas.getByRole("button", { name: "Клиент" });
+
+    await userEvent.click(trigger);
+    await expect(document.querySelector("[data-modal-kind=\"bottom-sheet\"]"))
+      .not.toBeNull();
+    await expect(document.querySelector("[data-floating-overlay]"))
+      .toBeNull();
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(body.getByRole("listbox")).toHaveFocus();
+
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(document.querySelector("[data-select-surface]"))
+      .toBeNull());
+    await expect(trigger).toHaveFocus();
+
+    await userEvent.click(trigger);
+    await userEvent.click(await body.findByRole("option", { name: "Вариант 1" }));
+    await waitFor(() => expect(document.querySelector("[data-select-surface]"))
+      .toBeNull());
+    await expect(trigger).toHaveFocus();
+  }
+};
+
+export const DisabledContract: Story = {
+  args: {} as never,
+  render: () => <DisabledFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const select = canvas.getByRole("button", { name: "Disabled Select" });
+    const multi = canvas.getByRole("button", { name: "Disabled MultiSelect" });
+    await expect(select).toBeDisabled();
+    await expect(multi).toBeDisabled();
+    await userEvent.click(select);
+    await userEvent.click(multi);
+    await expect(canvasElement.ownerDocument.querySelector("[data-select-surface]"))
+      .toBeNull();
   }
 };
 

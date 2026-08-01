@@ -149,7 +149,7 @@
     --ds-motion-control-state-duration: var(--ds-motion-duration-fast);
     --ds-motion-control-state-easing: var(--ds-motion-easing-standard);
     --ds-motion-control-label-duration: var(--ds-motion-duration-normal);
-    --ds-motion-control-label-easing: var(--ds-motion-easing-emphasized);
+    --ds-motion-control-label-easing: var(--ds-motion-easing-standard);
     --ds-motion-control-indicator-duration: var(--ds-motion-duration-fast);
     --ds-motion-control-indicator-easing: var(--ds-motion-easing-standard);
     --ds-motion-overlay-enter-duration: var(--ds-motion-duration-normal);

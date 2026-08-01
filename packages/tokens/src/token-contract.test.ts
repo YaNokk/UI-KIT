@@ -172,6 +172,7 @@ describe("motion token contract", () => {
   it("maps reusable semantic roles to primitive duration and easing tokens", () => {
     expect(motionTokens["motion.control.state.duration"]).toBe("{motion.duration.fast}");
     expect(motionTokens["motion.control.label.duration"]).toBe("{motion.duration.normal}");
+    expect(motionTokens["motion.control.label.easing"]).toBe("{motion.easing.standard}");
     expect(motionTokens["motion.control.indicator.easing"]).toBe("{motion.easing.standard}");
     expect(motionTokens["motion.overlay.enter.easing"]).toBe("{motion.easing.enter}");
     expect(motionTokens["motion.overlay.exit.duration"]).toBe("{motion.duration.fast}");

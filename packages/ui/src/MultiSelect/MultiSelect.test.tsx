@@ -109,6 +109,9 @@ describe("MultiSelect", () => {
   it("renders selected tags in the closed trigger", async () => {
     const { container } = render(<ControlledMulti items={baseItems} value={["a", "b"]} />);
     const trigger = screen.getByRole("button", { name: /Теги/ });
+    expect(trigger).toHaveAttribute("data-multiselect-trigger");
+    expect(trigger.querySelector("[data-multiselect-chevron]"))
+      .toHaveAttribute("aria-hidden", "true");
     expect(trigger.parentElement).toHaveTextContent("Альфа");
     expect(trigger.parentElement).toHaveTextContent("Бета");
     expect(container.querySelector("[data-field-chip] [data-control-text-clip]"))
@@ -160,7 +163,11 @@ describe("MultiSelect", () => {
     render(<ControlledMulti items={baseItems} value={["a", "b"]} />);
     const trigger = screen.getByRole("button", { name: /Теги/ });
     expect(trigger.querySelector("button")).toBeNull();
-    expect(screen.getAllByRole("button", { name: /Убрать/ })).toHaveLength(2);
+    const removes = screen.getAllByRole("button", { name: /Убрать/ });
+    expect(removes).toHaveLength(2);
+    for (const remove of removes) {
+      expect(remove).toHaveAttribute("data-field-chip-remove");
+    }
   });
 
   it("clear all resets selection without opening", async () => {
@@ -175,7 +182,10 @@ describe("MultiSelect", () => {
       />
     );
 
-    await user.click(screen.getByRole("button", { name: "Очистить выбор" }));
+    const clear = screen.getByRole("button", { name: "Очистить выбор" });
+    expect(clear).toHaveAttribute("data-multiselect-clear");
+    expect(screen.getByRole("button", { name: /Теги/ })).not.toContainElement(clear);
+    await user.click(clear);
     expect(onChange).toHaveBeenCalledWith([]);
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
@@ -316,6 +326,9 @@ describe("MultiSelect", () => {
     );
 
     const trigger = screen.getByRole("button", { name: /Теги/ });
+    expect(trigger).toHaveAttribute("aria-busy", "true");
+    expect(trigger.querySelector("[data-select-spinner]"))
+      .toHaveAttribute("aria-hidden", "true");
     expect(trigger.parentElement).toHaveTextContent("Альфа");
 
     await user.click(trigger);

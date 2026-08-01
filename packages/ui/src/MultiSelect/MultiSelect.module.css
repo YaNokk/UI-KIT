@@ -1,4 +1,6 @@
 .multiControl {
+  --multiselect-trigger-status-width: var(--ds-size-icon-md);
+
   position: relative;
   display: flex;
   flex: 1 1 auto;
@@ -10,6 +12,7 @@
 .openTrigger {
   position: absolute;
   inset: 0;
+  justify-content: flex-end;
 }
 
 .tagViewport {
@@ -24,7 +27,34 @@
   block-size: 100%;
   pointer-events: none;
   padding-inline: var(--field-control-padding-inline-start)
-    var(--field-control-padding-inline-end);
+    calc(
+      var(--multiselect-trigger-status-width)
+      + var(--field-gap)
+      + var(--field-control-padding-inline-end)
+    );
+}
+
+.triggerStatus {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--ds-space-1);
+}
+
+.statusLoadingCompact {
+  --multiselect-trigger-status-width: var(--ds-size-icon-sm);
+}
+
+.statusRefreshingCompact {
+  --multiselect-trigger-status-width: calc(
+    var(--ds-size-icon-sm) + var(--ds-space-1) + var(--ds-size-icon-md)
+  );
+}
+
+.statusRefreshingLarge {
+  --multiselect-trigger-status-width: calc(
+    var(--ds-size-icon-md) + var(--ds-space-1) + var(--ds-size-icon-md)
+  );
 }
 
 .tag {

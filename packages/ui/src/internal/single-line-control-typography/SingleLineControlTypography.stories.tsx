@@ -267,7 +267,22 @@ async function verifyTypography(canvasElement: HTMLElement, fallback: boolean, r
     expect(elements.length).toBeGreaterThan(0);
     for (const element of elements) {
       const computed = getComputedStyle(element);
-      expect(computed.getPropertyValue("--control-text-optical-offset").trim()).toBe(expectedOffsets[role]);
+      if (role.startsWith("fieldValueText")) {
+        expect(element).toHaveAttribute("data-field-value-typography");
+        if (element.hasAttribute("data-field-value-optical")) {
+          expect(computed.getPropertyValue("--control-text-optical-offset").trim())
+            .toBe(expectedOffsets[role]);
+        } else {
+          expect(element.tagName).toBe("INPUT");
+          expect(computed.getPropertyValue("--control-text-optical-offset").trim())
+            .toBe("");
+          expect(computed.position).toBe("static");
+          expect(computed.insetBlockStart).toBe("auto");
+        }
+      } else {
+        expect(computed.getPropertyValue("--control-text-optical-offset").trim())
+          .toBe(expectedOffsets[role]);
+      }
       expect(computed.fontWeight).toBe(expectedWeights[role]);
       if (fallback) expect(computed.fontFamily).not.toContain("Inter");
       else expect(computed.fontFamily).toContain("Inter");

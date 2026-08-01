@@ -447,7 +447,7 @@ export const motionTokens = {
   "motion.control.state.duration": "{motion.duration.fast}",
   "motion.control.state.easing": "{motion.easing.standard}",
   "motion.control.label.duration": "{motion.duration.normal}",
-  "motion.control.label.easing": "{motion.easing.emphasized}",
+  "motion.control.label.easing": "{motion.easing.standard}",
   "motion.control.indicator.duration": "{motion.duration.fast}",
   "motion.control.indicator.easing": "{motion.easing.standard}",
   "motion.overlay.enter.duration": "{motion.duration.normal}",

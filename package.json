@@ -12,7 +12,7 @@
     "tokens:generate": "node packages/tokens/scripts/generate.mjs",
     "tokens:check": "node packages/tokens/scripts/generate.mjs --check && npm run responsive:check",
     "responsive:check": "node scripts/check-responsive-foundation.mjs",
-    "lint": "eslint . && npm run typography:check",
+    "lint": "eslint . && npm run typography:check && npm run motion:check",
     "typography:check": "node scripts/check-single-line-control-typography.mjs",
     "motion:check": "node scripts/check-motion-foundation.mjs",
     "test": "vitest run packages",

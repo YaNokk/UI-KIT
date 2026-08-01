@@ -126,6 +126,11 @@ export default defineConfig({
           browser: "chromium",
           context: { forcedColors: "active" },
           name: "chromium-forced-colors"
+        },
+        {
+          browser: "chromium",
+          context: { reducedMotion: "reduce" },
+          name: "chromium-reduced-motion"
         }
       ]
     },

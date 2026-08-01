@@ -7,7 +7,7 @@
       },
       "label": {
         "duration": { "$type": "duration", "$value": "{motion.duration.normal}" },
-        "easing": { "$type": "cubicBezier", "$value": "{motion.easing.emphasized}" }
+        "easing": { "$type": "cubicBezier", "$value": "{motion.easing.standard}" }
       },
       "indicator": {
         "duration": { "$type": "duration", "$value": "{motion.duration.fast}" },

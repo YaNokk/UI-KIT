@@ -9,27 +9,36 @@
   inset-block-start: var(--control-text-optical-offset);
 }
 
-.fieldValueTextSm,
-.fieldValueTextMd,
-.fieldValueTextLg,
+.fieldValueOpticalSm,
+.fieldValueOpticalMd,
+.fieldValueOpticalLg,
 .compactChipText {
   position: relative;
   inset-block-start: var(--control-text-optical-offset);
 }
 
-.fieldValueTextSm {
-  --control-text-optical-offset: -0.25px;
+.fieldValueTypographySm {
   font: var(--ds-typography-field-value-text-sm);
 }
 
-.fieldValueTextMd {
-  --control-text-optical-offset: -0.25px;
+.fieldValueTypographyMd {
   font: var(--ds-typography-field-value-text-md);
 }
 
-.fieldValueTextLg {
-  --control-text-optical-offset: -0.5px;
+.fieldValueTypographyLg {
   font: var(--ds-typography-field-value-text-lg);
+}
+
+.fieldValueOpticalSm {
+  --control-text-optical-offset: -0.25px;
+}
+
+.fieldValueOpticalMd {
+  --control-text-optical-offset: -0.25px;
+}
+
+.fieldValueOpticalLg {
+  --control-text-optical-offset: -0.5px;
 }
 
 .compactChipText {

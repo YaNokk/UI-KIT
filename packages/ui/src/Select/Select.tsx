@@ -10,6 +10,7 @@ import {
   useState,
   type KeyboardEvent,
   type MouseEvent,
+  type ReactElement,
   type ReactNode
 } from "react";
 import { FieldShell } from "../FieldShell/FieldShell";
@@ -36,7 +37,10 @@ import { useSelectSearch } from "../internal/select/search";
 import { useSelectState } from "../internal/select/useSelectState";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import styles from "../internal/select/SelectTrigger.module.css";
-import { fieldValueTextClassNames } from "../internal/single-line-control-typography/singleLineControlTypography";
+import {
+  fieldValueOpticalClassNames,
+  fieldValueTypographyClassNames
+} from "../internal/single-line-control-typography/singleLineControlTypography";
 
 const textRoleNames: Record<FieldSize, string> = {
   sm: "fieldValueTextSm",
@@ -199,6 +203,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
     && value !== null;
   const loading = collectionState?.status === "loading";
   const refreshing = collectionState?.status === "refreshing";
+  const showClearButton = showClear && !loading;
 
   const handleOpenChange = useCallback((nextOpen: boolean) => {
     if (!nextOpen) search.resetQuery();
@@ -270,6 +275,52 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
     />
   ) : null;
 
+  const renderPanel = (triggerElement: ReactElement) => (
+    <SelectPanel
+      dismissBoundaryRef={shellRef}
+      messages={messages}
+      multiple={false}
+      onOpenChange={handleOpenChange}
+      open={open}
+      trigger={triggerElement}
+      focusTriggerRef={triggerRef}
+      skipFocusRestoreRef={skipFocusRestoreRef}
+      header={searchField}
+      initialFocusRef={searchable
+        ? searchRef
+        : hasEnabledActions
+          ? firstEnabledActionRef
+          : listboxRef}
+      interactive={interactive}
+    >
+      <SelectListboxView<Value>
+        activeRowId={state.activeRow?.rowId ?? null}
+        listboxId={listboxId}
+        messages={messages}
+        multiple={false}
+        firstEnabledActionRef={firstEnabledActionRef}
+        onHoverRow={(row) => state.setActiveRow(row)}
+        onKeyDown={(event) => state.handleListKeyDown(event, commit)}
+        onPickRow={commit}
+        onRetry={state.onRetry}
+        rows={state.collection.rows}
+        selectedValues={selectedValues}
+        status={state.status}
+        statusMessage={
+          state.status === "empty" && emptyMessage != null
+            ? emptyMessage
+            : state.status === "empty" && search.query.length > 0
+              ? messages.noResults
+            : state.status === "loading" && loadingMessage != null
+              ? loadingMessage
+              : state.statusMessage
+        }
+        autoFocus={false}
+        ref={listboxRef}
+      />
+    </SelectPanel>
+  );
+
   const trigger = (
     <FormControl
       block={block}
@@ -287,11 +338,11 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
       {({ label: controlLabel, ...controlProps }) => (
         <FieldShell
           disabled={disabled}
-          endAdornment={
+          endAdornment={showClearButton ? (
             <span className={styles.actions} data-field-interactive="">
-              {showClear && !loading ? (
                 <IconButton
                   aria-label={messages.clear}
+                  data-select-clear=""
                   disabled={disabled}
                   icon={<X />}
                   onClick={handleClear}
@@ -302,9 +353,65 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
                   size="sm"
                   variant="ghost"
                 />
+            </span>
+          ) : undefined}
+          invalid={invalid}
+          label={controlLabel}
+          labelFloated={open || value !== null}
+          labelView={labelView}
+          onFocusRequest={() => triggerRef.current?.focus()}
+          readOnly={readOnly}
+          ref={shellRef}
+          size={size}
+        >
+          {renderPanel(<button
+            {...controlProps}
+            aria-controls={open ? listboxId : undefined}
+            aria-expanded={open}
+            aria-haspopup="listbox"
+            aria-busy={loading || refreshing ? true : undefined}
+            aria-label={ariaLabel}
+            className={styles.value}
+            data-select-trigger=""
+            data-field-part="native-control"
+            disabled={disabled}
+            onKeyDown={handleTriggerKeyDown}
+            ref={(node) => {
+              triggerRef.current = node;
+            }}
+            type="button"
+          >
+            <span className={styles.valueContent}>
+              {displayOption?.leading != null ? (
+                <span aria-hidden="true" className={styles.valueLeading}>
+                  {displayOption.leading}
+                </span>
               ) : null}
+              <span
+                className={classNames(
+                  styles.valueText,
+                  displayOption === null && styles.placeholder
+                )}
+                data-field-placeholder={displayOption === null ? "" : undefined}
+                data-control-text-clip=""
+              >
+                <span
+                  className={classNames(
+                    styles.valueLabel,
+                    fieldValueTypographyClassNames[size],
+                    fieldValueOpticalClassNames[size]
+                  )}
+                  data-control-text=""
+                  data-control-text-role={textRoleNames[size]}
+                  data-field-value-optical=""
+                  data-field-value-typography=""
+                >{displayOption === null ? placeholder : displayOption.label}</span>
+              </span>
+            </span>
+            <span aria-hidden="true" className={styles.triggerStatus}>
               {loading || refreshing ? (
                 <Spinner
+                  data-select-spinner=""
                   size={size === "lg" ? "md" : "sm"}
                   tone="secondary"
                 />
@@ -315,56 +422,12 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
                   styles.chevron,
                   open && styles.chevronOpen
                 )}
+                data-select-chevron=""
               >
                 <ChevronDown />
               </span> : null}
             </span>
-          }
-          invalid={invalid}
-          label={controlLabel}
-          labelFloated={open || value !== null}
-          labelView={labelView}
-          onFocusRequest={() => triggerRef.current?.focus()}
-          readOnly={readOnly}
-          ref={shellRef}
-          size={size}
-        >
-          <button
-            {...controlProps}
-            aria-controls={open ? listboxId : undefined}
-            aria-expanded={open}
-            aria-haspopup="listbox"
-            aria-busy={loading || refreshing ? true : undefined}
-            aria-label={ariaLabel}
-            className={styles.value}
-            data-field-part="native-control"
-            disabled={disabled}
-            onKeyDown={handleTriggerKeyDown}
-            ref={(node) => {
-              triggerRef.current = node;
-            }}
-            type="button"
-          >
-            {displayOption?.leading != null ? (
-              <span aria-hidden="true" className={styles.valueLeading}>
-                {displayOption.leading}
-              </span>
-            ) : null}
-            <span
-              className={classNames(
-                styles.valueText,
-                displayOption === null && styles.placeholder
-              )}
-              data-field-placeholder={displayOption === null ? "" : undefined}
-              data-control-text-clip=""
-            >
-              <span
-                className={classNames(styles.valueLabel, fieldValueTextClassNames[size])}
-                data-control-text=""
-                data-control-text-role={textRoleNames[size]}
-              >{displayOption === null ? placeholder : displayOption.label}</span>
-            </span>
-          </button>
+          </button>)}
         </FieldShell>
       )}
     </FormControl>
@@ -375,48 +438,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
       {name ? (
         <input name={name} type="hidden" value={value ?? ""} />
       ) : null}
-      <SelectPanel
-        messages={messages}
-        multiple={false}
-        onOpenChange={handleOpenChange}
-        open={open}
-        trigger={trigger}
-        focusTriggerRef={triggerRef}
-        skipFocusRestoreRef={skipFocusRestoreRef}
-        header={searchField}
-        initialFocusRef={searchable
-          ? searchRef
-          : hasEnabledActions
-            ? firstEnabledActionRef
-            : listboxRef}
-        interactive={interactive}
-      >
-        <SelectListboxView<Value>
-          activeRowId={state.activeRow?.rowId ?? null}
-          listboxId={listboxId}
-          messages={messages}
-          multiple={false}
-          firstEnabledActionRef={firstEnabledActionRef}
-          onHoverRow={(row) => state.setActiveRow(row)}
-          onKeyDown={(event) => state.handleListKeyDown(event, commit)}
-          onPickRow={commit}
-          onRetry={state.onRetry}
-          rows={state.collection.rows}
-          selectedValues={selectedValues}
-          status={state.status}
-          statusMessage={
-            state.status === "empty" && emptyMessage != null
-              ? emptyMessage
-              : state.status === "empty" && search.query.length > 0
-                ? messages.noResults
-              : state.status === "loading" && loadingMessage != null
-                ? loadingMessage
-                : state.statusMessage
-          }
-          autoFocus={false}
-          ref={listboxRef}
-        />
-      </SelectPanel>
+      {trigger}
     </>
   );
 }) as <Value extends string = string>(

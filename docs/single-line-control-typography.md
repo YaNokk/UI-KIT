@@ -4,13 +4,17 @@ Flex alignment centers a font line box, not the visible glyphs. Fixed-height con
 
 ## Roles and approved values
 
-Each role owns its font metrics and an independently approved optical block offset. Calibration is private font data rather than spacing: it uses explicit quarter-pixel values in the shared foundation and is not part of the public token API.
+Each role owns its font metrics. Wrapped display text may additionally use an
+independently approved optical block offset. Calibration is private font data
+rather than spacing: it uses explicit quarter-pixel values in the shared
+foundation and is not part of the public token API. Native field editors use
+typography only and are never optically moved as elements.
 
 | Role | Offset | Metrics | Current consumers |
 |---|---:|---|---|
-| `fieldValueTextSm` | `-0.25px` | 13/14, medium | Input, Select, MultiSelect field value sm |
-| `fieldValueTextMd` | `-0.25px` | 14/20, medium | Input, Select, MultiSelect field value md |
-| `fieldValueTextLg` | `-0.5px` | 16/22, medium | Input, Select, MultiSelect field value lg |
+| `fieldValueTextSm` | wrapped: `-0.25px`; native: none | 13/14, medium | Input, Select, MultiSelect field value sm |
+| `fieldValueTextMd` | wrapped: `-0.25px`; native: none | 14/20, medium | Input, Select, MultiSelect field value md |
+| `fieldValueTextLg` | wrapped: `-0.5px`; native: none | 16/22, medium | Input, Select, MultiSelect field value lg |
 | `compactChipText` | `-0.25px` | 13/18, medium | MultiSelect chip and overflow |
 | `controlTextSm` | `-0.25px` | 13/18, medium | Button sm, ButtonLink sm |
 | `controlTextMd` | `-0.25px` | 14/20, medium | Button md, ButtonLink md |
@@ -22,7 +26,7 @@ Each role owns its font metrics and an independently approved optical block offs
 
 The negative direction moves the intact line box upward because the reviewed Inter glyph mass sat optically low inside these fixed-height consumers. Matching numeric values do not imply shared ownership: every role declares its own value, and governance/browser assertions freeze each mapping independently.
 
-Production keeps complete font line boxes. `text-box-trim` and `text-box-edge` are forbidden because cap/alphabetic trimming can remove Latin, Cyrillic, Kazakh Cyrillic and fallback-font descenders. Optical correction may move only the intact inner typography wrapper. Component CSS must not add `translateY`, `top`, `padding-top` or `inset-block-start` to text labels.
+Production keeps complete font line boxes. `text-box-trim` and `text-box-edge` are forbidden because cap/alphabetic trimming can remove Latin, Cyrillic, Kazakh Cyrillic and fallback-font descenders. Optical correction may move only an intact non-native typography wrapper. Native Input uses `fieldValueTypographyClassNames`; wrapped Select/MultiSelect values combine it with `fieldValueOpticalClassNames`. Component CSS must not add `translateY`, `top`, `padding-top` or `inset-block-start` to native editors or text labels.
 
 ## Clipping architecture
 
@@ -32,7 +36,12 @@ Badge `labelClip` is an inline-flex centering container. Only its inner `counter
 
 ## Audit decisions
 
-Button, ButtonLink, Tag, Badge, private MultiSelect chips/summaries, Select trigger and Select option/action primary labels use the shared roles. Select Action currently shares the same metrics and weight as an option, so both deliberately use `choiceControlLabel`; a future typography divergence requires a separate role and calibration.
+Button and ButtonLink use `controlText*`; Tag uses `compactControlText*`; Input,
+Select and MultiSelect field values use `fieldValueText*`; MultiSelect chips and
+`+N` use `compactChipText`. Badge uses `counterText`. Select Action currently
+shares the same metrics and weight as an option, so both deliberately use
+`choiceControlLabel`; a future typography divergence requires a separate role
+and calibration.
 
 Tooltip remains normal compact flowing text because its content can wrap, including when a particular value happens to fit on one line. LinkButton is link-like and may wrap. Input-family editors keep frozen FieldShell/caret geometry. IconButton and StatusIndicator have no visible text. Tabs, segmented controls, menu items, pagination and fixed-height breadcrumbs are not present. Future choice controls use `choiceControlLabel` only for a single-line label; a multi-line label or label/description stack uses normal flow.
 
@@ -44,6 +53,6 @@ Every fixture waits for `document.fonts.ready`, verifies the computed family, we
 
 Story-only guides cross the physical center of each control and outline its bounds. Approval is visual: compare visible glyph mass across digits, scripts and descenders, then confirm that icons, dots, remove controls and spinners remain independently centered. DOM rectangles are used only for no-clipping and frozen-height guards; line-box centering is not treated as optical proof.
 
-The intentional `system-ui` fallback reuses the same values. It is expected to remain acceptable, not pixel-identical to Inter. Runtime font detection and font-specific offsets are out of scope. A stable 125% runner is not configured, so no cross-engine or 125% optical-equivalence claim is made. Arabic, Hebrew, Indic, Thai and CJK support requires explicit fallback, direction and writing-system validation before it can be claimed.
+The intentional `system-ui` fallback reuses the same values. It is expected to remain acceptable, not pixel-identical to Inter. Runtime font detection and font-specific offsets are out of scope. Field geometry is exercised at 100% and with a deterministic 125% Chromium story zoom; this is not a cross-engine or OS-DPI optical-equivalence claim. Arabic, Hebrew, Indic, Thai and CJK support requires explicit fallback, direction and writing-system validation before it can be claimed.
 
 `npm run typography:check` rejects unsafe trimming, freezes every approved role value and prevents component-local optical hacks while allowing the shared foundation and documented FieldShell geometry.

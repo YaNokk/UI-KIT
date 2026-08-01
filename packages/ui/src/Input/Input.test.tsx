@@ -7,10 +7,31 @@ import userEvent from "@testing-library/user-event";
 import axe from "axe-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Input } from "./Input";
+import typographyStyles from "../internal/single-line-control-typography/singleLineControlTypography.module.css";
 
 afterEach(cleanup);
 
 describe("Input native behavior", () => {
+  it.each([
+    ["sm", typographyStyles.fieldValueTypographySm, "fieldValueTextSm"],
+    ["md", typographyStyles.fieldValueTypographyMd, "fieldValueTextMd"],
+    ["lg", typographyStyles.fieldValueTypographyLg, "fieldValueTextLg"]
+  ] as const)(
+    "applies %s field typography without moving the native editor",
+    (size, typographyClassName, role) => {
+      render(<Input aria-label={`Native ${size}`} size={size} />);
+      const input = screen.getByRole("textbox", { name: `Native ${size}` });
+
+      expect(input).toHaveClass(typographyClassName);
+      expect(input).toHaveAttribute("data-control-text-role", role);
+      expect(input).toHaveAttribute("data-field-value-typography");
+      expect(input).not.toHaveAttribute("data-field-value-optical");
+      expect(input).not.toHaveClass(typographyStyles.fieldValueOpticalSm);
+      expect(input).not.toHaveClass(typographyStyles.fieldValueOpticalMd);
+      expect(input).not.toHaveClass(typographyStyles.fieldValueOpticalLg);
+    }
+  );
+
   it("forwards native attributes, events and the input ref", async () => {
     const user = userEvent.setup();
     const ref = { current: null as HTMLInputElement | null };
