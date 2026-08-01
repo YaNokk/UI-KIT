@@ -33,6 +33,8 @@ const packages = [
     required: [
       "dist/index.js",
       "dist/index.d.ts",
+      "dist/Badge/index.js",
+      "dist/Badge/index.d.ts",
       "dist/Button/index.js",
       "dist/Button/index.d.ts",
       "dist/ButtonLink/index.js",
@@ -53,6 +55,12 @@ const packages = [
       "dist/Portal/index.d.ts",
       "dist/Spinner/index.js",
       "dist/Spinner/index.d.ts",
+      "dist/StatusIndicator/index.js",
+      "dist/StatusIndicator/index.d.ts",
+      "dist/Tag/index.js",
+      "dist/Tag/index.d.ts",
+      "dist/system-color/index.js",
+      "dist/system-color/index.d.ts",
       "dist/styles.css"
     ]
   },
