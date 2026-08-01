@@ -104,6 +104,24 @@ the resolver without changing public props.
 
 ## Layer and dismissal baseline
 
+Four related DOM regions remain distinct:
+
+- the **reference region** owns Floating UI positioning and the configured
+  reference interaction such as `useClick`;
+- the **floating region** contains the positioned surface and is internal to
+  outside-pointer dismissal;
+- the optional private **outside-press boundary**
+  (`outsidePressBoundaryRef`) extends only the DOM region treated as internal
+  by outside-pointer dismissal;
+- the **focus-containment region** is component-owned and determines whether a
+  focus move stays internal.
+
+`outsidePressBoundaryRef` does not expand the Floating UI reference, handle
+Escape, alter focus-out, reorder the nested overlay activation stack, or
+participate in modal focus management. Select/MultiSelect use their outer
+FieldShell as this boundary so clear and chip-remove pointer interactions do
+not dismiss an open panel.
+
 Outside a modal, floating surfaces use `zIndex.popover`. Inside a modal they
 consume `ModalLayerContext.floatingLayer`; nested floating surfaces advance
 within the private reserved range. The next modal guard/surface therefore

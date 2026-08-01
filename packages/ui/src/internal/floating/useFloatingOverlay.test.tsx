@@ -2,7 +2,7 @@
 
 import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { StrictMode, useState } from "react";
+import { StrictMode, useRef, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useFloatingOverlay } from "./useFloatingOverlay";
 
@@ -111,6 +111,38 @@ function SemanticFixture() {
   );
 }
 
+function OutsidePressBoundaryFixture({
+  onOpenChange
+}: {
+  onOpenChange: (open: boolean) => void;
+}) {
+  const outsidePressBoundaryRef = useRef<HTMLDivElement | null>(null);
+  const floating = useFloatingOverlay({
+    dismissOnEscape: true,
+    dismissOnOutsidePress: true,
+    interaction: "click",
+    onOpenChange,
+    open: true,
+    outsidePressBoundaryRef,
+    placement: "bottom-start"
+  });
+
+  return (
+    <>
+      <button ref={floating.refs.setReference} type="button">
+        Boundary reference
+      </button>
+      <div ref={floating.refs.setFloating}>
+        <button type="button">Boundary floating</button>
+      </div>
+      <div ref={outsidePressBoundaryRef}>
+        <button type="button">Boundary extension</button>
+      </div>
+      <button type="button">Real outside</button>
+    </>
+  );
+}
+
 describe("useFloatingOverlay semantics", () => {
   it("supports a DS-owned listbox role without dialog semantics", () => {
     render(<SemanticFixture />);
@@ -118,6 +150,29 @@ describe("useFloatingOverlay semantics", () => {
     expect(screen.getByRole("listbox")).toBeInTheDocument();
     expect(screen.getByRole("option")).toBeInTheDocument();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("extends only outside-pointer containment with outsidePressBoundaryRef", () => {
+    const onOpenChange = vi.fn();
+    render(<OutsidePressBoundaryFixture onOpenChange={onOpenChange} />);
+
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Boundary reference" }));
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Boundary floating" }));
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Boundary extension" }));
+    expect(onOpenChange).not.toHaveBeenCalled();
+
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Real outside" }));
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("does not extend Escape containment with outsidePressBoundaryRef", () => {
+    const onOpenChange = vi.fn();
+    render(<OutsidePressBoundaryFixture onOpenChange={onOpenChange} />);
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 });
 

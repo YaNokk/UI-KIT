@@ -591,12 +591,13 @@ describe("Select", () => {
   it("keeps readOnly trigger focusable without opening from pointer or keyboard", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onOpenChange = vi.fn();
     render(
       <ControlledSelect
         clearable
         items={baseItems}
         onChange={onChange}
-        open
+        onOpenChange={onOpenChange}
         readOnly
         value="a"
       />
@@ -604,13 +605,27 @@ describe("Select", () => {
     const trigger = screen.getByRole("button", { name: /Клиент/ });
 
     expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(trigger).not.toBeDisabled();
+    expect(trigger.tabIndex).toBe(0);
     expect(screen.queryByRole("button", { name: "Очистить выбор" }))
       .not.toBeInTheDocument();
     await user.click(trigger);
     expect(trigger).toHaveFocus();
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
-    await user.keyboard("{Enter}{ArrowDown}");
-    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    for (const command of [
+      "{Enter}",
+      " ",
+      "{ArrowDown}",
+      "{ArrowUp}",
+      "{Home}",
+      "{End}",
+      "{Backspace}",
+      "{Delete}"
+    ]) {
+      await user.keyboard(command);
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    }
+    expect(onOpenChange).not.toHaveBeenCalled();
     expect(onChange).not.toHaveBeenCalled();
   });
 });

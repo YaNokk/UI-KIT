@@ -412,7 +412,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
 
   const renderPanel = (triggerElement: ReactElement) => (
     <SelectPanel
-      dismissBoundaryRef={shellRef}
+      outsidePressBoundaryRef={shellRef}
       messages={messages}
       multiple
       onOpenChange={handleOpenChange}

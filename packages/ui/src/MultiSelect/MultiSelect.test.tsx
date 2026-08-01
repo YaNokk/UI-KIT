@@ -396,12 +396,13 @@ describe("MultiSelect", () => {
   it("keeps readOnly trigger focusable without opening or removing values", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onOpenChange = vi.fn();
     render(
       <ControlledMulti
         items={baseItems}
         clearable
         onChange={onChange}
-        open
+        onOpenChange={onOpenChange}
         readOnly
         value={["a", "b"]}
       />
@@ -409,14 +410,26 @@ describe("MultiSelect", () => {
     const trigger = screen.getByRole("button", { name: /Теги/ });
 
     expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(trigger).not.toBeDisabled();
+    expect(trigger.tabIndex).toBe(0);
     expect(screen.queryByRole("button", { name: "Очистить выбор" }))
       .not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Убрать/ }))
       .not.toBeInTheDocument();
     await user.click(trigger);
     expect(trigger).toHaveFocus();
-    await user.keyboard("{Enter}{Backspace}");
-    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    for (const command of [
+      "{Enter}",
+      " ",
+      "{ArrowDown}",
+      "{ArrowUp}",
+      "{Backspace}",
+      "{Delete}"
+    ]) {
+      await user.keyboard(command);
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    }
+    expect(onOpenChange).not.toHaveBeenCalled();
     expect(onChange).not.toHaveBeenCalled();
   });
 });

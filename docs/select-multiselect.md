@@ -1,4 +1,4 @@
-# Select and MultiSelect v1.6.2
+# Select and MultiSelect v1.6.3
 
 Popover triggers are owned by Floating UI `useClick`: a closed trigger opens
 and the same open trigger closes exactly once. No second manual click toggle is
@@ -11,6 +11,9 @@ presentation and leaves focus on the external target.
 The same open/close and focus-restoration contract is verified for controlled
 and uncontrolled Select state. Disabled Select/MultiSelect never open;
 read-only controls remain focusable but do not open or mutate their value.
+Read-only triggers stay in the normal Tab order and are not native-disabled;
+all pointer and selection keyboard commands are inert, and clear/chip-remove
+actions are absent. Disabled controls remain fully non-interactive.
 
 Popover focus containment is the union of the current reference trigger and
 the floating surface. Focus movement between either node stays internal;
@@ -24,6 +27,18 @@ and non-focusable; neither owns an `onClick`. `FieldShell` never synthesizes a
 Select activation. Clear and chip-remove buttons are independent controls;
 their field boundary is excluded from outside-dismiss so clearing/removing
 while open does not toggle or dismiss the popup.
+
+Select and MultiSelect pass their outer `FieldShell` as the private
+`outsidePressBoundaryRef`. This extends the region treated as internal only
+for outside-pointer dismissal. It does not change Escape handling, focus-out,
+reference click toggling, activation-stack ordering, or modal focus behavior.
+The reference button and floating surface retain their own independent
+containment roles.
+
+Both `loading` and `refreshing` spinner visuals belong to the main trigger hit
+region. A spinner click follows the same open/close contract as any other
+trigger click and emits at most one `onOpenChange` transition; the spinner is
+decorative, non-focusable and owns no click handler.
 
 Select DOM anatomy:
 

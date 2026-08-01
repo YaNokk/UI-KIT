@@ -277,7 +277,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
 
   const renderPanel = (triggerElement: ReactElement) => (
     <SelectPanel
-      dismissBoundaryRef={shellRef}
+      outsidePressBoundaryRef={shellRef}
       messages={messages}
       multiple={false}
       onOpenChange={handleOpenChange}

@@ -80,28 +80,67 @@ function MultiFixture({ searchable = false }: { searchable?: boolean }) {
 }
 
 function ReadOnlyFixture() {
+  const [selectValue, setSelectValue] = useState<string | null>("alpha");
+  const [placeholderValue, setPlaceholderValue] = useState<string | null>(null);
+  const [summaryValue, setSummaryValue] = useState<string[]>(["alpha", "beta"]);
+  const [chipsValue, setChipsValue] = useState<string[]>(["alpha", "beta"]);
+  const transitions = useRef<string[]>([]);
   return (
     <div className={styles.stack}>
       <Select
         clearable
-        items={baseItems}
-        label="ReadOnly Select"
+        items={[
+          {
+            value: "alpha",
+            label: "Альфа",
+            textValue: "Альфа",
+            leading: <User aria-hidden="true" />
+          },
+          ...baseItems.slice(1)
+        ]}
+        label="ReadOnly Select value"
         locale="ru-RU"
-        onChange={() => undefined}
-        open
+        onChange={setSelectValue}
+        onOpenChange={(open) => transitions.current.push(`select:${open}`)}
         readOnly
-        value="alpha"
+        value={selectValue}
+      />
+      <Select
+        clearable
+        items={baseItems}
+        label="ReadOnly Select placeholder"
+        locale="ru-RU"
+        onChange={setPlaceholderValue}
+        onOpenChange={(open) => transitions.current.push(`placeholder:${open}`)}
+        placeholder="Выберите клиента"
+        readOnly
+        value={placeholderValue}
       />
       <MultiSelect
         clearable
         items={baseItems}
-        label="ReadOnly MultiSelect"
+        label="ReadOnly MultiSelect summary"
+        labelView="inner"
         locale="ru-RU"
-        onChange={() => undefined}
-        open
+        onChange={setSummaryValue}
+        onOpenChange={(open) => transitions.current.push(`summary:${open}`)}
         readOnly
-        value={["alpha", "beta"]}
+        value={summaryValue}
       />
+      <MultiSelect
+        clearable
+        items={baseItems}
+        label="ReadOnly MultiSelect chips"
+        locale="ru-RU"
+        onChange={setChipsValue}
+        onOpenChange={(open) => transitions.current.push(`chips:${open}`)}
+        readOnly
+        value={chipsValue}
+      />
+      <output aria-label="ReadOnly values">
+        {[selectValue ?? "null", placeholderValue ?? "null", summaryValue.join(","), chipsValue.join(",")].join("|")}
+      </output>
+      <output aria-label="ReadOnly transitions">{transitions.current.join(",")}</output>
     </div>
   );
 }
@@ -458,9 +497,70 @@ function MultiSelectTriggerHitRegionFixture() {
           value={chipsValue}
         />
       </div>
+      <button onClick={() => setChipsValue(["alpha", "beta"])} type="button">
+        Reset chip values
+      </button>
       <output aria-label="Chips MultiSelect value">{chipsValue.join(",")}</output>
       <output aria-label="Chips MultiSelect transitions">
         {chipsTransitions.current.map(String).join(",")}
+      </output>
+    </div>
+  );
+}
+
+function LoadingSpinnerHitRegionFixture() {
+  const [selectOpen, setSelectOpen] = useState(false);
+  const selectTransitions = useRef<boolean[]>([]);
+  const [multiOpen, setMultiOpen] = useState(false);
+  const multiTransitions = useRef<boolean[]>([]);
+  const [refreshingMultiOpen, setRefreshingMultiOpen] = useState(false);
+  const refreshingMultiTransitions = useRef<boolean[]>([]);
+  return (
+    <div className={styles.stack}>
+      <Select
+        collectionState={{ status: "loading" }}
+        items={[]}
+        label="Loading spinner Select"
+        onChange={() => undefined}
+        onOpenChange={(open) => {
+          selectTransitions.current.push(open);
+          setSelectOpen(open);
+        }}
+        open={selectOpen}
+        value={null}
+      />
+      <output aria-label="Loading Select transitions">
+        {selectTransitions.current.map(String).join(",")}
+      </output>
+      <MultiSelect
+        collectionState={{ status: "loading" }}
+        items={[]}
+        label="Loading spinner MultiSelect"
+        onChange={() => undefined}
+        onOpenChange={(open) => {
+          multiTransitions.current.push(open);
+          setMultiOpen(open);
+        }}
+        open={multiOpen}
+        value={[]}
+      />
+      <output aria-label="Loading MultiSelect transitions">
+        {multiTransitions.current.map(String).join(",")}
+      </output>
+      <MultiSelect
+        collectionState={{ status: "refreshing" }}
+        items={baseItems}
+        label="Refreshing spinner MultiSelect"
+        onChange={() => undefined}
+        onOpenChange={(open) => {
+          refreshingMultiTransitions.current.push(open);
+          setRefreshingMultiOpen(open);
+        }}
+        open={refreshingMultiOpen}
+        value={["alpha"]}
+      />
+      <output aria-label="Refreshing MultiSelect transitions">
+        {refreshingMultiTransitions.current.map(String).join(",")}
       </output>
     </div>
   );
@@ -751,6 +851,14 @@ export const MultiSelectTriggerHitRegion: Story = {
     const chipsShell = chipsTrigger.closest("[data-field-part=\"shell\"]");
     const chipsTransitions = canvas.getByLabelText("Chips MultiSelect transitions");
     const chipsValue = canvas.getByLabelText("Chips MultiSelect value");
+    const clearClosed = canvas.getByRole("button", { name: "Очистить выбор" });
+    await expect(clearClosed).toHaveAttribute("data-multiselect-clear");
+    await userEvent.click(clearClosed);
+    expect(chipsValue.textContent).toBe("");
+    expect(chipsTransitions.textContent).toBe("");
+    await expect(body.queryByRole("listbox")).not.toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Reset chip values" }));
     const firstRemove = canvas.getByRole("button", { name: "Убрать Альфа" });
     await expect(firstRemove).toHaveAttribute("data-field-chip-remove");
     await userEvent.click(firstRemove);
@@ -774,6 +882,93 @@ export const MultiSelectTriggerHitRegion: Story = {
     await userEvent.click(chipsChevron);
     await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
     await expect(chipsTransitions).toHaveTextContent("true,false");
+
+    await userEvent.click(canvas.getByRole("button", { name: "Reset chip values" }));
+    const resetChipBody = chipsShell?.querySelector<HTMLElement>(
+      "[data-field-chip] [data-control-text-clip]"
+    );
+    if (!resetChipBody) throw new Error("Reset MultiSelect chip was not rendered.");
+    await userEvent.click(resolveVisualHitTarget(resetChipBody, chipsTrigger));
+    await expect(await body.findByRole("listbox")).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Очистить выбор" }));
+    expect(chipsValue.textContent).toBe("");
+    await expect(body.getByRole("listbox")).toBeInTheDocument();
+    await expect(chipsTransitions).toHaveTextContent("true,false,true");
+    await userEvent.click(chipsChevron);
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(chipsTransitions).toHaveTextContent("true,false,true,false");
+  }
+};
+
+export const LoadingSpinnerHitRegion: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <LoadingSpinnerHitRegionFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const document = canvasElement.ownerDocument;
+
+    const verifyLoadingTrigger = async ({
+      marker,
+      name,
+      transitionsLabel
+    }: {
+      marker: "data-select-trigger" | "data-multiselect-trigger";
+      name: string;
+      transitionsLabel: string;
+    }) => {
+      const trigger = canvas.getByRole("button", { name });
+      const spinner = trigger.querySelector<HTMLElement>("[data-select-spinner]");
+      if (!spinner) throw new Error(`${name} spinner was not rendered.`);
+      await expect(trigger).toHaveAttribute(marker);
+      await expect(trigger).toHaveAttribute("aria-busy", "true");
+      await expect(spinner).toHaveAttribute("aria-hidden", "true");
+      await expect(spinner).not.toHaveAttribute("tabindex");
+      await expect(spinner).not.toHaveAttribute("onclick");
+
+      await userEvent.click(spinner);
+      await waitFor(() => expect(document.querySelector("[data-select-surface]"))
+        .not.toBeNull());
+      await expect(canvas.getByLabelText(transitionsLabel)).toHaveTextContent("true");
+
+      await userEvent.click(spinner);
+      await waitFor(() => expect(document.querySelector("[data-select-surface]"))
+        .toBeNull());
+      await expect(canvas.getByLabelText(transitionsLabel))
+        .toHaveTextContent("true,false");
+    };
+
+    await verifyLoadingTrigger({
+      marker: "data-select-trigger",
+      name: "Loading spinner Select",
+      transitionsLabel: "Loading Select transitions"
+    });
+    await verifyLoadingTrigger({
+      marker: "data-multiselect-trigger",
+      name: "Loading spinner MultiSelect",
+      transitionsLabel: "Loading MultiSelect transitions"
+    });
+
+    const refreshingMulti = canvas.getByRole("button", {
+      name: "Refreshing spinner MultiSelect"
+    });
+    const refreshingSpinner = refreshingMulti.querySelector<HTMLElement>(
+      "[data-select-spinner]"
+    );
+    const refreshingChevron = refreshingMulti.querySelector<HTMLElement>(
+      "[data-multiselect-chevron]"
+    );
+    if (!refreshingSpinner || !refreshingChevron) {
+      throw new Error("Refreshing MultiSelect status is incomplete.");
+    }
+    await userEvent.click(refreshingSpinner);
+    await waitFor(() => expect(document.querySelector("[data-select-surface]"))
+      .not.toBeNull());
+    await userEvent.click(refreshingChevron);
+    await waitFor(() => expect(document.querySelector("[data-select-surface]"))
+      .toBeNull());
+    await expect(canvas.getByLabelText("Refreshing MultiSelect transitions"))
+      .toHaveTextContent("true,false");
   }
 };
 
@@ -1018,21 +1213,88 @@ export const ReadOnlyContract: Story = {
   render: () => <ReadOnlyFixture />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const select = canvas.getByRole("button", { name: "ReadOnly Select" });
-    const multi = canvas.getByRole("button", { name: "ReadOnly MultiSelect" });
-    await expect(select).toHaveAttribute("aria-expanded", "false");
-    await expect(multi).toHaveAttribute("aria-expanded", "false");
+    const document = canvasElement.ownerDocument;
+    const selectValue = canvas.getByRole("button", { name: "ReadOnly Select value" });
+    const selectPlaceholder = canvas.getByRole("button", {
+      name: "ReadOnly Select placeholder"
+    });
+    const multiSummary = canvas.getByRole("button", {
+      name: "ReadOnly MultiSelect summary"
+    });
+    const multiChips = canvas.getByRole("button", {
+      name: "ReadOnly MultiSelect chips"
+    });
+    const triggers = [selectValue, selectPlaceholder, multiSummary, multiChips];
+    for (const trigger of triggers) {
+      await expect(trigger).toHaveAttribute("aria-expanded", "false");
+      await expect(trigger).not.toBeDisabled();
+      expect(trigger.tabIndex).toBe(0);
+    }
     await expect(canvas.queryByRole("button", { name: "Очистить выбор" }))
       .not.toBeInTheDocument();
     await expect(canvas.queryByRole("button", { name: /Убрать/ }))
       .not.toBeInTheDocument();
 
-    await userEvent.click(select);
-    await userEvent.keyboard("{Enter} ");
-    await userEvent.click(multi);
-    await userEvent.keyboard("{Enter}{Backspace}");
-    await expect(canvasElement.ownerDocument.querySelector("[data-select-surface]"))
-      .toBeNull();
+    const assertReadOnlyTarget = async (target: HTMLElement, trigger: HTMLElement) => {
+      await userEvent.click(target);
+      await expect(trigger).toHaveFocus();
+      expect(document.querySelector("[data-select-surface]")).toBeNull();
+      expect(document.querySelector("[data-modal-kind=\"bottom-sheet\"]"))
+        .toBeNull();
+    };
+
+    const valueText = selectValue.querySelector<HTMLElement>("[data-control-text]");
+    const leading = selectValue.querySelector<HTMLElement>(".lucide-user");
+    const valueChevron = selectValue.querySelector<HTMLElement>("[data-select-chevron]");
+    const placeholder = selectPlaceholder.querySelector<HTMLElement>(
+      "[data-field-placeholder]"
+    );
+    const placeholderChevron = selectPlaceholder.querySelector<HTMLElement>(
+      "[data-select-chevron]"
+    );
+    if (!valueText || !leading || !valueChevron || !placeholder || !placeholderChevron) {
+      throw new Error("Read-only Select target anatomy is incomplete.");
+    }
+    for (const target of [selectValue, valueText, leading, valueChevron]) {
+      await assertReadOnlyTarget(target, selectValue);
+    }
+    for (const target of [selectPlaceholder, placeholder, placeholderChevron]) {
+      await assertReadOnlyTarget(target, selectPlaceholder);
+    }
+
+    const summaryShell = multiSummary.closest("[data-field-part=\"shell\"]");
+    const summary = summaryShell?.querySelector<HTMLElement>(
+      "[data-field-selection-presentation=\"summary\"]"
+    );
+    const summaryChevron = multiSummary.querySelector<HTMLElement>(
+      "[data-multiselect-chevron]"
+    );
+    const chipsShell = multiChips.closest("[data-field-part=\"shell\"]");
+    const chipBody = chipsShell?.querySelector<HTMLElement>(
+      "[data-field-chip] [data-control-text-clip]"
+    );
+    const chipsChevron = multiChips.querySelector<HTMLElement>(
+      "[data-multiselect-chevron]"
+    );
+    if (!summary || !summaryChevron || !chipBody || !chipsChevron) {
+      throw new Error("Read-only MultiSelect target anatomy is incomplete.");
+    }
+    await assertReadOnlyTarget(
+      resolveVisualHitTarget(summary, multiSummary),
+      multiSummary
+    );
+    await assertReadOnlyTarget(summaryChevron, multiSummary);
+    await assertReadOnlyTarget(multiSummary, multiSummary);
+    await assertReadOnlyTarget(
+      resolveVisualHitTarget(chipBody, multiChips),
+      multiChips
+    );
+    await assertReadOnlyTarget(chipsChevron, multiChips);
+    await assertReadOnlyTarget(multiChips, multiChips);
+
+    await expect(canvas.getByLabelText("ReadOnly values"))
+      .toHaveTextContent("alpha|null|alpha,beta|alpha,beta");
+    expect(canvas.getByLabelText("ReadOnly transitions").textContent).toBe("");
   }
 };
 

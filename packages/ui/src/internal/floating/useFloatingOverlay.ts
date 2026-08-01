@@ -34,7 +34,7 @@ type FloatingInteraction = "click" | "tooltip";
 export interface UseFloatingOverlayOptions {
   dismissOnEscape: boolean;
   dismissOnOutsidePress: boolean;
-  dismissBoundaryRef?: RefObject<HTMLElement | null> | undefined;
+  outsidePressBoundaryRef?: RefObject<HTMLElement | null> | undefined;
   interaction: FloatingInteraction;
   interactionEnabled?: boolean;
   matchTriggerWidth?: boolean;
@@ -70,7 +70,7 @@ function isRealmElement(value: unknown, doc: Document): value is Element {
 export function useFloatingOverlay({
   dismissOnEscape,
   dismissOnOutsidePress,
-  dismissBoundaryRef,
+  outsidePressBoundaryRef,
   interaction,
   interactionEnabled = true,
   matchTriggerWidth = false,
@@ -87,11 +87,13 @@ export function useFloatingOverlay({
   const activationEpoch = useRef(0);
   const [arrowElement, setArrowElement] = useState<HTMLElement | null>(null);
   const onOpenChangeRef = useRef(onOpenChange);
+  const outsidePressBoundaryRefRef = useRef(outsidePressBoundaryRef);
   const dismissConfigRef = useRef({ dismissOnEscape, dismissOnOutsidePress });
   const modalSurfaceArbitrationRef = useRef(modalLayer !== null);
 
   useEffect(() => {
     onOpenChangeRef.current = onOpenChange;
+    outsidePressBoundaryRefRef.current = outsidePressBoundaryRef;
     dismissConfigRef.current = { dismissOnEscape, dismissOnOutsidePress };
     modalSurfaceArbitrationRef.current = modalLayer !== null;
   });
@@ -239,7 +241,7 @@ export function useFloatingOverlay({
       if (
         (isRealmElement(currentReference, ownerDocument)
           && currentReference.contains(target))
-        || dismissBoundaryRef?.current?.contains(target)
+        || outsidePressBoundaryRefRef.current?.current?.contains(target)
         || floating.refs.floating.current?.contains(target)
       ) {
         return;
@@ -294,7 +296,7 @@ export function useFloatingOverlay({
     };
     // Only logical activation and document ownership re-register the overlay.
     // Dismiss configuration and callbacks are read through latest-value refs.
-  }, [dismissBoundaryRef, open, ownerDocument]);
+  }, [open, ownerDocument]);
 
   const arrowStyle = useMemo(
     () => ({
