@@ -1,0 +1,16 @@
+.root {
+  display: inline-block;
+  flex: none;
+  border-radius: var(--ds-radius-full);
+  background-color: var(--system-color-solid);
+}
+
+.sm {
+  width: calc(var(--ds-space-2) - var(--ds-border-width-strong));
+  height: calc(var(--ds-space-2) - var(--ds-border-width-strong));
+}
+
+.md {
+  width: var(--ds-space-2);
+  height: var(--ds-space-2);
+}

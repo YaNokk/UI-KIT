@@ -113,6 +113,71 @@
       "border": { "$type": "color", "$value": "{brand.accentBorder}" }
     }
   },
+  "systemColor": {
+    "gray": {
+      "softBackground": { "$type": "color", "$value": "{color.neutral.100}" },
+      "softBackgroundHover": { "$type": "color", "$value": "{color.neutral.200}" },
+      "softBackgroundSelected": { "$type": "color", "$value": "{color.neutral.300}" },
+      "foreground": { "$type": "color", "$value": "{color.neutral.700}" },
+      "border": { "$type": "color", "$value": "{color.neutral.300}" },
+      "solidBackground": { "$type": "color", "$value": "{color.neutral.700}" },
+      "onSolid": { "$type": "color", "$value": "{color.neutral.0}" }
+    },
+    "blue": {
+      "softBackground": { "$type": "color", "$value": "{color.blue.100}" },
+      "softBackgroundHover": { "$type": "color", "$value": "{color.blue.200}" },
+      "softBackgroundSelected": { "$type": "color", "$value": "{color.blue.300}" },
+      "foreground": { "$type": "color", "$value": "{color.blue.700}" },
+      "border": { "$type": "color", "$value": "{color.blue.300}" },
+      "solidBackground": { "$type": "color", "$value": "{color.blue.700}" },
+      "onSolid": { "$type": "color", "$value": "{color.neutral.0}" }
+    },
+    "green": {
+      "softBackground": { "$type": "color", "$value": "{color.green.100}" },
+      "softBackgroundHover": { "$type": "color", "$value": "{color.green.200}" },
+      "softBackgroundSelected": { "$type": "color", "$value": "{color.green.300}" },
+      "foreground": { "$type": "color", "$value": "{color.green.900}" },
+      "border": { "$type": "color", "$value": "{color.green.300}" },
+      "solidBackground": { "$type": "color", "$value": "{color.green.700}" },
+      "onSolid": { "$type": "color", "$value": "{color.neutral.0}" }
+    },
+    "amber": {
+      "softBackground": { "$type": "color", "$value": "{color.amber.100}" },
+      "softBackgroundHover": { "$type": "color", "$value": "{color.amber.200}" },
+      "softBackgroundSelected": { "$type": "color", "$value": "{color.amber.300}" },
+      "foreground": { "$type": "color", "$value": "{color.amber.900}" },
+      "border": { "$type": "color", "$value": "{color.amber.300}" },
+      "solidBackground": { "$type": "color", "$value": "{color.amber.700}" },
+      "onSolid": { "$type": "color", "$value": "{color.neutral.0}" }
+    },
+    "red": {
+      "softBackground": { "$type": "color", "$value": "{color.red.100}" },
+      "softBackgroundHover": { "$type": "color", "$value": "{color.red.200}" },
+      "softBackgroundSelected": { "$type": "color", "$value": "{color.red.300}" },
+      "foreground": { "$type": "color", "$value": "{color.red.900}" },
+      "border": { "$type": "color", "$value": "{color.red.300}" },
+      "solidBackground": { "$type": "color", "$value": "{color.red.700}" },
+      "onSolid": { "$type": "color", "$value": "{color.neutral.0}" }
+    },
+    "purple": {
+      "softBackground": { "$type": "color", "$value": "{color.purple.100}" },
+      "softBackgroundHover": { "$type": "color", "$value": "{color.purple.200}" },
+      "softBackgroundSelected": { "$type": "color", "$value": "{color.purple.300}" },
+      "foreground": { "$type": "color", "$value": "{color.purple.900}" },
+      "border": { "$type": "color", "$value": "{color.purple.300}" },
+      "solidBackground": { "$type": "color", "$value": "{color.purple.700}" },
+      "onSolid": { "$type": "color", "$value": "{color.neutral.0}" }
+    },
+    "brand": {
+      "softBackground": { "$type": "color", "$value": "{brand.accentSoft}" },
+      "softBackgroundHover": { "$type": "color", "$value": "{brand.accentSoftHover}" },
+      "softBackgroundSelected": { "$type": "color", "$value": "{brand.accentSoftActive}" },
+      "foreground": { "$type": "color", "$value": "{brand.accentContent}" },
+      "border": { "$type": "color", "$value": "{brand.accentBorder}" },
+      "solidBackground": { "$type": "color", "$value": "{brand.accent}" },
+      "onSolid": { "$type": "color", "$value": "{brand.onAccent}" }
+    }
+  },
   "navigation": {
     "item": {
       "background": { "$type": "color", "$value": "transparent" },

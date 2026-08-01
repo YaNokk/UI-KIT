@@ -66,6 +66,40 @@ describe("icon token contract", () => {
   });
 });
 
+describe("system color token contract", () => {
+  const colors = ["gray", "blue", "green", "amber", "red", "purple", "brand"];
+  const roles = [
+    "softBackground",
+    "softBackgroundHover",
+    "softBackgroundSelected",
+    "foreground",
+    "border",
+    "solidBackground",
+    "onSolid"
+  ];
+
+  it.each(themes)("%s exposes the complete closed system-color matrix", (_, tokens) => {
+    expect(
+      Object.keys(tokens)
+        .filter((path) => path.startsWith("systemColor."))
+    ).toEqual(colors.flatMap((color) => roles.map((role) => `systemColor.${color}.${role}`)));
+  });
+
+  it.each(themes)("%s keeps fixed system colors brand-independent", (_, tokens) => {
+    for (const color of colors.filter((color) => color !== "brand")) {
+      for (const role of roles) {
+        expect(tokens[`systemColor.${color}.${role}` as keyof typeof tokens])
+          .not.toContain("{brand.");
+      }
+    }
+  });
+
+  it.each(themes)("%s aliases brand solid contrast to the runtime resolver", (_, tokens) => {
+    expect(tokens["systemColor.brand.solidBackground"]).toBe("{brand.accent}");
+    expect(tokens["systemColor.brand.onSolid"]).toBe("{brand.onAccent}");
+  });
+});
+
 describe("overlay size token contract", () => {
   it("keeps Dialog and Drawer roles independent from breakpoints", () => {
     expect(primitiveTokens["size.overlay.dialog.md"]).toEqual({

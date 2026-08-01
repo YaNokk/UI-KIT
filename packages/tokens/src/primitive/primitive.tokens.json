@@ -16,28 +16,46 @@
     },
     "blue": {
       "100": { "$type": "color", "$value": "#dbeafe" },
+      "200": { "$type": "color", "$value": "#bfdbfe" },
+      "300": { "$type": "color", "$value": "#93c5fd" },
       "500": { "$type": "color", "$value": "#0080ff" },
       "600": { "$type": "color", "$value": "#006cd9" },
-      "700": { "$type": "color", "$value": "#005bb8" }
+      "700": { "$type": "color", "$value": "#005bb8" },
+      "800": { "$type": "color", "$value": "#00478f" },
+      "900": { "$type": "color", "$value": "#003366" }
     },
     "green": {
       "100": { "$type": "color", "$value": "#dcfce7" },
+      "200": { "$type": "color", "$value": "#bbf7d0" },
       "300": { "$type": "color", "$value": "#86efac" },
       "700": { "$type": "color", "$value": "#15803d" },
+      "800": { "$type": "color", "$value": "#166534" },
       "900": { "$type": "color", "$value": "#14532d" }
     },
     "amber": {
       "100": { "$type": "color", "$value": "#fef3c7" },
+      "200": { "$type": "color", "$value": "#fde68a" },
       "300": { "$type": "color", "$value": "#fcd34d" },
       "700": { "$type": "color", "$value": "#b45309" },
+      "800": { "$type": "color", "$value": "#92400e" },
       "900": { "$type": "color", "$value": "#78350f" }
     },
     "red": {
       "100": { "$type": "color", "$value": "#fee2e2" },
+      "200": { "$type": "color", "$value": "#fecaca" },
       "300": { "$type": "color", "$value": "#fca5a5" },
       "600": { "$type": "color", "$value": "#dc2626" },
       "700": { "$type": "color", "$value": "#b91c1c" },
+      "800": { "$type": "color", "$value": "#991b1b" },
       "900": { "$type": "color", "$value": "#7f1d1d" }
+    },
+    "purple": {
+      "100": { "$type": "color", "$value": "#f3e8ff" },
+      "200": { "$type": "color", "$value": "#e9d5ff" },
+      "300": { "$type": "color", "$value": "#d8b4fe" },
+      "700": { "$type": "color", "$value": "#7e22ce" },
+      "800": { "$type": "color", "$value": "#6b21a8" },
+      "900": { "$type": "color", "$value": "#581c87" }
     }
   },
   "space": {

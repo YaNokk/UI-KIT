@@ -19,6 +19,10 @@
       "types": "./dist/AmountInput/index.d.ts",
       "import": "./dist/AmountInput/index.js"
     },
+    "./badge": {
+      "types": "./dist/Badge/index.d.ts",
+      "import": "./dist/Badge/index.js"
+    },
     "./bottom-sheet": {
       "types": "./dist/BottomSheet/index.d.ts",
       "import": "./dist/BottomSheet/index.js"
@@ -98,6 +102,18 @@
     "./spinner": {
       "types": "./dist/Spinner/index.d.ts",
       "import": "./dist/Spinner/index.js"
+    },
+    "./status-indicator": {
+      "types": "./dist/StatusIndicator/index.d.ts",
+      "import": "./dist/StatusIndicator/index.js"
+    },
+    "./system-color": {
+      "types": "./dist/system-color/index.d.ts",
+      "import": "./dist/system-color/index.js"
+    },
+    "./tag": {
+      "types": "./dist/Tag/index.d.ts",
+      "import": "./dist/Tag/index.js"
     },
     "./styles.css": "./dist/styles.css",
     "./text": {

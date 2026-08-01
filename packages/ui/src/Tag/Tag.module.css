@@ -1,0 +1,97 @@
+.root {
+  appearance: none;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  margin: var(--ds-space-0);
+  color: var(--system-color-foreground);
+  font-family: var(--ds-font-family-sans);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: var(--ds-line-height-caption);
+  background-color: var(--system-color-soft);
+  border: var(--ds-border-width-default) solid var(--system-color-border);
+  border-radius: var(--ds-radius-full);
+  transition:
+    color var(--ds-motion-fast),
+    background-color var(--ds-motion-fast),
+    border-color var(--ds-motion-fast);
+}
+
+button.root {
+  cursor: pointer;
+}
+
+.sm {
+  min-height: calc(var(--ds-size-control-sm) - var(--ds-space-2));
+  gap: var(--ds-space-1);
+  padding-inline: var(--ds-space-2);
+  font-size: var(--ds-font-size-caption);
+}
+
+.md {
+  min-height: var(--ds-size-control-sm);
+  gap: var(--ds-space-1);
+  padding-inline: var(--ds-space-3);
+  font-size: var(--ds-font-size-body-sm);
+  line-height: var(--ds-line-height-body-sm);
+}
+
+.label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.removeIcon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--ds-size-icon-sm);
+  height: var(--ds-size-icon-sm);
+  color: currentColor;
+  opacity: 0.72;
+}
+
+.removeIcon > svg {
+  width: 100%;
+  height: 100%;
+  stroke-width: var(--ds-icon-stroke-default);
+}
+
+@media (hover: hover) {
+  button.root:not(:disabled):hover {
+    background-color: var(--system-color-soft-hover);
+  }
+}
+
+button.root:not(:disabled):active,
+.selected {
+  background-color: var(--system-color-soft-selected);
+  border-color: var(--system-color-foreground);
+}
+
+button.root:focus-visible {
+  outline: var(--ds-focus-ring-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-ring-width);
+  box-shadow: 0 0 0 var(--ds-focus-ring-width) var(--ds-focus-ring-offset);
+}
+
+.disabled,
+button.root:disabled {
+  opacity: 0.48;
+}
+
+button.root:disabled {
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    transition: none;
+  }
+}

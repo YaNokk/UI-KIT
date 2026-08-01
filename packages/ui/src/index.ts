@@ -5,6 +5,9 @@ export type {
   DesignSystemProviderProps
 } from "./DesignSystemProvider/index.js";
 export type { BrandInput, ThemeMode } from "@mypoint/tokens";
+export type { SystemColor } from "./system-color/index.js";
+export { Badge } from "./Badge/index.js";
+export type { BadgeProps } from "./Badge/index.js";
 export { BottomSheet } from "./BottomSheet/index.js";
 export type { BottomSheetProps } from "./BottomSheet/index.js";
 export { Dialog } from "./Dialog/index.js";
@@ -110,6 +113,19 @@ export type {
   SpinnerSize,
   SpinnerTone
 } from "./Spinner/index.js";
+export { StatusIndicator } from "./StatusIndicator/index.js";
+export type {
+  StatusIndicatorProps,
+  StatusIndicatorSize
+} from "./StatusIndicator/index.js";
+export { Tag } from "./Tag/index.js";
+export type {
+  RemovableTagProps,
+  SelectableTagProps,
+  StaticTagProps,
+  TagProps,
+  TagSize
+} from "./Tag/index.js";
 export { Text } from "./Text/index.js";
 export type {
   TextElement,

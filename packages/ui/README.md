@@ -5,6 +5,7 @@ ESM React-компоненты дизайн-системы MyPoint.
 ```tsx
 import "@mypoint/ui/styles.css";
 import {
+  Badge,
   Button,
   ButtonLink,
   DesignSystemProvider,
@@ -12,6 +13,8 @@ import {
   IconButton,
   Link,
   Spinner,
+  StatusIndicator,
+  Tag,
   Text,
 } from "@mypoint/ui";
 import { RefreshCw } from "lucide-react";
@@ -30,6 +33,9 @@ export function App() {
       <Button variant="primary">Создать заказ</Button>
       <IconButton aria-label="Обновить" icon={<RefreshCw />} />
       <Spinner label="Загрузка заказов" tone="accent" />
+      <Tag color="green" dot>Выполнен</Tag>
+      <Badge color="red" label="3 непрочитанных уведомления">{3}</Badge>
+      <StatusIndicator color="green" label="Сервис доступен" />
     </DesignSystemProvider>
   );
 }
@@ -55,7 +61,9 @@ React и ReactDOM предоставляются consumer-приложением
 Компоненты доступны через root named exports и явные ESM subpaths:
 `@mypoint/ui/design-system-provider`, `@mypoint/ui/button`, `@mypoint/ui/button-link`,
 `@mypoint/ui/icon-button`, `@mypoint/ui/spinner`, `@mypoint/ui/text`, `@mypoint/ui/heading` и
-`@mypoint/ui/link`. Monetary-компоненты также доступны через
+`@mypoint/ui/link`. System-color primitives доступны как `@mypoint/ui/tag`,
+`@mypoint/ui/badge`, `@mypoint/ui/status-indicator`; общий закрытый тип — через
+`@mypoint/ui/system-color`. Monetary-компоненты также доступны через
 `@mypoint/ui/amount` и `@mypoint/ui/amount-input`.
 
 Forms и overlay foundations доступны как `Portal`/`PortalProvider`,

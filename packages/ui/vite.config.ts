@@ -26,6 +26,9 @@ export default defineConfig({
         "AmountInput/index": fileURLToPath(
           new URL("./src/AmountInput/index.ts", import.meta.url)
         ),
+        "Badge/index": fileURLToPath(
+          new URL("./src/Badge/index.ts", import.meta.url)
+        ),
         "Button/index": fileURLToPath(
           new URL("./src/Button/index.ts", import.meta.url)
         ),
@@ -74,6 +77,15 @@ export default defineConfig({
         "Spinner/index": fileURLToPath(
           new URL("./src/Spinner/index.ts", import.meta.url)
         ),
+        "StatusIndicator/index": fileURLToPath(
+          new URL("./src/StatusIndicator/index.ts", import.meta.url)
+        ),
+        "system-color/index": fileURLToPath(
+          new URL("./src/system-color/index.ts", import.meta.url)
+        ),
+        "Tag/index": fileURLToPath(
+          new URL("./src/Tag/index.ts", import.meta.url)
+        ),
         "Text/index": fileURLToPath(
           new URL("./src/Text/index.ts", import.meta.url)
         )
@@ -90,6 +102,7 @@ export default defineConfig({
         || id === "@maskito/kit"
         || id === "@mypoint/tokens"
         || id === "@radix-ui/react-dialog"
+        || id === "lucide-react"
         || id === "virtua",
       output: {
         preserveModules: true,

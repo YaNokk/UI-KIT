@@ -1,0 +1,69 @@
+.gray {
+  --system-color-soft: var(--ds-system-color-gray-soft-background);
+  --system-color-soft-hover: var(--ds-system-color-gray-soft-background-hover);
+  --system-color-soft-selected: var(--ds-system-color-gray-soft-background-selected);
+  --system-color-foreground: var(--ds-system-color-gray-foreground);
+  --system-color-border: var(--ds-system-color-gray-border);
+  --system-color-solid: var(--ds-system-color-gray-solid-background);
+  --system-color-on-solid: var(--ds-system-color-gray-on-solid);
+}
+
+.blue {
+  --system-color-soft: var(--ds-system-color-blue-soft-background);
+  --system-color-soft-hover: var(--ds-system-color-blue-soft-background-hover);
+  --system-color-soft-selected: var(--ds-system-color-blue-soft-background-selected);
+  --system-color-foreground: var(--ds-system-color-blue-foreground);
+  --system-color-border: var(--ds-system-color-blue-border);
+  --system-color-solid: var(--ds-system-color-blue-solid-background);
+  --system-color-on-solid: var(--ds-system-color-blue-on-solid);
+}
+
+.green {
+  --system-color-soft: var(--ds-system-color-green-soft-background);
+  --system-color-soft-hover: var(--ds-system-color-green-soft-background-hover);
+  --system-color-soft-selected: var(--ds-system-color-green-soft-background-selected);
+  --system-color-foreground: var(--ds-system-color-green-foreground);
+  --system-color-border: var(--ds-system-color-green-border);
+  --system-color-solid: var(--ds-system-color-green-solid-background);
+  --system-color-on-solid: var(--ds-system-color-green-on-solid);
+}
+
+.amber {
+  --system-color-soft: var(--ds-system-color-amber-soft-background);
+  --system-color-soft-hover: var(--ds-system-color-amber-soft-background-hover);
+  --system-color-soft-selected: var(--ds-system-color-amber-soft-background-selected);
+  --system-color-foreground: var(--ds-system-color-amber-foreground);
+  --system-color-border: var(--ds-system-color-amber-border);
+  --system-color-solid: var(--ds-system-color-amber-solid-background);
+  --system-color-on-solid: var(--ds-system-color-amber-on-solid);
+}
+
+.red {
+  --system-color-soft: var(--ds-system-color-red-soft-background);
+  --system-color-soft-hover: var(--ds-system-color-red-soft-background-hover);
+  --system-color-soft-selected: var(--ds-system-color-red-soft-background-selected);
+  --system-color-foreground: var(--ds-system-color-red-foreground);
+  --system-color-border: var(--ds-system-color-red-border);
+  --system-color-solid: var(--ds-system-color-red-solid-background);
+  --system-color-on-solid: var(--ds-system-color-red-on-solid);
+}
+
+.purple {
+  --system-color-soft: var(--ds-system-color-purple-soft-background);
+  --system-color-soft-hover: var(--ds-system-color-purple-soft-background-hover);
+  --system-color-soft-selected: var(--ds-system-color-purple-soft-background-selected);
+  --system-color-foreground: var(--ds-system-color-purple-foreground);
+  --system-color-border: var(--ds-system-color-purple-border);
+  --system-color-solid: var(--ds-system-color-purple-solid-background);
+  --system-color-on-solid: var(--ds-system-color-purple-on-solid);
+}
+
+.brand {
+  --system-color-soft: var(--ds-system-color-brand-soft-background);
+  --system-color-soft-hover: var(--ds-system-color-brand-soft-background-hover);
+  --system-color-soft-selected: var(--ds-system-color-brand-soft-background-selected);
+  --system-color-foreground: var(--ds-system-color-brand-foreground);
+  --system-color-border: var(--ds-system-color-brand-border);
+  --system-color-solid: var(--ds-system-color-brand-solid-background);
+  --system-color-on-solid: var(--ds-system-color-brand-on-solid);
+}
