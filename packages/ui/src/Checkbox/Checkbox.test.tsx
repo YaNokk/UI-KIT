@@ -14,10 +14,10 @@ describe("Checkbox", () => {
   it("uses a native input and reports checked state before the event", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
-    render(<Checkbox label="Новости" name="news" onChange={onChange} value="yes" />);
+    render(<Checkbox label="News" name="news" onChange={onChange} value="yes" />);
 
-    const checkbox = screen.getByRole("checkbox", { name: "Новости" });
-    await user.click(screen.getByText("Новости"));
+    const checkbox = screen.getByRole("checkbox", { name: "News" });
+    await user.click(screen.getByText("News"));
 
     expect(checkbox).toBeChecked();
     expect(onChange).toHaveBeenCalledWith(true, expect.objectContaining({ type: "change" }));
@@ -27,15 +27,15 @@ describe("Checkbox", () => {
 
   it("sets indeterminate on the native input and forwards its ref", () => {
     const ref = createRef<HTMLInputElement>();
-    render(<Checkbox indeterminate label="Выбрать всё" ref={ref} />);
-    expect(ref.current).toBe(screen.getByRole("checkbox", { name: "Выбрать всё" }));
+    render(<Checkbox indeterminate label="Select all" ref={ref} />);
+    expect(ref.current).toBe(screen.getByRole("checkbox", { name: "Select all" }));
     expect(ref.current?.indeterminate).toBe(true);
   });
 
   it("keeps the native indeterminate property aligned with an unchanged prop", async () => {
     const user = userEvent.setup();
-    render(<Checkbox indeterminate label="Выбрать всё" />);
-    const checkbox = screen.getByRole<HTMLInputElement>("checkbox", { name: "Выбрать всё" });
+    render(<Checkbox indeterminate label="Select all" />);
+    const checkbox = screen.getByRole<HTMLInputElement>("checkbox", { name: "Select all" });
     await user.click(checkbox);
     expect(checkbox.indeterminate).toBe(true);
   });
@@ -44,22 +44,40 @@ describe("Checkbox", () => {
     render(
       <Checkbox
         aria-describedby="external"
-        description="Подсказка"
-        error="Обязательное согласие"
+        description="Hint"
+        error="Agreement is required"
         id="terms"
-        label="Условия"
+        label="Terms"
       />
     );
-    const checkbox = screen.getByRole("checkbox", { name: "Условия" });
+    const checkbox = screen.getByRole("checkbox", { name: "Terms" });
     expect(checkbox).toHaveAttribute("aria-invalid", "true");
     expect(checkbox).toHaveAttribute("aria-describedby", "external terms-error");
-    expect(screen.queryByText("Подсказка")).not.toBeInTheDocument();
-    expect(screen.getByText("Обязательное согласие")).toBeInTheDocument();
+    expect(screen.queryByText("Hint")).not.toBeInTheDocument();
+    expect(screen.getByText("Agreement is required")).not.toHaveAttribute("role", "alert");
+  });
+
+  it("uses native checked, unchecked and default-on form submission", () => {
+    const { container } = render(
+      <form>
+        <Checkbox defaultChecked label="Named value" name="named" value="yes" />
+        <Checkbox label="Unchecked value" name="unchecked" value="yes" />
+        <Checkbox defaultChecked label="Default value" name="default" />
+      </form>
+    );
+    const form = container.querySelector("form");
+    if (!form) throw new Error("Expected form fixture");
+    const data = new FormData(form);
+    expect(data.get("named")).toBe("yes");
+    expect(data.has("unchecked")).toBe(false);
+    expect(data.get("default")).toBe("on");
   });
 
   it("has no detectable axe violations", async () => {
-    const { container } = render(<Checkbox description="Письма раз в неделю" label="Новости" />);
-    const results = await axe.run(container, { rules: { "color-contrast": { enabled: false } } });
+    const { container } = render(<Checkbox description="Sent once a week" label="News" />);
+    const results = await axe.run(container, {
+      rules: { "color-contrast": { enabled: false } }
+    });
     expect(results.violations).toEqual([]);
   });
 });

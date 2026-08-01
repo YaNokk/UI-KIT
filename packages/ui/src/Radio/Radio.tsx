@@ -36,18 +36,15 @@ export interface RadioProps
   size?: ChoiceControlSize;
 }
 
-interface RadioControlProps extends RadioProps {
-  invalid?: boolean;
-}
-
 function joinIds(...ids: Array<string | undefined>): string | undefined {
   const value = ids.filter(Boolean).join(" ");
   return value || undefined;
 }
 
-export const RadioControl = forwardRef<HTMLInputElement, RadioControlProps>(
+export const RadioControl = forwardRef<HTMLInputElement, RadioProps>(
   function RadioControl(
     {
+      "aria-describedby": ariaDescribedBy,
       "aria-labelledby": ariaLabelledBy,
       align = "start",
       block = false,
@@ -56,7 +53,6 @@ export const RadioControl = forwardRef<HTMLInputElement, RadioControlProps>(
       defaultChecked,
       description,
       disabled = false,
-      invalid = false,
       id,
       label,
       onChange,
@@ -68,6 +64,7 @@ export const RadioControl = forwardRef<HTMLInputElement, RadioControlProps>(
   ) {
     const generatedId = useId();
     const inputId = id ?? generatedId;
+    const descriptionId = description == null ? undefined : `${inputId}-description`;
     const labelId = label == null ? undefined : `${inputId}-label`;
 
     return (
@@ -80,6 +77,7 @@ export const RadioControl = forwardRef<HTMLInputElement, RadioControlProps>(
       >
         <input
           {...nativeProps}
+          aria-describedby={joinIds(ariaDescribedBy, descriptionId)}
           aria-labelledby={joinIds(ariaLabelledBy, labelId)}
           checked={checked}
           className={choiceControlStyles.nativeInput}
@@ -93,7 +91,6 @@ export const RadioControl = forwardRef<HTMLInputElement, RadioControlProps>(
         <ChoiceIndicator
           checked={checked === true}
           disabled={disabled}
-          invalid={invalid}
           kind="radio"
           size={size}
         />
@@ -102,6 +99,7 @@ export const RadioControl = forwardRef<HTMLInputElement, RadioControlProps>(
           disabled={disabled}
           label={label}
           labelId={labelId}
+          messageId={descriptionId}
           size={size}
         />
       </ChoiceControlLayout>

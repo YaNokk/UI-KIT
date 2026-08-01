@@ -155,9 +155,9 @@ export function ChoiceGroupField({
       aria-describedby={messageId}
       aria-invalid={error != null ? true : undefined}
       aria-label={ariaLabel}
-      aria-required={required ? true : undefined}
       className={classNames(styles.group, block && styles.block, className)}
       data-invalid={error != null ? "" : undefined}
+      data-required={required ? "" : undefined}
       disabled={disabled}
     >
       <legend className={styles.legend}>

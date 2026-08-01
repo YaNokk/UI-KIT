@@ -177,10 +177,12 @@
 }
 
 .indicator[data-kind="switch"][data-checked] .switchThumb {
+  background-color: var(--ds-action-primary-foreground);
   transform: translateX(var(--switch-thumb-translation));
 }
 
 .nativeInput:checked + .indicator[data-kind="switch"] .switchThumb {
+  background-color: var(--ds-action-primary-foreground);
   transform: translateX(var(--switch-thumb-translation));
 }
 
@@ -210,6 +212,11 @@
   color: var(--ds-icon-disabled);
   background-color: var(--ds-control-background-disabled);
   border-color: var(--ds-border-subtle);
+}
+
+.indicator[data-kind="switch"][data-disabled][data-checked] .switchThumb,
+.nativeInput:disabled:checked + .indicator[data-kind="switch"] .switchThumb {
+  background-color: var(--ds-icon-disabled);
 }
 
 .nativeInput:focus-visible + .indicator {

@@ -79,11 +79,9 @@ export function RadioGroup<Value extends string = string>({
         const optionDisabled = disabled || option.disabled === true;
         return (
           <RadioControl
-            aria-invalid={error != null ? true : undefined}
             checked={selectedValue === option.value}
             description={option.description}
             disabled={optionDisabled}
-            invalid={error != null}
             key={option.value}
             label={option.label}
             name={groupName}
