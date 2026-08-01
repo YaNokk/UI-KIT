@@ -347,12 +347,15 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
             <span
               className={classNames(
                 styles.valueText,
-                controlTextClassNames[size],
                 displayOption === null && styles.placeholder
               )}
               data-field-placeholder={displayOption === null ? "" : undefined}
+              data-control-text-clip=""
             >
-              {displayOption === null ? placeholder : displayOption.label}
+              <span
+                className={classNames(styles.valueLabel, controlTextClassNames[size])}
+                data-control-text=""
+              >{displayOption === null ? placeholder : displayOption.label}</span>
             </span>
           </button>
         </FieldShell>

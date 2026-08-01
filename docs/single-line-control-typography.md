@@ -9,7 +9,11 @@ Flex alignment centers a font line box, not the visible glyphs. Fixed-height con
 - `counterText`: Badge and future compact counters.
 - `choiceControlLabel`: Select option/action primary labels and future single-line Checkbox, Radio and Switch labels.
 
-Each role owns its font metrics and its optical block offset. The current calibrated offset is the canonical zero spacing token; progressive `text-box-trim` is applied only in the shared foundation. Component CSS must not add `translateY`, `top`, `padding-top` or `inset-block-start` to text labels.
+Each role owns its font metrics and its optical block offset. The current calibrated offset is the canonical zero spacing token. Production keeps the complete font line box: `text-box-trim` and `text-box-edge` are forbidden because cap/alphabetic trimming can remove Latin, Cyrillic, Kazakh Cyrillic and fallback-font descenders. Optical correction may move only the intact inner typography wrapper. Component CSS must not add `translateY`, `top`, `padding-top` or `inset-block-start` to text labels.
+
+## Clipping architecture
+
+Controls that truncate horizontally use two layers: an outer clip wrapper owns `min-inline-size`, `overflow`, ellipsis and `white-space`; its inner wrapper owns the typography role and optional optical offset. Tag, Badge, Select trigger/options/actions and MultiSelect chips/summaries follow this structure. Button does not need a clip wrapper because its label wraps rather than ellipsizes. No typography wrapper may also own `overflow: hidden`.
 
 ## Audit decisions
 
@@ -17,6 +21,8 @@ Button, ButtonLink, Tag, Badge, private MultiSelect chips, Select trigger and Se
 
 ## Calibration baseline
 
-The Storybook story `Foundations/SingleLineControlTypography/Matrix` waits for `document.fonts.ready`, checks the intended Inter-first stack, and covers Latin, Cyrillic, digits, symbols, descenders, role weights and control sizes. The frozen automated baseline is Chromium on Windows at 100% zoom. A stable 125% runner is not configured, so no cross-engine or 125% optical-equivalence claim is made.
+The Storybook stories `Foundations/SingleLineControlTypography/Matrix` and `SystemUiFallback` wait for `document.fonts.ready`, verify Inter and intentional `system-ui` fallback separately, check unchanged control heights and validate that text remains vertically inside every clip wrapper. Fixtures cover Latin (`Ag`, `gjpqy`, accented letters), Cyrillic (`Дру`, `Уцщ`, `ЦЩ`, `Йц`), Kazakh Cyrillic (`Ә Ғ Қ Ң Ө Ұ Ү Һ І`), digits, symbols and currency signs.
 
-Story-only center guides cross the physical center of each control. Review visible glyph balance rather than treating DOM rectangle centering as optical measurement. The targeted `npm run typography:check` gate prevents new component-local optical hacks while allowing the shared foundation and unrelated component geometry.
+The frozen automated baseline is Chromium on Windows at 100% zoom. A stable 125% runner is not configured, so no cross-engine or 125% optical-equivalence claim is made. Frozen script coverage is Latin, Cyrillic and Kazakh Cyrillic with Inter and system-ui fallback. Arabic, Hebrew, Indic, Thai and CJK support requires explicit fallback, direction and writing-system validation before it can be claimed.
+
+Story-only center guides cross the physical center of each control. Review visible glyph balance rather than treating DOM rectangle centering as optical measurement. The targeted `npm run typography:check` gate rejects unsafe trimming and prevents new component-local optical hacks while allowing the shared foundation and documented FieldShell geometry.

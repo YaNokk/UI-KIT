@@ -4,6 +4,7 @@ declare const styles: {
   readonly tagViewport: string;
   readonly tag: string;
   readonly tagLabel: string;
+  readonly labelText: string;
   readonly tagRemove: string;
   readonly activeTag: string;
   readonly disabledTag: string;

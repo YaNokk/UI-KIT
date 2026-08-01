@@ -33,11 +33,17 @@ button.root {
   padding-inline: var(--ds-space-3);
 }
 
-.label {
+.labelClip {
+  display: inline-flex;
+  align-items: center;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.label {
+  display: inline-block;
 }
 
 .removeIcon {

@@ -69,10 +69,12 @@ describe("MultiSelect", () => {
   });
 
   it("renders selected tags in the closed trigger", async () => {
-    render(<ControlledMulti items={baseItems} value={["a", "b"]} />);
+    const { container } = render(<ControlledMulti items={baseItems} value={["a", "b"]} />);
     const trigger = screen.getByRole("button", { name: /Теги/ });
     expect(trigger.parentElement).toHaveTextContent("Альфа");
     expect(trigger.parentElement).toHaveTextContent("Бета");
+    expect(container.querySelector("[data-field-chip] [data-control-text-clip]"))
+      .toContainElement(container.querySelector("[data-field-chip] [data-compact-control-text]"));
   });
 
   it.each([

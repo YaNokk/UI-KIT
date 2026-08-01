@@ -59,7 +59,9 @@ function RowContent({ leading, label, description, trailing }: RowContentSlots) 
         </span>
       )}
       <span className={styles.body}>
-        <span className={classNames(styles.label, choiceControlLabelClassName)} data-choice-control-label="">{label}</span>
+        <span className={styles.label} data-control-text-clip="">
+          <span className={classNames(styles.labelText, choiceControlLabelClassName)} data-choice-control-label="">{label}</span>
+        </span>
         {description == null ? null : (
           <span className={styles.description}>{description}</span>
         )}

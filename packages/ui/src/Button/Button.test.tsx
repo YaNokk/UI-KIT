@@ -32,6 +32,7 @@ describe("Button native semantics", () => {
     expect(button.tagName).toBe("BUTTON");
     expect(button).toHaveAttribute("type", "button");
     expect(button).toHaveAttribute("data-testid", "button");
+    expect(button.querySelector("[data-control-text]")).toHaveTextContent("Сохранить");
     expect(ref.current).toBe(button);
   });
 

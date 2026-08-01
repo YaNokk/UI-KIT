@@ -499,14 +499,15 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
               {value.length === 0 ? (
                 <span
                   aria-hidden="true"
-                  className={classNames(styles.placeholder, compactControlTextClassNames.md)}
+                  className={styles.placeholder}
+                  data-control-text-clip=""
                   data-field-placeholder=""
                 >
-                  {placeholder}
+                  <span className={compactControlTextClassNames.md} data-compact-control-text="">{placeholder}</span>
                 </span>
               ) : compactInnerSummary ? (
-                <span aria-hidden="true" className={classNames(styles.compactSummary, compactControlTextClassNames.md)}>
-                  {messages.selectedCount(value.length)}
+                <span aria-hidden="true" className={styles.compactSummary} data-control-text-clip="">
+                  <span className={compactControlTextClassNames.md} data-compact-control-text="">{messages.selectedCount(value.length)}</span>
                 </span>
               ) : (
                 <>
@@ -522,8 +523,8 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                         data-field-chip=""
                         key={entry}
                       >
-                        <span aria-hidden="true" className={classNames(styles.tagLabel, compactControlTextClassNames.md)} data-compact-control-text="">
-                          {display?.label}
+                        <span aria-hidden="true" className={styles.tagLabel} data-control-text-clip="">
+                          <span className={classNames(styles.labelText, compactControlTextClassNames.md)} data-compact-control-text="">{display?.label}</span>
                         </span>
                         {interactive ? (
                           <button
@@ -563,7 +564,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                 ref={sizerRef}
               >
                 <span className={classNames(styles.tag, styles.measureTag)} data-measure-tag="">
-                  <span className={classNames(styles.tagLabel, compactControlTextClassNames.md)} data-measure-label="" />
+                  <span className={styles.tagLabel} data-measure-label=""><span className={classNames(styles.labelText, compactControlTextClassNames.md)} /></span>
                   {interactive ? (
                     <span className={styles.tagRemove}>
                       <X aria-hidden="true" />

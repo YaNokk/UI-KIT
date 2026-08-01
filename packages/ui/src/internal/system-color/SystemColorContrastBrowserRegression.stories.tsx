@@ -92,8 +92,8 @@ export const ComputedRoles: Story = {
       const row = canvasElement.querySelector(`[data-color-row="${color}"]`);
       if (!(row instanceof HTMLElement)) throw new Error(`Missing ${color} row`);
       const tagLabels = row.querySelectorAll("[data-compact-control-text]");
-      const soft = tagLabels[0]?.parentElement;
-      const selected = tagLabels[1]?.parentElement;
+      const soft = tagLabels[0]?.parentElement?.parentElement;
+      const selected = tagLabels[1]?.parentElement?.parentElement;
       const badge = row.querySelector("[data-badge]");
       for (const surface of [soft, selected, badge]) {
         if (!(surface instanceof HTMLElement)) throw new Error(`Missing ${color} surface`);

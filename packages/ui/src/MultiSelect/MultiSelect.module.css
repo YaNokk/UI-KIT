@@ -44,9 +44,14 @@
 }
 
 .tagLabel {
+  min-inline-size: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.labelText {
+  display: inline-block;
 }
 
 .tagRemove {

@@ -70,10 +70,12 @@ export function Tag(props: TagProps) {
   const content = (
     <>
       {dot ? <StatusIndicator color={color} size="sm" /> : null}
-      <span
-        className={classNames(styles.label, compactControlTextClassNames[size])}
-        data-compact-control-text=""
-      >{children}</span>
+      <span className={styles.labelClip} data-control-text-clip="">
+        <span
+          className={classNames(styles.label, compactControlTextClassNames[size])}
+          data-compact-control-text=""
+        >{children}</span>
+      </span>
       {isRemovable ? (
         <span aria-hidden="true" className={styles.removeIcon}>
           <X />

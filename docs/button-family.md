@@ -18,11 +18,9 @@ button-only behavior. `IconButton` remains a separate action primitive.
 ## Optical label alignment
 
 Button-family labels are tight single-line control text. The shared
-single-line control typography foundation may trim the font line box with `text-box-trim` and
-`text-box-edge` to align visible glyph bounds when the browser supports it.
-This is a progressive enhancement guarded by `@supports`: unsupported
-browsers keep the canonical line-height, padding and control height as an
-acceptable fallback.
+single-line control typography foundation preserves the complete line box;
+`text-box-trim` and `text-box-edge` are forbidden because they can clip
+descenders across the primary and fallback font stacks.
 
 The rule belongs to `controlTextSm/Md/Lg`, shared with other fixed-height
 control families. It is not part of global typography and must not be replaced

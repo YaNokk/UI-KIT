@@ -15,6 +15,7 @@ declare const styles: {
   readonly leading: string;
   readonly body: string;
   readonly label: string;
+  readonly labelText: string;
   readonly description: string;
   readonly trailing: string;
   readonly disabledRow: string;

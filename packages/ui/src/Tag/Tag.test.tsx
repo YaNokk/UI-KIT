@@ -13,10 +13,12 @@ afterEach(cleanup);
 describe("Tag modes", () => {
   it("renders a static non-focusable span", () => {
     render(<Tag color="green">Выполнен</Tag>);
-    const tag = screen.getByText("Выполнен").closest("span");
+    const label = screen.getByText("Выполнен");
+    const clip = label.closest("[data-control-text-clip]");
 
-    expect(tag?.parentElement).toHaveClass(styles.root);
-    expect(tag).toHaveAttribute("data-compact-control-text");
+    expect(clip?.parentElement).toHaveClass(styles.root);
+    expect(label).toHaveAttribute("data-compact-control-text");
+    expect(clip).toContainElement(label);
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 

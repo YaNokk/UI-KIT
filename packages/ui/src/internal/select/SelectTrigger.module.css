@@ -40,6 +40,10 @@
   white-space: nowrap;
 }
 
+.valueLabel {
+  display: inline-block;
+}
+
 .placeholder {
   color: var(--ds-control-placeholder);
 }

@@ -168,6 +168,10 @@
   white-space: nowrap;
 }
 
+.labelText {
+  display: inline-block;
+}
+
 .description {
   overflow: hidden;
   color: var(--ds-text-secondary);

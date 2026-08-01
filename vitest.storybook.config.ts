@@ -34,6 +34,9 @@ const storybookCsfTransform: Plugin = {
       && !normalizedId.includes(
         "/packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx"
       )
+      && !normalizedId.includes(
+        "/packages/ui/src/internal/single-line-control-typography/SingleLineControlTypography.stories.tsx"
+      )
     ) {
       return undefined;
     }
@@ -47,7 +50,8 @@ const storybookCsfTransform: Plugin = {
         "../../../packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx",
-        "../../../packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx"
+        "../../../packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx",
+        "../../../packages/ui/src/internal/single-line-control-typography/SingleLineControlTypography.stories.tsx"
       ],
       tagsFilter: { include: ["test"], exclude: [], skip: [] }
     });
@@ -106,7 +110,8 @@ export default defineConfig({
       "packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx",
       "packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx",
       "packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx",
-      "packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx"
+      "packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx",
+      "packages/ui/src/internal/single-line-control-typography/SingleLineControlTypography.stories.tsx"
     ],
     browser: {
       enabled: true,

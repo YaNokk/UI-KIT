@@ -48,6 +48,23 @@
   inline-size: 320px;
 }
 
+.selectGrid {
+  display: grid;
+  gap: var(--ds-space-2);
+  inline-size: 320px;
+}
+
+.fallback {
+  --ds-font-family-sans: system-ui, sans-serif;
+  --ds-typography-control-text-sm: var(--ds-font-weight-medium) var(--ds-font-size-body-sm) / var(--ds-line-height-body-sm) system-ui, sans-serif;
+  --ds-typography-control-text-md: var(--ds-font-weight-medium) var(--ds-font-size-body) / var(--ds-line-height-body) system-ui, sans-serif;
+  --ds-typography-control-text-lg: var(--ds-font-weight-medium) var(--ds-font-size-body-lg) / var(--ds-line-height-body-lg) system-ui, sans-serif;
+  --ds-typography-compact-control-text-sm: var(--ds-font-weight-medium) var(--ds-font-size-caption) / var(--ds-line-height-caption) system-ui, sans-serif;
+  --ds-typography-compact-control-text-md: var(--ds-font-weight-medium) var(--ds-font-size-body-sm) / var(--ds-line-height-body-sm) system-ui, sans-serif;
+  --ds-typography-counter-text: var(--ds-font-weight-semibold) var(--ds-font-size-caption) / var(--ds-line-height-caption) system-ui, sans-serif;
+  --ds-typography-choice-control-label: var(--ds-font-weight-regular) var(--ds-font-size-body) / var(--ds-line-height-body) system-ui, sans-serif;
+}
+
 @media (--ds-below-md) {
   .row {
     grid-template-columns: 1fr;

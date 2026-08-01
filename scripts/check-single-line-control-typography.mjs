@@ -10,6 +10,7 @@ const geometryAllowlist = new Set([
 ]);
 const textSelector = /(label|text|value|summary|placeholder|overflow|badge|tag)/i;
 const suspiciousDeclaration = /\b(?:transform\s*:\s*translateY|inset-block-start\s*:|top\s*:|padding-top\s*:)/i;
+const unsafeTrimming = /\b(?:text-box-trim|text-box-edge)\s*:/i;
 
 async function collect(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -24,8 +25,11 @@ const violations = [];
 for (const file of await collect(root)) {
   if (!file.endsWith(".module.css")) continue;
   const relative = path.normalize(path.relative(root, file));
-  if (relative === sharedFoundation || geometryAllowlist.has(relative)) continue;
   const source = await readFile(file, "utf8");
+  if (unsafeTrimming.test(source)) {
+    violations.push(`${relative}: unsafe glyph trimming`);
+  }
+  if (relative === sharedFoundation || geometryAllowlist.has(relative)) continue;
   for (const match of source.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
     const [, selector, declarations] = match;
     if (!textSelector.test(selector) || /\.arrow\b/.test(selector)) continue;

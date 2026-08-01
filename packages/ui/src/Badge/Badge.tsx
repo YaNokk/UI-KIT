@@ -46,7 +46,9 @@ export function Badge({
       )}
       data-badge=""
     >
-      <span className={classNames(styles.label, counterTextClassName)} data-counter-text="">{value}</span>
+      <span className={styles.labelClip} data-control-text-clip="">
+        <span className={classNames(styles.label, counterTextClassName)} data-counter-text="">{value}</span>
+      </span>
     </span>
   );
 }
