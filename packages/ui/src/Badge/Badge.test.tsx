@@ -10,8 +10,9 @@ afterEach(cleanup);
 
 describe("Badge", () => {
   it("keeps zero visible", () => {
-    render(<Badge>{0}</Badge>);
+    const { container } = render(<Badge>{0}</Badge>);
     expect(screen.getByText("0")).toBeInTheDocument();
+    expect(container.querySelector("[data-counter-text]")).toHaveTextContent("0");
   });
 
   it("formats numeric overflow only when max is provided", () => {
@@ -41,9 +42,7 @@ describe("Badge", () => {
 
   it("has no detectable axe violations", async () => {
     const { container } = render(<div><Badge>{0}</Badge><Badge color="red" max={99}>{120}</Badge></div>);
-    const results = await axe.run(container, {
-      rules: { "color-contrast": { enabled: false } }
-    });
+    const results = await axe.run(container);
     expect(results.violations).toEqual([]);
   });
 });

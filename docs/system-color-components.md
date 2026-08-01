@@ -6,8 +6,8 @@
 | --- | --- | --- | --- | --- |
 | Closed palette | `gray`, `blue`, `green`, `amber`, `red`, `purple`, `brand` | Core Tag exposes broader visual variants, not this palette | Status tokens cover only success/warning/danger/info | Add the exact seven-value `SystemColor` union |
 | Soft surfaces | Pale Tag background, tone foreground and border | Checked/hover/disabled states are relevant | Existing status roles have no hover/selected and no gray/purple | Add reusable `systemColor.*.softBackground*`, `foreground`, `border` roles |
-| Solid surfaces | Compact filled counters and status points | Core StatusBadge confirms multi-size compact indicators | No shared solid/on-solid status family | Add `solidBackground` and `onSolid` roles |
-| Runtime brand | Designer has a fixed brand swatch | Not owned by Core DS | Runtime resolver already exposes mode-aware soft roles, `accent` and contrast-safe `onAccent` | Brand aliases the existing resolver; no second contrast algorithm |
+| Marker and solid surfaces | Status points preserve exact identity; compact counters carry text | Core StatusBadge confirms multi-size compact indicators | No split marker/text-surface family | Add `markerBackground` plus `solidBackground` and `onSolid` roles |
+| Runtime brand | Designer has a fixed brand swatch | Not owned by Core DS | Runtime resolver exposes mode-aware soft roles, exact `accent` and contrast-safe action pair | Marker aliases accent; Badge aliases the Primary Button action pair; no second contrast algorithm |
 | Interaction | Designer removable Tag uses a small nested button | Core Tag covers pressed, disabled, clear and keyboard-native button behavior | Canonical project controls use native button semantics and focus tokens | Selectable and removable Tag are each one button; modes are mutually exclusive |
 | Accessibility | Visual reference does not name icon-only remove actions | Core provides useful disabled/pressed cases but not the v1 API | WCAG baseline requires semantic HTML, focus and names | `aria-pressed`, required `removeLabel`, decorative embedded dot, labeled standalone status |
 
@@ -22,8 +22,9 @@ layer, not to individual components.
 Fixed colors alias primitive palettes and remain brand-independent. Light mode
 uses pale 100/200/300 surfaces; dark mode uses independently reviewed
 900/800/700 surfaces. `brand` alone aliases the runtime mode-aware brand family.
-Solid brand foreground is `{brand.onAccent}`, reusing the resolver's WCAG
-contrast decision. The roles are not responsive: component geometry and
+Brand marker aliases `{brand.accent}` exactly. Brand solid/on-solid aliases
+`{brand.actionBackground}` and `{brand.actionForeground}`, matching Primary
+Button's contrast-safe pair. The roles are not responsive: component geometry and
 container layout handle density without duplicating color tokens.
 
 The added primitive palette steps only support reusable semantic states that

@@ -36,6 +36,7 @@ import { useSelectSearch } from "../internal/select/search";
 import { useSelectState } from "../internal/select/useSelectState";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import styles from "../internal/select/SelectTrigger.module.css";
+import { controlTextClassNames } from "../internal/single-line-control-typography/singleLineControlTypography";
 
 export interface SelectProps<Value extends string = string> {
   value: Value | null;
@@ -346,6 +347,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
             <span
               className={classNames(
                 styles.valueText,
+                controlTextClassNames[size],
                 displayOption === null && styles.placeholder
               )}
               data-field-placeholder={displayOption === null ? "" : undefined}

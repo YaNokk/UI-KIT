@@ -1,0 +1,53 @@
+.controlTextSm,
+.controlTextMd,
+.controlTextLg,
+.compactControlTextSm,
+.compactControlTextMd,
+.counterText,
+.choiceControlLabel {
+  --control-text-optical-offset: var(--ds-space-0);
+
+  position: relative;
+  inset-block-start: var(--control-text-optical-offset);
+}
+
+.controlTextSm {
+  font: var(--ds-typography-control-text-sm);
+}
+
+.controlTextMd {
+  font: var(--ds-typography-control-text-md);
+}
+
+.controlTextLg {
+  font: var(--ds-typography-control-text-lg);
+}
+
+.compactControlTextSm {
+  font: var(--ds-typography-compact-control-text-sm);
+}
+
+.compactControlTextMd {
+  font: var(--ds-typography-compact-control-text-md);
+}
+
+.counterText {
+  font: var(--ds-typography-counter-text);
+}
+
+.choiceControlLabel {
+  font: var(--ds-typography-choice-control-label);
+}
+
+@supports (text-box-trim: trim-both) {
+  .controlTextSm,
+  .controlTextMd,
+  .controlTextLg,
+  .compactControlTextSm,
+  .compactControlTextMd,
+  .counterText,
+  .choiceControlLabel {
+    text-box-trim: trim-both;
+    text-box-edge: cap alphabetic;
+  }
+}

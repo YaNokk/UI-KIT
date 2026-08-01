@@ -1,5 +1,68 @@
 {
   "typography": {
+    "controlTextSm": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.bodySm}",
+        "fontWeight": "{font.weight.medium}",
+        "lineHeight": "{lineHeight.bodySm}"
+      }
+    },
+    "controlTextMd": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.body}",
+        "fontWeight": "{font.weight.medium}",
+        "lineHeight": "{lineHeight.body}"
+      }
+    },
+    "controlTextLg": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.bodyLg}",
+        "fontWeight": "{font.weight.medium}",
+        "lineHeight": "{lineHeight.bodyLg}"
+      }
+    },
+    "compactControlTextSm": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.caption}",
+        "fontWeight": "{font.weight.medium}",
+        "lineHeight": "{lineHeight.caption}"
+      }
+    },
+    "compactControlTextMd": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.bodySm}",
+        "fontWeight": "{font.weight.medium}",
+        "lineHeight": "{lineHeight.bodySm}"
+      }
+    },
+    "counterText": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.caption}",
+        "fontWeight": "{font.weight.semibold}",
+        "lineHeight": "{lineHeight.caption}"
+      }
+    },
+    "choiceControlLabel": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.body}",
+        "fontWeight": "{font.weight.regular}",
+        "lineHeight": "{lineHeight.body}"
+      }
+    },
     "caption": {
       "$type": "typography",
       "$value": {

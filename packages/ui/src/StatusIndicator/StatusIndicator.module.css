@@ -2,7 +2,7 @@
   display: inline-block;
   flex: none;
   border-radius: var(--ds-radius-full);
-  background-color: var(--system-color-solid);
+  background-color: var(--system-color-marker);
 }
 
 .sm {

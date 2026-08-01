@@ -1,4 +1,5 @@
 .gray {
+  --system-color-marker: var(--ds-system-color-gray-marker-background);
   --system-color-soft: var(--ds-system-color-gray-soft-background);
   --system-color-soft-hover: var(--ds-system-color-gray-soft-background-hover);
   --system-color-soft-selected: var(--ds-system-color-gray-soft-background-selected);
@@ -9,6 +10,7 @@
 }
 
 .blue {
+  --system-color-marker: var(--ds-system-color-blue-marker-background);
   --system-color-soft: var(--ds-system-color-blue-soft-background);
   --system-color-soft-hover: var(--ds-system-color-blue-soft-background-hover);
   --system-color-soft-selected: var(--ds-system-color-blue-soft-background-selected);
@@ -19,6 +21,7 @@
 }
 
 .green {
+  --system-color-marker: var(--ds-system-color-green-marker-background);
   --system-color-soft: var(--ds-system-color-green-soft-background);
   --system-color-soft-hover: var(--ds-system-color-green-soft-background-hover);
   --system-color-soft-selected: var(--ds-system-color-green-soft-background-selected);
@@ -29,6 +32,7 @@
 }
 
 .amber {
+  --system-color-marker: var(--ds-system-color-amber-marker-background);
   --system-color-soft: var(--ds-system-color-amber-soft-background);
   --system-color-soft-hover: var(--ds-system-color-amber-soft-background-hover);
   --system-color-soft-selected: var(--ds-system-color-amber-soft-background-selected);
@@ -39,6 +43,7 @@
 }
 
 .red {
+  --system-color-marker: var(--ds-system-color-red-marker-background);
   --system-color-soft: var(--ds-system-color-red-soft-background);
   --system-color-soft-hover: var(--ds-system-color-red-soft-background-hover);
   --system-color-soft-selected: var(--ds-system-color-red-soft-background-selected);
@@ -49,6 +54,7 @@
 }
 
 .purple {
+  --system-color-marker: var(--ds-system-color-purple-marker-background);
   --system-color-soft: var(--ds-system-color-purple-soft-background);
   --system-color-soft-hover: var(--ds-system-color-purple-soft-background-hover);
   --system-color-soft-selected: var(--ds-system-color-purple-soft-background-selected);
@@ -59,6 +65,7 @@
 }
 
 .brand {
+  --system-color-marker: var(--ds-system-color-brand-marker-background);
   --system-color-soft: var(--ds-system-color-brand-soft-background);
   --system-color-soft-hover: var(--ds-system-color-brand-soft-background-hover);
   --system-color-soft-selected: var(--ds-system-color-brand-soft-background-selected);

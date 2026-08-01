@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { getSystemColorClass, type SystemColor } from "../internal/system-color/systemColor";
 import { classNames } from "../shared/classNames";
 import { StatusIndicator } from "../StatusIndicator/StatusIndicator";
+import { compactControlTextClassNames } from "../internal/single-line-control-typography/singleLineControlTypography";
 import styles from "./Tag.module.css";
 
 export type TagSize = "sm" | "md";
@@ -11,7 +12,6 @@ interface TagBaseProps {
   children: ReactNode;
   className?: string;
   color?: SystemColor;
-  disabled?: boolean;
   dot?: boolean;
   size?: TagSize;
 }
@@ -24,6 +24,7 @@ export interface StaticTagProps extends TagBaseProps {
 }
 
 export interface SelectableTagProps extends TagBaseProps {
+  disabled?: boolean;
   onClick(): void;
   onRemove?: never;
   removeLabel?: never;
@@ -31,6 +32,7 @@ export interface SelectableTagProps extends TagBaseProps {
 }
 
 export interface RemovableTagProps extends TagBaseProps {
+  disabled?: boolean;
   onClick?: never;
   onRemove(): void;
   removeLabel: string;
@@ -49,10 +51,10 @@ export function Tag(props: TagProps) {
     children,
     className,
     color = "gray",
-    disabled = false,
     dot = false,
     size = "md"
   } = props;
+  const disabled = "disabled" in props ? props.disabled ?? false : false;
   const isRemovable = "onRemove" in props && typeof props.onRemove === "function";
   const isSelectable = !isRemovable
     && "selected" in props
@@ -63,13 +65,15 @@ export function Tag(props: TagProps) {
     sizeClassNames[size],
     getSystemColorClass(color),
     selected && styles.selected,
-    disabled && styles.disabled,
     className
   );
   const content = (
     <>
       {dot ? <StatusIndicator color={color} size="sm" /> : null}
-      <span className={styles.label}>{children}</span>
+      <span
+        className={classNames(styles.label, compactControlTextClassNames[size])}
+        data-compact-control-text=""
+      >{children}</span>
       {isRemovable ? (
         <span aria-hidden="true" className={styles.removeIcon}>
           <X />

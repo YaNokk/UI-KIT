@@ -115,6 +115,7 @@
   },
   "systemColor": {
     "gray": {
+      "markerBackground": { "$type": "color", "$value": "{color.neutral.500}" },
       "softBackground": { "$type": "color", "$value": "{color.neutral.100}" },
       "softBackgroundHover": { "$type": "color", "$value": "{color.neutral.200}" },
       "softBackgroundSelected": { "$type": "color", "$value": "{color.neutral.300}" },
@@ -124,15 +125,17 @@
       "onSolid": { "$type": "color", "$value": "{color.neutral.0}" }
     },
     "blue": {
+      "markerBackground": { "$type": "color", "$value": "{color.blue.500}" },
       "softBackground": { "$type": "color", "$value": "{color.blue.100}" },
       "softBackgroundHover": { "$type": "color", "$value": "{color.blue.200}" },
       "softBackgroundSelected": { "$type": "color", "$value": "{color.blue.300}" },
-      "foreground": { "$type": "color", "$value": "{color.blue.700}" },
+      "foreground": { "$type": "color", "$value": "{color.blue.800}" },
       "border": { "$type": "color", "$value": "{color.blue.300}" },
       "solidBackground": { "$type": "color", "$value": "{color.blue.700}" },
       "onSolid": { "$type": "color", "$value": "{color.neutral.0}" }
     },
     "green": {
+      "markerBackground": { "$type": "color", "$value": "{color.green.500}" },
       "softBackground": { "$type": "color", "$value": "{color.green.100}" },
       "softBackgroundHover": { "$type": "color", "$value": "{color.green.200}" },
       "softBackgroundSelected": { "$type": "color", "$value": "{color.green.300}" },
@@ -142,6 +145,7 @@
       "onSolid": { "$type": "color", "$value": "{color.neutral.0}" }
     },
     "amber": {
+      "markerBackground": { "$type": "color", "$value": "{color.amber.500}" },
       "softBackground": { "$type": "color", "$value": "{color.amber.100}" },
       "softBackgroundHover": { "$type": "color", "$value": "{color.amber.200}" },
       "softBackgroundSelected": { "$type": "color", "$value": "{color.amber.300}" },
@@ -151,6 +155,7 @@
       "onSolid": { "$type": "color", "$value": "{color.neutral.0}" }
     },
     "red": {
+      "markerBackground": { "$type": "color", "$value": "{color.red.500}" },
       "softBackground": { "$type": "color", "$value": "{color.red.100}" },
       "softBackgroundHover": { "$type": "color", "$value": "{color.red.200}" },
       "softBackgroundSelected": { "$type": "color", "$value": "{color.red.300}" },
@@ -160,6 +165,7 @@
       "onSolid": { "$type": "color", "$value": "{color.neutral.0}" }
     },
     "purple": {
+      "markerBackground": { "$type": "color", "$value": "{color.purple.500}" },
       "softBackground": { "$type": "color", "$value": "{color.purple.100}" },
       "softBackgroundHover": { "$type": "color", "$value": "{color.purple.200}" },
       "softBackgroundSelected": { "$type": "color", "$value": "{color.purple.300}" },
@@ -169,13 +175,14 @@
       "onSolid": { "$type": "color", "$value": "{color.neutral.0}" }
     },
     "brand": {
+      "markerBackground": { "$type": "color", "$value": "{brand.accent}" },
       "softBackground": { "$type": "color", "$value": "{brand.accentSoft}" },
       "softBackgroundHover": { "$type": "color", "$value": "{brand.accentSoftHover}" },
       "softBackgroundSelected": { "$type": "color", "$value": "{brand.accentSoftActive}" },
       "foreground": { "$type": "color", "$value": "{brand.accentContent}" },
       "border": { "$type": "color", "$value": "{brand.accentBorder}" },
-      "solidBackground": { "$type": "color", "$value": "{brand.accent}" },
-      "onSolid": { "$type": "color", "$value": "{brand.onAccent}" }
+      "solidBackground": { "$type": "color", "$value": "{brand.actionBackground}" },
+      "onSolid": { "$type": "color", "$value": "{brand.actionForeground}" }
     }
   },
   "navigation": {

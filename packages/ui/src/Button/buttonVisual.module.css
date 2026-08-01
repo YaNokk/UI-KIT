@@ -45,17 +45,6 @@
   overflow-wrap: anywhere;
 }
 
-@supports (text-box-trim: trim-both) {
-  .label {
-    /*
-     * Tight single-line controls align visible glyph bounds rather than
-     * the full font line box when browser support is available.
-     */
-    text-box-trim: trim-both;
-    text-box-edge: cap alphabetic;
-  }
-}
-
 .icon {
   display: inline-flex;
   flex: none;
@@ -77,8 +66,6 @@
   --button-padding-inline: var(--ds-space-3);
 
   min-height: var(--ds-size-control-sm);
-  font: var(--ds-typography-body-sm);
-  font-weight: var(--ds-font-weight-medium);
 }
 
 .md {
@@ -86,8 +73,6 @@
   --button-padding-inline: var(--ds-space-4);
 
   min-height: var(--ds-size-control-md);
-  font: var(--ds-typography-body);
-  font-weight: var(--ds-font-weight-medium);
 }
 
 .lg {
@@ -95,8 +80,6 @@
   --button-padding-inline: var(--ds-space-5);
 
   min-height: var(--ds-size-control-lg);
-  font: var(--ds-typography-body-lg);
-  font-weight: var(--ds-font-weight-medium);
 }
 
 .primary {

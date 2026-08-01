@@ -69,6 +69,7 @@ describe("icon token contract", () => {
 describe("system color token contract", () => {
   const colors = ["gray", "blue", "green", "amber", "red", "purple", "brand"];
   const roles = [
+    "markerBackground",
     "softBackground",
     "softBackgroundHover",
     "softBackgroundSelected",
@@ -95,8 +96,9 @@ describe("system color token contract", () => {
   });
 
   it.each(themes)("%s aliases brand solid contrast to the runtime resolver", (_, tokens) => {
-    expect(tokens["systemColor.brand.solidBackground"]).toBe("{brand.accent}");
-    expect(tokens["systemColor.brand.onSolid"]).toBe("{brand.onAccent}");
+    expect(tokens["systemColor.brand.markerBackground"]).toBe("{brand.accent}");
+    expect(tokens["systemColor.brand.solidBackground"]).toBe("{brand.actionBackground}");
+    expect(tokens["systemColor.brand.onSolid"]).toBe("{brand.actionForeground}");
   });
 });
 
@@ -120,6 +122,13 @@ describe("overlay size token contract", () => {
 describe("typography token contract", () => {
   it("exposes the complete compact role scale without color", () => {
     expect(Object.keys(typographyTokens)).toEqual([
+      "typography.controlTextSm",
+      "typography.controlTextMd",
+      "typography.controlTextLg",
+      "typography.compactControlTextSm",
+      "typography.compactControlTextMd",
+      "typography.counterText",
+      "typography.choiceControlLabel",
       "typography.caption",
       "typography.bodySm",
       "typography.body",

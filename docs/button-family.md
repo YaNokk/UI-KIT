@@ -17,20 +17,19 @@ button-only behavior. `IconButton` remains a separate action primitive.
 
 ## Optical label alignment
 
-Button-family labels are tight single-line control text. The shared visual
-foundation may trim the font line box with `text-box-trim` and
+Button-family labels are tight single-line control text. The shared
+single-line control typography foundation may trim the font line box with `text-box-trim` and
 `text-box-edge` to align visible glyph bounds when the browser supports it.
 This is a progressive enhancement guarded by `@supports`: unsupported
 browsers keep the canonical line-height, padding and control height as an
 acceptable fallback.
 
-The rule remains local to the shared Button/ButtonLink label. It is not part
-of global typography roles and must not be replaced with pixel offsets,
-negative margins, asymmetric padding or size-specific geometry. A shared
-control-label utility is justified only after another independent control
-family proves the same requirement.
+The rule belongs to `controlTextSm/Md/Lg`, shared with other fixed-height
+control families. It is not part of global typography and must not be replaced
+with component-local pixel offsets, negative margins, asymmetric padding or
+size-specific geometry.
 
-The `Button / TypographyAlignment` Storybook story covers `sm`, `md` and `lg`
+The `Foundations / SingleLineControlTypography / Matrix` Storybook story covers `sm`, `md` and `lg`
 with Latin, Cyrillic, descender and numeric labels, icon combinations,
 loading layout and ButtonLink parity.
 

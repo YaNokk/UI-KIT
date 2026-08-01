@@ -44,7 +44,7 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
         })}
         ref={ref}
       >
-        <ButtonVisualContent endIcon={endIcon} startIcon={startIcon}>
+        <ButtonVisualContent endIcon={endIcon} size={size} startIcon={startIcon}>
           {children}
         </ButtonVisualContent>
       </a>

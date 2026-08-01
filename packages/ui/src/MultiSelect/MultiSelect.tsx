@@ -38,6 +38,7 @@ import { useSelectState } from "../internal/select/useSelectState";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import triggerStyles from "../internal/select/SelectTrigger.module.css";
 import styles from "./MultiSelect.module.css";
+import { compactControlTextClassNames } from "../internal/single-line-control-typography/singleLineControlTypography";
 
 export interface MultiSelectProps<Value extends string = string> {
   value: Value[];
@@ -498,13 +499,13 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
               {value.length === 0 ? (
                 <span
                   aria-hidden="true"
-                  className={styles.placeholder}
+                  className={classNames(styles.placeholder, compactControlTextClassNames.md)}
                   data-field-placeholder=""
                 >
                   {placeholder}
                 </span>
               ) : compactInnerSummary ? (
-                <span aria-hidden="true" className={styles.compactSummary}>
+                <span aria-hidden="true" className={classNames(styles.compactSummary, compactControlTextClassNames.md)}>
                   {messages.selectedCount(value.length)}
                 </span>
               ) : (
@@ -521,7 +522,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                         data-field-chip=""
                         key={entry}
                       >
-                        <span aria-hidden="true" className={styles.tagLabel}>
+                        <span aria-hidden="true" className={classNames(styles.tagLabel, compactControlTextClassNames.md)} data-compact-control-text="">
                           {display?.label}
                         </span>
                         {interactive ? (
@@ -548,7 +549,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                     );
                   })}
                   {overflowCount > 0 ? (
-                    <span aria-hidden="true" className={styles.overflow}>
+                    <span aria-hidden="true" className={classNames(styles.overflow, compactControlTextClassNames.md)}>
                       {"+" + overflowCount}
                     </span>
                   ) : null}
@@ -562,14 +563,14 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                 ref={sizerRef}
               >
                 <span className={classNames(styles.tag, styles.measureTag)} data-measure-tag="">
-                  <span className={styles.tagLabel} data-measure-label="" />
+                  <span className={classNames(styles.tagLabel, compactControlTextClassNames.md)} data-measure-label="" />
                   {interactive ? (
                     <span className={styles.tagRemove}>
                       <X aria-hidden="true" />
                     </span>
                   ) : null}
                 </span>
-                <span className={styles.overflow} data-measure-overflow="" />
+                <span className={classNames(styles.overflow, compactControlTextClassNames.md)} data-measure-overflow="" />
               </span>
             )}
           </span>

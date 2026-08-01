@@ -16,6 +16,7 @@ describe("Tag modes", () => {
     const tag = screen.getByText("Выполнен").closest("span");
 
     expect(tag?.parentElement).toHaveClass(styles.root);
+    expect(tag).toHaveAttribute("data-compact-control-text");
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
@@ -82,9 +83,7 @@ describe("Tag accessibility", () => {
         <Tag onRemove={() => undefined} removeLabel="Удалить тег QA">QA</Tag>
       </div>
     );
-    const results = await axe.run(container, {
-      rules: { "color-contrast": { enabled: false } }
-    });
+    const results = await axe.run(container);
     expect(results.violations).toEqual([]);
   });
 });

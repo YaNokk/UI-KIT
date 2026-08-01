@@ -28,12 +28,13 @@ function TokenMatrix() {
   return (
     <div className="grid gap-3">
       {colors.map((color) => (
-        <div className="grid grid-cols-5 items-center gap-2" key={color}>
+        <div className="grid grid-cols-6 items-center gap-2" key={color}>
           <span className="typo-body-sm">{color}</span>
+          <span className="h-5 w-5 rounded-full" style={roleStyle(color, "marker-background")} title="marker" />
           <span className="rounded-lg border p-2" style={roleStyle(color, "soft-background")}>soft</span>
-          <span className="rounded-lg border p-2" style={roleStyle(color, "soft-background-hover")}>hover</span>
           <span className="rounded-lg border p-2" style={roleStyle(color, "soft-background-selected")}>selected</span>
           <span className="rounded-lg p-2" style={roleStyle(color, "solid-background")}>solid</span>
+          <span className="rounded-lg p-2" style={{ backgroundColor: `var(--ds-system-color-${color}-solid-background)`, color: `var(--ds-system-color-${color}-on-solid)` }}>onSolid</span>
         </div>
       ))}
     </div>
@@ -68,6 +69,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const SystemColors: Story = {};
+export const SystemColorRoleMatrix: Story = {};
+export const SystemColorSolidRoles: Story = {};
 
 export const SystemColorsDark: Story = {
   decorators: [(Story) => <DesignSystemProvider mode="dark"><div className="p-4"><Story /></div></DesignSystemProvider>]

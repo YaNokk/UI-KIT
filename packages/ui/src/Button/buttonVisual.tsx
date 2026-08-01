@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { classNames } from "../shared/classNames";
+import { controlTextClassNames } from "../internal/single-line-control-typography/singleLineControlTypography";
 import styles from "./buttonVisual.module.css";
 
 export type ButtonVariant = "primary" | "secondary" | "soft" | "danger";
@@ -52,6 +53,7 @@ interface ButtonVisualContentProps {
   children: ReactNode;
   className?: string | undefined;
   endIcon?: ReactNode;
+  size?: ButtonSize;
   startIcon?: ReactNode;
 }
 
@@ -59,6 +61,7 @@ export function ButtonVisualContent({
   children,
   className,
   endIcon,
+  size = "md",
   startIcon
 }: ButtonVisualContentProps) {
   return (
@@ -69,7 +72,10 @@ export function ButtonVisualContent({
         </span>
       ) : null}
 
-      <span className={styles.label}>{children}</span>
+      <span
+        className={classNames(styles.label, controlTextClassNames[size])}
+        data-control-text=""
+      >{children}</span>
 
       {endIcon !== undefined && endIcon !== null ? (
         <span aria-hidden="true" className={styles.icon}>

@@ -35,6 +35,31 @@ export const Brand: Story = {
   )],
   render: () => <Badge color="brand" label="12 новых событий">12</Badge>
 };
+export const BrandDefaultBlue: Story = {
+  render: () => <Badge color="brand">12</Badge>
+};
+export const BrandLightYellow: Story = Brand;
+export const BrandLightGreen: Story = {
+  decorators: [(Story) => (
+    // eslint-disable-next-line design-system/no-design-literals -- Runtime brand contrast stress case.
+    <DesignSystemProvider brand={{ accentColor: "#86efac" }}><div className="p-4"><Story /></div></DesignSystemProvider>
+  )],
+  render: () => <Badge color="brand">12</Badge>
+};
+export const BrandDark: Story = {
+  decorators: [(Story) => (
+    // eslint-disable-next-line design-system/no-design-literals -- Runtime brand contrast stress case.
+    <DesignSystemProvider brand={{ accentColor: "#7f1d1d" }} mode="dark"><div className="p-4"><Story /></div></DesignSystemProvider>
+  )],
+  render: () => <Badge color="brand">12</Badge>
+};
+export const BrandExplicitForeground: Story = {
+  decorators: [(Story) => (
+    // eslint-disable-next-line design-system/no-design-literals -- Runtime brand contrast stress case.
+    <DesignSystemProvider brand={{ accentColor: "#facc15", foregroundColor: "#111827" }}><div className="p-4"><Story /></div></DesignSystemProvider>
+  )],
+  render: () => <Badge color="brand">12</Badge>
+};
 export const DesignerReference: Story = {
   render: () => <div className="flex items-center gap-3"><Badge color="red">3</Badge><Badge color="blue">12</Badge><Badge color="green">99</Badge><Badge color="amber">!</Badge></div>
 };

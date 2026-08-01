@@ -1,5 +1,4 @@
 declare const styles: {
-  readonly disabled: string;
   readonly label: string;
   readonly md: string;
   readonly removeIcon: string;

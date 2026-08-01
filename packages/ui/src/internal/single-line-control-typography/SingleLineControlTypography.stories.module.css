@@ -1,0 +1,55 @@
+.matrix {
+  display: grid;
+  gap: var(--ds-space-4);
+  color: var(--ds-text-primary);
+}
+
+.note {
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-body-sm);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--ds-space-4);
+}
+
+.cells,
+.weights {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-3);
+}
+
+.weights {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.guide {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.guide::after {
+  position: absolute;
+  inset-inline: calc(-1 * var(--ds-space-1));
+  inset-block-start: 50%;
+  border-block-start: var(--ds-border-width-default) solid var(--ds-border-danger);
+  content: "";
+  pointer-events: none;
+}
+
+.selectCell {
+  inline-size: 320px;
+}
+
+@media (--ds-below-md) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}

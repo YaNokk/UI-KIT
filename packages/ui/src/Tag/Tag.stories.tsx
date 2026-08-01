@@ -40,6 +40,10 @@ export const Sizes: Story = {
   render: () => <div className="flex items-center gap-2"><Tag size="sm">Small</Tag><Tag size="md">Medium</Tag></div>
 };
 
+export const TypographySmMd: Story = {
+  render: () => <div className="flex items-center gap-2"><Tag size="sm">Ag Дру gj 08 99+</Tag><Tag size="md">Ag Дру gj 08 99+</Tag></div>
+};
+
 export const Static: Story = {};
 export const WithDot: Story = { render: () => <Tag color="green" dot>Online</Tag> };
 
@@ -69,7 +73,7 @@ export const Removable: Story = {
 };
 
 export const Disabled: Story = {
-  render: () => <div className="flex gap-2"><Tag disabled>Static</Tag><Tag disabled onClick={fn()} selected={false}>Selectable</Tag></div>
+  render: () => <Tag disabled onClick={fn()} selected={false}>Selectable</Tag>
 };
 
 export const LongText: Story = {
@@ -91,6 +95,7 @@ export const Brand: Story = {
   )],
   render: () => <Tag color="brand" onClick={fn()} selected>Яркий бренд</Tag>
 };
+export const BrandSoft: Story = Brand;
 
 export const DesignerReference: Story = {
   render: () => (

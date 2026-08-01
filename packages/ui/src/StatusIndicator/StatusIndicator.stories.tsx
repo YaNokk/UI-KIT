@@ -58,3 +58,4 @@ export const Brand: Story = {
   )],
   render: () => <StatusIndicator color="brand" label="Бренд" size="md" />
 };
+export const BrandExactAccent: Story = Brand;

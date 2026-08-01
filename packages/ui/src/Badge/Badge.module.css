@@ -9,12 +9,14 @@
   padding-inline: var(--ds-space-1);
   overflow: hidden;
   color: var(--system-color-on-solid);
-  font-family: var(--ds-font-family-sans);
-  font-size: var(--ds-font-size-caption);
-  font-weight: var(--ds-font-weight-semibold);
-  line-height: var(--ds-line-height-caption);
   text-overflow: ellipsis;
   white-space: nowrap;
   background-color: var(--system-color-solid);
   border-radius: var(--ds-radius-full);
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

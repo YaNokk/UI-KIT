@@ -31,6 +31,9 @@ const storybookCsfTransform: Plugin = {
       && !normalizedId.includes(
         "/packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx"
       )
+      && !normalizedId.includes(
+        "/packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx"
+      )
     ) {
       return undefined;
     }
@@ -43,7 +46,8 @@ const storybookCsfTransform: Plugin = {
       stories: [
         "../../../packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx",
-        "../../../packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx"
+        "../../../packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx",
+        "../../../packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx"
       ],
       tagsFilter: { include: ["test"], exclude: [], skip: [] }
     });
@@ -101,7 +105,8 @@ export default defineConfig({
     include: [
       "packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx",
       "packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx",
-      "packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx"
+      "packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx",
+      "packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx"
     ],
     browser: {
       enabled: true,

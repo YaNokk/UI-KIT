@@ -476,3 +476,8 @@ export const GroupedLargeNoVirtualization: Story = {
     />
   )
 };
+
+export const TypographySmMdLg: Story = {
+  args: {} as never,
+  render: () => <div className="grid w-80 gap-3"><SelectHarness size="sm" /><SelectHarness size="md" /><SelectHarness size="lg" open /></div>
+};

@@ -311,3 +311,8 @@ export const NarrowContainer: Story = {
     }
   }
 };
+
+export const TypographySmMdLg: Story = {
+  args: { children: "Ag Дру gj 08 99+", variant: "primary" },
+  render: (args) => <div className="flex items-center gap-3"><Button {...args} size="sm" /><Button {...args} size="md" /><Button {...args} size="lg" /></div>
+};

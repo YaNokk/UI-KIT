@@ -13,6 +13,7 @@ import { VList, type VListHandle } from "virtua";
 import { Button } from "../../Button/Button";
 import { Spinner } from "../../Spinner/Spinner";
 import { classNames } from "../../shared/classNames";
+import { choiceControlLabelClassName } from "../single-line-control-typography/singleLineControlTypography";
 import type {
   SelectActionRow,
   SelectInteractiveRow,
@@ -58,7 +59,7 @@ function RowContent({ leading, label, description, trailing }: RowContentSlots) 
         </span>
       )}
       <span className={styles.body}>
-        <span className={styles.label}>{label}</span>
+        <span className={classNames(styles.label, choiceControlLabelClassName)} data-choice-control-label="">{label}</span>
         {description == null ? null : (
           <span className={styles.description}>{description}</span>
         )}

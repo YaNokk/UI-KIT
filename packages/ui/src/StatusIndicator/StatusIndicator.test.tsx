@@ -34,9 +34,7 @@ describe("StatusIndicator", () => {
       </div>
     );
 
-    const results = await axe.run(container, {
-      rules: { "color-contrast": { enabled: false } }
-    });
+    const results = await axe.run(container);
     expect(results.violations).toEqual([]);
   });
 });

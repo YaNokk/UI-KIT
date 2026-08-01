@@ -38,7 +38,6 @@
   padding-inline: var(--ds-space-2) var(--ds-space-1);
   block-size: var(--ds-space-5);
   color: var(--ds-action-soft-foreground);
-  font: var(--ds-typography-body-sm);
   background: var(--ds-action-soft-background);
   border: var(--ds-border-width-default) solid var(--ds-brand-accent-border);
   border-radius: var(--ds-radius-md);
@@ -105,7 +104,6 @@
   flex: none;
   padding-inline: var(--ds-space-1);
   color: var(--ds-text-secondary);
-  font: var(--ds-typography-body-sm);
   white-space: nowrap;
 }
 
@@ -121,7 +119,6 @@
 .compactSummary {
   overflow: hidden;
   color: var(--ds-text-accent);
-  font: var(--ds-typography-body-sm);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

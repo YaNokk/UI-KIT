@@ -80,6 +80,7 @@
   --color-status-info-background: var(--ds-status-info-background);
   --color-status-info-foreground: var(--ds-status-info-foreground);
   --color-status-info-border: var(--ds-status-info-border);
+  --color-system-color-gray-marker-background: var(--ds-system-color-gray-marker-background);
   --color-system-color-gray-soft-background: var(--ds-system-color-gray-soft-background);
   --color-system-color-gray-soft-background-hover: var(--ds-system-color-gray-soft-background-hover);
   --color-system-color-gray-soft-background-selected: var(--ds-system-color-gray-soft-background-selected);
@@ -87,6 +88,7 @@
   --color-system-color-gray-border: var(--ds-system-color-gray-border);
   --color-system-color-gray-solid-background: var(--ds-system-color-gray-solid-background);
   --color-system-color-gray-on-solid: var(--ds-system-color-gray-on-solid);
+  --color-system-color-blue-marker-background: var(--ds-system-color-blue-marker-background);
   --color-system-color-blue-soft-background: var(--ds-system-color-blue-soft-background);
   --color-system-color-blue-soft-background-hover: var(--ds-system-color-blue-soft-background-hover);
   --color-system-color-blue-soft-background-selected: var(--ds-system-color-blue-soft-background-selected);
@@ -94,6 +96,7 @@
   --color-system-color-blue-border: var(--ds-system-color-blue-border);
   --color-system-color-blue-solid-background: var(--ds-system-color-blue-solid-background);
   --color-system-color-blue-on-solid: var(--ds-system-color-blue-on-solid);
+  --color-system-color-green-marker-background: var(--ds-system-color-green-marker-background);
   --color-system-color-green-soft-background: var(--ds-system-color-green-soft-background);
   --color-system-color-green-soft-background-hover: var(--ds-system-color-green-soft-background-hover);
   --color-system-color-green-soft-background-selected: var(--ds-system-color-green-soft-background-selected);
@@ -101,6 +104,7 @@
   --color-system-color-green-border: var(--ds-system-color-green-border);
   --color-system-color-green-solid-background: var(--ds-system-color-green-solid-background);
   --color-system-color-green-on-solid: var(--ds-system-color-green-on-solid);
+  --color-system-color-amber-marker-background: var(--ds-system-color-amber-marker-background);
   --color-system-color-amber-soft-background: var(--ds-system-color-amber-soft-background);
   --color-system-color-amber-soft-background-hover: var(--ds-system-color-amber-soft-background-hover);
   --color-system-color-amber-soft-background-selected: var(--ds-system-color-amber-soft-background-selected);
@@ -108,6 +112,7 @@
   --color-system-color-amber-border: var(--ds-system-color-amber-border);
   --color-system-color-amber-solid-background: var(--ds-system-color-amber-solid-background);
   --color-system-color-amber-on-solid: var(--ds-system-color-amber-on-solid);
+  --color-system-color-red-marker-background: var(--ds-system-color-red-marker-background);
   --color-system-color-red-soft-background: var(--ds-system-color-red-soft-background);
   --color-system-color-red-soft-background-hover: var(--ds-system-color-red-soft-background-hover);
   --color-system-color-red-soft-background-selected: var(--ds-system-color-red-soft-background-selected);
@@ -115,6 +120,7 @@
   --color-system-color-red-border: var(--ds-system-color-red-border);
   --color-system-color-red-solid-background: var(--ds-system-color-red-solid-background);
   --color-system-color-red-on-solid: var(--ds-system-color-red-on-solid);
+  --color-system-color-purple-marker-background: var(--ds-system-color-purple-marker-background);
   --color-system-color-purple-soft-background: var(--ds-system-color-purple-soft-background);
   --color-system-color-purple-soft-background-hover: var(--ds-system-color-purple-soft-background-hover);
   --color-system-color-purple-soft-background-selected: var(--ds-system-color-purple-soft-background-selected);
@@ -122,6 +128,7 @@
   --color-system-color-purple-border: var(--ds-system-color-purple-border);
   --color-system-color-purple-solid-background: var(--ds-system-color-purple-solid-background);
   --color-system-color-purple-on-solid: var(--ds-system-color-purple-on-solid);
+  --color-system-color-brand-marker-background: var(--ds-system-color-brand-marker-background);
   --color-system-color-brand-soft-background: var(--ds-system-color-brand-soft-background);
   --color-system-color-brand-soft-background-hover: var(--ds-system-color-brand-soft-background-hover);
   --color-system-color-brand-soft-background-selected: var(--ds-system-color-brand-soft-background-selected);
@@ -177,6 +184,27 @@
   --breakpoint-2xl: 1536px;
 }
 
+@utility typo-control-text-sm {
+  font: var(--ds-typography-control-text-sm);
+}
+@utility typo-control-text-md {
+  font: var(--ds-typography-control-text-md);
+}
+@utility typo-control-text-lg {
+  font: var(--ds-typography-control-text-lg);
+}
+@utility typo-compact-control-text-sm {
+  font: var(--ds-typography-compact-control-text-sm);
+}
+@utility typo-compact-control-text-md {
+  font: var(--ds-typography-compact-control-text-md);
+}
+@utility typo-counter-text {
+  font: var(--ds-typography-counter-text);
+}
+@utility typo-choice-control-label {
+  font: var(--ds-typography-choice-control-label);
+}
 @utility typo-caption {
   font: var(--ds-typography-caption);
 }

@@ -1,6 +1,7 @@
 import type { HTMLAttributes } from "react";
 import { getSystemColorClass, type SystemColor } from "../internal/system-color/systemColor";
 import { classNames } from "../shared/classNames";
+import { counterTextClassName } from "../internal/single-line-control-typography/singleLineControlTypography";
 import styles from "./Badge.module.css";
 
 export interface BadgeProps
@@ -45,7 +46,7 @@ export function Badge({
       )}
       data-badge=""
     >
-      {value}
+      <span className={classNames(styles.label, counterTextClassName)} data-counter-text="">{value}</span>
     </span>
   );
 }

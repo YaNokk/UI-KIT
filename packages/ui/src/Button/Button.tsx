@@ -86,6 +86,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       <ButtonVisualContent
         className={loading ? styles.loadingContent : undefined}
         endIcon={endIcon}
+        size={size}
         startIcon={startIcon}
       >
         {children}
