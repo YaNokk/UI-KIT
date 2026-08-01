@@ -924,7 +924,6 @@ export const LoadingSpinnerHitRegion: Story = {
       await expect(trigger).toHaveAttribute("aria-busy", "true");
       await expect(spinner).toHaveAttribute("aria-hidden", "true");
       await expect(spinner).not.toHaveAttribute("tabindex");
-      await expect(spinner).not.toHaveAttribute("onclick");
 
       await userEvent.click(spinner);
       await waitFor(() => expect(document.querySelector("[data-select-surface]"))

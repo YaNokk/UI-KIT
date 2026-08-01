@@ -15,7 +15,7 @@ function normalizePath(value: string) {
 
 // addon-vitest 9.1.20's generated import.meta.url guard does not match the
 // Vitest worker path in this Windows workspace (Unicode + spaces). Keep the
-// compatibility transform scoped to this one CI-only regression story.
+// compatibility transform scoped to the selected CI-only regression stories.
 const storybookCsfTransform: Plugin = {
   name: "storybook-csf-transform-windows-compat",
   enforce: "pre",
@@ -24,6 +24,9 @@ const storybookCsfTransform: Plugin = {
     if (
       !normalizedId.includes(
         "/packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx"
+      )
+      && !normalizedId.includes(
+        "/packages/ui/src/FieldShell/InnerLabelGeometry.stories.tsx"
       )
       && !normalizedId.includes(
         "/packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx"
@@ -48,6 +51,7 @@ const storybookCsfTransform: Plugin = {
       previewLevelTags: [],
       stories: [
         "../../../packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx",
+        "../../../packages/ui/src/FieldShell/InnerLabelGeometry.stories.tsx",
         "../../../packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx",
@@ -108,6 +112,7 @@ export default defineConfig({
     fileParallelism: false,
     include: [
       "packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx",
+      "packages/ui/src/FieldShell/InnerLabelGeometry.stories.tsx",
       "packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx",
       "packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx",
       "packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx",
