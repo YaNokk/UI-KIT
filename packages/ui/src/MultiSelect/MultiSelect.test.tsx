@@ -46,6 +46,44 @@ afterEach(() => {
 });
 
 describe("MultiSelect", () => {
+  const fieldValueRoles = {
+    sm: "fieldValueTextSm",
+    md: "fieldValueTextMd",
+    lg: "fieldValueTextLg"
+  } as const;
+
+  it.each(["sm", "md", "lg"] as const)(
+    "uses the %s field-value role for empty and summary presentations",
+    (size) => {
+      const { container, rerender } = render(
+        <ControlledMulti items={baseItems} labelView="inner" size={size} value={[]} />
+      );
+      expect(container.querySelector("[data-field-placeholder] > span"))
+        .toHaveAttribute(
+          "data-control-text-role",
+          fieldValueRoles[size]
+        );
+
+      if (size !== "lg") {
+        rerender(
+          <ControlledMulti
+            items={baseItems}
+            key={`${size}-filled`}
+            labelView="inner"
+            size={size}
+            value={["a", "b"]}
+          />
+        );
+        expect(container.querySelector(
+          "[data-field-selection-presentation=\"summary\"] [data-control-text-role]"
+        ))
+          .toHaveAttribute(
+            "data-control-text-role",
+            fieldValueRoles[size]
+          );
+      }
+    }
+  );
   it("toggles options immediately and stays open", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
@@ -74,9 +112,9 @@ describe("MultiSelect", () => {
     expect(trigger.parentElement).toHaveTextContent("Альфа");
     expect(trigger.parentElement).toHaveTextContent("Бета");
     expect(container.querySelector("[data-field-chip] [data-control-text-clip]"))
-      .toContainElement(container.querySelector("[data-field-chip] [data-compact-control-text]"));
-    expect(container.querySelector("[data-field-chip] [data-compact-control-text]"))
-      .toHaveAttribute("data-control-text-role", "compactControlTextMd");
+      .toContainElement(container.querySelector("[data-field-chip] [data-compact-chip-text]"));
+    expect(container.querySelector("[data-field-chip] [data-compact-chip-text]"))
+      .toHaveAttribute("data-control-text-role", "compactChipText");
   });
 
   it.each([

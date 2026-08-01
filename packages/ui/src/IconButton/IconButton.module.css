@@ -15,9 +15,9 @@
   border-radius: var(--ds-radius-lg);
   cursor: pointer;
   transition:
-    color var(--ds-motion-fast),
-    background-color var(--ds-motion-fast),
-    border-color var(--ds-motion-fast);
+    color var(--ds-motion-control-state-duration) var(--ds-motion-control-state-easing),
+    background-color var(--ds-motion-control-state-duration) var(--ds-motion-control-state-easing),
+    border-color var(--ds-motion-control-state-duration) var(--ds-motion-control-state-easing);
 }
 
 .root:focus-visible {

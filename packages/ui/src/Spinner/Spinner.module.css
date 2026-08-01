@@ -53,7 +53,7 @@
   stroke: currentColor;
   /* Local optical geometry for the progress ring, not the Lucide icon stroke. */
   stroke-width: 3;
-  animation: spinner-rotate var(--ds-motion-slow) linear infinite;
+  animation: spinner-rotate var(--ds-motion-duration-slow) linear infinite;
 }
 
 .track {

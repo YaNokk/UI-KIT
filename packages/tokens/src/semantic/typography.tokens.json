@@ -1,5 +1,41 @@
 {
   "typography": {
+    "fieldValueTextSm": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.bodySm}",
+        "fontWeight": "{font.weight.medium}",
+        "lineHeight": "{lineHeight.fieldSm}"
+      }
+    },
+    "fieldValueTextMd": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.body}",
+        "fontWeight": "{font.weight.medium}",
+        "lineHeight": "{lineHeight.body}"
+      }
+    },
+    "fieldValueTextLg": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.bodyLg}",
+        "fontWeight": "{font.weight.medium}",
+        "lineHeight": "{lineHeight.fieldLg}"
+      }
+    },
+    "compactChipText": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontSize": "{font.size.bodySm}",
+        "fontWeight": "{font.weight.medium}",
+        "lineHeight": "{lineHeight.bodySm}"
+      }
+    },
     "controlTextSm": {
       "$type": "typography",
       "$value": {

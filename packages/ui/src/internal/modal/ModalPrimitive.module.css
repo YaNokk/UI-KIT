@@ -66,14 +66,14 @@
 }
 
 .surface[data-motion-ready][data-state="open"] {
-  animation-duration: var(--ds-motion-slow);
-  animation-timing-function: ease-out;
+  animation-duration: var(--ds-motion-overlay-enter-duration);
+  animation-timing-function: var(--ds-motion-overlay-enter-easing);
   animation-fill-mode: both;
 }
 
 .surface[data-motion-ready][data-state="closed"] {
-  animation-duration: var(--ds-motion-normal);
-  animation-timing-function: ease-in;
+  animation-duration: var(--ds-motion-overlay-exit-duration);
+  animation-timing-function: var(--ds-motion-overlay-exit-easing);
   animation-fill-mode: both;
 }
 

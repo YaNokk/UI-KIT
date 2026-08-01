@@ -58,7 +58,7 @@ describe("Select", () => {
       trigger.querySelector("[data-control-text]")
     );
     expect(trigger.querySelector("[data-control-text]"))
-      .toHaveAttribute("data-control-text-role", "controlTextMd");
+      .toHaveAttribute("data-control-text-role", "fieldValueTextMd");
 
     await user.click(trigger);
     const listbox = await screen.findByRole("listbox");
@@ -72,6 +72,24 @@ describe("Select", () => {
       .toHaveAttribute("data-control-text-role", "choiceControlLabel");
     // trigger keeps a single role with expanded state
     expect(trigger).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("closes an open popover trigger exactly once after listbox focus", async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(
+      <ControlledSelect items={baseItems} onOpenChange={onOpenChange} />
+    );
+
+    const trigger = screen.getByRole("button", { name: "Клиент" });
+    await user.click(trigger);
+    const listbox = await screen.findByRole("listbox");
+    await waitFor(() => expect(listbox).toHaveFocus());
+
+    await user.click(trigger);
+    await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument());
+    expect(onOpenChange.mock.calls.map(([nextOpen]) => nextOpen))
+      .toEqual([true, false]);
   });
 
   it("selects an option and closes", async () => {

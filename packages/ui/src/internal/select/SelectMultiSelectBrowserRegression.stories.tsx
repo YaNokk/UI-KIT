@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { Dialog } from "../../Dialog/Dialog";
+import { Input } from "../../Input/Input";
 import { MultiSelect } from "../../MultiSelect/MultiSelect";
 import { Select } from "../../Select/Select";
 import type { SelectCollectionItem } from "./collection";
@@ -284,6 +285,73 @@ function GroupedLargeFixture({ multiple }: { multiple: boolean }) {
   );
 }
 
+function TriggerToggleFixture() {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState<string | null>(null);
+  const transitions = useRef<boolean[]>([]);
+  return (
+    <div>
+      <Select
+        items={baseItems}
+        label="Trigger toggle"
+        onChange={setValue}
+        onOpenChange={(nextOpen) => {
+          transitions.current.push(nextOpen);
+          setOpen(nextOpen);
+        }}
+        open={open}
+        searchable
+        value={value}
+      />
+      <button type="button">Outside target</button>
+      <output aria-label="Open transitions">
+        {transitions.current.map(String).join(",")}
+      </output>
+    </div>
+  );
+}
+
+function FieldValueTypographyFixture() {
+  const roles = {
+    sm: "fieldValueTextSm",
+    md: "fieldValueTextMd",
+    lg: "fieldValueTextLg"
+  } as const;
+  return (
+    <div>
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <section data-field-value-row={size} data-expected-role={roles[size]} key={size}>
+          <Input aria-label={`Input ${size}`} size={size} value="Pending gjpqy Черновик ҰҒҚҮӘӨ 99+" readOnly />
+          <Select
+            items={baseItems}
+            label={`Select ${size}`}
+            onChange={() => undefined}
+            size={size}
+            value="alpha"
+          />
+          <MultiSelect
+            items={baseItems}
+            label={`Multi empty ${size}`}
+            labelView="inner"
+            onChange={() => undefined}
+            placeholder="Черновик ҰҒҚҮӘӨ 99+"
+            size={size}
+            value={[]}
+          />
+          <MultiSelect
+            items={baseItems}
+            label={`Multi selected ${size}`}
+            labelView="inner"
+            onChange={() => undefined}
+            size={size}
+            value={["alpha", "beta"]}
+          />
+        </section>
+      ))}
+    </div>
+  );
+}
+
 const meta = {
   title: "Fields/SelectMultiSelectBrowserRegression",
   component: Select,
@@ -293,6 +361,68 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+export const TriggerToggle: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <TriggerToggleFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole("button", { name: "Trigger toggle" });
+    const transitions = canvas.getByLabelText("Open transitions");
+
+    await userEvent.click(trigger);
+    await expect(await body.findByRole("textbox")).toHaveFocus();
+    await userEvent.click(trigger);
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(transitions).toHaveTextContent("true,false");
+
+    await userEvent.click(trigger);
+    const listbox = await body.findByRole("listbox");
+    listbox.focus();
+    await expect(listbox).toHaveFocus();
+    await userEvent.click(trigger);
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(transitions).toHaveTextContent("true,false,true,false");
+
+    await userEvent.click(trigger);
+    await userEvent.click(canvas.getByRole("button", { name: "Outside target" }));
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+
+    await userEvent.click(trigger);
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
+    await expect(transitions).toHaveTextContent(
+      "true,false,true,false,true,false,true,false"
+    );
+  }
+};
+
+export const FieldValueTypographyMatrix: Story = {
+  args: {} as never,
+  render: () => <FieldValueTypographyFixture />,
+  play: async ({ canvasElement }) => {
+    for (const row of canvasElement.querySelectorAll<HTMLElement>(
+      "[data-field-value-row]"
+    )) {
+      const expectedRole = row.dataset.expectedRole;
+      expect(expectedRole).toBeTruthy();
+      const fieldValues = row.querySelectorAll<HTMLElement>(
+        "[data-control-text-role^=\"fieldValueText\"]"
+      );
+      const size = row.dataset.fieldValueRow;
+      expect(fieldValues.length).toBe(size === "lg" ? 3 : 4);
+      for (const value of fieldValues) {
+        expect(value).toHaveAttribute("data-control-text-role", expectedRole);
+      }
+      for (const chip of row.querySelectorAll<HTMLElement>("[data-field-chip]")) {
+        expect(chip.querySelector("[data-control-text-role]"))
+          .toHaveAttribute("data-control-text-role", "compactChipText");
+      }
+    }
+  }
+};
 
 export const PanelHeightAndScrollOwner: Story = {
   args: {} as never,
@@ -492,7 +622,7 @@ export const PopoverSelectInternalFocus: Story = {
     await waitFor(() => expect(search).toHaveFocus());
     await expect(disabledAction).toBeDisabled();
     await userEvent.tab();
-    await expect(action).toHaveFocus();
+    await waitFor(() => expect(action).toHaveFocus());
     await expect(listbox).toBeInTheDocument();
     await userEvent.tab();
     await expect(listbox).toHaveFocus();
@@ -537,7 +667,7 @@ export const PopoverMultiSelectActionKeyboard: Story = {
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(canvas.getByRole("button", { name: "Action focus MultiSelect" }));
     const action = await body.findByRole("button", { name: "Создать тег" });
-    await expect(action).toHaveFocus();
+    await waitFor(() => expect(action).toHaveFocus());
     await userEvent.keyboard(" ");
     await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
     await expect(canvas.getByLabelText("MultiSelect action calls")).toHaveTextContent("1");

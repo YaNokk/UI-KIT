@@ -1,9 +1,28 @@
+// @vitest-environment jsdom
+
 import { afterEach, describe, expect, it } from "vitest";
-import { isFocusWithinElement } from "./focusContainment";
+import {
+  isFocusWithinElement,
+  isFocusWithinSelectRegion
+} from "./focusContainment";
 
 describe("isFocusWithinElement", () => {
   afterEach(() => {
     document.body.replaceChildren();
+  });
+
+  it("treats the reference and floating surface as one focus region", () => {
+    const surface = document.createElement("div");
+    const reference = document.createElement("button");
+    const option = document.createElement("button");
+    const outside = document.createElement("button");
+    surface.append(option);
+    document.body.append(reference, surface, outside);
+
+    expect(isFocusWithinSelectRegion(surface, reference, option)).toBe(true);
+    expect(isFocusWithinSelectRegion(surface, reference, reference)).toBe(true);
+    expect(isFocusWithinSelectRegion(surface, reference, outside)).toBe(false);
+    expect(isFocusWithinSelectRegion(surface, reference, null)).toBe(false);
   });
 
   it("uses the panel owner-document realm for related targets", () => {

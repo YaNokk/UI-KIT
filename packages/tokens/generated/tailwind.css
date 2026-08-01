@@ -184,6 +184,18 @@
   --breakpoint-2xl: 1536px;
 }
 
+@utility typo-field-value-text-sm {
+  font: var(--ds-typography-field-value-text-sm);
+}
+@utility typo-field-value-text-md {
+  font: var(--ds-typography-field-value-text-md);
+}
+@utility typo-field-value-text-lg {
+  font: var(--ds-typography-field-value-text-lg);
+}
+@utility typo-compact-chip-text {
+  font: var(--ds-typography-compact-chip-text);
+}
 @utility typo-control-text-sm {
   font: var(--ds-typography-control-text-sm);
 }

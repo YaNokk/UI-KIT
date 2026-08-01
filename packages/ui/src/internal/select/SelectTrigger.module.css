@@ -58,7 +58,8 @@
   display: inline-flex;
   align-items: center;
   color: var(--ds-control-icon);
-  transition: transform var(--ds-motion-fast);
+  transition: transform var(--ds-motion-control-indicator-duration)
+    var(--ds-motion-control-indicator-easing);
 }
 
 .chevronOpen {
@@ -68,10 +69,4 @@
 .chevron > svg {
   inline-size: var(--ds-size-icon-md);
   block-size: var(--ds-size-icon-md);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .chevron {
-    transition: none;
-  }
 }

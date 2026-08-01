@@ -13,6 +13,10 @@ import styles from "./SingleLineControlTypography.stories.module.css";
 import typographyStyles from "./singleLineControlTypography.module.css";
 
 type TypographyRole =
+  | "fieldValueTextSm"
+  | "fieldValueTextMd"
+  | "fieldValueTextLg"
+  | "compactChipText"
   | "controlTextSm"
   | "controlTextMd"
   | "controlTextLg"
@@ -22,6 +26,10 @@ type TypographyRole =
   | "choiceControlLabel";
 
 const expectedOffsets: Record<TypographyRole, string> = {
+  fieldValueTextSm: "-0.25px",
+  fieldValueTextMd: "-0.25px",
+  fieldValueTextLg: "-0.5px",
+  compactChipText: "-0.25px",
   controlTextSm: "-0.25px",
   controlTextMd: "-0.25px",
   controlTextLg: "-0.5px",
@@ -32,6 +40,10 @@ const expectedOffsets: Record<TypographyRole, string> = {
 };
 
 const expectedWeights: Record<TypographyRole, string> = {
+  fieldValueTextSm: "500",
+  fieldValueTextMd: "500",
+  fieldValueTextLg: "500",
+  compactChipText: "500",
   controlTextSm: "500",
   controlTextMd: "500",
   controlTextLg: "500",
@@ -42,6 +54,10 @@ const expectedWeights: Record<TypographyRole, string> = {
 };
 
 const roleDetails: Record<TypographyRole, { metrics: string; consumers: string }> = {
+  fieldValueTextSm: { metrics: "13 / 14 · 500", consumers: "Input, Select, MultiSelect value sm" },
+  fieldValueTextMd: { metrics: "14 / 20 · 500", consumers: "Input, Select, MultiSelect value md" },
+  fieldValueTextLg: { metrics: "16 / 22 · 500", consumers: "Input, Select, MultiSelect value lg" },
+  compactChipText: { metrics: "13 / 18 · 500", consumers: "MultiSelect chip and overflow" },
   controlTextSm: { metrics: "14 / 20 · 500", consumers: "Button sm, Select trigger sm" },
   controlTextMd: { metrics: "16 / 24 · 500", consumers: "Button md, Select trigger md" },
   controlTextLg: { metrics: "18 / 28 · 500", consumers: "Button lg, Select trigger lg" },
@@ -157,12 +173,17 @@ function CounterRoleSection() {
 function MultiSelectRoleSection() {
   const [value, setValue] = useState(["gjpqy", "Уцщ"]);
   return (
-    <section className={styles.roleSection} data-role-section="compactControlTextMd">
-      <RoleHeader role="compactControlTextMd" />
+    <section className={styles.roleSection} data-role-section="compactChipText">
+      <RoleHeader role="compactChipText" />
       <div className={styles.multiGrid}>
         {(["sm", "md", "lg"] as const).map((size) => (
           <span className={styles.selectCell} data-height={size === "lg" ? "multi-chip" : undefined} key={size}>
             <MultiSelect aria-label={`MultiSelect ${size}`} items={selectItems} labelView={size === "lg" ? "outer" : "inner"} onChange={setValue} size={size} value={value} />
+          </span>
+        ))}
+        {(["sm", "md", "lg"] as const).map((size) => (
+          <span className={styles.selectCell} key={`empty-${size}`}>
+            <MultiSelect aria-label={`MultiSelect empty ${size}`} items={selectItems} labelView="inner" onChange={() => undefined} size={size} value={[]} />
           </span>
         ))}
         <span className={styles.selectCell}>
@@ -209,7 +230,7 @@ function Calibration({ family = "all" }: { family?: "all" | "badge" | "button" |
       {family === "all" || family === "tag" ? <CompactRoleSection size="sm" /> : null}
       {family === "all" || family === "tag" ? <CompactRoleSection size="md" /> : null}
       {family === "all" || family === "badge" ? <CounterRoleSection /> : null}
-      {family === "multi" ? <MultiSelectRoleSection /> : null}
+      {family === "all" || family === "multi" ? <MultiSelectRoleSection /> : null}
       {family === "all" || family === "select" ? <ChoiceRoleSection /> : null}
       {family === "all" ? <TooltipAudit /> : null}
     </div>
@@ -277,6 +298,7 @@ async function verifyTypography(canvasElement: HTMLElement, fallback: boolean, r
 const allRoles = Object.keys(expectedOffsets) as TypographyRole[];
 const controlRoles: TypographyRole[] = ["controlTextSm", "controlTextMd", "controlTextLg"];
 const tagRoles: TypographyRole[] = ["compactControlTextSm", "compactControlTextMd"];
+const fieldValueRoles: TypographyRole[] = ["fieldValueTextSm", "fieldValueTextMd", "fieldValueTextLg"];
 
 const meta = {
   title: "Foundations/SingleLineControlTypography",
@@ -292,8 +314,8 @@ export const Matrix: Story = { play: async ({ canvasElement }) => verifyTypograp
 export const BadgeRoleMatrix: Story = { args: { family: "badge" }, play: async ({ canvasElement }) => verifyTypography(canvasElement, false, ["counterText"]) };
 export const ButtonSizeMatrix: Story = { args: { family: "button" }, play: async ({ canvasElement }) => verifyTypography(canvasElement, false, controlRoles) };
 export const TagSizeStateMatrix: Story = { args: { family: "tag" }, play: async ({ canvasElement }) => verifyTypography(canvasElement, false, tagRoles) };
-export const SelectTriggerOptionActionMatrix: Story = { args: { family: "select" }, play: async ({ canvasElement }) => verifyTypography(canvasElement, false, [...controlRoles, "choiceControlLabel"]) };
-export const MultiSelectChipSummaryMatrix: Story = { args: { family: "multi" }, play: async ({ canvasElement }) => verifyTypography(canvasElement, false, ["compactControlTextMd"]) };
+export const SelectTriggerOptionActionMatrix: Story = { args: { family: "select" }, play: async ({ canvasElement }) => verifyTypography(canvasElement, false, [...controlRoles, ...fieldValueRoles, "choiceControlLabel"]) };
+export const MultiSelectChipSummaryMatrix: Story = { args: { family: "multi" }, play: async ({ canvasElement }) => verifyTypography(canvasElement, false, [...fieldValueRoles, "compactChipText"]) };
 export const SystemUiFallbackMatrix: Story = {
   decorators: [(Story) => <FallbackScope><Story /></FallbackScope>],
   play: async ({ canvasElement }) => verifyTypography(canvasElement, true, allRoles)

@@ -4,20 +4,13 @@
   --field-padding-inline: var(--ds-space-3);
   --field-control-padding-inline-end: var(--field-padding-inline);
   --field-control-padding-inline-start: var(--field-padding-inline);
-  --field-inner-content-bottom: var(--ds-space-0);
-  --field-inner-label-content-gap: var(--ds-space-1);
-  --field-inner-label-line-height:
-    calc(var(--ds-line-height-caption) - var(--ds-space-1));
-  --field-inner-label-top: var(--ds-space-1);
-  --field-inner-content-top:
-    calc(
-      var(--field-inner-label-top)
-      + var(--field-inner-label-line-height)
-      + var(--field-inner-label-content-gap)
-    );
-  --field-inner-value-line-height:
-    calc(var(--ds-line-height-body) - var(--ds-space-1));
-  --field-label-resting-block-start: 50%;
+  --field-label-floated-top: var(--ds-space-1);
+  --field-label-line-height: calc(var(--ds-line-height-caption) - var(--ds-space-1));
+  --field-content-padding-top: var(--ds-space-4);
+  --field-content-padding-bottom: var(--ds-space-1);
+  --field-value-line-height: var(--ds-line-height-body);
+  --field-label-resting-translate-y: var(--ds-space-2);
+  --field-label-resting-scale: 1.2727;
 
   box-sizing: border-box;
   display: flex;
@@ -30,9 +23,9 @@
   border: var(--ds-border-width-default) solid var(--ds-control-border);
   border-radius: var(--ds-radius-lg);
   transition:
-    background-color var(--ds-motion-fast),
-    border-color var(--ds-motion-fast),
-    box-shadow var(--ds-motion-fast);
+    background-color var(--ds-motion-control-state-duration) var(--ds-motion-control-state-easing),
+    border-color var(--ds-motion-control-state-duration) var(--ds-motion-control-state-easing),
+    box-shadow var(--ds-motion-control-state-duration) var(--ds-motion-control-state-easing);
 }
 
 @media (hover: hover) {
@@ -82,12 +75,12 @@
 
 .inner.floated .control,
 .inner:focus-within .control {
-  padding-block-end: var(--field-inner-content-bottom);
-  padding-block-start: var(--field-inner-content-top);
+  padding-block-end: var(--field-content-padding-bottom);
+  padding-block-start: var(--field-content-padding-top);
 }
 
 .inner .control {
-  line-height: var(--field-inner-value-line-height);
+  line-height: var(--field-value-line-height);
 }
 
 .innerLabel {
@@ -101,23 +94,23 @@
 .inner .innerLabel {
   position: absolute;
   z-index: var(--ds-z-index-default);
-  inset-block-start: var(--field-label-resting-block-start);
+  inset-block-start: var(--field-label-floated-top);
   inset-inline-end: var(--field-control-padding-inline-end);
   inset-inline-start: var(--field-control-padding-inline-start);
   display: block;
   overflow: hidden;
   color: var(--ds-text-secondary);
-  font: inherit;
+  font: var(--ds-typography-caption);
+  line-height: var(--field-label-line-height);
   text-overflow: ellipsis;
-  transform: translateY(-50%);
-  transform-origin: top center;
+  transform: translateY(var(--field-label-resting-translate-y))
+    scale(var(--field-label-resting-scale));
+  transform-origin: left top;
   white-space: nowrap;
   pointer-events: none;
   transition:
-    color var(--ds-motion-fast),
-    font var(--ds-motion-fast),
-    inset-block-start var(--ds-motion-fast),
-    transform var(--ds-motion-fast);
+    color var(--ds-motion-control-label-duration) var(--ds-motion-control-label-easing),
+    transform var(--ds-motion-control-label-duration) var(--ds-motion-control-label-easing);
 }
 
 .inner .innerLabel > label {
@@ -130,11 +123,11 @@
 
 .inner.floated .innerLabel,
 .inner:focus-within .innerLabel {
-  block-size: var(--field-inner-label-line-height);
-  inset-block-start: var(--field-inner-label-top);
-  font: var(--ds-typography-caption);
-  line-height: var(--field-inner-label-line-height);
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
+}
+
+.root:dir(rtl) .innerLabel {
+  transform-origin: right top;
 }
 
 .inner.invalid .innerLabel {
@@ -186,61 +179,44 @@
   --field-gap: var(--ds-space-1);
   --field-icon-size: var(--ds-size-icon-sm);
   --field-padding-inline: var(--ds-space-2);
-  --field-inner-content-bottom: var(--ds-space-0);
-  --field-inner-label-content-gap: calc(-1 * var(--ds-space-1));
-  --field-inner-label-line-height:
-    calc(var(--ds-line-height-caption) - var(--ds-space-1));
-  --field-inner-label-top: var(--ds-space-1);
-  --field-inner-content-top:
-    calc(
-      var(--field-inner-label-top)
-      + var(--field-inner-label-line-height)
-      + var(--field-inner-label-content-gap)
-    );
-  --field-inner-value-line-height: var(--ds-line-height-body-sm);
+  --field-label-floated-top: calc(var(--ds-space-1) / 2);
+  --field-label-line-height: calc(var(--ds-line-height-caption) - var(--ds-space-1) - var(--ds-space-1) / 2);
+  --field-content-padding-top: var(--ds-space-3);
+  --field-content-padding-bottom: var(--ds-space-1);
+  --field-value-line-height: var(--ds-line-height-field-sm);
+  --field-label-resting-translate-y: var(--ds-space-2);
+  --field-label-resting-scale: 1.1818;
 
   height: var(--ds-size-control-sm);
-  font: var(--ds-typography-body-sm);
+  font: var(--ds-typography-field-value-text-sm);
 }
 
 .md {
-  --field-inner-content-bottom: var(--ds-space-0);
-  --field-inner-label-content-gap: var(--ds-space-1);
-  --field-inner-label-line-height:
-    calc(var(--ds-line-height-caption) - var(--ds-space-1));
-  --field-inner-label-top: var(--ds-space-1);
-  --field-inner-content-top:
-    calc(
-      var(--field-inner-label-top)
-      + var(--field-inner-label-line-height)
-      + var(--field-inner-label-content-gap)
-    );
-  --field-inner-value-line-height:
-    calc(var(--ds-line-height-body) - var(--ds-space-1));
+  --field-label-floated-top: var(--ds-space-1);
+  --field-label-line-height: calc(var(--ds-line-height-caption) - var(--ds-space-1) - var(--ds-space-1) / 2);
+  --field-content-padding-top: calc(var(--ds-space-3) + var(--ds-space-1) / 2);
+  --field-content-padding-bottom: var(--ds-space-1);
+  --field-value-line-height: var(--ds-line-height-body);
+  --field-label-resting-translate-y: var(--ds-space-2);
+  --field-label-resting-scale: 1.2727;
 
   height: var(--ds-size-control-md);
-  font: var(--ds-typography-body);
+  font: var(--ds-typography-field-value-text-md);
 }
 
 .lg {
   --field-icon-size: var(--ds-size-icon-lg);
   --field-padding-inline: var(--ds-space-4);
-  --field-inner-content-bottom: var(--ds-space-1);
-  --field-inner-label-content-gap: var(--ds-space-1);
-  --field-inner-label-line-height:
-    calc(var(--ds-line-height-caption) - var(--ds-space-1));
-  --field-inner-label-top: var(--ds-space-1);
-  --field-inner-content-top:
-    calc(
-      var(--field-inner-label-top)
-      + var(--field-inner-label-line-height)
-      + var(--field-inner-label-content-gap)
-    );
-  --field-inner-value-line-height:
-    calc(var(--ds-line-height-body-lg) - var(--ds-space-1));
+  --field-label-floated-top: var(--ds-space-1);
+  --field-label-line-height: calc(var(--ds-line-height-caption) - var(--ds-space-1));
+  --field-content-padding-top: var(--ds-space-4);
+  --field-content-padding-bottom: var(--ds-space-2);
+  --field-value-line-height: var(--ds-line-height-field-lg);
+  --field-label-resting-translate-y: var(--ds-space-3);
+  --field-label-resting-scale: 1.4545;
 
   height: var(--ds-size-control-lg);
-  font: var(--ds-typography-body-lg);
+  font: var(--ds-typography-field-value-text-lg);
 }
 
 .inner:not(.floated):not(:focus-within)
@@ -283,14 +259,4 @@
 
 .root[data-field-textlike] [data-field-interactive] {
   cursor: default;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .root {
-    transition: none;
-  }
-
-  .inner .innerLabel {
-    transition: none;
-  }
 }

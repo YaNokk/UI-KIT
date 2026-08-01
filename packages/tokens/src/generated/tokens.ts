@@ -135,6 +135,14 @@ export const primitiveTokens = {
   "font.weight.regular": 400,
   "font.weight.medium": 500,
   "font.weight.semibold": 600,
+  "lineHeight.fieldSm": {
+    "value": 14,
+    "unit": "px"
+  },
+  "lineHeight.fieldLg": {
+    "value": 22,
+    "unit": "px"
+  },
   "lineHeight.caption": {
     "value": 16,
     "unit": "px"
@@ -200,18 +208,46 @@ export const primitiveTokens = {
   "shadow.sm": "0 1px 2px rgb(13 16 21 / 0.12)",
   "shadow.md": "0 6px 16px rgb(13 16 21 / 0.16)",
   "shadow.lg": "0 16px 32px rgb(13 16 21 / 0.2)",
-  "motion.fast": {
-    "value": 100,
+  "motion.duration.instant": {
+    "value": 0,
     "unit": "ms"
   },
-  "motion.normal": {
-    "value": 150,
+  "motion.duration.fast": {
+    "value": 120,
     "unit": "ms"
   },
-  "motion.slow": {
-    "value": 250,
+  "motion.duration.normal": {
+    "value": 180,
     "unit": "ms"
   },
+  "motion.duration.slow": {
+    "value": 240,
+    "unit": "ms"
+  },
+  "motion.easing.standard": [
+    0.2,
+    0,
+    0,
+    1
+  ],
+  "motion.easing.enter": [
+    0,
+    0,
+    0,
+    1
+  ],
+  "motion.easing.exit": [
+    0.3,
+    0,
+    1,
+    1
+  ],
+  "motion.easing.emphasized": [
+    0.2,
+    0,
+    0,
+    1.2
+  ],
   "zIndex.default": 0,
   "zIndex.focused": 100,
   "zIndex.sticky": 100,
@@ -285,6 +321,30 @@ export const primitiveTokens = {
 } as const;
 
 export const typographyTokens = {
+  "typography.fieldValueTextSm": {
+    "fontFamily": "{font.family.sans}",
+    "fontSize": "{font.size.bodySm}",
+    "fontWeight": "{font.weight.medium}",
+    "lineHeight": "{lineHeight.fieldSm}"
+  },
+  "typography.fieldValueTextMd": {
+    "fontFamily": "{font.family.sans}",
+    "fontSize": "{font.size.body}",
+    "fontWeight": "{font.weight.medium}",
+    "lineHeight": "{lineHeight.body}"
+  },
+  "typography.fieldValueTextLg": {
+    "fontFamily": "{font.family.sans}",
+    "fontSize": "{font.size.bodyLg}",
+    "fontWeight": "{font.weight.medium}",
+    "lineHeight": "{lineHeight.fieldLg}"
+  },
+  "typography.compactChipText": {
+    "fontFamily": "{font.family.sans}",
+    "fontSize": "{font.size.bodySm}",
+    "fontWeight": "{font.weight.medium}",
+    "lineHeight": "{lineHeight.bodySm}"
+  },
   "typography.controlTextSm": {
     "fontFamily": "{font.family.sans}",
     "fontSize": "{font.size.bodySm}",
@@ -381,6 +441,19 @@ export const typographyTokens = {
     "fontWeight": "{font.weight.semibold}",
     "lineHeight": "{lineHeight.pageTitle}"
   }
+} as const;
+
+export const motionTokens = {
+  "motion.control.state.duration": "{motion.duration.fast}",
+  "motion.control.state.easing": "{motion.easing.standard}",
+  "motion.control.label.duration": "{motion.duration.normal}",
+  "motion.control.label.easing": "{motion.easing.emphasized}",
+  "motion.control.indicator.duration": "{motion.duration.fast}",
+  "motion.control.indicator.easing": "{motion.easing.standard}",
+  "motion.overlay.enter.duration": "{motion.duration.normal}",
+  "motion.overlay.enter.easing": "{motion.easing.enter}",
+  "motion.overlay.exit.duration": "{motion.duration.fast}",
+  "motion.overlay.exit.easing": "{motion.easing.exit}"
 } as const;
 
 export const defaultBrandTokens = {
@@ -724,6 +797,8 @@ export const darkSemanticTokens = {
 export type PrimitiveTokenPath = keyof typeof primitiveTokens;
 
 export type TypographyTokenPath = keyof typeof typographyTokens;
+
+export type MotionTokenPath = keyof typeof motionTokens;
 
 export type BrandTokenPath = keyof typeof defaultBrandTokens;
 

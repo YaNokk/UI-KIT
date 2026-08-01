@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   darkSemanticTokens,
   lightSemanticTokens,
+  motionTokens,
   primitiveTokens,
   typographyTokens
 } from "./index";
@@ -122,6 +123,10 @@ describe("overlay size token contract", () => {
 describe("typography token contract", () => {
   it("exposes the complete compact role scale without color", () => {
     expect(Object.keys(typographyTokens)).toEqual([
+      "typography.fieldValueTextSm",
+      "typography.fieldValueTextMd",
+      "typography.fieldValueTextLg",
+      "typography.compactChipText",
       "typography.controlTextSm",
       "typography.controlTextMd",
       "typography.controlTextLg",
@@ -153,6 +158,23 @@ describe("typography token contract", () => {
     expect(typographyTokens["typography.body"].fontSize).toBe("{font.size.body}");
     expect(typographyTokens["typography.headingSm"].fontSize).toBe("{font.size.headingSm}");
     expect(typographyTokens["typography.pageTitle"].lineHeight).toBe("{lineHeight.pageTitle}");
+  });
+
+  it("keeps field-value roles consistent and lg at 16px", () => {
+    expect(typographyTokens["typography.fieldValueTextLg"].fontSize)
+      .toBe("{font.size.bodyLg}");
+    expect(typographyTokens["typography.compactChipText"])
+      .not.toEqual(typographyTokens["typography.fieldValueTextMd"]);
+  });
+});
+
+describe("motion token contract", () => {
+  it("maps reusable semantic roles to primitive duration and easing tokens", () => {
+    expect(motionTokens["motion.control.state.duration"]).toBe("{motion.duration.fast}");
+    expect(motionTokens["motion.control.label.duration"]).toBe("{motion.duration.normal}");
+    expect(motionTokens["motion.control.indicator.easing"]).toBe("{motion.easing.standard}");
+    expect(motionTokens["motion.overlay.enter.easing"]).toBe("{motion.easing.enter}");
+    expect(motionTokens["motion.overlay.exit.duration"]).toBe("{motion.duration.fast}");
   });
 });
 

@@ -9,10 +9,18 @@ import {
 } from "react";
 import { FieldShell } from "../FieldShell/FieldShell";
 import { FormControl } from "../FormControl/FormControl";
+import { fieldValueTextClassNames } from "../internal/single-line-control-typography/singleLineControlTypography";
+import { classNames } from "../shared/classNames";
 import type { FieldLabelView, FieldSize } from "../shared/field";
 import styles from "./Input.module.css";
 
 export type InputSize = FieldSize;
+
+const fieldValueRoleNames: Record<FieldSize, string> = {
+  sm: "fieldValueTextSm",
+  md: "fieldValueTextMd",
+  lg: "fieldValueTextLg"
+};
 
 export interface InputProps
   extends Omit<
@@ -120,7 +128,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           <input
             {...nativeProps}
             {...controlProps}
-            className={styles.input}
+            className={classNames(styles.input, fieldValueTextClassNames[size])}
+            data-control-text-role={fieldValueRoleNames[size]}
             data-field-part="native-control"
             data-label-floated={labelFloated ? "" : undefined}
             data-label-view={effectiveLabelView}

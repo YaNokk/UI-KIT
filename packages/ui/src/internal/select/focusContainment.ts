@@ -17,3 +17,27 @@ export function isFocusWithinElement(
     return false;
   }
 }
+
+export function isFocusWithinSelectRegion(
+  surface: HTMLElement,
+  reference: HTMLElement | null,
+  relatedTarget: EventTarget | null
+): boolean {
+  if (relatedTarget === null) return false;
+
+  const ownerWindow = surface.ownerDocument.defaultView;
+  const NodeCtor = ownerWindow?.Node;
+  const ElementCtor = ownerWindow?.Element;
+  if (NodeCtor && ElementCtor) {
+    if (!(relatedTarget instanceof NodeCtor)) return false;
+    if (surface.contains(relatedTarget)) return true;
+    return reference instanceof ElementCtor && reference.contains(relatedTarget);
+  }
+
+  try {
+    return surface.contains(relatedTarget as Node)
+      || Boolean(reference?.contains(relatedTarget as Node));
+  } catch {
+    return false;
+  }
+}

@@ -8,11 +8,15 @@ Each role owns its font metrics and an independently approved optical block offs
 
 | Role | Offset | Metrics | Current consumers |
 |---|---:|---|---|
-| `controlTextSm` | `-0.25px` | 14/20, medium | Button sm, ButtonLink sm, Select trigger sm |
-| `controlTextMd` | `-0.25px` | 16/24, medium | Button md, ButtonLink md, Select trigger md |
-| `controlTextLg` | `-0.5px` | 18/28, medium | Button lg, ButtonLink lg, Select trigger lg |
+| `fieldValueTextSm` | `-0.25px` | 13/14, medium | Input, Select, MultiSelect field value sm |
+| `fieldValueTextMd` | `-0.25px` | 14/20, medium | Input, Select, MultiSelect field value md |
+| `fieldValueTextLg` | `-0.5px` | 16/22, medium | Input, Select, MultiSelect field value lg |
+| `compactChipText` | `-0.25px` | 13/18, medium | MultiSelect chip and overflow |
+| `controlTextSm` | `-0.25px` | 13/18, medium | Button sm, ButtonLink sm |
+| `controlTextMd` | `-0.25px` | 14/20, medium | Button md, ButtonLink md |
+| `controlTextLg` | `-0.5px` | 16/24, medium | Button lg, ButtonLink lg |
 | `compactControlTextSm` | `-0.5px` | 12/16, medium | Tag sm |
-| `compactControlTextMd` | `-0.25px` | 14/20, medium | Tag md, private MultiSelect chip/summary |
+| `compactControlTextMd` | `-0.25px` | 13/18, medium | Tag md |
 | `counterText` | `-0.5px` | 12/16, semibold | Badge, future compact counters |
 | `choiceControlLabel` | `-0.25px` | 16/24, regular | Select option/action, future single-line Checkbox/Radio/Switch labels |
 

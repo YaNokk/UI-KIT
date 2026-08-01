@@ -24,12 +24,13 @@ the shared shell, while focus or an owner-supplied floated state reveals the
 placeholder/value in the lower band. Adornments remain centered in the full
 shell and presentation states do not change these vertical baselines.
 
-The optical freeze defines every inner variable explicitly per size. `sm`
-uses `space-1` label top, caption line height, `space-3` content top and no
-content bottom inset. `md` uses `space-1`, caption line height, `space-4` and
-no bottom inset. `lg` uses `space-1`, caption line height, `space-4` and a
-`space-1` bottom inset. Consumers center content only inside this resulting
-lower zone; they do not introduce their own vertical offsets.
+The v1.6 optical freeze defines label top/line, content top/bottom, value line
+and inline padding explicitly for each size. Every size has a non-zero bottom
+inset. `sm` uses an explicit compact caption/value geometry and no negative
+gap. The stable caption label remains at its floated top and represents its
+resting state only through translate/scale; only transform and color animate.
+Consumers center content only inside the resulting lower zone and never add
+their own vertical offsets. See `docs/field-inner-geometry.md`.
 
 MultiSelect freezes inner selected presentation by requested size: `sm` and
 `md` use a textual localized summary, while `lg` uses a single row of chips

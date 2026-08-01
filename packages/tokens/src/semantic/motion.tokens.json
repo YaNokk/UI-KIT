@@ -1,0 +1,28 @@
+{
+  "motion": {
+    "control": {
+      "state": {
+        "duration": { "$type": "duration", "$value": "{motion.duration.fast}" },
+        "easing": { "$type": "cubicBezier", "$value": "{motion.easing.standard}" }
+      },
+      "label": {
+        "duration": { "$type": "duration", "$value": "{motion.duration.normal}" },
+        "easing": { "$type": "cubicBezier", "$value": "{motion.easing.emphasized}" }
+      },
+      "indicator": {
+        "duration": { "$type": "duration", "$value": "{motion.duration.fast}" },
+        "easing": { "$type": "cubicBezier", "$value": "{motion.easing.standard}" }
+      }
+    },
+    "overlay": {
+      "enter": {
+        "duration": { "$type": "duration", "$value": "{motion.duration.normal}" },
+        "easing": { "$type": "cubicBezier", "$value": "{motion.easing.enter}" }
+      },
+      "exit": {
+        "duration": { "$type": "duration", "$value": "{motion.duration.fast}" },
+        "easing": { "$type": "cubicBezier", "$value": "{motion.easing.exit}" }
+      }
+    }
+  }
+}

@@ -12,9 +12,9 @@
   border: var(--ds-border-width-default) solid var(--system-color-border);
   border-radius: var(--ds-radius-full);
   transition:
-    color var(--ds-motion-fast),
-    background-color var(--ds-motion-fast),
-    border-color var(--ds-motion-fast);
+    color var(--ds-motion-control-state-duration) var(--ds-motion-control-state-easing),
+    background-color var(--ds-motion-control-state-duration) var(--ds-motion-control-state-easing),
+    border-color var(--ds-motion-control-state-duration) var(--ds-motion-control-state-easing);
 }
 
 button.root {

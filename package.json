@@ -14,6 +14,7 @@
     "responsive:check": "node scripts/check-responsive-foundation.mjs",
     "lint": "eslint . && npm run typography:check",
     "typography:check": "node scripts/check-single-line-control-typography.mjs",
+    "motion:check": "node scripts/check-motion-foundation.mjs",
     "test": "vitest run packages",
     "test:storybook": "vitest --config vitest.storybook.config.ts --run",
     "typecheck": "tsc -p tsconfig.check.json --noEmit",

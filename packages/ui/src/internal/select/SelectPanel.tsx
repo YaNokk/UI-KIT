@@ -16,7 +16,7 @@ import {
   useFloatingOverlay
 } from "../floating/useFloatingOverlay";
 import { renderFloatingTrigger } from "../floating/trigger";
-import { isFocusWithinElement } from "./focusContainment";
+import { isFocusWithinSelectRegion } from "./focusContainment";
 import { useSelectPresentation } from "./useSelectPresentation";
 import type { SelectMessages } from "./types";
 import styles from "./SelectPanel.module.css";
@@ -56,6 +56,7 @@ export function SelectPanel({
   const previousPresentation = useRef(presentation);
   const previousOpen = useRef(open);
   const popoverFocusOutReady = useRef(false);
+  const referenceElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (previousOpen.current && !open) {
@@ -106,6 +107,7 @@ export function SelectPanel({
   });
 
   const setTriggerNode = (node: HTMLElement | null) => {
+    referenceElementRef.current = node;
     floating.refs.setReference(node);
     if (triggerRef) triggerRef.current = node;
   };
@@ -121,7 +123,13 @@ export function SelectPanel({
 
   const handlePopoverFocusOut = (event: FocusEvent<HTMLDivElement>) => {
     if (!popoverFocusOutReady.current) return;
-    if (isFocusWithinElement(event.currentTarget, event.relatedTarget)) return;
+    if (
+      isFocusWithinSelectRegion(
+        event.currentTarget,
+        referenceElementRef.current,
+        event.relatedTarget
+      )
+    ) return;
     if (skipFocusRestoreRef) skipFocusRestoreRef.current = true;
     onOpenChange(false);
   };

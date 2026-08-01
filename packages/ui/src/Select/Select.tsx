@@ -36,12 +36,12 @@ import { useSelectSearch } from "../internal/select/search";
 import { useSelectState } from "../internal/select/useSelectState";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import styles from "../internal/select/SelectTrigger.module.css";
-import { controlTextClassNames } from "../internal/single-line-control-typography/singleLineControlTypography";
+import { fieldValueTextClassNames } from "../internal/single-line-control-typography/singleLineControlTypography";
 
 const textRoleNames: Record<FieldSize, string> = {
-  sm: "controlTextSm",
-  md: "controlTextMd",
-  lg: "controlTextLg"
+  sm: "fieldValueTextSm",
+  md: "fieldValueTextMd",
+  lg: "fieldValueTextLg"
 };
 
 export interface SelectProps<Value extends string = string> {
@@ -359,7 +359,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
               data-control-text-clip=""
             >
               <span
-                className={classNames(styles.valueLabel, controlTextClassNames[size])}
+                className={classNames(styles.valueLabel, fieldValueTextClassNames[size])}
                 data-control-text=""
                 data-control-text-role={textRoleNames[size]}
               >{displayOption === null ? placeholder : displayOption.label}</span>

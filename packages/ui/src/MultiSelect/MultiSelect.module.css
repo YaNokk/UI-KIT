@@ -113,6 +113,8 @@
 }
 
 .placeholder {
+  display: flex;
+  align-items: center;
   overflow: hidden;
   flex: 1 1 auto;
   min-inline-size: 0;
@@ -122,6 +124,8 @@
 }
 
 .compactSummary {
+  display: flex;
+  align-items: center;
   overflow: hidden;
   color: var(--ds-text-accent);
   text-overflow: ellipsis;

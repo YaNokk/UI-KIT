@@ -74,6 +74,8 @@
     --ds-font-weight-regular: 400;
     --ds-font-weight-medium: 500;
     --ds-font-weight-semibold: 600;
+    --ds-line-height-field-sm: 14px;
+    --ds-line-height-field-lg: 22px;
     --ds-line-height-caption: 16px;
     --ds-line-height-body-sm: 18px;
     --ds-line-height-body: 20px;
@@ -94,9 +96,14 @@
     --ds-shadow-sm: 0 1px 2px rgb(13 16 21 / 0.12);
     --ds-shadow-md: 0 6px 16px rgb(13 16 21 / 0.16);
     --ds-shadow-lg: 0 16px 32px rgb(13 16 21 / 0.2);
-    --ds-motion-fast: 100ms;
-    --ds-motion-normal: 150ms;
-    --ds-motion-slow: 250ms;
+    --ds-motion-duration-instant: 0ms;
+    --ds-motion-duration-fast: 120ms;
+    --ds-motion-duration-normal: 180ms;
+    --ds-motion-duration-slow: 240ms;
+    --ds-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ds-motion-easing-enter: cubic-bezier(0, 0, 0, 1);
+    --ds-motion-easing-exit: cubic-bezier(0.3, 0, 1, 1);
+    --ds-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1.2);
     --ds-z-index-default: 0;
     --ds-z-index-focused: 100;
     --ds-z-index-sticky: 100;
@@ -119,6 +126,10 @@
     --ds-breakpoint-lg: 1024px;
     --ds-breakpoint-xl: 1280px;
     --ds-breakpoint-2xl: 1536px;
+    --ds-typography-field-value-text-sm: var(--ds-font-weight-medium) var(--ds-font-size-body-sm)/var(--ds-line-height-field-sm) var(--ds-font-family-sans);
+    --ds-typography-field-value-text-md: var(--ds-font-weight-medium) var(--ds-font-size-body)/var(--ds-line-height-body) var(--ds-font-family-sans);
+    --ds-typography-field-value-text-lg: var(--ds-font-weight-medium) var(--ds-font-size-body-lg)/var(--ds-line-height-field-lg) var(--ds-font-family-sans);
+    --ds-typography-compact-chip-text: var(--ds-font-weight-medium) var(--ds-font-size-body-sm)/var(--ds-line-height-body-sm) var(--ds-font-family-sans);
     --ds-typography-control-text-sm: var(--ds-font-weight-medium) var(--ds-font-size-body-sm)/var(--ds-line-height-body-sm) var(--ds-font-family-sans);
     --ds-typography-control-text-md: var(--ds-font-weight-medium) var(--ds-font-size-body)/var(--ds-line-height-body) var(--ds-font-family-sans);
     --ds-typography-control-text-lg: var(--ds-font-weight-medium) var(--ds-font-size-body-lg)/var(--ds-line-height-body-lg) var(--ds-font-family-sans);
@@ -135,6 +146,16 @@
     --ds-typography-heading-md: var(--ds-font-weight-semibold) var(--ds-font-size-heading-md)/var(--ds-line-height-heading-md) var(--ds-font-family-sans);
     --ds-typography-heading-lg: var(--ds-font-weight-semibold) var(--ds-font-size-heading-lg)/var(--ds-line-height-heading-lg) var(--ds-font-family-sans);
     --ds-typography-page-title: var(--ds-font-weight-semibold) var(--ds-font-size-page-title)/var(--ds-line-height-page-title) var(--ds-font-family-sans);
+    --ds-motion-control-state-duration: var(--ds-motion-duration-fast);
+    --ds-motion-control-state-easing: var(--ds-motion-easing-standard);
+    --ds-motion-control-label-duration: var(--ds-motion-duration-normal);
+    --ds-motion-control-label-easing: var(--ds-motion-easing-emphasized);
+    --ds-motion-control-indicator-duration: var(--ds-motion-duration-fast);
+    --ds-motion-control-indicator-easing: var(--ds-motion-easing-standard);
+    --ds-motion-overlay-enter-duration: var(--ds-motion-duration-normal);
+    --ds-motion-overlay-enter-easing: var(--ds-motion-easing-enter);
+    --ds-motion-overlay-exit-duration: var(--ds-motion-duration-fast);
+    --ds-motion-overlay-exit-easing: var(--ds-motion-easing-exit);
     --ds-brand-accent: #0080ff;
     --ds-brand-preferred-on-accent: #ffffff;
     --ds-brand-on-accent: #000000;
@@ -471,9 +492,11 @@
 
   @media (prefers-reduced-motion: reduce) {
     :root {
-      --ds-motion-fast: 0ms;
-      --ds-motion-normal: 0ms;
-      --ds-motion-slow: 0ms;
+      --ds-motion-control-state-duration: 0ms;
+      --ds-motion-control-label-duration: 0ms;
+      --ds-motion-control-indicator-duration: 0ms;
+      --ds-motion-overlay-enter-duration: 0ms;
+      --ds-motion-overlay-exit-duration: 0ms;
     }
   }
 }

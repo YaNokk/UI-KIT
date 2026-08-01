@@ -196,6 +196,14 @@ export const GeometryAssertions: Story = {
       if (!shell || !label) throw new Error("Inner field geometry was not rendered.");
       expect(label.getBoundingClientRect().bottom)
         .toBeLessThanOrEqual(value.getBoundingClientRect().top + tolerance);
+      const shellStyle = getComputedStyle(shell);
+      expect(parseFloat(shellStyle.getPropertyValue("--field-content-padding-bottom")))
+        .toBeGreaterThan(0);
+      const labelStyle = getComputedStyle(label);
+      expect(labelStyle.transitionProperty.split(",").map((entry) => entry.trim()))
+        .toEqual(["color", "transform"]);
+      expect(labelStyle.transitionProperty).not.toContain("font");
+      expect(labelStyle.transitionProperty).not.toContain("inset-block-start");
       return shell;
     };
 

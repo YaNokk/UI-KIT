@@ -251,7 +251,7 @@ function CalibrationGrid() {
 }
 
 const meta = {
-  title: "Fields/InnerLabelGeometry",
+  title: "Fields/FieldShell/InnerLabelGeometryV1_6",
   component: FieldShell,
   parameters: { layout: "fullscreen" }
 } satisfies Meta<typeof FieldShell>;
@@ -410,6 +410,14 @@ export const GeometryAssertions: Story = {
       const labelRect = label.getBoundingClientRect();
       const valueRect = value.getBoundingClientRect();
       expect(labelRect.bottom).toBeLessThanOrEqual(valueRect.top + tolerance);
+      const shellStyle = getComputedStyle(shell);
+      expect(parseFloat(shellStyle.getPropertyValue("--field-content-padding-bottom")))
+        .toBeGreaterThan(0);
+      const labelStyle = getComputedStyle(label);
+      expect(labelStyle.transitionProperty.split(",").map((entry) => entry.trim()))
+        .toEqual(["color", "transform"]);
+      expect(labelStyle.transitionProperty).not.toContain("font");
+      expect(labelStyle.transitionProperty).not.toContain("inset-block-start");
     };
 
     const input = canvas.getByRole("textbox", { name: "Geometry Input sm" });

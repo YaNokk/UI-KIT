@@ -38,7 +38,16 @@ import { useSelectState } from "../internal/select/useSelectState";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import triggerStyles from "../internal/select/SelectTrigger.module.css";
 import styles from "./MultiSelect.module.css";
-import { compactControlTextClassNames } from "../internal/single-line-control-typography/singleLineControlTypography";
+import {
+  compactChipTextClassName,
+  fieldValueTextClassNames
+} from "../internal/single-line-control-typography/singleLineControlTypography";
+
+const fieldValueRoleNames: Record<FieldSize, string> = {
+  sm: "fieldValueTextSm",
+  md: "fieldValueTextMd",
+  lg: "fieldValueTextLg"
+};
 
 export interface MultiSelectProps<Value extends string = string> {
   value: Value[];
@@ -504,17 +513,15 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                   data-field-placeholder=""
                 >
                   <span
-                    className={compactControlTextClassNames.md}
-                    data-compact-control-text=""
-                    data-control-text-role="compactControlTextMd"
+                    className={fieldValueTextClassNames[size]}
+                    data-control-text-role={fieldValueRoleNames[size]}
                   >{placeholder}</span>
                 </span>
               ) : compactInnerSummary ? (
                 <span aria-hidden="true" className={styles.compactSummary} data-control-text-clip="">
                   <span
-                    className={compactControlTextClassNames.md}
-                    data-compact-control-text=""
-                    data-control-text-role="compactControlTextMd"
+                    className={fieldValueTextClassNames[size]}
+                    data-control-text-role={fieldValueRoleNames[size]}
                   >{messages.selectedCount(value.length)}</span>
                 </span>
               ) : (
@@ -533,9 +540,9 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                       >
                         <span aria-hidden="true" className={styles.tagLabel} data-control-text-clip="">
                           <span
-                            className={classNames(styles.labelText, compactControlTextClassNames.md)}
-                            data-compact-control-text=""
-                            data-control-text-role="compactControlTextMd"
+                            className={classNames(styles.labelText, compactChipTextClassName)}
+                            data-compact-chip-text=""
+                            data-control-text-role="compactChipText"
                           >{display?.label}</span>
                         </span>
                         {interactive ? (
@@ -564,8 +571,8 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                   {overflowCount > 0 ? (
                     <span
                       aria-hidden="true"
-                      className={classNames(styles.overflow, compactControlTextClassNames.md)}
-                      data-control-text-role="compactControlTextMd"
+                      className={classNames(styles.overflow, compactChipTextClassName)}
+                      data-control-text-role="compactChipText"
                     >
                       {"+" + overflowCount}
                     </span>
@@ -580,14 +587,14 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                 ref={sizerRef}
               >
                 <span className={classNames(styles.tag, styles.measureTag)} data-measure-tag="">
-                  <span className={styles.tagLabel} data-measure-label=""><span className={classNames(styles.labelText, compactControlTextClassNames.md)} /></span>
+                  <span className={styles.tagLabel} data-measure-label=""><span className={classNames(styles.labelText, compactChipTextClassName)} /></span>
                   {interactive ? (
                     <span className={styles.tagRemove}>
                       <X aria-hidden="true" />
                     </span>
                   ) : null}
                 </span>
-                <span className={classNames(styles.overflow, compactControlTextClassNames.md)} data-measure-overflow="" />
+                <span className={classNames(styles.overflow, compactChipTextClassName)} data-measure-overflow="" />
               </span>
             )}
           </span>

@@ -7,8 +7,8 @@
   text-underline-offset: 0.16em;
   cursor: pointer;
   transition:
-    color var(--ds-motion-fast),
-    text-decoration-color var(--ds-motion-fast);
+    color var(--ds-motion-control-state-duration) var(--ds-motion-control-state-easing),
+    text-decoration-color var(--ds-motion-control-state-duration) var(--ds-motion-control-state-easing);
 }
 
 .root:focus-visible {
