@@ -107,6 +107,14 @@
   border-radius: var(--ds-radius-full);
 }
 
+.indicator[data-kind="radio"].sm {
+  --choice-radio-dot-size: 8px;
+}
+
+.indicator[data-kind="radio"].md {
+  --choice-radio-dot-size: 10px;
+}
+
 .indicator[data-kind="checkbox"][data-checked],
 .nativeInput:checked + .indicator[data-kind="checkbox"],
 .nativeInput:indeterminate + .indicator[data-kind="checkbox"] {
@@ -123,8 +131,8 @@
 }
 
 .radioDot {
-  inline-size: 50%;
-  block-size: 50%;
+  inline-size: var(--choice-radio-dot-size);
+  block-size: var(--choice-radio-dot-size);
   background-color: currentcolor;
   border-radius: var(--ds-radius-full);
   transform: scale(0);

@@ -31,7 +31,7 @@ const brands = [
 
 function CalibrationSection({ children, title }: { children: ReactNode; title: string }) {
   return (
-    <section className="grid min-w-0 gap-3 rounded-lg border border-border-default bg-background-surface p-4">
+    <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 rounded-lg border border-border-default bg-background-surface p-4">
       <h2 className="typo-heading-sm text-text-primary">{title}</h2>
       {children}
     </section>
@@ -39,7 +39,7 @@ function CalibrationSection({ children, title }: { children: ReactNode; title: s
 }
 
 function CalibrationPage({ children }: { children: ReactNode }) {
-  return <div className="grid min-w-0 gap-4 bg-background-page p-6 text-text-primary">{children}</div>;
+  return <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 bg-background-page p-6 text-text-primary">{children}</div>;
 }
 
 function indicatorFor(control: HTMLElement): HTMLElement {
@@ -48,10 +48,61 @@ function indicatorFor(control: HTMLElement): HTMLElement {
   return indicator;
 }
 
-function expectRect(element: HTMLElement, width: number, height: number) {
+function expectRect(element: Element, width: number, height: number) {
   const rect = element.getBoundingClientRect();
   expect(Math.round(rect.width)).toBe(width);
   expect(Math.round(rect.height)).toBe(height);
+}
+
+function expectContained(outer: Element, inner: Element) {
+  const outerRect = outer.getBoundingClientRect();
+  const innerRect = inner.getBoundingClientRect();
+  expect(innerRect.left).toBeGreaterThanOrEqual(outerRect.left);
+  expect(innerRect.top).toBeGreaterThanOrEqual(outerRect.top);
+  expect(innerRect.right).toBeLessThanOrEqual(outerRect.right);
+  expect(innerRect.bottom).toBeLessThanOrEqual(outerRect.bottom);
+}
+
+function expectCentered(outer: Element, inner: Element) {
+  const outerRect = outer.getBoundingClientRect();
+  const innerRect = inner.getBoundingClientRect();
+  const deltaX = Math.abs((outerRect.left + outerRect.width / 2) - (innerRect.left + innerRect.width / 2));
+  const deltaY = Math.abs((outerRect.top + outerRect.height / 2) - (innerRect.top + innerRect.height / 2));
+  expect(deltaX).toBeLessThanOrEqual(0.5);
+  expect(deltaY).toBeLessThanOrEqual(0.5);
+}
+
+function SemanticProbes() {
+  const probeStyle = {
+    blockSize: 1,
+    inlineSize: 1,
+    overflow: "hidden",
+    position: "absolute"
+  } as const;
+
+  return (
+    <span aria-hidden="true">
+      <span data-control-border-hover-probe="" style={{ ...probeStyle, backgroundColor: "var(--ds-control-border-hover)" }} />
+      <span data-primary-hover-probe="" style={{ ...probeStyle, backgroundColor: "var(--ds-action-primary-background-hover)" }} />
+      <span data-primary-active-probe="" style={{ ...probeStyle, backgroundColor: "var(--ds-action-primary-background-active)" }} />
+    </span>
+  );
+}
+
+function probeColor(canvasElement: HTMLElement, selector: string) {
+  const probe = canvasElement.querySelector(selector);
+  if (!(probe instanceof HTMLElement)) throw new Error(`Missing semantic probe: ${selector}`);
+  return getComputedStyle(probe).backgroundColor;
+}
+
+function canAssertHoverColors(indicator: HTMLElement) {
+  return matchMedia("(hover: hover)").matches
+    && !matchMedia("(forced-colors: active)").matches
+    && indicator.parentElement?.matches(":hover") === true;
+}
+
+async function settleControlTransition() {
+  await new Promise((resolve) => setTimeout(resolve, 250));
 }
 
 function expectThumbInset(track: HTMLElement, thumb: HTMLElement, edge: "start" | "end") {
@@ -63,6 +114,18 @@ function expectThumbInset(track: HTMLElement, thumb: HTMLElement, edge: "start" 
   expect(Math.round(inset)).toBe(2);
   expect(thumbRect.top).toBeGreaterThanOrEqual(trackRect.top);
   expect(thumbRect.bottom).toBeLessThanOrEqual(trackRect.bottom);
+}
+
+function expectLogicalThumbInset(
+  track: HTMLElement,
+  thumb: HTMLElement,
+  direction: "ltr" | "rtl",
+  checked: boolean
+) {
+  const edge = direction === "ltr"
+    ? checked ? "end" : "start"
+    : checked ? "start" : "end";
+  expectThumbInset(track, thumb, edge);
 }
 
 const meta = {
@@ -101,6 +164,17 @@ export const CheckboxGeometry: Story = {
       expectRect(indicator, size, size);
       expect(getComputedStyle(indicator).borderWidth).not.toBe("0px");
     }
+    for (const [name, markSize] of [["Checkbox sm checked", 12], ["Checkbox md checked", 16]] as const) {
+      const indicator = indicatorFor(canvas.getByRole("checkbox", { name }));
+      const checkmark = indicator.querySelector("svg");
+      if (!(checkmark instanceof SVGSVGElement)) throw new Error("Checkbox checkmark was not rendered.");
+      expectRect(checkmark, markSize, markSize);
+      expect(getComputedStyle(checkmark).display).not.toBe("none");
+      expect(getComputedStyle(checkmark).stroke).not.toBe("none");
+      expect(checkmark.getAttribute("stroke-width")).not.toBeNull();
+      expectContained(indicator, checkmark);
+      expectCentered(indicator, checkmark);
+    }
   }
 };
 
@@ -108,6 +182,7 @@ export const CheckboxStateMatrix: Story = {
   render: () => (
     <CalibrationPage>
       <CalibrationSection title="Checkbox states">
+        <SemanticProbes />
         <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
           <Checkbox label="Unchecked" />
           <Checkbox defaultChecked label="Checked" />
@@ -125,7 +200,21 @@ export const CheckboxStateMatrix: Story = {
     const canvas = within(canvasElement);
     const hover = canvas.getByRole("checkbox", { name: "Hover target" });
     await userEvent.hover(canvas.getByText("Hover target"));
-    expect(indicatorFor(hover).getBoundingClientRect().width).toBeGreaterThan(0);
+    await settleControlTransition();
+    const hoverIndicator = indicatorFor(hover);
+    if (canAssertHoverColors(hoverIndicator)) {
+      expect(getComputedStyle(hoverIndicator).borderColor).toBe(probeColor(canvasElement, "[data-control-border-hover-probe]"));
+    }
+    const checked = canvas.getByRole("checkbox", { name: "Checked" });
+    await userEvent.hover(canvas.getByText("Checked"));
+    await settleControlTransition();
+    const checkedIndicator = indicatorFor(checked);
+    if (canAssertHoverColors(checkedIndicator)) {
+      const checkedStyle = getComputedStyle(checkedIndicator);
+      const primaryHover = probeColor(canvasElement, "[data-primary-hover-probe]");
+      expect(checkedStyle.backgroundColor).toBe(primaryHover);
+      expect(checkedStyle.borderColor).toBe(primaryHover);
+    }
     const focused = canvas.getByRole("checkbox", { name: "Focus visible" });
     focused.focus();
     expect(getComputedStyle(indicatorFor(focused)).outlineStyle).toBe("solid");
@@ -144,7 +233,23 @@ export const CheckboxIndeterminateMatrix: Story = {
         </div>
       </CalibrationSection>
     </CalibrationPage>
-  )
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const [name, markSize] of [["Indeterminate sm", 12], ["Indeterminate md", 16]] as const) {
+      const indicator = indicatorFor(canvas.getByRole("checkbox", { name }));
+      const [checkmark, minus] = indicator.querySelectorAll("svg");
+      if (!(checkmark instanceof SVGSVGElement) || !(minus instanceof SVGSVGElement)) {
+        throw new Error("Indeterminate marks were not rendered.");
+      }
+      expect(getComputedStyle(checkmark).display).toBe("none");
+      expect(getComputedStyle(minus).display).not.toBe("none");
+      expectRect(minus, markSize, markSize);
+      expect(minus.getBoundingClientRect().width).toBeLessThan(indicator.clientWidth);
+      expectContained(indicator, minus);
+      expectCentered(indicator, minus);
+    }
+  }
 };
 
 export const RadioGeometry: Story = {
@@ -166,6 +271,8 @@ export const RadioGeometry: Story = {
       if (!(radioDot instanceof HTMLElement)) throw new Error("Radio dot was not rendered.");
       expectRect(indicator, outer, outer);
       expectRect(radioDot, dot, dot);
+      expectContained(indicator, radioDot);
+      expectCentered(indicator, radioDot);
     }
   }
 };
@@ -174,6 +281,7 @@ export const RadioStateMatrix: Story = {
   render: () => (
     <CalibrationPage>
       <CalibrationSection title="Radio states">
+        <SemanticProbes />
         <div className="grid gap-3">
           <Radio label="Unchecked radio" name="radio-state-a" />
           <Radio defaultChecked label="Checked radio" name="radio-state-b" />
@@ -183,7 +291,20 @@ export const RadioStateMatrix: Story = {
         </div>
       </CalibrationSection>
     </CalibrationPage>
-  )
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const checked = canvas.getByRole("radio", { name: "Checked radio" });
+    await userEvent.hover(canvas.getByText("Checked radio"));
+    await settleControlTransition();
+    const indicator = indicatorFor(checked);
+    if (!canAssertHoverColors(indicator)) return;
+    const dot = indicator.firstElementChild;
+    if (!(dot instanceof HTMLElement)) throw new Error("Radio dot was not rendered.");
+    const primaryHover = probeColor(canvasElement, "[data-primary-hover-probe]");
+    expect(getComputedStyle(indicator).borderColor).toBe(primaryHover);
+    expect(getComputedStyle(dot).backgroundColor).toBe(primaryHover);
+  }
 };
 
 export const SwitchGeometry: Story = {
@@ -211,7 +332,7 @@ export const SwitchGeometry: Story = {
       const thumb = indicator.firstElementChild;
       if (!(thumb instanceof HTMLElement)) throw new Error("Switch thumb was not rendered.");
       expectRect(indicator, width, height);
-      expectThumbInset(indicator, thumb, edge);
+      expectLogicalThumbInset(indicator, thumb, "ltr", edge === "end");
     }
   }
 };
@@ -220,6 +341,7 @@ export const SwitchStateMatrix: Story = {
   render: () => (
     <CalibrationPage>
       <CalibrationSection title="Switch states">
+        <SemanticProbes />
         <div className="grid gap-3">
           <Switch label="Off" />
           <Switch defaultChecked label="On" />
@@ -230,7 +352,19 @@ export const SwitchStateMatrix: Story = {
         </div>
       </CalibrationSection>
     </CalibrationPage>
-  )
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const checked = canvas.getByRole("switch", { name: "On" });
+    await userEvent.hover(canvas.getByText("On"));
+    await settleControlTransition();
+    const indicator = indicatorFor(checked);
+    if (!canAssertHoverColors(indicator)) return;
+    const primaryHover = probeColor(canvasElement, "[data-primary-hover-probe]");
+    const indicatorStyle = getComputedStyle(indicator);
+    expect(indicatorStyle.backgroundColor).toBe(primaryHover);
+    expect(indicatorStyle.borderColor).toBe(primaryHover);
+  }
 };
 
 export const LabelAlignment: Story = {
@@ -406,23 +540,28 @@ export const RTL: Story = {
         <div className="grid gap-3" dir="rtl">
           <Checkbox label="RTL checkbox" />
           <Radio defaultChecked label="RTL radio" />
-          <Switch label="RTL switch off" position="start" />
-          <Switch defaultChecked label="RTL switch on" position="start" />
+          <Switch label="RTL switch sm off" position="start" size="sm" />
+          <Switch defaultChecked label="RTL switch sm on" position="start" size="sm" />
+          <Switch label="RTL switch md off" position="start" size="md" />
+          <Switch defaultChecked label="RTL switch md on" position="start" size="md" />
         </div>
       </CalibrationSection>
     </CalibrationPage>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const offTrack = indicatorFor(canvas.getByRole("switch", { name: "RTL switch off" }));
-    const onTrack = indicatorFor(canvas.getByRole("switch", { name: "RTL switch on" }));
-    const offThumb = offTrack.firstElementChild;
-    const onThumb = onTrack.firstElementChild;
-    if (!(offThumb instanceof HTMLElement) || !(onThumb instanceof HTMLElement)) {
-      throw new Error("RTL thumbs were not rendered.");
+    for (const [name, checked, width, height] of [
+      ["RTL switch sm off", false, 32, 20],
+      ["RTL switch sm on", true, 32, 20],
+      ["RTL switch md off", false, 40, 24],
+      ["RTL switch md on", true, 40, 24]
+    ] as const) {
+      const track = indicatorFor(canvas.getByRole("switch", { name }));
+      const thumb = track.firstElementChild;
+      if (!(thumb instanceof HTMLElement)) throw new Error("RTL thumb was not rendered.");
+      expectRect(track, width, height);
+      expectLogicalThumbInset(track, thumb, "rtl", checked);
     }
-    expectThumbInset(offTrack, offThumb, "end");
-    expectThumbInset(onTrack, onThumb, "start");
   }
 };
 
