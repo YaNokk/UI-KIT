@@ -173,7 +173,6 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   const selectedSummaryId = useId();
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
-  const [shellElement, setShellElement] = useState<HTMLDivElement | null>(null);
   const skipFocusRestoreRef = useRef(false);
   const viewportRef = useRef<HTMLSpanElement | null>(null);
   const sizerRef = useRef<HTMLSpanElement | null>(null);
@@ -181,14 +180,15 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   const firstEnabledActionRef = useRef<HTMLButtonElement | null>(null);
   const listboxRef = useRef<HTMLDivElement | null>(null);
 
-  const setShellNode = useCallback((node: HTMLDivElement | null) => {
-    shellRef.current = node;
-    setShellElement(node);
-  }, []);
-
   useImperativeHandle(ref, () => triggerRef.current as HTMLElement, []);
 
-  const collection = useMemo(() => normalizeSelectCollection(items), [items]);
+  const unfilteredCollection = search.visibleItems === items
+    ? state.collection
+    : null;
+  const collection = useMemo(
+    () => unfilteredCollection ?? normalizeSelectCollection(items),
+    [items, unfilteredCollection]
+  );
   const cacheByValue = useMemo(() => {
     const map = new Map<Value, SelectOption<Value>>();
     for (const option of selectedItems ?? []) map.set(option.value, option);
@@ -419,7 +419,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   const renderPanel = (triggerElement: ReactElement) => (
     <SelectPanel
       outsidePressBoundaryRef={shellRef}
-      referenceElement={shellElement}
+      geometryReferenceRef={shellRef}
       messages={messages}
       multiple
       onOpenChange={handleOpenChange}
@@ -528,7 +528,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
             if (interactive) handleOpenChange(!open);
           }}
           readOnly={readOnly}
-          ref={setShellNode}
+          ref={shellRef}
           size={size}
         >
           <span className={classNames(

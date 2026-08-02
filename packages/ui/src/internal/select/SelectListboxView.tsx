@@ -102,15 +102,16 @@ function SelectListboxViewInner<Value extends string>(
 ) {
   const virtualRef = useRef<VListHandle>(null);
   const listboxRef = useRef<HTMLDivElement>(null);
-  const actionRows = useMemo(
-    () => rows.filter((row): row is SelectActionRow => row.type === "action"),
-    [rows]
-  );
+  const { actionRows, optionRows } = useMemo(() => {
+    const nextActionRows: SelectActionRow[] = [];
+    const nextOptionRows: Exclude<SelectRow<Value>, SelectActionRow>[] = [];
+    for (const row of rows) {
+      if (row.type === "action") nextActionRows.push(row);
+      else nextOptionRows.push(row);
+    }
+    return { actionRows: nextActionRows, optionRows: nextOptionRows };
+  }, [rows]);
   const firstEnabledActionId = actionRows.find((row) => !row.disabled)?.rowId;
-  const optionRows = useMemo(
-    () => rows.filter((row) => row.type !== "action"),
-    [rows]
-  );
   const activeRowIndex = useMemo(() => {
     if (activeRowId === null) return -1;
     return optionRows.findIndex(

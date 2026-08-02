@@ -801,6 +801,127 @@ function MultiSelectNarrowPopupFixture() {
   );
 }
 
+const transitionItems: SelectCollectionItem[] = [
+  {
+    value: "alpha",
+    label: "Alpha",
+    textValue: "Alpha",
+    leading: <User aria-label="Customer icon" role="img" />
+  },
+  { value: "beta", label: "Beta", textValue: "Beta" }
+];
+
+type AddonTransitionStatus = "ready" | "refreshing" | "loading";
+
+function nextAddonTransitionStatus(status: AddonTransitionStatus): AddonTransitionStatus {
+  if (status === "ready") return "refreshing";
+  if (status === "refreshing") return "loading";
+  return "ready";
+}
+
+function SelectNarrowAddonTransitionsFixture() {
+  const [status, setStatus] = useState<AddonTransitionStatus>("ready");
+  const [value, setValue] = useState<string | null>("alpha");
+  return (
+    <div className={styles.width320} data-select-addon-transitions="">
+      <Select
+        block
+        clearable
+        collectionState={{ status }}
+        items={transitionItems}
+        label="Select addon transitions"
+        labelView="inner"
+        onChange={setValue}
+        placeholder="Choose a value"
+        value={value}
+      />
+      <button
+        onClick={() => setStatus(nextAddonTransitionStatus)}
+        type="button"
+      >Cycle Select status</button>
+      <button
+        onClick={() => setValue((current) => current === null ? "alpha" : null)}
+        type="button"
+      >Toggle Select value</button>
+      <output aria-label="Select transition status">
+        {`${status}:${value ?? "empty"}`}
+      </output>
+    </div>
+  );
+}
+
+function MultiSelectNarrowAddonTransitionsFixture() {
+  const [status, setStatus] = useState<AddonTransitionStatus>("ready");
+  const [value, setValue] = useState<string[]>(["beta"]);
+  return (
+    <div className={styles.width320} data-multiselect-addon-transitions="">
+      <MultiSelect
+        block
+        clearable
+        collectionState={{ status }}
+        items={transitionItems}
+        label="MultiSelect addon transitions"
+        labelView="outer"
+        onChange={setValue}
+        placeholder="Choose values"
+        value={value}
+      />
+      <button
+        onClick={() => setStatus(nextAddonTransitionStatus)}
+        type="button"
+      >Cycle MultiSelect status</button>
+      <button
+        onClick={() => setValue((current) => current.length === 0 ? ["beta"] : [])}
+        type="button"
+      >Toggle MultiSelect value</button>
+      <output aria-label="MultiSelect transition status">
+        {`${status}:${value.length === 0 ? "empty" : "selected"}`}
+      </output>
+    </div>
+  );
+}
+
+function SelectLeadingAccessibilityIsolationFixture() {
+  const namedLeadingItem: SelectCollectionItem = {
+    value: "alpha",
+    label: "Alpha",
+    textValue: "Alpha",
+    leading: <User aria-label="Customer icon" role="img" />
+  };
+  return (
+    <div className={styles.stack}>
+      <Select
+        items={[namedLeadingItem]}
+        label="Selected outer naming"
+        onChange={() => undefined}
+        value="alpha"
+      />
+      <Select
+        items={[namedLeadingItem]}
+        label="Selected inner naming"
+        labelView="inner"
+        onChange={() => undefined}
+        value="alpha"
+      />
+      <Select
+        items={[namedLeadingItem]}
+        label="Placeholder outer naming"
+        onChange={() => undefined}
+        placeholder="Choose a customer"
+        value={null}
+      />
+      <Select
+        items={[namedLeadingItem]}
+        label="Read only inner naming"
+        labelView="inner"
+        onChange={() => undefined}
+        readOnly
+        value="alpha"
+      />
+    </div>
+  );
+}
+
 function TagRemoveContainmentFixture() {
   const [value, setValue] = useState<string[]>(["alpha", "beta"]);
   const [changes, setChanges] = useState(0);
@@ -1609,9 +1730,6 @@ export const TagRemoveContainment: Story = {
     assertContainedAndStable(initialRect);
     await userEvent.hover(remove);
     assertContainedAndStable(initialRect);
-    fireEvent.mouseDown(remove);
-    assertContainedAndStable(initialRect);
-    fireEvent.mouseUp(remove);
     await userEvent.click(remove);
     await expect(canvas.getByLabelText("Tag remove changes")).toHaveTextContent("1");
 
@@ -1630,6 +1748,37 @@ export const TagRemoveContainment: Story = {
 };
 
 export const TagRemoveHoverActive = TagRemoveContainment;
+
+// Genuine :active capture is covered by SelectTagRemoveStateCapture.browser.test.tsx.
+export const TagRemoveRealHoverActive = TagRemoveContainment;
+
+export const SelectLeadingAccessibilityIsolation: Story = {
+  args: {} as never,
+  render: () => <SelectLeadingAccessibilityIsolationFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const name of [
+      "Selected outer naming",
+      "Selected inner naming",
+      "Placeholder outer naming",
+      "Read only inner naming"
+    ]) {
+      await expect(canvas.getByRole("button", { name })).toHaveAccessibleName(name);
+    }
+    const selectedTriggers = [
+      canvas.getByRole("button", { name: "Selected outer naming" }),
+      canvas.getByRole("button", { name: "Selected inner naming" }),
+      canvas.getByRole("button", { name: "Read only inner naming" })
+    ];
+    for (const trigger of selectedTriggers) {
+      const leading = fieldShellFor(trigger).querySelector(
+        "[data-field-part=\"start-adornment\"] > [aria-hidden=\"true\"]"
+      );
+      expect(leading).not.toBeNull();
+    }
+    expect(canvas.queryByRole("img", { name: "Customer icon" })).toBeNull();
+  }
+};
 
 export const SelectNarrow320PopupWidth: Story = {
   args: {} as never,
@@ -1687,6 +1836,141 @@ export const MultiSelectNarrow320PopupWidth: Story = {
 };
 
 export const Narrow320AddonTransitions = MultiSelectNarrow320PopupWidth;
+
+export const SelectNarrow320AddonTransitions: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <SelectNarrowAddonTransitionsFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole("button", { name: "Select addon transitions" });
+    const shell = fieldShellFor(trigger);
+    const initialWidth = shell.getBoundingClientRect().width;
+    expect(Math.abs(initialWidth - 320)).toBeLessThanOrEqual(0.5);
+    await userEvent.click(trigger);
+    const surface = (await body.findByRole("listbox")).closest<HTMLElement>(
+      "[data-select-surface]"
+    );
+    if (!surface) throw new Error("Select transition surface was not rendered.");
+
+    const assertStablePopup = () => {
+      expect(fieldShellFor(trigger)).toBe(shell);
+      expect(shell.getBoundingClientRect().width).toBe(initialWidth);
+      expect(trigger).toHaveAttribute("aria-expanded", "true");
+      expectPopupMatchesShell(trigger, surface);
+    };
+    assertStablePopup();
+    expect(shell.querySelector("[data-field-part=\"start-adornment\"]"))
+      .not.toBeNull();
+    expect(shell.querySelector("[data-select-clear]")).not.toBeNull();
+    expect(shell.querySelector("[data-select-chevron]")).not.toBeNull();
+
+    fireEvent.click(canvas.getByRole("button", { name: "Cycle Select status" }));
+    await waitFor(() => expect(canvas.getByLabelText("Select transition status"))
+      .toHaveTextContent("refreshing:alpha"));
+    expect(shell.querySelector("[data-select-spinner]")).not.toBeNull();
+    expect(shell.querySelector("[data-select-clear]")).not.toBeNull();
+    expect(shell.querySelector("[data-select-chevron]")).not.toBeNull();
+    assertStablePopup();
+
+    fireEvent.click(canvas.getByRole("button", { name: "Cycle Select status" }));
+    await waitFor(() => expect(canvas.getByLabelText("Select transition status"))
+      .toHaveTextContent("loading:alpha"));
+    expect(shell.querySelector("[data-select-spinner]")).not.toBeNull();
+    expect(shell.querySelector("[data-select-clear]")).toBeNull();
+    expect(shell.querySelector("[data-select-chevron]")).toBeNull();
+    assertStablePopup();
+
+    fireEvent.click(canvas.getByRole("button", { name: "Cycle Select status" }));
+    fireEvent.click(canvas.getByRole("button", { name: "Toggle Select value" }));
+    await waitFor(() => expect(canvas.getByLabelText("Select transition status"))
+      .toHaveTextContent("ready:empty"));
+    expect(shell.querySelector("[data-field-part=\"start-adornment\"]")).toBeNull();
+    expect(shell.querySelector("[data-select-clear]")).toBeNull();
+    assertStablePopup();
+
+    fireEvent.click(canvas.getByRole("button", { name: "Cycle Select status" }));
+    await waitFor(() => expect(canvas.getByLabelText("Select transition status"))
+      .toHaveTextContent("refreshing:empty"));
+    expect(shell.querySelector("[data-select-spinner]")).not.toBeNull();
+    assertStablePopup();
+    fireEvent.click(canvas.getByRole("button", { name: "Cycle Select status" }));
+    await waitFor(() => expect(canvas.getByLabelText("Select transition status"))
+      .toHaveTextContent("loading:empty"));
+    expect(shell.querySelector("[data-select-spinner]")).not.toBeNull();
+    assertStablePopup();
+  }
+};
+
+export const MultiSelectNarrow320AddonTransitions: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <MultiSelectNarrowAddonTransitionsFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole("button", { name: "MultiSelect addon transitions" });
+    const shell = fieldShellFor(trigger);
+    const initialWidth = shell.getBoundingClientRect().width;
+    expect(Math.abs(initialWidth - 320)).toBeLessThanOrEqual(0.5);
+    expect(shell.querySelectorAll("[data-field-chip]")).toHaveLength(1);
+    await userEvent.click(trigger);
+    const surface = (await body.findByRole("listbox")).closest<HTMLElement>(
+      "[data-select-surface]"
+    );
+    if (!surface) throw new Error("MultiSelect transition surface was not rendered.");
+
+    const assertStablePopup = () => {
+      expect(fieldShellFor(trigger)).toBe(shell);
+      expect(shell.getBoundingClientRect().width).toBe(initialWidth);
+      expect(trigger).toHaveAttribute("aria-expanded", "true");
+      expectPopupMatchesShell(trigger, surface);
+    };
+    assertStablePopup();
+    expect(shell.querySelector("[data-field-selection-presentation]"))
+      .not.toBeNull();
+    expect(shell.querySelector("[data-multiselect-clear]")).not.toBeNull();
+    expect(shell.querySelector("[data-multiselect-chevron]")).not.toBeNull();
+
+    fireEvent.click(canvas.getByRole("button", { name: "Cycle MultiSelect status" }));
+    await waitFor(() => expect(canvas.getByLabelText("MultiSelect transition status"))
+      .toHaveTextContent("refreshing:selected"));
+    expect(shell.querySelector("[data-select-spinner]")).not.toBeNull();
+    expect(shell.querySelector("[data-multiselect-clear]")).not.toBeNull();
+    expect(shell.querySelector("[data-multiselect-chevron]")).not.toBeNull();
+    assertStablePopup();
+
+    fireEvent.click(canvas.getByRole("button", { name: "Cycle MultiSelect status" }));
+    await waitFor(() => expect(canvas.getByLabelText("MultiSelect transition status"))
+      .toHaveTextContent("loading:selected"));
+    expect(shell.querySelector("[data-select-spinner]")).not.toBeNull();
+    expect(shell.querySelector("[data-multiselect-clear]")).toBeNull();
+    expect(shell.querySelector("[data-multiselect-chevron]")).toBeNull();
+    assertStablePopup();
+
+    fireEvent.click(canvas.getByRole("button", { name: "Cycle MultiSelect status" }));
+    fireEvent.click(canvas.getByRole("button", { name: "Toggle MultiSelect value" }));
+    await waitFor(() => expect(canvas.getByLabelText("MultiSelect transition status"))
+      .toHaveTextContent("ready:empty"));
+    expect(shell.querySelector("[data-field-chip]")).toBeNull();
+    expect(shell.querySelector("[data-multiselect-clear]")).toBeNull();
+    assertStablePopup();
+
+    fireEvent.click(canvas.getByRole("button", { name: "Cycle MultiSelect status" }));
+    await waitFor(() => expect(canvas.getByLabelText("MultiSelect transition status"))
+      .toHaveTextContent("refreshing:empty"));
+    expect(shell.querySelector("[data-select-spinner]")).not.toBeNull();
+    assertStablePopup();
+    fireEvent.click(canvas.getByRole("button", { name: "Cycle MultiSelect status" }));
+    await waitFor(() => expect(canvas.getByLabelText("MultiSelect transition status"))
+      .toHaveTextContent("loading:empty"));
+    expect(shell.querySelector("[data-select-spinner]")).not.toBeNull();
+    assertStablePopup();
+  }
+};
+
+export const PopupReferenceLifecycle = SelectNarrow320AddonTransitions;
 
 export const InnerLabelAddonIsolation: Story = {
   args: {} as never,

@@ -48,6 +48,33 @@ afterEach(() => {
 });
 
 describe("Select", () => {
+  it("keeps selected leading content decorative without changing its name", () => {
+    render(
+      <ControlledSelect
+        items={[{
+          value: "a",
+          label: "Альфа",
+          textValue: "Альфа",
+          leading: (
+            <svg aria-label="Customer icon" role="img">
+              <circle cx="8" cy="8" r="4" />
+            </svg>
+          )
+        }]}
+        value="a"
+      />
+    );
+
+    const trigger = screen.getByRole("button", { name: "Клиент" });
+    expect(trigger).toHaveAccessibleName("Клиент");
+    expect(trigger).not.toHaveAccessibleName(/Customer icon/);
+    const leading = trigger.closest("[data-field-part=\"shell\"]")
+      ?.querySelector("[data-field-part=\"start-adornment\"]");
+    expect(leading?.firstElementChild).toHaveAttribute("aria-hidden", "true");
+    expect(screen.queryByRole("img", { name: "Customer icon" }))
+      .not.toBeInTheDocument();
+  });
+
   it("renders placeholder and opens with options", async () => {
     const user = userEvent.setup();
     render(<ControlledSelect items={baseItems} />);

@@ -79,9 +79,9 @@ export function useSelectSearch<Value extends string>(
 
   const resetQuery = useCallback(() => setQuery(""), [setQuery]);
   const visibleItems = useMemo(
-    () => searchable && !external
+    () => searchable && !external && query.trim().length > 0
       ? filterSelectItems(items, query, searchProps?.filter)
-      : [...items],
+      : items,
     [external, items, query, searchProps?.filter, searchable]
   );
 

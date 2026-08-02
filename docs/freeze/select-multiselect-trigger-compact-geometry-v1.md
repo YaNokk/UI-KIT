@@ -1,8 +1,10 @@
 # Select / MultiSelect Trigger and Compact Geometry v1
 
-Status: **corrective implementation complete; freeze pending full CI**
+Status: **corrective implementation in verification; freeze pending full CI**
 
 Base commit: `66fca4d439ed68678dd70f37676eb8181cd7b0ef`
+
+Corrective pass v1.1 base commit: `af0819ca1aa5f06461bc2b77133ae4edf56831a5`
 
 Implementation date: 2026-08-02
 
@@ -69,6 +71,10 @@ the existing `+N` overflow policy.
 ## Accessibility results
 
 - Trigger button naming, `aria-expanded`, `aria-controls` and busy state are unchanged.
+- Selected Select leading content is wrapped in a local `aria-hidden` subtree.
+  An intentionally named `Customer icon` SVG does not enter the trigger accessible
+  name; placeholder, selected, readOnly, inner-label and outer-label naming remain
+  owned by the field label.
 - Tag remove remains a real button with an accessible name and one removal per activation.
 - Option indicators remain `aria-hidden`, without role, tabindex, nested input or event owner.
 - Decorative shell addons focus/toggle through the existing FieldShell delegation;
@@ -77,9 +83,33 @@ the existing `+N` overflow policy.
 ## Browser and Storybook coverage
 
 Focused stories cover tag containment at 100%/125%, normal/hover/active chip
-geometry, Select and MultiSelect 320 px popup alignment, addon transitions,
+geometry, Select and MultiSelect 320 px popup alignment through idle,
+refreshing and loading addon transitions,
 compact indicator size/state/brand/virtualization/Popover/BottomSheet behavior,
 and inner-label addon isolation for `sm`/`md`/`lg`.
+
+`SelectLeadingAccessibilityIsolation`, `SelectNarrow320AddonTransitions`,
+`MultiSelectNarrow320AddonTransitions` and `PopupReferenceLifecycle` assert the
+corrective contracts in Chromium, forced-colors and reduced-motion environments.
+The focused Playwright state capture proves genuine `:hover` and delayed-click
+`:active` before reading geometry; chip width/height stay stable, the remove action
+stays contained, `:active` clears after release and exactly one value is removed.
+
+## Corrective reference lifecycle decision
+
+The state-driven `shellElement` and the competing layout-effect reference update
+were removed. `SelectPanel` now installs one stable Floating UI virtual reference,
+whose geometry and `contextElement` are read from `shellRef.current`. The interactive
+button remains the focus/ARIA owner, while `FieldShell` remains the authoritative
+geometry owner. Callback-ref null/node churn during ordinary rerenders is ignored,
+so clear/spinner/chevron and selected-value transitions neither null the reference
+nor close/reopen the popup.
+
+Collection preparation was also stabilized: an unfiltered source reuses the
+controller's normalized collection, and listbox option/action rows are partitioned
+in one pass. The unit runner retains file parallelism but caps it at four workers,
+preventing CPU-heavy jsdom suites from starving the unchanged 5 s 10,000-option
+contract. No timeout was increased.
 
 ## Gates
 
@@ -88,28 +118,30 @@ Passed locally:
 - `npm run typecheck`
 - `npm run tokens:check`
 - `npm run lint` (including typography and motion governance)
-- focused FieldShell/Select/MultiSelect unit tests (56/56)
+- focused Select/MultiSelect unit tests (50/50)
+- three consecutive complete `npm run test` executions on the final code:
+  353/353 in 28.61 s, 353/353 in 28.53 s and 353/353 in 28.13 s
+- the 10,000-option Select test completed in 2.034 s in a complete run and
+  1.477 s in the final focused Select run
 - `npm run test:storybook` through the repository-required IPv4-first runner
-  (24 files, 324/324 tests across Chromium, forced colors and reduced motion)
+  (24 files, 339/339 tests across Chromium, forced colors and reduced motion)
 - `npm run choice-controls:verify` (24/24 story executions, 14/14 negative
   verifier fixtures and 2/2 real-browser state-capture tests)
-- focused in-app browser inspection for 320 px popup edges, compact indicator
-  geometry, tag containment and inner-label addon centers
-
-The complete unit suite reached 351/352 in its parallel run; the sole failure
-was the existing 5 s timeout in the 10,000-option Select test. That exact test
-passed immediately in isolation (1/1), and the focused Select suite passed
-25/25. This is recorded as a non-functional timing flake rather than a freeze
-gate success for the complete unit job.
+- focused Select tag-remove Playwright capture (1/1)
+- focused Select/MultiSelect Storybook browser file (141/141 across the three
+  Chromium environments)
 
 The remaining repository, Storybook, package and CI gates are recorded only
 after execution. Per repository instructions, this local corrective pass does
-not run `build`, `build-storybook` or build-dependent package gates.
+not run `build`, `build-storybook`, `pack:check`, `consumer:test` or
+`tree-shaking:test`; the latter package gates invoke consumer/build work.
 
 ## Known limitations
 
 - Visual approval of the selected 16/20/20 px option geometry remains a human review gate.
 - Full CI and package-distribution evidence is pending.
+- Existing jsdom diagnostics for unimplemented canvas, pseudo-element computed
+  style and `window.scrollTo` remain noisy but do not fail the complete unit gate.
 - BottomSheet popup-width matching is not applicable because the sheet owns its viewport width;
   selection, compact-indicator and accessibility parity remain required.
 

@@ -163,19 +163,19 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const skipFocusRestoreRef = useRef(false);
   const shellRef = useRef<HTMLDivElement | null>(null);
-  const [shellElement, setShellElement] = useState<HTMLDivElement | null>(null);
   const searchRef = useRef<HTMLInputElement | null>(null);
   const firstEnabledActionRef = useRef<HTMLButtonElement | null>(null);
   const listboxRef = useRef<HTMLDivElement | null>(null);
 
-  const setShellNode = useCallback((node: HTMLDivElement | null) => {
-    shellRef.current = node;
-    setShellElement(node);
-  }, []);
-
   useImperativeHandle(ref, () => triggerRef.current as HTMLElement, []);
 
-  const collection = useMemo(() => normalizeSelectCollection(items), [items]);
+  const unfilteredCollection = search.visibleItems === items
+    ? state.collection
+    : null;
+  const collection = useMemo(
+    () => unfilteredCollection ?? normalizeSelectCollection(items),
+    [items, unfilteredCollection]
+  );
   const displayOption = useMemo(() => {
     if (value === null) return null;
     const inCollection = collection.optionRowByValue.get(value);
@@ -284,7 +284,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
   const renderPanel = (triggerElement: ReactElement) => (
     <SelectPanel
       outsidePressBoundaryRef={shellRef}
-      referenceElement={shellElement}
+      geometryReferenceRef={shellRef}
       messages={messages}
       multiple={false}
       onOpenChange={handleOpenChange}
@@ -392,9 +392,11 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
             if (interactive) handleOpenChange(!open);
           }}
           readOnly={readOnly}
-          ref={setShellNode}
+          ref={shellRef}
           size={size}
-          startAdornment={displayOption?.leading}
+          startAdornment={displayOption?.leading == null ? undefined : (
+            <span aria-hidden="true">{displayOption.leading}</span>
+          )}
         >
           {renderPanel(<button
             {...controlProps}

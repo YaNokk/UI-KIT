@@ -4,6 +4,9 @@ import { configDefaults, defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     exclude: [...configDefaults.exclude, "**/*.browser.test.tsx"],
+    // Keep CPU-heavy jsdom suites from starving the 10,000-option
+    // virtualization contract while preserving file-level parallelism.
+    maxWorkers: 4,
   },
   resolve: {
     alias: [

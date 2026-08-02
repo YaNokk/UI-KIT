@@ -1,6 +1,5 @@
 import {
   useEffect,
-  useLayoutEffect,
   useRef,
   type ReactElement,
   type ReactNode,
@@ -24,7 +23,7 @@ import styles from "./SelectPanel.module.css";
 
 export interface SelectPanelProps {
   trigger: ReactElement;
-  referenceElement?: HTMLElement | null | undefined;
+  geometryReferenceRef?: RefObject<HTMLElement | null> | undefined;
   triggerRef?: RefObject<HTMLElement | null> | undefined;
   focusTriggerRef?: RefObject<HTMLButtonElement | null> | undefined;
   skipFocusRestoreRef?: MutableRefObject<boolean> | undefined;
@@ -42,7 +41,7 @@ export interface SelectPanelProps {
 
 export function SelectPanel({
   trigger,
-  referenceElement,
+  geometryReferenceRef,
   triggerRef,
   focusTriggerRef,
   skipFocusRestoreRef,
@@ -62,6 +61,20 @@ export function SelectPanel({
   const previousOpen = useRef(open);
   const popoverFocusOutReady = useRef(false);
   const referenceElementRef = useRef<HTMLElement | null>(null);
+  const geometryReferenceRefRef = useRef(geometryReferenceRef);
+  geometryReferenceRefRef.current = geometryReferenceRef;
+  const virtualReferenceRef = useRef({
+    getBoundingClientRect: () => {
+      const element = geometryReferenceRefRef.current?.current
+        ?? referenceElementRef.current;
+      return element?.getBoundingClientRect() ?? new DOMRect();
+    },
+    get contextElement() {
+      return geometryReferenceRefRef.current?.current
+        ?? referenceElementRef.current
+        ?? undefined;
+    }
+  });
 
   useEffect(() => {
     if (previousOpen.current && !open) {
@@ -113,19 +126,14 @@ export function SelectPanel({
   });
 
   const setTriggerNode = (node: HTMLElement | null) => {
+    if (node === null && geometryReferenceRef) return;
+    if (node === referenceElementRef.current) return;
     referenceElementRef.current = node;
-    floating.refs.setReference(referenceElement ?? node);
+    floating.refs.setReference(
+      geometryReferenceRef ? virtualReferenceRef.current : node
+    );
     if (triggerRef) triggerRef.current = node;
   };
-
-  // Select fields use the complete FieldShell border box as their floating
-  // reference. The interactive button remains the focus/ARIA owner, while
-  // leading and trailing shell slots cannot narrow the popup measurement.
-  useLayoutEffect(() => {
-    if (!referenceElement) return;
-    floating.refs.setReference(referenceElement);
-    return () => floating.refs.setReference(null);
-  }, [floating.refs, referenceElement]);
 
   const renderedTrigger = renderFloatingTrigger(
     trigger,
