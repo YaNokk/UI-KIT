@@ -6,6 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { vitestTransform } from "storybook/internal/csf-tools";
 import type { Plugin } from "vite";
 import { defineConfig } from "vitest/config";
+import { forceExecuteTransformedStories } from "./scripts/storybook-csf-transform.mjs";
 import {
   workspaceAliases,
   workspaceTokenCssAliases,
@@ -36,7 +37,7 @@ const forcedColorsStoryTransform: Plugin = {
     });
     return {
       ...transformed,
-      code: transformed.code.replace("if (_isRunningFromThisFile) {", "if (true) {"),
+      code: forceExecuteTransformedStories(transformed.code),
     };
   },
 };

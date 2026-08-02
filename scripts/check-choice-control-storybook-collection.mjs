@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
@@ -6,6 +7,8 @@ import {
   expectedEnvironmentNames,
   storyFile
 } from "./choice-control-storybook-manifest.mjs";
+import { forceExecuteTransformedStories } from "./storybook-csf-transform.mjs";
+import { defaultStorybookTagsFilter } from "./storybook-test-tags.mjs";
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const configPath = resolve(repositoryRoot, "vitest.storybook.config.ts");
@@ -50,13 +53,35 @@ for (const entry of expectedConfigEntries) {
   assertExactCount(config, entry.value, 1, entry.label);
 }
 
+assert.deepEqual(defaultStorybookTagsFilter, {
+  include: ["test"],
+  exclude: ["forced-colors-only"],
+  skip: []
+});
 assertExactCount(
   config,
-  'tagsFilter: { include: ["test"], exclude: [], skip: [] }',
+  'import { defaultStorybookTagsFilter } from "./scripts/storybook-test-tags.mjs";',
   1,
-  "Storybook test tag filter"
+  "Shared Storybook tag manifest import"
+);
+assertExactCount(
+  config,
+  "tagsFilter: defaultStorybookTagsFilter",
+  1,
+  "Shared Storybook tag filter usage"
 );
 assertExactCount(story, 'tags: ["test"]', 1, "Choice Control story test tag");
+
+assert.throws(
+  () => forceExecuteTransformedStories("export const story = true;"),
+  /execution marker must appear exactly once; found 0/
+);
+assert.equal(
+  forceExecuteTransformedStories(
+    "before if (_isRunningFromThisFile) { after"
+  ),
+  "before if (true) { after"
+);
 
 for (const storyName of allExpectedStories) {
   assertExactCount(

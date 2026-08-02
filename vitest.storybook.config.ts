@@ -7,6 +7,8 @@ import { vitestTransform } from "storybook/internal/csf-tools";
 import type { Plugin } from "vite";
 import { defineConfig } from "vitest/config";
 import { expectedEnvironmentNames } from "./scripts/choice-control-storybook-manifest.mjs";
+import { forceExecuteTransformedStories } from "./scripts/storybook-csf-transform.mjs";
+import { defaultStorybookTagsFilter } from "./scripts/storybook-test-tags.mjs";
 import {
   workspaceAliases,
   workspaceTokenCssAliases,
@@ -82,19 +84,12 @@ const storybookCsfTransform: Plugin = {
         "../../../packages/ui/src/InternationalPhoneInput/InternationalPhoneInputBrowserRegression.stories.tsx",
         "../../../packages/ui/src/Textarea/TextareaBrowserRegression.stories.tsx"
       ],
-      tagsFilter: {
-        include: ["test"],
-        exclude: ["forced-colors-only"],
-        skip: []
-      }
+      tagsFilter: defaultStorybookTagsFilter
     });
 
     return {
       ...transformed,
-      code: transformed.code.replace(
-        "if (_isRunningFromThisFile) {",
-        "if (true) {"
-      )
+      code: forceExecuteTransformedStories(transformed.code)
     };
   }
 };

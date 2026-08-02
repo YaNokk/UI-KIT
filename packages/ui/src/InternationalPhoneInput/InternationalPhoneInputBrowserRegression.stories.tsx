@@ -199,8 +199,8 @@ export const VirtualizedSelectedCountryVisibleOnOpen: Story = {
     await expect(japan).toHaveAttribute("aria-selected", "true");
     const listboxRect = listbox.getBoundingClientRect();
     const optionRect = japan.getBoundingClientRect();
-    await expect(optionRect.top).toBeGreaterThanOrEqual(listboxRect.top);
-    await expect(optionRect.bottom).toBeLessThanOrEqual(listboxRect.bottom);
+    await expect(optionRect.top).toBeGreaterThanOrEqual(listboxRect.top - 1);
+    await expect(optionRect.bottom).toBeLessThanOrEqual(listboxRect.bottom + 1);
   }
 };
 

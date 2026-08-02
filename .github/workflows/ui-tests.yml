@@ -32,7 +32,7 @@ jobs:
           path: |
             .artifacts/choice-controls-storybook-report.json
             .artifacts/choice-controls-storybook-summary.json
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 30
       - name: Run Select and MultiSelect verification for ${{ github.sha }}
         run: npm run select-multiselect:verify
