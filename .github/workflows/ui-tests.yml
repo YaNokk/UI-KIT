@@ -16,4 +16,12 @@ jobs:
       - run: npm ci
       - run: npm run motion:check
       - run: npx playwright install --with-deps chromium
+      - run: npm run choice-controls:storybook:collection-check
       - run: npm run test:storybook
+      - run: npm run choice-controls:storybook:report
+      - run: npm run choice-controls:storybook:execution-check
+      - run: npm run build-storybook
+      - run: npm run build
+      - run: npm run pack:check
+      - run: npm run consumer:test
+      - run: npm run tree-shaking:test
