@@ -26,6 +26,20 @@ function indicatorFor(control: HTMLElement): HTMLElement {
   return indicator;
 }
 
+function expectThumbContained(track: HTMLElement, thumb: HTMLElement) {
+  const trackRect = track.getBoundingClientRect();
+  const thumbRect = thumb.getBoundingClientRect();
+
+  expect(trackRect.width).toBeGreaterThan(0);
+  expect(trackRect.height).toBeGreaterThan(0);
+  expect(thumbRect.width).toBeGreaterThan(0);
+  expect(thumbRect.height).toBeGreaterThan(0);
+  expect(thumbRect.left).toBeGreaterThanOrEqual(trackRect.left);
+  expect(thumbRect.right).toBeLessThanOrEqual(trackRect.right);
+  expect(thumbRect.top).toBeGreaterThanOrEqual(trackRect.top);
+  expect(thumbRect.bottom).toBeLessThanOrEqual(trackRect.bottom);
+}
+
 const meta = {
   title: "Foundations/ChoiceControlBrowserRegression",
   tags: ["test"],
@@ -101,14 +115,12 @@ export const SwitchBrandForeground: Story = {
               aria-hidden="true"
               className="inline-block size-1"
               data-primary-background-probe=""
-              data-testid="primary-background-probe"
               style={{ backgroundColor: "var(--ds-action-primary-background)" }}
             />
             <span
               aria-hidden="true"
               className="inline-block size-1"
               data-primary-foreground-probe=""
-              data-testid="primary-foreground-probe"
               style={{ backgroundColor: "var(--ds-action-primary-foreground)" }}
             />
           </div>
@@ -119,7 +131,6 @@ export const SwitchBrandForeground: Story = {
           aria-hidden="true"
           className="inline-block size-1"
           data-disabled-thumb-probe=""
-          data-testid="disabled-thumb-probe"
           style={{ backgroundColor: "var(--ds-icon-disabled)" }}
         />
         <Switch defaultChecked disabled label="disabled checked switch" />
@@ -135,11 +146,17 @@ export const SwitchBrandForeground: Story = {
       const scoped = within(scope);
       const control = scoped.getByRole("switch", { name: `${fixture.name} switch` });
       const button = scoped.getByRole("button", { name: `${fixture.name} primary` });
-      const backgroundProbe = scoped.getByTestId("primary-background-probe");
-      const foregroundProbe = scoped.getByTestId("primary-foreground-probe");
+      const backgroundProbe = scope.querySelector("[data-primary-background-probe]");
+      const foregroundProbe = scope.querySelector("[data-primary-foreground-probe]");
       const indicator = indicatorFor(control);
       const thumb = indicator.firstElementChild;
       if (!(thumb instanceof HTMLElement)) throw new Error(`Missing ${fixture.name} thumb`);
+      if (!(backgroundProbe instanceof HTMLElement)) {
+        throw new Error(`Missing ${fixture.name} background probe`);
+      }
+      if (!(foregroundProbe instanceof HTMLElement)) {
+        throw new Error(`Missing ${fixture.name} foreground probe`);
+      }
 
       if (!forcedColors) {
         expect(getComputedStyle(indicator).backgroundColor)
@@ -153,10 +170,7 @@ export const SwitchBrandForeground: Story = {
       } else {
         expect(getComputedStyle(indicator).forcedColorAdjust).toBe("none");
         expect(getComputedStyle(indicator).borderWidth).not.toBe("0px");
-        expect(indicator.getBoundingClientRect().width).toBeGreaterThan(0);
-        expect(thumb.getBoundingClientRect().width).toBeGreaterThan(0);
-        expect(getComputedStyle(indicator).backgroundColor)
-          .not.toBe(getComputedStyle(thumb).backgroundColor);
+        expectThumbContained(indicator, thumb);
       }
     }
 
@@ -166,7 +180,7 @@ export const SwitchBrandForeground: Story = {
     const disabled = disabledScoped.getByRole("switch", { name: "disabled checked switch" });
     const disabledIndicator = indicatorFor(disabled);
     const disabledThumb = disabledIndicator.firstElementChild;
-    const disabledProbe = disabledScoped.getByTestId("disabled-thumb-probe");
+    const disabledProbe = disabledScope.querySelector("[data-disabled-thumb-probe]");
     if (!(disabledThumb instanceof HTMLElement)) throw new Error("Missing disabled thumb");
     if (!(disabledProbe instanceof HTMLElement)) throw new Error("Missing disabled probe");
     if (!forcedColors) {
@@ -175,9 +189,7 @@ export const SwitchBrandForeground: Story = {
     } else {
       expect(getComputedStyle(disabledIndicator).forcedColorAdjust).toBe("none");
       expect(getComputedStyle(disabledIndicator).borderWidth).not.toBe("0px");
-      expect(disabledThumb.getBoundingClientRect().width).toBeGreaterThan(0);
-      expect(getComputedStyle(disabledIndicator).backgroundColor)
-        .not.toBe(getComputedStyle(disabledThumb).backgroundColor);
+      expectThumbContained(disabledIndicator, disabledThumb);
     }
   }
 };

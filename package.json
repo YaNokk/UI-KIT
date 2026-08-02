@@ -17,6 +17,7 @@
     "motion:check": "node scripts/check-motion-foundation.mjs",
     "test": "vitest run packages",
     "test:storybook": "vitest --config vitest.storybook.config.ts --run",
+    "choice-controls:storybook:collection-check": "node scripts/check-choice-control-storybook-collection.mjs",
     "typecheck": "tsc -p tsconfig.check.json --noEmit",
     "pack:check": "node scripts/verify-package.mjs",
     "consumer:test": "node scripts/test-consumer.mjs",
