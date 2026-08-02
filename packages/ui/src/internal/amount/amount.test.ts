@@ -38,7 +38,7 @@ describe("amount foundation", () => {
     expect(dollar.currencyPosition).toBe("prefix");
     expect(dollar.currency).toBe("$");
     expect(dollar.currencySeparator).toBe("");
-    expect(resolveAmountFormat({}).locale).toBe("en-US");
+    expect(resolveAmountFormat({}).locale).toBe("ru-RU");
   });
 
   it("returns styled display parts and honors signs/trailing zeros", () => {

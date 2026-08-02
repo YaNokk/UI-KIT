@@ -60,6 +60,8 @@ export function SelectPanel({
   const presentation = useSelectPresentation();
   const previousPresentation = useRef(presentation);
   const previousOpen = useRef(open);
+  const requestedOpen = useRef(open);
+  requestedOpen.current = open;
   const popoverFocusOutReady = useRef(false);
   const referenceElementRef = useRef<HTMLElement | null>(null);
   const geometryReferenceRefRef = useRef(geometryReferenceRef);
@@ -76,6 +78,11 @@ export function SelectPanel({
         ?? undefined;
     }
   });
+  const requestOpenChange = useCallback((nextOpen: boolean) => {
+    if (requestedOpen.current === nextOpen) return;
+    requestedOpen.current = nextOpen;
+    onOpenChange(nextOpen);
+  }, [onOpenChange]);
 
   useEffect(() => {
     if (previousOpen.current && !open) {
@@ -93,8 +100,8 @@ export function SelectPanel({
   useEffect(() => {
     if (previousPresentation.current === presentation) return;
     previousPresentation.current = presentation;
-    if (open) onOpenChange(false);
-  }, [presentation, open, onOpenChange]);
+    if (open) requestOpenChange(false);
+  }, [presentation, open, requestOpenChange]);
 
   useEffect(() => {
     popoverFocusOutReady.current = false;
@@ -118,9 +125,9 @@ export function SelectPanel({
     dismissOnOutsidePress: true,
     outsidePressBoundaryRef,
     interaction: "click",
-    interactionEnabled: presentation === "popover" && interactive,
+    interactionEnabled: false,
     matchTriggerWidth: true,
-    onOpenChange,
+    onOpenChange: requestOpenChange,
     open: presentation === "popover" && open,
     placement: "bottom-start",
     role: undefined
@@ -145,8 +152,8 @@ export function SelectPanel({
     trigger,
     floating.getReferenceProps,
     setTriggerNode,
-    presentation === "sheet" && interactive
-      ? { onClick: () => onOpenChange(!open) }
+    interactive
+      ? { onClick: () => requestOpenChange(!open) }
       : {}
   );
 
@@ -160,7 +167,7 @@ export function SelectPanel({
       )
     ) return;
     if (skipFocusRestoreRef) skipFocusRestoreRef.current = true;
-    onOpenChange(false);
+    requestOpenChange(false);
   };
 
   return (
@@ -194,7 +201,7 @@ export function SelectPanel({
           footer={multiple ? (
             <Button
               fullWidth
-              onClick={() => onOpenChange(false)}
+              onClick={() => requestOpenChange(false)}
               variant="primary"
             >
               {messages.done}
@@ -202,7 +209,7 @@ export function SelectPanel({
           ) : undefined}
           {...(initialFocusRef === undefined ? {} : { initialFocusRef })}
           onOpenChange={(nextOpen) => {
-            if (!nextOpen) onOpenChange(false);
+            if (!nextOpen) requestOpenChange(false);
           }}
           open={open}
           title={messages.sheetTitle}

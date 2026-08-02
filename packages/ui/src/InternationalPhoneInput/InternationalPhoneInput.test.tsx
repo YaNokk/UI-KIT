@@ -4,6 +4,7 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axe from "axe-core";
+import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DesignSystemProvider } from "../DesignSystemProvider/DesignSystemProvider";
 import { InternationalPhoneInput } from "./InternationalPhoneInput";
@@ -115,9 +116,50 @@ describe("InternationalPhoneInput", () => {
     });
     expect(onCountryChange).not.toHaveBeenCalled();
     expect(onValueChange).toHaveBeenLastCalledWith(
-      "+48123123123",
+      "+748123123123",
       expect.objectContaining({ country: "RU" })
     );
+  });
+
+  it("round-trips a detected international paste through controlled country", async () => {
+    const onCountryChange = vi.fn();
+    const onValueChange = vi.fn();
+
+    function ControlledFixture() {
+      const [country, setCountry] = useState("RU");
+      const [value, setValue] = useState("");
+      return (
+        <InternationalPhoneInput
+          aria-label="Телефон"
+          countries={["RU", "PL"]}
+          country={country}
+          onCountryChange={(nextCountry, meta) => {
+            onCountryChange(nextCountry, meta);
+            setCountry(nextCountry ?? "RU");
+          }}
+          onValueChange={(nextValue, meta) => {
+            onValueChange(nextValue, meta);
+            setValue(nextValue);
+          }}
+          value={value}
+        />
+      );
+    }
+
+    render(<ControlledFixture />);
+    fireEvent.paste(screen.getByRole("textbox", { name: "Телефон" }), {
+      clipboardData: { getData: () => "+48 123 123 123" }
+    });
+
+    expect(onCountryChange).toHaveBeenLastCalledWith("PL", {
+      previousCountry: "RU",
+      source: "number"
+    });
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      "+48123123123",
+      expect.objectContaining({ country: "PL", source: "paste" })
+    );
+    await waitFor(() => expect(screen.getByRole("button", { name: /Польша/ })).toBeVisible());
   });
 
   it("supports both clear policies and retains country selection", async () => {
@@ -132,7 +174,7 @@ describe("InternationalPhoneInput", () => {
         aria-label="Phone"
       />
     );
-    await user.click(screen.getByRole("button", { name: "Clear phone number" }));
+    await user.click(screen.getByRole("button", { name: "Очистить номер телефона" }));
     expect(preserve).toHaveBeenLastCalledWith(
       "+48",
       expect.objectContaining({ country: "PL", source: "clear" })
@@ -149,7 +191,7 @@ describe("InternationalPhoneInput", () => {
         aria-label="Phone"
       />
     );
-    await user.click(screen.getByRole("button", { name: "Clear phone number" }));
+    await user.click(screen.getByRole("button", { name: "Очистить номер телефона" }));
     expect(clear).toHaveBeenLastCalledWith(
       "",
       expect.objectContaining({ country: "PL", source: "clear" })
@@ -166,8 +208,8 @@ describe("InternationalPhoneInput", () => {
       />
     );
     expect(screen.getByRole("textbox", { name: "Phone" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: /Choose country/ })).toBeDisabled();
-    expect(screen.queryByRole("button", { name: "Clear phone number" })).toBeNull();
+    expect(screen.getByRole("button", { name: /Выбрать страну/ })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: "Очистить номер телефона" })).toBeNull();
 
     rerender(
       <InternationalPhoneInput
@@ -178,8 +220,8 @@ describe("InternationalPhoneInput", () => {
       />
     );
     expect(screen.getByRole("textbox", { name: "Phone" })).toHaveAttribute("readonly");
-    expect(screen.getByRole("button", { name: /Choose country/ })).toBeDisabled();
-    expect(screen.queryByRole("button", { name: "Clear phone number" })).toBeNull();
+    expect(screen.getByRole("button", { name: /Выбрать страну/ })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: "Очистить номер телефона" })).toBeNull();
   });
 
   it("uses Provider locale, shared field geometry, and decorative flags", () => {
@@ -199,6 +241,36 @@ describe("InternationalPhoneInput", () => {
       .toHaveAttribute("data-label-view", "inner");
     expect(container.querySelector("[data-country-flag='RU']"))
       .toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("uses Russian labels and country names when locale is omitted", async () => {
+    const user = userEvent.setup();
+    render(
+      <InternationalPhoneInput
+        aria-label="Телефон"
+        countries={["RU", "PL", "US"]}
+        defaultCountry="RU"
+      />
+    );
+    await user.click(screen.getByRole("button", { name: /Выбрать страну: Россия/ }));
+    expect(screen.getByPlaceholderText("Поиск страны")).toBeVisible();
+    expect(screen.getByRole("option", { name: /Польша/ })).toBeVisible();
+    expect(screen.getByRole("option", { name: /США/ })).toBeVisible();
+  });
+
+  it("supports an explicit English locale override", async () => {
+    const user = userEvent.setup();
+    render(
+      <InternationalPhoneInput
+        aria-label="Phone"
+        countries={["RU", "PL"]}
+        defaultCountry="RU"
+        locale="en-US"
+      />
+    );
+    await user.click(screen.getByRole("button", { name: /Choose country: Russia/ }));
+    expect(screen.getByPlaceholderText("Search countries")).toBeVisible();
+    expect(screen.getByRole("option", { name: /Poland/ })).toBeVisible();
   });
 
   it("has no obvious accessibility violations", async () => {

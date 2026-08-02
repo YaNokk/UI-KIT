@@ -12,7 +12,7 @@ export function createPhoneMask(
       ? { countryIsoCode: country.toUpperCase() as CountryCode }
       : {}),
     metadata,
-    strict: false,
+    strict: country !== null,
     separator: " "
   });
 }

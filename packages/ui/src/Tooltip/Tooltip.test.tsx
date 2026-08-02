@@ -112,7 +112,7 @@ describe("Tooltip", () => {
 
     await user.click(screen.getByRole("button", { name: "Compact trigger" }));
     expect(onClick).toHaveBeenCalledTimes(1);
-    expect(await screen.findByRole("dialog", { name: "Tooltip" }))
+    expect(await screen.findByRole("dialog", { name: "Подсказка" }))
       .toBeInTheDocument();
   });
 

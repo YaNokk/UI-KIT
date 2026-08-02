@@ -94,7 +94,7 @@ describe("QuantityInput", () => {
     await user.click(
       screen.getByRole("button", { name: "Увеличить количество" }),
     );
-    expect(screen.getByRole("spinbutton")).toHaveValue("0.3");
+    expect(screen.getByRole("spinbutton")).toHaveValue("0,3");
   });
 
   it("keeps keyboard and button stepping in parity", async () => {
@@ -131,10 +131,10 @@ describe("QuantityInput", () => {
         name: "Увеличить кнопочное количество",
       }),
     );
-    expect(keyboardInput).toHaveValue("0.3");
+    expect(keyboardInput).toHaveValue("0,3");
     expect(
       screen.getByRole("spinbutton", { name: "Кнопочное количество" }),
-    ).toHaveValue("0.3");
+    ).toHaveValue("0,3");
 
     await user.click(keyboardInput);
     await user.keyboard("{ArrowDown}");
@@ -143,10 +143,10 @@ describe("QuantityInput", () => {
         name: "Уменьшить кнопочное количество",
       }),
     );
-    expect(keyboardInput).toHaveValue("0.2");
+    expect(keyboardInput).toHaveValue("0,2");
     expect(
       screen.getByRole("spinbutton", { name: "Кнопочное количество" }),
-    ).toHaveValue("0.2");
+    ).toHaveValue("0,2");
   });
 
   it("keeps fractional boundary actions aligned with the stepped value", async () => {
@@ -166,7 +166,7 @@ describe("QuantityInput", () => {
     await user.click(
       screen.getByRole("button", { name: "Увеличить количество" }),
     );
-    expect(input).toHaveValue("1.3");
+    expect(input).toHaveValue("1,3");
     expect(
       screen.getByRole("button", { name: "Увеличить количество" }),
     ).toBeDisabled();

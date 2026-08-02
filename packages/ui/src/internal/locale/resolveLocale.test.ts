@@ -6,6 +6,6 @@ describe("resolveLocale", () => {
     expect(resolveLocale("pl-PL", "de-DE")).toBe("pl-PL");
     expect(resolveLocale(undefined, "de-DE")).toBe("de-DE");
     expect(resolveLocale()).toBe(DEFAULT_LOCALE);
-    expect(DEFAULT_LOCALE).toBe("en-US");
+    expect(DEFAULT_LOCALE).toBe("ru-RU");
   });
 });

@@ -73,7 +73,7 @@ const preview: Preview = {
     }
   },
   initialGlobals: {
-    locale: "en-US",
+    locale: "ru-RU",
     mode: "light",
     accent: "blue",
     foreground: "light"

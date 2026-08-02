@@ -180,7 +180,7 @@ export const InternationalPhoneInput = forwardRef<
     ? null
     : detectPhoneCountry(semanticValue, allowedCountries);
   const normalizedControlledCountry = controlledCountry?.toUpperCase() ?? null;
-  const resolvedCountry = countryControlled
+  const effectiveCountry = countryControlled
     ? (normalizedControlledCountry !== null
       && allowedCountries.includes(normalizedControlledCountry)
         ? normalizedControlledCountry
@@ -195,38 +195,18 @@ export const InternationalPhoneInput = forwardRef<
           : null)
       ?? firstCountry;
   const [displayValue, setDisplayValue] = useState(() =>
-    formatPhoneValue(semanticValue, resolvedCountry)
+    formatPhoneValue(semanticValue, effectiveCountry)
   );
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
   const lastExternalValue = useRef(semanticValue);
-  const maskOptions = useMemo(() => createPhoneMask(resolvedCountry), [resolvedCountry]);
+  const maskOptions = useMemo(() => createPhoneMask(effectiveCountry), [effectiveCountry]);
   const maskRef = usePhoneInputMask(maskOptions);
 
   useEffect(() => {
-    setDisplayValue(formatPhoneValue(semanticValue, resolvedCountry));
-  }, [resolvedCountry, semanticValue]);
-
-  useEffect(() => {
-    if (!valueControlled || lastExternalValue.current === semanticValue) return;
-    const previousCountry = internalCountry;
-    lastExternalValue.current = semanticValue;
-    if (!countryControlled && detectedCountry !== null && detectedCountry !== previousCountry) {
-      setInternalCountry(detectedCountry);
-      onCountryChange?.(detectedCountry, {
-        previousCountry,
-        source: "external"
-      });
-    }
-  }, [
-    countryControlled,
-    detectedCountry,
-    internalCountry,
-    onCountryChange,
-    semanticValue,
-    valueControlled
-  ]);
+    setDisplayValue(formatPhoneValue(semanticValue, effectiveCountry));
+  }, [effectiveCountry, semanticValue]);
 
   const setInputRef = useCallback((node: HTMLInputElement | null) => {
     inputRef.current = node;
@@ -258,40 +238,89 @@ export const InternationalPhoneInput = forwardRef<
     });
   }, [allowedCountries, onValueChange, valueControlled]);
 
-  const applyEditingValue = useCallback((rawValue: string, source: "input" | "paste") => {
-    const nextValue = normalizePhoneValue(rawValue, resolvedCountry);
-    const nextDetected = detectPhoneCountry(nextValue, allowedCountries);
-    const nextCountry = countryControlled
-      ? resolvedCountry
-      : nextDetected ?? resolvedCountry;
-    if (!countryControlled && nextDetected !== null && nextDetected !== internalCountry) {
-      const previousCountry = internalCountry;
-      setInternalCountry(nextDetected);
-      onCountryChange?.(nextDetected, { previousCountry, source: "number" });
+  const applyExternalCanonicalValue = useCallback((nextValue: string) => {
+    const nextCountry = detectPhoneCountry(nextValue, allowedCountries);
+    if (nextCountry !== null && nextCountry !== effectiveCountry) {
+      if (!countryControlled) setInternalCountry(nextCountry);
+      onCountryChange?.(nextCountry, {
+        previousCountry: effectiveCountry,
+        source: "external"
+      });
     }
-    emitValue(nextValue, nextCountry, source);
+    setDisplayValue(formatPhoneValue(nextValue, effectiveCountry));
   }, [
     allowedCountries,
     countryControlled,
+    effectiveCountry,
+    onCountryChange
+  ]);
+
+  useEffect(() => {
+    if (!valueControlled || lastExternalValue.current === semanticValue) return;
+    lastExternalValue.current = semanticValue;
+    applyExternalCanonicalValue(semanticValue);
+  }, [applyExternalCanonicalValue, semanticValue, valueControlled]);
+
+  const applyNationalEditingValue = useCallback((rawValue: string, source: "input" | "paste") => {
+    if (effectiveCountry === null) {
+      emitValue(normalizePhoneValue(rawValue), null, source);
+      return;
+    }
+    const callingCode = getCountryCallingCode(effectiveCountry);
+    const rawDigits = rawValue.replace(/\D/g, "");
+    const startsInternational = rawValue.trimStart().startsWith("+");
+    const nationalValue = callingCode !== null && startsInternational
+      ? (rawDigits.startsWith(callingCode)
+        ? rawDigits.slice(callingCode.length)
+        : rawDigits)
+      : rawValue;
+    const nextValue = nationalValue === "" && callingCode !== null
+      ? `+${callingCode}`
+      : normalizePhoneValue(nationalValue, effectiveCountry);
+    emitValue(nextValue, effectiveCountry, source);
+  }, [
+    effectiveCountry,
+    emitValue
+  ]);
+
+  const applyInternationalPasteValue = useCallback((rawValue: string) => {
+    const nextValue = normalizePhoneValue(rawValue);
+    const nextCountry = detectPhoneCountry(nextValue, allowedCountries);
+    if (nextCountry === null) {
+      applyNationalEditingValue(rawValue, "paste");
+      return;
+    }
+    if (nextCountry !== effectiveCountry) {
+      if (!countryControlled) setInternalCountry(nextCountry);
+      onCountryChange?.(nextCountry, {
+        previousCountry: effectiveCountry,
+        source: "number"
+      });
+    }
+    emitValue(nextValue, nextCountry, "paste");
+  }, [
+    allowedCountries,
+    applyNationalEditingValue,
+    countryControlled,
+    effectiveCountry,
     emitValue,
-    internalCountry,
-    onCountryChange,
-    resolvedCountry
+    onCountryChange
   ]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    applyEditingValue(event.currentTarget.value, "input");
+    applyNationalEditingValue(event.currentTarget.value, "input");
   };
 
   const handlePaste = (event: ClipboardEvent<HTMLInputElement>) => {
     const pasted = event.clipboardData.getData("text");
     if (!pasted) return;
     event.preventDefault();
-    applyEditingValue(pasted, "paste");
+    if (pasted.trimStart().startsWith("+")) applyInternationalPasteValue(pasted);
+    else applyNationalEditingValue(pasted, "paste");
   };
 
   const handleCountryChange = (nextCountry: PhoneCountryCode) => {
-    const previousCountry = resolvedCountry;
+    const previousCountry = effectiveCountry;
     if (!countryControlled) setInternalCountry(nextCountry);
     onCountryChange?.(nextCountry, {
       previousCountry,
@@ -305,15 +334,19 @@ export const InternationalPhoneInput = forwardRef<
   };
 
   const handleClear = () => {
-    const previousCountry = resolvedCountry;
+    const previousCountry = effectiveCountry;
     const callingCode = previousCountry === null
       ? null
       : getCountryCallingCode(previousCountry);
     const nextValue = preserveCountryCallingCode && callingCode
       ? `+${callingCode}`
       : "";
-    emitValue(nextValue, resolvedCountry, "clear");
-    requestAnimationFrame(() => inputRef.current?.focus());
+    emitValue(nextValue, effectiveCountry, "clear");
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+      const caret = inputRef.current?.value.length ?? 0;
+      inputRef.current?.setSelectionRange(caret, caret);
+    });
   };
 
   const invalid = error != null || ariaInvalid === true || ariaInvalid === "true";
@@ -369,7 +402,7 @@ export const InternationalPhoneInput = forwardRef<
           startAdornment={(
             <CountryPicker
               countries={countryData}
-              country={resolvedCountry}
+              country={effectiveCountry}
               disabled={disabled || readOnly}
               fieldRef={shellRef}
               inputRef={inputRef}
@@ -401,8 +434,8 @@ export const InternationalPhoneInput = forwardRef<
             onChange={handleChange}
             onFocus={(event: FocusEvent<HTMLInputElement>) => {
               setFocused(true);
-              if (semanticValue === "" && resolvedCountry !== null) {
-                const callingCode = getCountryCallingCode(resolvedCountry);
+              if (semanticValue === "" && effectiveCountry !== null) {
+                const callingCode = getCountryCallingCode(effectiveCountry);
                 if (callingCode !== null) setDisplayValue(`+${callingCode}`);
               }
               onFocus?.(event);

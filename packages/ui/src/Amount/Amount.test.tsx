@@ -36,7 +36,7 @@ describe("Amount", () => {
         value={120}
       />
     );
-    expect(container.firstChild).toHaveTextContent("+1.20");
+    expect(container.firstChild).toHaveTextContent("+1,20");
     expect(container.firstChild).toHaveClass(
       "consumer-typography",
       styles.secondaryMinor,
@@ -51,7 +51,7 @@ describe("Amount", () => {
         <Amount data-testid="negative" value={-5} />
       </>
     );
-    expect(screen.getByTestId("zero")).toHaveTextContent("0.00");
-    expect(screen.getByTestId("negative")).toHaveTextContent("-0.05");
+    expect(screen.getByTestId("zero")).toHaveTextContent("0,00");
+    expect(screen.getByTestId("negative")).toHaveTextContent("-0,05");
   });
 });

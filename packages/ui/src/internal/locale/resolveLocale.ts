@@ -1,4 +1,4 @@
-export const DEFAULT_LOCALE = "en-US";
+export const DEFAULT_LOCALE = "ru-RU";
 
 /**
  * Shared locale boundary for UI foundations.

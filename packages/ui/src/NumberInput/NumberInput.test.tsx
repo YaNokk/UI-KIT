@@ -51,8 +51,8 @@ describe("NumberInput", () => {
     const input = screen.getByRole("spinbutton", { name: "Вес" });
     await user.click(input);
     await user.keyboard("{ArrowUp}");
-    expect(input).toHaveValue("0.3");
-    expect(onChange).toHaveBeenLastCalledWith(0.3, { inputValue: "0.3" });
+    expect(input).toHaveValue("0,3");
+    expect(onChange).toHaveBeenLastCalledWith(0.3, { inputValue: "0,3" });
   });
 
   it("shares the keyboard stepping path through typed composition actions", async () => {
@@ -77,12 +77,12 @@ describe("NumberInput", () => {
     );
     const input = screen.getByRole("spinbutton", { name: "Шаг" });
     await user.click(screen.getByRole("button", { name: "Увеличить" }));
-    expect(input).toHaveValue("0.3");
+    expect(input).toHaveValue("0,3");
     await user.click(input);
     await user.keyboard("{ArrowDown}");
-    expect(input).toHaveValue("0.2");
+    expect(input).toHaveValue("0,2");
     await user.click(screen.getByRole("button", { name: "Уменьшить" }));
-    expect(input).toHaveValue("0.1");
+    expect(input).toHaveValue("0,1");
   });
 
   it("keeps actions current across props and separate from the native ref", () => {
@@ -115,7 +115,7 @@ describe("NumberInput", () => {
       />,
     );
     act(() => actionsRef.current?.decrement());
-    expect(onChange).toHaveBeenLastCalledWith(4.5, { inputValue: "4.5" });
+    expect(onChange).toHaveBeenLastCalledWith(4.5, { inputValue: "4,5" });
 
     onChange.mockClear();
     rerender(
@@ -174,10 +174,10 @@ describe("NumberInput", () => {
       />,
     );
     const input = screen.getByRole("spinbutton", { name: "Точность" });
-    await user.type(input, "1.2");
-    expect(input).toHaveValue("1.2");
+    await user.type(input, "1,2");
+    expect(input).toHaveValue("1,2");
     await user.tab();
-    expect(input).toHaveValue("1.20");
+    expect(input).toHaveValue("1,20");
   });
 
   it("keeps aria-valuenow aligned when a controlled consumer rejects an update", async () => {

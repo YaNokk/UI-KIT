@@ -13,6 +13,7 @@ export interface PhoneCountry {
 }
 
 function displayName(locale: string, country: string): string {
+  if (locale.toLowerCase().startsWith("ru") && country === "US") return "США";
   try {
     const localized = new Intl.DisplayNames([locale], { type: "region" }).of(country);
     if (localized) return localized;

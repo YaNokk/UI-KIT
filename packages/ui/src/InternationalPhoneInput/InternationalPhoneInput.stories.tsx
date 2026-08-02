@@ -111,6 +111,11 @@ export const RuntimeLocales: Story = {
   )
 };
 
+export const ExplicitEnglishLocale: Story = {
+  args: { label: "Phone", locale: "en-US" },
+  render: (args) => <ControlledExample {...args} />
+};
+
 export const RuntimeBrands: Story = {
   render: (args) => (
     // eslint-disable-next-line design-system/no-design-literals -- Runtime brand stress fixture.
