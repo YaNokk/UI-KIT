@@ -125,9 +125,9 @@
 
 .indicator[data-kind="radio"][data-checked],
 .nativeInput:checked + .indicator[data-kind="radio"] {
-  color: var(--ds-action-primary-background);
+  color: var(--ds-control-selection-indicator);
   background-color: var(--ds-control-background);
-  border-color: var(--ds-action-primary-background);
+  border-color: var(--ds-control-selection-indicator);
 }
 
 .radioDot {
@@ -353,9 +353,9 @@
 
   .root:not([data-disabled]):hover .indicator[data-kind="radio"][data-checked],
   .root:not([data-disabled]):hover .nativeInput:checked + .indicator[data-kind="radio"] {
-    color: var(--ds-action-primary-background-hover);
+    color: var(--ds-control-selection-indicator-hover);
     background-color: var(--ds-control-background);
-    border-color: var(--ds-action-primary-background-hover);
+    border-color: var(--ds-control-selection-indicator-hover);
   }
 }
 
@@ -372,9 +372,9 @@
 
 .root:not([data-disabled]):active .indicator[data-kind="radio"][data-checked],
 .root:not([data-disabled]):active .nativeInput:checked + .indicator[data-kind="radio"] {
-  color: var(--ds-action-primary-background-active);
+  color: var(--ds-control-selection-indicator-active);
   background-color: var(--ds-control-background);
-  border-color: var(--ds-action-primary-background-active);
+  border-color: var(--ds-control-selection-indicator-active);
 }
 
 @media (forced-colors: active) {

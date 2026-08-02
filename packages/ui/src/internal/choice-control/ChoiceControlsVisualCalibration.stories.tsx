@@ -1,7 +1,7 @@
 /* eslint-disable design-system/no-design-literals -- Deliberate visual calibration fixtures and runtime-brand stress cases. */
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, within } from "storybook/test";
 import { Checkbox } from "../../Checkbox/Checkbox";
 import { CheckboxGroup } from "../../CheckboxGroup/CheckboxGroup";
 import { DesignSystemProvider } from "../../DesignSystemProvider/DesignSystemProvider";
@@ -28,6 +28,7 @@ const brands = [
   { brand: { accentColor: "#003366" }, name: "Dark navy" },
   { brand: { accentColor: "#7c3aed" }, name: "Purple" }
 ] as const;
+const brandModes = ["light", "dark"] as const;
 
 function CalibrationSection({ children, title }: { children: ReactNode; title: string }) {
   return (
@@ -85,24 +86,33 @@ function SemanticProbes() {
       <span data-control-border-hover-probe="" style={{ ...probeStyle, backgroundColor: "var(--ds-control-border-hover)" }} />
       <span data-primary-hover-probe="" style={{ ...probeStyle, backgroundColor: "var(--ds-action-primary-background-hover)" }} />
       <span data-primary-active-probe="" style={{ ...probeStyle, backgroundColor: "var(--ds-action-primary-background-active)" }} />
+      <span data-selection-indicator-probe="" style={{ ...probeStyle, backgroundColor: "var(--ds-control-selection-indicator)" }} />
+      <span data-selection-indicator-hover-probe="" style={{ ...probeStyle, backgroundColor: "var(--ds-control-selection-indicator-hover)" }} />
+      <span data-selection-indicator-active-probe="" style={{ ...probeStyle, backgroundColor: "var(--ds-control-selection-indicator-active)" }} />
     </span>
   );
 }
 
-function probeColor(canvasElement: HTMLElement, selector: string) {
-  const probe = canvasElement.querySelector(selector);
-  if (!(probe instanceof HTMLElement)) throw new Error(`Missing semantic probe: ${selector}`);
-  return getComputedStyle(probe).backgroundColor;
+function parseRgb(color: string) {
+  const channels = color.match(/[\d.]+/g)?.slice(0, 3).map(Number);
+  if (!channels || channels.length !== 3) throw new Error(`Unsupported computed color: ${color}`);
+  return channels;
 }
 
-function canAssertHoverColors(indicator: HTMLElement) {
-  return matchMedia("(hover: hover)").matches
-    && !matchMedia("(forced-colors: active)").matches
-    && indicator.parentElement?.matches(":hover") === true;
+function luminance(color: string) {
+  const channels = parseRgb(color).map((channel) => {
+    const value = channel / 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * (channels[0] ?? 0)
+    + 0.7152 * (channels[1] ?? 0)
+    + 0.0722 * (channels[2] ?? 0);
 }
 
-async function settleControlTransition() {
-  await new Promise((resolve) => setTimeout(resolve, 250));
+function contrast(first: string, second: string) {
+  const lighter = Math.max(luminance(first), luminance(second));
+  const darker = Math.min(luminance(first), luminance(second));
+  return (lighter + 0.05) / (darker + 0.05);
 }
 
 function expectThumbInset(track: HTMLElement, thumb: HTMLElement, edge: "start" | "end") {
@@ -198,23 +208,6 @@ export const CheckboxStateMatrix: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const hover = canvas.getByRole("checkbox", { name: "Hover target" });
-    await userEvent.hover(canvas.getByText("Hover target"));
-    await settleControlTransition();
-    const hoverIndicator = indicatorFor(hover);
-    if (canAssertHoverColors(hoverIndicator)) {
-      expect(getComputedStyle(hoverIndicator).borderColor).toBe(probeColor(canvasElement, "[data-control-border-hover-probe]"));
-    }
-    const checked = canvas.getByRole("checkbox", { name: "Checked" });
-    await userEvent.hover(canvas.getByText("Checked"));
-    await settleControlTransition();
-    const checkedIndicator = indicatorFor(checked);
-    if (canAssertHoverColors(checkedIndicator)) {
-      const checkedStyle = getComputedStyle(checkedIndicator);
-      const primaryHover = probeColor(canvasElement, "[data-primary-hover-probe]");
-      expect(checkedStyle.backgroundColor).toBe(primaryHover);
-      expect(checkedStyle.borderColor).toBe(primaryHover);
-    }
     const focused = canvas.getByRole("checkbox", { name: "Focus visible" });
     focused.focus();
     expect(getComputedStyle(indicatorFor(focused)).outlineStyle).toBe("solid");
@@ -291,20 +284,7 @@ export const RadioStateMatrix: Story = {
         </div>
       </CalibrationSection>
     </CalibrationPage>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const checked = canvas.getByRole("radio", { name: "Checked radio" });
-    await userEvent.hover(canvas.getByText("Checked radio"));
-    await settleControlTransition();
-    const indicator = indicatorFor(checked);
-    if (!canAssertHoverColors(indicator)) return;
-    const dot = indicator.firstElementChild;
-    if (!(dot instanceof HTMLElement)) throw new Error("Radio dot was not rendered.");
-    const primaryHover = probeColor(canvasElement, "[data-primary-hover-probe]");
-    expect(getComputedStyle(indicator).borderColor).toBe(primaryHover);
-    expect(getComputedStyle(dot).backgroundColor).toBe(primaryHover);
-  }
+  )
 };
 
 export const SwitchGeometry: Story = {
@@ -352,19 +332,7 @@ export const SwitchStateMatrix: Story = {
         </div>
       </CalibrationSection>
     </CalibrationPage>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const checked = canvas.getByRole("switch", { name: "On" });
-    await userEvent.hover(canvas.getByText("On"));
-    await settleControlTransition();
-    const indicator = indicatorFor(checked);
-    if (!canAssertHoverColors(indicator)) return;
-    const primaryHover = probeColor(canvasElement, "[data-primary-hover-probe]");
-    const indicatorStyle = getComputedStyle(indicator);
-    expect(indicatorStyle.backgroundColor).toBe(primaryHover);
-    expect(indicatorStyle.borderColor).toBe(primaryHover);
-  }
+  )
 };
 
 export const LabelAlignment: Story = {
@@ -441,19 +409,50 @@ export const PositionStartEnd: Story = {
 export const RuntimeBrandMatrix: Story = {
   render: () => (
     <CalibrationPage>
-      {brands.map((fixture) => (
-        <DesignSystemProvider {...("brand" in fixture ? { brand: fixture.brand } : {})} key={fixture.name}>
-          <CalibrationSection title={fixture.name}>
-            <div className="flex flex-wrap gap-4">
-              <Checkbox defaultChecked label="Checkbox" />
-              <Radio defaultChecked label="Radio" name={`brand-${fixture.name}`} />
-              <Switch defaultChecked label="Switch" position="start" />
-            </div>
-          </CalibrationSection>
-        </DesignSystemProvider>
-      ))}
+      {brandModes.flatMap((mode) => brands.map((fixture) => {
+        const fixtureName = `${fixture.name} ${mode}`;
+        return (
+          <DesignSystemProvider
+            {...("brand" in fixture ? { brand: fixture.brand } : {})}
+            key={fixtureName}
+            mode={mode}
+          >
+            <CalibrationSection title={fixtureName}>
+              <SemanticProbes />
+              <div className="flex flex-wrap gap-4">
+                <Checkbox defaultChecked label={`Checkbox ${fixtureName}`} />
+                <Radio defaultChecked label={`Radio ${fixtureName}`} name={`brand-${fixtureName}`} />
+                <Switch defaultChecked label={`Switch ${fixtureName}`} position="start" />
+              </div>
+            </CalibrationSection>
+          </DesignSystemProvider>
+        );
+      }))}
     </CalibrationPage>
-  )
+  ),
+  play: async ({ canvasElement }) => {
+    if (matchMedia("(forced-colors: active)").matches) return;
+    const canvas = within(canvasElement);
+    for (const mode of brandModes) {
+      for (const fixture of brands) {
+        const fixtureName = `${fixture.name} ${mode}`;
+        const radio = canvas.getByRole("radio", { name: `Radio ${fixtureName}` });
+        const indicator = indicatorFor(radio);
+        const dot = indicator.firstElementChild;
+        const section = indicator.closest("section");
+        const probe = section?.querySelector("[data-selection-indicator-probe]");
+        if (!(dot instanceof HTMLElement) || !(probe instanceof HTMLElement)) {
+          throw new Error(`Incomplete runtime-brand fixture: ${fixtureName}`);
+        }
+        const indicatorStyle = getComputedStyle(indicator);
+        const dotColor = getComputedStyle(dot).backgroundColor;
+        const selectionColor = getComputedStyle(probe).backgroundColor;
+        expect(indicatorStyle.borderColor).toBe(selectionColor);
+        expect(dotColor).toBe(selectionColor);
+        expect(contrast(selectionColor, indicatorStyle.backgroundColor)).toBeGreaterThanOrEqual(3);
+      }
+    }
+  }
 };
 
 export const DarkModeMatrix: Story = {
@@ -495,12 +494,21 @@ export const ForcedColorsMatrix: Story = {
   play: async ({ canvasElement }) => {
     if (!matchMedia("(forced-colors: active)").matches) return;
     const canvas = within(canvasElement);
-    for (const name of ["FC unchecked", "FC checked", "FC indeterminate", "FC radio", "FC switch off", "FC switch on"]) {
+    for (const name of ["FC unchecked", "FC checked", "FC indeterminate", "FC disabled", "FC radio", "FC switch off", "FC switch on"]) {
       const role = name.includes("radio") ? "radio" : name.includes("switch") ? "switch" : "checkbox";
       const indicator = indicatorFor(canvas.getByRole(role, { name }));
       expect(getComputedStyle(indicator).forcedColorAdjust).toBe("none");
       expect(getComputedStyle(indicator).borderWidth).not.toBe("0px");
     }
+    const disabled = indicatorFor(canvas.getByRole("checkbox", { name: "FC disabled" }));
+    expect(disabled.hasAttribute("data-disabled")).toBe(true);
+    const radio = canvas.getByRole("radio", { name: "FC radio" });
+    const radioIndicator = indicatorFor(radio);
+    const dot = radioIndicator.firstElementChild;
+    if (!(dot instanceof HTMLElement)) throw new Error("Forced-colors Radio dot was not rendered.");
+    expect(dot.getBoundingClientRect().width).toBeGreaterThan(0);
+    radio.focus();
+    expect(getComputedStyle(radioIndicator).outlineStyle).toBe("solid");
   }
 };
 

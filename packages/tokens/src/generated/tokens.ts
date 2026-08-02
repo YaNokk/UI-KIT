@@ -472,7 +472,10 @@ export const defaultBrandTokens = {
   "brand.actionBackground": "#0074e8",
   "brand.actionBackgroundHover": "#006bd5",
   "brand.actionBackgroundActive": "#0061c3",
-  "brand.actionForeground": "#ffffff"
+  "brand.actionForeground": "#ffffff",
+  "brand.selectionIndicator": "#0080ff",
+  "brand.selectionIndicatorHover": "#0076eb",
+  "brand.selectionIndicatorActive": "#006cd6"
 } as const;
 
 export const defaultDarkBrandTokens = {
@@ -491,7 +494,10 @@ export const defaultDarkBrandTokens = {
   "brand.actionBackground": "#0074e8",
   "brand.actionBackgroundHover": "#006bd5",
   "brand.actionBackgroundActive": "#0061c3",
-  "brand.actionForeground": "#ffffff"
+  "brand.actionForeground": "#ffffff",
+  "brand.selectionIndicator": "#0080ff",
+  "brand.selectionIndicatorHover": "#148aff",
+  "brand.selectionIndicatorActive": "#2994ff"
 } as const;
 
 export const lightSemanticTokens = {
@@ -538,6 +544,9 @@ export const lightSemanticTokens = {
   "control.borderHover": "{border.strong}",
   "control.borderFocus": "{brand.accent}",
   "control.borderError": "{color.red.600}",
+  "control.selectionIndicator": "{brand.selectionIndicator}",
+  "control.selectionIndicatorHover": "{brand.selectionIndicatorHover}",
+  "control.selectionIndicatorActive": "{brand.selectionIndicatorActive}",
   "control.text": "{text.primary}",
   "control.placeholder": "{text.placeholder}",
   "control.icon": "{icon.secondary}",
@@ -687,6 +696,9 @@ export const darkSemanticTokens = {
   "control.borderHover": "{border.strong}",
   "control.borderFocus": "{brand.accent}",
   "control.borderError": "{color.red.300}",
+  "control.selectionIndicator": "{brand.selectionIndicator}",
+  "control.selectionIndicatorHover": "{brand.selectionIndicatorHover}",
+  "control.selectionIndicatorActive": "{brand.selectionIndicatorActive}",
   "control.text": "{text.primary}",
   "control.placeholder": "{text.placeholder}",
   "control.icon": "{icon.secondary}",

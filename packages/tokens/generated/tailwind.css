@@ -43,6 +43,9 @@
   --color-control-border-hover: var(--ds-control-border-hover);
   --color-control-border-focus: var(--ds-control-border-focus);
   --color-control-border-error: var(--ds-control-border-error);
+  --color-control-selection-indicator: var(--ds-control-selection-indicator);
+  --color-control-selection-indicator-hover: var(--ds-control-selection-indicator-hover);
+  --color-control-selection-indicator-active: var(--ds-control-selection-indicator-active);
   --color-control-text: var(--ds-control-text);
   --color-control-placeholder: var(--ds-control-placeholder);
   --color-control-icon: var(--ds-control-icon);

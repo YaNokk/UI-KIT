@@ -15,6 +15,9 @@
     "actionBackground": { "$type": "color", "$value": "#0074e8" },
     "actionBackgroundHover": { "$type": "color", "$value": "#006bd5" },
     "actionBackgroundActive": { "$type": "color", "$value": "#0061c3" },
-    "actionForeground": { "$type": "color", "$value": "#ffffff" }
+    "actionForeground": { "$type": "color", "$value": "#ffffff" },
+    "selectionIndicator": { "$type": "color", "$value": "#0080ff" },
+    "selectionIndicatorHover": { "$type": "color", "$value": "#148aff" },
+    "selectionIndicatorActive": { "$type": "color", "$value": "#2994ff" }
   }
 }

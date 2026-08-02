@@ -48,6 +48,14 @@ describe("action token contract", () => {
   });
 });
 
+describe("selection indicator token contract", () => {
+  it.each(themes)("%s keeps checked outline semantics resolver-owned", (_, tokens) => {
+    expect(tokens["control.selectionIndicator"]).toBe("{brand.selectionIndicator}");
+    expect(tokens["control.selectionIndicatorHover"]).toBe("{brand.selectionIndicatorHover}");
+    expect(tokens["control.selectionIndicatorActive"]).toBe("{brand.selectionIndicatorActive}");
+  });
+});
+
 describe("icon token contract", () => {
   it("uses the Lucide-compatible geometry baseline", () => {
     expect(primitiveTokens["size.icon.sm"]).toEqual({ value: 16, unit: "px" });

@@ -69,6 +69,9 @@ brand.actionBackground
 brand.actionBackgroundHover
 brand.actionBackgroundActive
 brand.actionForeground
+brand.selectionIndicator
+brand.selectionIndicatorHover
+brand.selectionIndicatorActive
 ```
 
 `accentColor` is the identity seed and remains unchanged in `brand.accent`.
@@ -137,6 +140,13 @@ light-mode surfaces must not be reused unchanged in dark mode. The
 `actionBackground*` family is resolved independently from mode-neutral
 identity preservation and may only be consumed through semantic action
 aliases.
+
+`selectionIndicator*` is another resolver-owned family. It preserves the
+identity accent when that accent has at least 3:1 contrast against the current
+neutral control surface; otherwise the resolver moves it toward the
+mode-appropriate high-contrast endpoint. Hover and active values continue in
+the same direction. Components consume these values only through
+`control.selectionIndicator*`; they never modify backend colors locally.
 
 ## React boundary
 

@@ -22,6 +22,9 @@ export interface ResolvedBrand {
   actionBackgroundHover: string;
   actionBackgroundActive: string;
   actionForeground: string;
+  selectionIndicator: string;
+  selectionIndicatorHover: string;
+  selectionIndicatorActive: string;
 }
 
 export type BrandCssVariables = Record<`--ds-brand-${string}`, string>;
@@ -170,6 +173,13 @@ export function resolveBrand(input: BrandInput, mode: ThemeMode): ResolvedBrand 
   const focus = contrast(accent, modeSurface) >= MIN_FOCUS_CONTRAST
     ? accent
     : readableForeground(modeSurface);
+  const selectionEndpoint = bestContrastEndpoint(modeSurface);
+  const selectionIndicator = deriveAccessibleColor(
+    accent,
+    selectionEndpoint,
+    [modeSurface],
+    MIN_FOCUS_CONTRAST
+  );
 
   return {
     accent: toHex(accent),
@@ -187,7 +197,10 @@ export function resolveBrand(input: BrandInput, mode: ThemeMode): ResolvedBrand 
     actionBackground: toHex(actionBackground),
     actionBackgroundHover: toHex(interactiveShade(actionBackground, actionForeground, 0.08)),
     actionBackgroundActive: toHex(interactiveShade(actionBackground, actionForeground, 0.16)),
-    actionForeground: toHex(actionForeground)
+    actionForeground: toHex(actionForeground),
+    selectionIndicator: toHex(selectionIndicator),
+    selectionIndicatorHover: toHex(mix(selectionIndicator, selectionEndpoint, 0.08)),
+    selectionIndicatorActive: toHex(mix(selectionIndicator, selectionEndpoint, 0.16))
   };
 }
 
@@ -212,7 +225,10 @@ export function createBrandCssVariables(
     "--ds-brand-action-background": brand.actionBackground,
     "--ds-brand-action-background-hover": brand.actionBackgroundHover,
     "--ds-brand-action-background-active": brand.actionBackgroundActive,
-    "--ds-brand-action-foreground": brand.actionForeground
+    "--ds-brand-action-foreground": brand.actionForeground,
+    "--ds-brand-selection-indicator": brand.selectionIndicator,
+    "--ds-brand-selection-indicator-hover": brand.selectionIndicatorHover,
+    "--ds-brand-selection-indicator-active": brand.selectionIndicatorActive
   };
 }
 

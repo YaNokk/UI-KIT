@@ -172,6 +172,9 @@
     --ds-brand-action-background-hover: #006bd5;
     --ds-brand-action-background-active: #0061c3;
     --ds-brand-action-foreground: #ffffff;
+    --ds-brand-selection-indicator: #0080ff;
+    --ds-brand-selection-indicator-hover: #0076eb;
+    --ds-brand-selection-indicator-active: #006cd6;
   }
 
   :root, [data-theme="light"] {
@@ -219,6 +222,9 @@
     --ds-control-border-hover: var(--ds-border-strong);
     --ds-control-border-focus: var(--ds-brand-accent);
     --ds-control-border-error: var(--ds-color-red-600);
+    --ds-control-selection-indicator: var(--ds-brand-selection-indicator);
+    --ds-control-selection-indicator-hover: var(--ds-brand-selection-indicator-hover);
+    --ds-control-selection-indicator-active: var(--ds-brand-selection-indicator-active);
     --ds-control-text: var(--ds-text-primary);
     --ds-control-placeholder: var(--ds-text-placeholder);
     --ds-control-icon: var(--ds-icon-secondary);
@@ -342,6 +348,9 @@
     --ds-brand-action-background-hover: #006bd5;
     --ds-brand-action-background-active: #0061c3;
     --ds-brand-action-foreground: #ffffff;
+    --ds-brand-selection-indicator: #0080ff;
+    --ds-brand-selection-indicator-hover: #148aff;
+    --ds-brand-selection-indicator-active: #2994ff;
     --ds-background-page: var(--ds-color-neutral-950);
     --ds-background-surface: var(--ds-color-neutral-900);
     --ds-background-surface-raised: var(--ds-color-neutral-800);
@@ -385,6 +394,9 @@
     --ds-control-border-hover: var(--ds-border-strong);
     --ds-control-border-focus: var(--ds-brand-accent);
     --ds-control-border-error: var(--ds-color-red-300);
+    --ds-control-selection-indicator: var(--ds-brand-selection-indicator);
+    --ds-control-selection-indicator-hover: var(--ds-brand-selection-indicator-hover);
+    --ds-control-selection-indicator-active: var(--ds-brand-selection-indicator-active);
     --ds-control-text: var(--ds-text-primary);
     --ds-control-placeholder: var(--ds-text-placeholder);
     --ds-control-icon: var(--ds-icon-secondary);

@@ -22,6 +22,7 @@
     "choice-controls:storybook:execution-check": "node scripts/check-choice-control-storybook-execution.mjs",
     "choice-controls:storybook:execution-test": "node scripts/test-choice-control-storybook-execution.mjs",
     "choice-controls:storybook:verify": "npm run choice-controls:storybook:collection-check && npm run choice-controls:storybook:report && npm run choice-controls:storybook:execution-check",
+    "choice-controls:state-capture:test": "vitest --config vitest.choice-controls-state.config.ts --run",
     "typecheck": "tsc -p tsconfig.check.json --noEmit",
     "pack:check": "node scripts/verify-package.mjs",
     "consumer:test": "node scripts/test-consumer.mjs",

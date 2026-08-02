@@ -32,7 +32,7 @@ function contrast(first: string, second: string): number {
 }
 
 describe("resolveBrand", () => {
-  const stressAccents = ["#0080ff", "#16a34a", "#7c3aed", "#facc15", "#111827"];
+  const stressAccents = ["#0080ff", "#facc15", "#86efac", "#003366", "#7c3aed"];
   const modes: ThemeMode[] = ["light", "dark"];
 
   it.each(modes.flatMap((mode) => stressAccents.map((accentColor) => [mode, accentColor] as const)))(
@@ -53,6 +53,10 @@ describe("resolveBrand", () => {
       expect(contrast(brand.accentSoftHover, brand.accentContent)).toBeGreaterThanOrEqual(4.5);
       expect(contrast(brand.accentSoftActive, brand.accentContent)).toBeGreaterThanOrEqual(4.5);
       expect(brand.accentSoftForeground).toBe(brand.accentContent);
+      const controlSurface = mode === "dark" ? "#171b22" : "#ffffff";
+      expect(contrast(brand.selectionIndicator, controlSurface)).toBeGreaterThanOrEqual(3);
+      expect(contrast(brand.selectionIndicatorHover, controlSurface)).toBeGreaterThanOrEqual(3);
+      expect(contrast(brand.selectionIndicatorActive, controlSurface)).toBeGreaterThanOrEqual(3);
     }
   );
 

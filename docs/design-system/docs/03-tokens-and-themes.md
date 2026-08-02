@@ -121,6 +121,9 @@ control.border
 control.borderHover
 control.borderFocus
 control.borderError
+control.selectionIndicator
+control.selectionIndicatorHover
+control.selectionIndicatorActive
 control.text
 control.placeholder
 control.icon
@@ -217,6 +220,9 @@ brand.actionBackground
 brand.actionBackgroundHover
 brand.actionBackgroundActive
 brand.actionForeground
+brand.selectionIndicator
+brand.selectionIndicatorHover
+brand.selectionIndicatorActive
 ```
 
 `brand.accent` preserves the supplied identity color. Primary actions alias the
@@ -224,6 +230,13 @@ separate, contrast-safe `brand.action*` palette; soft actions alias the
 mode-aware `brand.accentSoft*` surfaces and `brand.accentContent`.
 Semantic navigation, selection and focus tokens may alias the appropriate
 identity roles.
+
+`brand.selectionIndicator*` is resolved against the mode-specific neutral
+control surface with at least 3:1 non-text contrast. Semantic
+`control.selectionIndicator*` aliases expose that reusable checked
+outline/dot/icon role without making components derive or darken backend
+colors locally. The role is brand- and mode-aware, does not vary by viewport,
+and is separate from filled-action contrast.
 
 Brand must not alter spacing, typography, radius, neutral surfaces, control sizes, success/warning/danger or breakpoints.
 
