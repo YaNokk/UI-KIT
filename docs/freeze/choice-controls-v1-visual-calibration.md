@@ -1,13 +1,20 @@
 # Choice Controls v1 — visual calibration report
 
-Status: v1.2 local visual-state gate completed; CI evidence is still required before visual freeze.
+Status: v1.3 CI visual-freeze gate implemented; CI verification pending; visual freeze is not declared.
 
 ## Verification identity
 
 - Visual calibration implementation commit: `9656c00d0c4c28311dc6e909d9ed6fb1a94c9266`.
-- Verified runtime commit: `9656c00d0c4c28311dc6e909d9ed6fb1a94c9266`.
-- Local verification timestamp: `2026-08-02T11:36:18+02:00`.
-- CI workflow run / artifact: not available. This report does not claim CI success.
+- Documentation baseline commit: `8330dc3fa376061420d98e5ccdda9c1d77792873`.
+- CI gate implementation and locally verified runtime commit: `db9594111aa721bd983649c7f922b106652693a6`.
+- Local verification timestamp: `2026-08-02T11:53:16+02:00`.
+- Workflow / job: `UI Tests` / `storybook-browser`.
+- Verified CI commit: pending.
+- Workflow run ID / URL: pending.
+- Job status: pending.
+- Artifact: pending run; configured as `choice-controls-storybook-${{ github.sha }}`.
+- Artifact retention: 30 days.
+- CI state-capture result: pending.
 - Previous visual-calibration baseline: `1e2ed0c768bcfa9bf36c4ca639988fc9e211904e`.
 
 No public props, native input semantics, component outer geometry, typography values, motion values, Select, MultiSelect or FieldShell contracts changed in v1.2.
@@ -95,7 +102,7 @@ Active capture:
 - compares them with `action.primary.backgroundActive` or `control.selectionIndicatorActive` probes;
 - awaits pointer release and requires `:active` to become false.
 
-No production test class or synthetic pseudo-state override was added. Focused result: 1 browser file, 2 tests passed.
+The current Vitest Playwright browser context exposes locator-level interactions but no stable direct `mouse.down()` / `mouse.up()` primitive. The test therefore keeps the verified `click({ delay: 600 })` timing window and asserts `:active` both before style capture and false after release. No production test class or synthetic pseudo-state override was added. Focused result: 1 browser file, 2 tests passed.
 
 ## Storybook and environment results
 
@@ -129,15 +136,27 @@ No production test class or synthetic pseudo-state override was added. Focused r
 | 100%/125% | Approved | Visual review and deterministic zoom assertions |
 | Responsive widths | Approved | 320/390/768/1440 no-clipping checks |
 
+## Canonical Choice Controls verification
+
+The single local and CI entry point is:
+
+```text
+npm run choice-controls:verify
+```
+
+It covers static collection protection, the 24-execution focused Storybook report, runtime identity verification, 14 negative execution fixtures and the two real Chromium hover/active captures.
+
+The `UI Tests / storybook-browser` workflow runs this command as a required step named with `${{ github.sha }}`. It has no `continue-on-error`. The existing SHA-qualified runtime evidence upload remains after this step, while full Storybook, build and package gates remain later in the same job; artifact upload alone therefore cannot establish a successful freeze gate.
+
 ## Local gates
 
-All required commands passed for implementation commit `9656c00d0c4c28311dc6e909d9ed6fb1a94c9266`:
+All required commands passed on the tree committed as `db9594111aa721bd983649c7f922b106652693a6`:
 
+- `npm ci` — 511 packages installed, 518 audited; known deprecation and audit warnings below
 - `npm run tokens:check`
 - `npm run typecheck`
 - `npm run test` — 41 files, 351 tests
-- `npm run choice-controls:state-capture:test` — 1 Chromium file, 2 real-state tests
-- `npm run choice-controls:storybook:verify` — 24 executions, 0 skipped, 0 failed
+- `npm run choice-controls:verify` — 24/24 focused executions, 14/14 negative fixtures, 2/2 `chromium-state-capture` tests
 - `npm run test:storybook` — 24 files, 270 tests across Chromium, forced colors and reduced motion
 - `npm run build-storybook`
 - `npm run build`
@@ -148,8 +167,14 @@ All required commands passed for implementation commit `9656c00d0c4c28311dc6e909
 - `npm run typography:check`
 - `npm run motion:check`
 
+Known non-fatal warnings: npm reported deprecations for `whatwg-encoding@3.1.1` and `glob@10.5.0` plus one high-severity audit finding; jsdom reported unsupported scroll/canvas/pseudo-element capabilities; Storybook reported unmatched optional story globs, ignored dependency `use client` directives and chunks above 500 kB; the UI build retained the existing empty `modal/index` and `system-color/index` chunks.
+
 ## Freeze decision
 
-Every visual matrix row is Approved and the implementation is locally eligible for freeze. The full visual freeze is **blocked with an explicit reason**: no CI workflow run or CI artifact exists yet for verified implementation commit `9656c00d0c4c28311dc6e909d9ed6fb1a94c9266`.
+Every visual matrix row is Approved and the implementation is locally eligible for freeze. The full visual freeze is **blocked with an explicit reason**: no successful `UI Tests / storybook-browser` run or uploaded runtime evidence artifact exists yet for CI gate commit `db9594111aa721bd983649c7f922b106652693a6`.
 
 Until that external evidence exists, this report does not declare the final freeze for `ChoiceControlLayout`, `ChoiceControlContent`, `ChoiceIndicator`, `Checkbox`, `CheckboxGroup`, `Radio`, `RadioGroup` or `Switch`.
+
+After the full job succeeds and the SHA-qualified artifact is available, the declaration may freeze their public APIs, native semantics, `sm`/`md` geometry, checked/indeterminate/on visuals, runtime-brand and selection-indicator mappings, hover/active/focus states, disabled behavior, error ownership, forced-colors behavior, LTR/RTL geometry and responsive wrapping. Any later change to those contracts requires a versioned corrective pass.
+
+The candidate freeze explicitly excludes MultiSelect ChoiceIndicator integration, InternationalPhoneInput, card choices, SwitchGroup, segmented controls, new variants and new sizes.

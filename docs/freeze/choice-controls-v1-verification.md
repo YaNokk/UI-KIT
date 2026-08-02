@@ -1,6 +1,6 @@
 # Choice Controls v1 verification
 
-Status: local behavioral and package verification complete; CI verification pending; ready for visual calibration.
+Status: local behavioral, state-capture and package verification complete; CI verification pending.
 
 Visual freeze is not declared by this document. Durable freeze governance remains blocked until the workflow succeeds for the committed verification infrastructure and uploads its evidence artifact.
 
@@ -10,8 +10,8 @@ Visual freeze is not declared by this document. Durable freeze governance remain
 | --- | --- |
 | Implementation base SHA | `fbe8fdfb37c1c2d9d96f76054954953f1ead9b3e` |
 | v1.5 infrastructure base SHA | `0ec9903b52546598187d1ca936a54f5ea73bb1f3` |
-| Verification infrastructure commit SHA | pending; v1.5 changes are not committed yet |
-| Verified runtime SHA | `0ec9903b52546598187d1ca936a54f5ea73bb1f3` |
+| Verification infrastructure commit SHA | `db9594111aa721bd983649c7f922b106652693a6` |
+| Verified runtime SHA | `db9594111aa721bd983649c7f922b106652693a6` |
 | Workflow | `UI Tests` |
 | Job | `storybook-browser` |
 | Workflow run URL / run ID | pending |
@@ -29,17 +29,26 @@ Runtime evidence is transient and ignored by Git:
 .artifacts/choice-controls-storybook-summary.json
 ```
 
-No current-HEAD summary is tracked. `npm run choice-controls:storybook:verify` regenerates both files, and the resulting files do not appear in `git status --short`.
+No current-HEAD summary is tracked. `npm run choice-controls:verify` regenerates both files, validates runtime execution, runs negative verifier fixtures and captures real hover/active states; the generated evidence does not appear in `git status --short`.
 
 The workflow uploads both paths with `actions/upload-artifact@v4`, `if: always()`, `if-no-files-found: error`, a SHA-qualified artifact name and 30-day retention. The upload step does not convert a failed execution check into success.
 
-## Local verification result
+## Canonical local verification
 
-The focused evidence was generated at `2026-08-02T01:40:02.577Z` by:
+Use one entry point for the complete focused Choice Controls gate:
 
 ```text
-npm run choice-controls:storybook:report
-npm run choice-controls:storybook:execution-check
+npm run choice-controls:verify
+```
+
+The lower-level Storybook and state-capture scripts remain implementation details for diagnosis. CI uses the canonical command as a required step tied to `${{ github.sha }}`.
+
+## Local verification result
+
+The focused evidence was generated at `2026-08-02T09:53:16.334Z` by:
+
+```text
+npm run choice-controls:verify
 ```
 
 Evidence identity:
@@ -76,12 +85,9 @@ The manifest is shared by the Storybook config, collection check, report generat
 | `npm ci` | passed; 511 packages installed, 518 audited |
 | `npm run tokens:check` | passed |
 | `npm run typecheck` | passed |
-| `npm run test` | passed; 41 files, 349/349 tests |
-| `npm run choice-controls:storybook:collection-check` | passed; 1 source file, 8 logical stories, 3 environments |
-| `npm run choice-controls:storybook:report` | passed; raw and normalized evidence generated under `.artifacts` |
-| `npm run choice-controls:storybook:execution-check` | passed; 24/24, 0 skipped, 0 failed |
-| `npm run choice-controls:storybook:execution-test` | passed; 14/14 negative fixtures |
-| `npm run test:storybook` | passed; 7 source files, 21 environment-file suites, 219/219 executions |
+| `npm run test` | passed; 41 files, 351/351 tests |
+| `npm run choice-controls:verify` | passed; 24/24 focused executions, 14/14 negative fixtures, 2/2 real Chromium state captures |
+| `npm run test:storybook` | passed; 24 environment-file suites, 270/270 tests |
 | `npm run build-storybook` | passed; output `storybook-static` |
 | `npm run build` | passed; tokens, UI and retail UI built |
 | `npm run pack:check` | passed; tokens, UI and retail UI tarballs verified |
@@ -96,7 +102,7 @@ The package correction adds the five already-declared Choice Control subpath ent
 
 ## CI verification result
 
-CI verification pending. No workflow run exists for the uncommitted v1.5 infrastructure, so this document does not claim CI success, artifact upload or formal durable freeze.
+CI verification pending. No workflow run exists yet for committed v1.3 gate infrastructure `db9594111aa721bd983649c7f922b106652693a6`, so this document does not claim CI success, artifact upload or formal durable freeze.
 
 After the workflow runs, record its run ID/URL, commit SHA, status and uploaded artifact identity in the Identity section. Formal freeze governance requires the `UI Tests / storybook-browser` job to pass and `choice-controls-storybook-<commit SHA>` to be available.
 
@@ -117,4 +123,4 @@ Local package verification complete.
 
 CI verification and runtime evidence upload pending.
 
-Ready for visual calibration. Visual freeze is not declared.
+Ready for CI visual-freeze verification. Visual freeze is not declared.
