@@ -14,12 +14,14 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run tokens:check
+      - run: npm run typecheck
+      - run: npm run test
+      - run: npm run lint
       - run: npm run motion:check
       - run: npx playwright install --with-deps chromium
-      - run: npm run choice-controls:storybook:collection-check
-      - run: npm run choice-controls:storybook:report
-      - run: npm run choice-controls:storybook:execution-check
-      - run: npm run choice-controls:storybook:execution-test
+      - name: Run Choice Controls verification for ${{ github.sha }}
+        run: npm run choice-controls:verify
       - name: Upload Choice Controls Storybook evidence
         if: always()
         uses: actions/upload-artifact@v4

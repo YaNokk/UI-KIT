@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  darkSemanticTokens,
   defaultBrandTokens,
-  defaultDarkBrandTokens
+  defaultDarkBrandTokens,
+  lightSemanticTokens,
+  primitiveTokens
 } from "./generated/tokens";
 import { resolveBrand, type ThemeMode } from "./runtime-brand";
 
@@ -31,6 +34,18 @@ function contrast(first: string, second: string): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+function resolveSemanticColor(
+  path: string,
+  semanticTokens: Readonly<Record<string, unknown>>
+): string {
+  const source: Readonly<Record<string, unknown>> = { ...primitiveTokens, ...semanticTokens };
+  const value = source[path];
+
+  if (typeof value !== "string") throw new TypeError(`Expected a color token at ${path}.`);
+  const alias = /^\{(.+)\}$/.exec(value);
+  return alias?.[1] ? resolveSemanticColor(alias[1], semanticTokens) : value;
+}
+
 describe("resolveBrand", () => {
   const stressAccents = ["#0080ff", "#facc15", "#86efac", "#003366", "#7c3aed"];
   const modes: ThemeMode[] = ["light", "dark"];
@@ -53,7 +68,8 @@ describe("resolveBrand", () => {
       expect(contrast(brand.accentSoftHover, brand.accentContent)).toBeGreaterThanOrEqual(4.5);
       expect(contrast(brand.accentSoftActive, brand.accentContent)).toBeGreaterThanOrEqual(4.5);
       expect(brand.accentSoftForeground).toBe(brand.accentContent);
-      const controlSurface = mode === "dark" ? "#171b22" : "#ffffff";
+      const semanticTokens = mode === "dark" ? darkSemanticTokens : lightSemanticTokens;
+      const controlSurface = resolveSemanticColor("control.background", semanticTokens);
       expect(contrast(brand.selectionIndicator, controlSurface)).toBeGreaterThanOrEqual(3);
       expect(contrast(brand.selectionIndicatorHover, controlSurface)).toBeGreaterThanOrEqual(3);
       expect(contrast(brand.selectionIndicatorActive, controlSurface)).toBeGreaterThanOrEqual(3);
