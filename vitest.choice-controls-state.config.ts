@@ -17,6 +17,7 @@ export default defineConfig({
   test: {
     browser: {
       enabled: true,
+      api: { host: "127.0.0.1" },
       headless: true,
       instances: [{ browser: "chromium", name: "chromium-state-capture" }],
       provider: "playwright"

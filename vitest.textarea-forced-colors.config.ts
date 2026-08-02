@@ -76,6 +76,7 @@ export default defineConfig({
     include: [storyPath],
     browser: {
       enabled: true,
+      api: { host: "127.0.0.1" },
       provider: "playwright",
       headless: true,
       instances: [
