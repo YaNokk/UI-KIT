@@ -59,6 +59,9 @@ export default defineConfig({
         "Input/index": fileURLToPath(
           new URL("./src/Input/index.ts", import.meta.url)
         ),
+        "InternationalPhoneInput/index": fileURLToPath(
+          new URL("./src/InternationalPhoneInput/index.ts", import.meta.url)
+        ),
         "Link/index": fileURLToPath(
           new URL("./src/Link/index.ts", import.meta.url)
         ),
@@ -115,6 +118,8 @@ export default defineConfig({
         || id === "react/jsx-runtime"
         || id === "@maskito/core"
         || id === "@maskito/kit"
+        || id === "@maskito/phone"
+        || id.startsWith("libphonenumber-js")
         || id === "@mypoint/tokens"
         || id === "@radix-ui/react-dialog"
         || id === "lucide-react"

@@ -47,6 +47,9 @@ const storybookCsfTransform: Plugin = {
       && !normalizedId.includes(
         "/packages/ui/src/internal/choice-control/ChoiceControlsVisualCalibration.stories.tsx"
       )
+      && !normalizedId.includes(
+        "/packages/ui/src/InternationalPhoneInput/InternationalPhoneInputBrowserRegression.stories.tsx"
+      )
     ) {
       return undefined;
     }
@@ -64,7 +67,8 @@ const storybookCsfTransform: Plugin = {
         "../../../packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/single-line-control-typography/SingleLineControlTypography.stories.tsx",
         "../../../packages/ui/src/internal/choice-control/ChoiceControlBrowserRegression.stories.tsx",
-        "../../../packages/ui/src/internal/choice-control/ChoiceControlsVisualCalibration.stories.tsx"
+        "../../../packages/ui/src/internal/choice-control/ChoiceControlsVisualCalibration.stories.tsx",
+        "../../../packages/ui/src/InternationalPhoneInput/InternationalPhoneInputBrowserRegression.stories.tsx"
       ],
       tagsFilter: { include: ["test"], exclude: [], skip: [] }
     });
@@ -127,7 +131,8 @@ export default defineConfig({
       "packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx",
       "packages/ui/src/internal/single-line-control-typography/SingleLineControlTypography.stories.tsx",
       "packages/ui/src/internal/choice-control/ChoiceControlBrowserRegression.stories.tsx",
-      "packages/ui/src/internal/choice-control/ChoiceControlsVisualCalibration.stories.tsx"
+      "packages/ui/src/internal/choice-control/ChoiceControlsVisualCalibration.stories.tsx",
+      "packages/ui/src/InternationalPhoneInput/InternationalPhoneInputBrowserRegression.stories.tsx"
     ],
     browser: {
       enabled: true,

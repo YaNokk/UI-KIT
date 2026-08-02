@@ -113,6 +113,18 @@ if (
   throw new Error("Amount or retail-ui survived the NumberInput-only build.");
 }
 
+runBuild("tree-international-phone-input", "dist-tree-international-phone-input");
+const phoneInputJavaScript = readOutput("dist-tree-international-phone-input", ".js");
+if (
+  !phoneInputJavaScript.includes("Tree-shaken international phone")
+  || !phoneInputJavaScript.includes("listbox")
+) {
+  throw new Error("InternationalPhoneInput or its country picker was not found.");
+}
+if (phoneInputJavaScript.includes("data-amount-part")) {
+  throw new Error("Amount survived the InternationalPhoneInput-only build.");
+}
+
 runBuild("tree-quantity-input", "dist-tree-quantity-input");
 const quantityInputJavaScript = readOutput("dist-tree-quantity-input", ".js");
 if (

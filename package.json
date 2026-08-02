@@ -25,6 +25,7 @@
     "choice-controls:state-capture:test": "vitest --config vitest.choice-controls-state.config.ts --run",
     "select:state-capture:test": "vitest --config vitest.select-state.config.ts --run",
     "select-multiselect:verify": "npm run select:state-capture:test && npm run test:storybook -- packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx",
+    "international-phone-input:verify": "vitest run packages/ui/src/internal/phone packages/ui/src/InternationalPhoneInput",
     "choice-controls:verify": "npm run choice-controls:storybook:verify && npm run choice-controls:storybook:execution-test && npm run choice-controls:state-capture:test",
     "typecheck": "tsc -p tsconfig.check.json --noEmit",
     "pack:check": "node scripts/verify-package.mjs",

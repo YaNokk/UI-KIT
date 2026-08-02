@@ -80,6 +80,14 @@ export type {
   InputProps,
   InputSize
 } from "./Input/index.js";
+export { InternationalPhoneInput } from "./InternationalPhoneInput/index.js";
+export type {
+  InternationalPhoneInputProps,
+  PhoneCountryChangeMeta,
+  PhoneCountryCode,
+  PhoneValueChangeMeta,
+  PhoneValueChangeSource
+} from "./InternationalPhoneInput/index.js";
 export { Link, LinkButton } from "./Link/index.js";
 export type {
   LinkAppearance,

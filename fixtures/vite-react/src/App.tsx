@@ -6,6 +6,7 @@ import { ButtonLink } from "@mypoint/ui/button-link";
 import { Checkbox } from "@mypoint/ui/checkbox";
 import { CheckboxGroup } from "@mypoint/ui/checkbox-group";
 import { IconButton } from "@mypoint/ui/icon-button";
+import { InternationalPhoneInput } from "@mypoint/ui/international-phone-input";
 import { Spinner } from "@mypoint/ui/spinner";
 import { StatusIndicator } from "@mypoint/ui/status-indicator";
 import { Tag } from "@mypoint/ui/tag";
@@ -57,6 +58,7 @@ export function App() {
         value={123456}
       />
       <NumberInput aria-label="Number" value={1.25} />
+      <InternationalPhoneInput defaultCountry="PL" label="Phone" />
       <QuantityInput
         aria-label="Quantity"
         decreaseLabel="Decrease quantity"

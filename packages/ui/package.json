@@ -75,6 +75,10 @@
       "types": "./dist/Input/index.d.ts",
       "import": "./dist/Input/index.js"
     },
+    "./international-phone-input": {
+      "types": "./dist/InternationalPhoneInput/index.d.ts",
+      "import": "./dist/InternationalPhoneInput/index.js"
+    },
     "./link": {
       "types": "./dist/Link/index.d.ts",
       "import": "./dist/Link/index.js"
@@ -160,8 +164,10 @@
     "@floating-ui/react": "0.27.20",
     "@maskito/core": "^4.0.1",
     "@maskito/kit": "^4.0.1",
+    "@maskito/phone": "^4.0.1",
     "@mypoint/tokens": "^0.1.0",
     "@radix-ui/react-dialog": "1.1.23",
+    "libphonenumber-js": "^1.13.10",
     "lucide-react": "^1.27.0",
     "virtua": "^0.41.5"
   }

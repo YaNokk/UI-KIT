@@ -1,0 +1,118 @@
+.input {
+  appearance: none;
+  box-sizing: border-box;
+  display: block;
+  flex: 1 1 auto;
+  inline-size: 100%;
+  block-size: 100%;
+  min-inline-size: 0;
+  margin: var(--ds-space-0);
+  padding-block: var(--ds-space-0);
+  padding-inline-end: var(--field-control-padding-inline-end);
+  padding-inline-start: var(--field-control-padding-inline-start);
+  color: inherit;
+  font: inherit;
+  text-overflow: ellipsis;
+  cursor: text;
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+.input::placeholder {
+  color: var(--ds-control-placeholder);
+  opacity: 1;
+}
+
+.input:disabled {
+  color: var(--ds-text-disabled);
+  cursor: not-allowed;
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+}
+
+.clearButton {
+  --icon-button-icon-size: var(--field-icon-size);
+}
+
+.countryTrigger {
+  appearance: none;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-1);
+  min-inline-size: var(--ds-size-control-sm);
+  block-size: var(--ds-size-control-sm);
+  margin: var(--ds-space-0);
+  padding: var(--ds-space-0);
+  color: var(--ds-control-icon);
+  background: transparent;
+  border: 0;
+  border-radius: var(--ds-radius-md);
+  cursor: pointer;
+}
+
+.countryTrigger:focus-visible {
+  outline: var(--ds-focus-ring-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-ring-width);
+}
+
+.countryTrigger:disabled {
+  color: var(--ds-icon-disabled);
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .countryTrigger:not(:disabled):hover {
+    background: var(--ds-background-interactive-hover);
+  }
+}
+
+.countryTrigger > svg,
+.chevron {
+  inline-size: var(--ds-size-icon-sm);
+  block-size: var(--ds-size-icon-sm);
+  stroke-width: var(--ds-icon-stroke-default);
+}
+
+.flag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--ds-size-icon-md);
+  block-size: var(--ds-size-icon-sm);
+  overflow: hidden;
+  font: var(--ds-typography-body-lg);
+  white-space: nowrap;
+}
+
+.chevron {
+  transition: transform var(--ds-motion-control-state-duration)
+    var(--ds-motion-control-state-easing);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.countryPanel {
+  max-block-size: calc(var(--ds-size-control-lg) * 8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .countryTrigger:focus-visible {
+    outline-color: Highlight;
+  }
+}

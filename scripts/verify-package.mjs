@@ -51,6 +51,8 @@ const packages = [
       "dist/IconButton/index.d.ts",
       "dist/Input/index.js",
       "dist/Input/index.d.ts",
+      "dist/InternationalPhoneInput/index.js",
+      "dist/InternationalPhoneInput/index.d.ts",
       "dist/NumberInput/index.js",
       "dist/NumberInput/index.d.ts",
       "dist/PasswordInput/index.js",
