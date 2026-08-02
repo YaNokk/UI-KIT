@@ -3,8 +3,10 @@
 Select and MultiSelect resolve selection visuals exclusively through the
 runtime semantic token graph. A selected row uses `background.selected` and
 the soft-action foreground; selected hover and active states use the matching
-soft-action state roles. The checked MultiSelect indicator uses the primary
-action background and foreground. Disabled presentation always wins over
+soft-action state roles. MultiSelect reuses the private frozen checkbox-kind
+`ChoiceIndicator`; its checked visual therefore uses the primary action
+background and foreground, while its visual-only DOM remains `aria-hidden`
+inside the owning `role="option"`. Disabled presentation always wins over
 brand selection presentation.
 
 MultiSelect chips use the same soft-action foreground/background family plus
@@ -22,7 +24,8 @@ the complete localized selection summary remains exposed to assistive
 technology even when visible chips overflow or the small inner-label variant
 uses a compact count.
 
-The checkbox marker and selected chip remain private foundations in v1. Their
-DOM and token contracts are deliberately isolated in SelectListbox and
-MultiSelect styles so they can be extracted later only after a second generic
-use case and Storybook review prove a public API.
+The option indicator depends on the private Choice Control foundation and does
+not own selection, input semantics, focus or events. MultiSelect maps `sm` to
+the frozen 20 px indicator and `md`/`lg` to the frozen 24 px indicator. The
+selected chip remains a private MultiSelect foundation; neither primitive is
+promoted to a public API by this integration.

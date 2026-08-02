@@ -26,3 +26,10 @@
 .blockHost {
   inline-size: min(100%, 480px);
 }
+
+.primaryColorProbe {
+  position: absolute;
+  inline-size: var(--ds-space-1);
+  block-size: var(--ds-space-1);
+  background: var(--ds-action-primary-background);
+}

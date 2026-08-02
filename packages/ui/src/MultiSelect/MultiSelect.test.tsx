@@ -106,6 +106,54 @@ describe("MultiSelect", () => {
     expect(onChange).toHaveBeenCalledWith(["b"]);
   });
 
+  it("keeps the private ChoiceIndicator visual-only and toggles through its option once", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <ControlledMulti
+        items={baseItems}
+        onChange={onChange}
+        size="sm"
+        value={["a"]}
+      />
+    );
+
+    await user.click(screen.getByRole("button", { name: /Теги/ }));
+    const options = await screen.findAllByRole("option");
+    expect(screen.getByRole("listbox")).toHaveAttribute("aria-multiselectable", "true");
+
+    for (const option of options) {
+      const indicator = option.querySelector<HTMLElement>(
+        ':scope > [data-kind="checkbox"]'
+      );
+      expect(indicator).not.toBeNull();
+      expect(indicator).toHaveAttribute("aria-hidden", "true");
+      expect(indicator).not.toHaveAttribute("role");
+      expect(indicator).not.toHaveAttribute("tabindex");
+      expect(indicator?.querySelector("input, button, [role=checkbox], [tabindex]"))
+        .toBeNull();
+    }
+
+    const alpha = screen.getByRole("option", { name: "Альфа" });
+    const alphaIndicator = alpha.querySelector<HTMLElement>(
+      ':scope > [data-kind="checkbox"]'
+    );
+    if (!alphaIndicator) throw new Error("MultiSelect ChoiceIndicator was not rendered.");
+    expect(alpha).toHaveAttribute("aria-selected", "true");
+    expect(alphaIndicator).toHaveAttribute("data-checked");
+
+    await user.click(alphaIndicator);
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenLastCalledWith([]);
+    expect(alpha).toHaveAttribute("aria-selected", "false");
+    expect(alphaIndicator).not.toHaveAttribute("data-checked");
+
+    const disabled = screen.getByRole("option", { name: "Гамма" });
+    expect(disabled).toHaveAttribute("aria-disabled", "true");
+    expect(disabled.querySelector(':scope > [data-kind="checkbox"]'))
+      .toHaveAttribute("data-disabled");
+  });
+
   it("renders selected tags in the closed trigger", async () => {
     const { container } = render(<ControlledMulti items={baseItems} value={["a", "b"]} />);
     const trigger = screen.getByRole("button", { name: /Теги/ });

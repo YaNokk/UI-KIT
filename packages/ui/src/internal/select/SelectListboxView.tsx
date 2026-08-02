@@ -12,7 +12,9 @@ import {
 import { VList, type VListHandle } from "virtua";
 import { Button } from "../../Button/Button";
 import { Spinner } from "../../Spinner/Spinner";
+import type { ChoiceControlSize } from "../../shared/choiceControl";
 import { classNames } from "../../shared/classNames";
+import { ChoiceIndicator } from "../choice-control/ChoiceControl";
 import { choiceControlLabelClassName } from "../single-line-control-typography/singleLineControlTypography";
 import type {
   SelectActionRow,
@@ -32,6 +34,7 @@ export interface SelectListboxViewProps<Value extends string> {
   statusMessage: ReactNode;
   onRetry: (() => void) | undefined;
   multiple: boolean;
+  choiceIndicatorSize?: ChoiceControlSize;
   activeRowId: string | null;
   selectedValues: ReadonlySet<Value>;
   messages: SelectMessages;
@@ -84,6 +87,7 @@ function SelectListboxViewInner<Value extends string>(
     statusMessage,
     onRetry,
     multiple,
+    choiceIndicatorSize = "md",
     activeRowId,
     selectedValues,
     messages,
@@ -199,15 +203,13 @@ function SelectListboxViewInner<Value extends string>(
 
     const selected = selectedValues.has(row.option.value);
     const marker = multiple ? (
-      <span
-        aria-hidden="true"
-        className={classNames(
-          styles.checkboxMarker,
-          selected && styles.checkboxMarkerChecked
-        )}
-      >
-        {selected ? <Check /> : null}
-      </span>
+      <ChoiceIndicator
+        checked={selected}
+        className={styles.choiceIndicator}
+        disabled={row.disabled}
+        kind="checkbox"
+        size={choiceIndicatorSize}
+      />
     ) : (
       <span
         aria-hidden="true"
@@ -226,6 +228,7 @@ function SelectListboxViewInner<Value extends string>(
         aria-selected={selected}
         className={classNames(
           styles.row,
+          multiple && styles.multipleRow,
           active && styles.active,
           selected && styles.selected,
           row.disabled && styles.disabledRow

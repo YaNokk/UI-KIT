@@ -430,6 +430,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
     >
       <SelectListboxView<Value>
         activeRowId={state.activeRow?.rowId ?? null}
+        choiceIndicatorSize={size === "sm" ? "sm" : "md"}
         listboxId={listboxId}
         messages={messages}
         multiple

@@ -74,6 +74,16 @@
   user-select: none;
 }
 
+.multipleRow {
+  align-items: flex-start;
+}
+
+.multipleRow .label,
+.multipleRow .description {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
 @media (hover: hover) {
   .row:not(.disabledRow, .selected):hover {
     background: var(--ds-background-interactive-hover);
@@ -125,27 +135,24 @@
   block-size: var(--ds-size-icon-md);
 }
 
-.checkboxMarker {
-  display: inline-flex;
+.choiceIndicator {
   flex: none;
-  align-items: center;
-  justify-content: center;
-  inline-size: var(--ds-size-icon-md);
-  block-size: var(--ds-size-icon-md);
-  color: var(--ds-icon-accent);
-  border: var(--ds-border-width-default) solid var(--ds-border-strong);
-  border-radius: var(--ds-radius-sm);
 }
 
-.checkboxMarkerChecked {
-  color: var(--ds-action-primary-foreground);
-  background: var(--ds-action-primary-background);
-  border-color: var(--ds-action-primary-background);
+@media (hover: hover) {
+  .multipleRow:not(.disabledRow):hover .choiceIndicator:not([data-checked]) {
+    border-color: var(--ds-control-border-hover);
+  }
+
+  .multipleRow:not(.disabledRow):hover .choiceIndicator[data-checked] {
+    background-color: var(--ds-action-primary-background-hover);
+    border-color: var(--ds-action-primary-background-hover);
+  }
 }
 
-.checkboxMarker > svg {
-  inline-size: var(--ds-size-icon-sm);
-  block-size: var(--ds-size-icon-sm);
+.multipleRow:not(.disabledRow):active .choiceIndicator[data-checked] {
+  background-color: var(--ds-action-primary-background-active);
+  border-color: var(--ds-action-primary-background-active);
 }
 
 .leading {

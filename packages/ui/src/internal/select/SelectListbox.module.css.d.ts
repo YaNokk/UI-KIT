@@ -6,12 +6,12 @@ declare const styles: {
   readonly refreshing: string;
   readonly groupHeader: string;
   readonly row: string;
+  readonly multipleRow: string;
   readonly active: string;
   readonly selected: string;
   readonly selectedMarker: string;
   readonly selectedMarkerVisible: string;
-  readonly checkboxMarker: string;
-  readonly checkboxMarkerChecked: string;
+  readonly choiceIndicator: string;
   readonly leading: string;
   readonly body: string;
   readonly label: string;

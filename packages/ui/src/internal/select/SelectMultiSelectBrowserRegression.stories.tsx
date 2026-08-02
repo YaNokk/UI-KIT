@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { User } from "lucide-react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { Dialog } from "../../Dialog/Dialog";
+import { DesignSystemProvider } from "../../DesignSystemProvider/DesignSystemProvider";
 import { Input } from "../../Input/Input";
 import { MultiSelect } from "../../MultiSelect/MultiSelect";
 import { Select } from "../../Select/Select";
@@ -644,6 +645,138 @@ function FieldValueTypographyFixture() {
       ))}
     </div>
   );
+}
+
+const indicatorItems: SelectCollectionItem[] = [
+  {
+    value: "alpha",
+    label: "Альфа",
+    description: "Описание выбранного варианта",
+    textValue: "Альфа"
+  },
+  {
+    value: "beta",
+    label: "Бета",
+    description: "Описание невыбранного варианта",
+    textValue: "Бета"
+  },
+  {
+    value: "disabled",
+    label: "Недоступный вариант",
+    textValue: "Недоступный вариант",
+    disabled: true
+  },
+  {
+    value: "long",
+    label: "Очень длинный вариант, который переносится и сохраняет выравнивание индикатора по первой строке",
+    textValue: "Очень длинный вариант"
+  },
+  {
+    type: "action",
+    id: "create-indicator-item",
+    label: "Создать вариант",
+    textValue: "Создать вариант",
+    onSelect: () => undefined
+  }
+];
+
+function MultiSelectChoiceIndicatorFixture({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
+  const [value, setValue] = useState<string[]>(["alpha", "disabled"]);
+  const [changes, setChanges] = useState(0);
+  return (
+    <div className={styles.width320}>
+      <MultiSelect
+        block
+        items={indicatorItems}
+        label={`ChoiceIndicator ${size}`}
+        onChange={(nextValue) => {
+          setChanges((count) => count + 1);
+          setValue(nextValue);
+        }}
+        open
+        size={size}
+        value={value}
+      />
+      <output aria-label="ChoiceIndicator changes">{changes}</output>
+    </div>
+  );
+}
+
+function MultiSelectChoiceIndicatorSizeFixture() {
+  const [size, setSize] = useState<"sm" | "md" | "lg">("sm");
+  return (
+    <div className={styles.stack}>
+      <button
+        onClick={() => setSize((current) => current === "sm" ? "md" : current === "md" ? "lg" : "sm")}
+        type="button"
+      >
+        Toggle indicator size
+      </button>
+      <MultiSelectChoiceIndicatorFixture size={size} />
+    </div>
+  );
+}
+
+// eslint-disable-next-line design-system/no-design-literals -- Deliberate runtime-brand contrast fixtures.
+const integrationBrands = ["#0080ff", "#facc15", "#86efac", "#003366", "#7c3aed"] as const;
+
+function MultiSelectChoiceIndicatorBrandFixture() {
+  const [brandIndex, setBrandIndex] = useState(0);
+  const [mode, setMode] = useState<"light" | "dark">("light");
+  const accentColor = integrationBrands[brandIndex] ?? integrationBrands[0];
+  return (
+    <DesignSystemProvider brand={{ accentColor }} mode={mode}>
+      <div className={styles.stack}>
+        <button
+          onClick={() => setBrandIndex((index) => (index + 1) % integrationBrands.length)}
+          type="button"
+        >Next integration brand</button>
+        <button onClick={() => setMode((value) => value === "light" ? "dark" : "light")} type="button">
+          Toggle integration mode
+        </button>
+        <output aria-label="Integration brand state">{`${brandIndex}:${mode}`}</output>
+        <span aria-hidden="true" className={styles.primaryColorProbe} data-primary-color-probe="" />
+        <MultiSelectChoiceIndicatorFixture />
+      </div>
+    </DesignSystemProvider>
+  );
+}
+
+function VirtualMultiSelectChoiceIndicatorFixture() {
+  const [value, setValue] = useState<string[]>(["virtual-0"]);
+  return (
+    <MultiSelect
+      block
+      items={virtualItems}
+      label="Virtual ChoiceIndicator MultiSelect"
+      onChange={setValue}
+      open
+      searchable
+      value={value}
+    />
+  );
+}
+
+function choiceIndicatorFor(option: HTMLElement): HTMLElement {
+  const indicator = option.querySelector<HTMLElement>(
+    ':scope > [data-kind="checkbox"][aria-hidden="true"]'
+  );
+  if (!indicator) throw new Error("MultiSelect ChoiceIndicator was not rendered.");
+  return indicator;
+}
+
+function expectChoiceIndicatorGeometry(indicator: HTMLElement, size: number) {
+  const indicatorRect = indicator.getBoundingClientRect();
+  expect(indicatorRect.width).toBe(size);
+  expect(indicatorRect.height).toBe(size);
+  const mark = indicator.querySelector("svg");
+  if (!(mark instanceof SVGElement)) throw new Error("ChoiceIndicator checkmark was not rendered.");
+  if (getComputedStyle(mark).display === "none") return;
+  const markRect = mark.getBoundingClientRect();
+  expect(markRect.left).toBeGreaterThanOrEqual(indicatorRect.left);
+  expect(markRect.top).toBeGreaterThanOrEqual(indicatorRect.top);
+  expect(markRect.right).toBeLessThanOrEqual(indicatorRect.right);
+  expect(markRect.bottom).toBeLessThanOrEqual(indicatorRect.bottom);
 }
 
 function resolveVisualHitTarget(target: HTMLElement, trigger: HTMLElement) {
@@ -1462,6 +1595,180 @@ export const SheetMultiSelectInternalFocus: Story = {
   }
 };
 
+export const MultiSelectChoiceIndicatorIntegration: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "tablet" } },
+  render: () => <MultiSelectChoiceIndicatorFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const listbox = await body.findByRole("listbox");
+    await expect(listbox).toHaveAttribute("aria-multiselectable", "true");
+    const options = body.getAllByRole("option");
+    await expect(options).toHaveLength(4);
+    for (const option of options) {
+      const indicator = choiceIndicatorFor(option);
+      await expect(indicator).toHaveAttribute("aria-hidden", "true");
+      await expect(indicator).not.toHaveAttribute("role");
+      await expect(indicator).not.toHaveAttribute("tabindex");
+      expect(indicator.querySelector("input, button, [role=checkbox], [tabindex]"))
+        .toBeNull();
+      expectChoiceIndicatorGeometry(indicator, 24);
+    }
+    expect(listbox.querySelector("input, [role=checkbox]"))
+      .toBeNull();
+
+    const alpha = body.getByRole("option", { name: /^Альфа/ });
+    const beta = body.getByRole("option", { name: /^Бета/ });
+    const disabled = body.getByRole("option", { name: "Недоступный вариант" });
+    const long = body.getByRole("option", { name: /Очень длинный вариант/ });
+    const alphaIndicator = choiceIndicatorFor(alpha);
+    const betaIndicator = choiceIndicatorFor(beta);
+    const disabledIndicator = choiceIndicatorFor(disabled);
+    await expect(alpha).toHaveAttribute("aria-selected", "true");
+    await expect(alphaIndicator).toHaveAttribute("data-checked");
+    await expect(beta).toHaveAttribute("aria-selected", "false");
+    await expect(betaIndicator).not.toHaveAttribute("data-checked");
+    await expect(disabled).toHaveAttribute("aria-disabled", "true");
+    await expect(disabledIndicator).toHaveAttribute("data-disabled");
+    await expect(disabledIndicator).toHaveAttribute("data-checked");
+
+    const alphaHeight = alpha.getBoundingClientRect().height;
+    const betaHeight = beta.getBoundingClientRect().height;
+    expect(Math.abs(alphaHeight - betaHeight)).toBeLessThanOrEqual(0.5);
+    const longLabel = long.querySelector<HTMLElement>("[data-choice-control-label]");
+    if (!longLabel) throw new Error("Long option label was not rendered.");
+    expect(getComputedStyle(longLabel.closest("span") ?? longLabel).whiteSpace).toBe("normal");
+    expect(Math.abs(
+      choiceIndicatorFor(long).getBoundingClientRect().top
+      - longLabel.getBoundingClientRect().top
+    )).toBeLessThanOrEqual(1);
+
+    const action = body.getByRole("button", { name: "Создать вариант" });
+    expect(action.querySelector('[data-kind="checkbox"]')).toBeNull();
+
+    await userEvent.click(alphaIndicator);
+    await expect(canvas.getByLabelText("ChoiceIndicator changes")).toHaveTextContent("1");
+    await expect(alpha).toHaveAttribute("aria-selected", "false");
+    await expect(alphaIndicator).not.toHaveAttribute("data-checked");
+    expect(alpha.getBoundingClientRect().height).toBe(alphaHeight);
+
+    await userEvent.hover(beta);
+    listbox.focus();
+    await userEvent.keyboard(" ");
+    await expect(canvas.getByLabelText("ChoiceIndicator changes")).toHaveTextContent("2");
+    await expect(beta).toHaveAttribute("aria-selected", "true");
+    await expect(betaIndicator).toHaveAttribute("data-checked");
+
+    if (matchMedia("(forced-colors: active)").matches) {
+      expect(getComputedStyle(betaIndicator).forcedColorAdjust).toBe("none");
+      expect(getComputedStyle(betaIndicator).borderWidth).not.toBe("0px");
+    }
+  }
+};
+
+export const MultiSelectChoiceIndicatorSizes: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <MultiSelectChoiceIndicatorSizeFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const expectedSizes = [20, 24, 24];
+    for (let index = 0; index < expectedSizes.length; index += 1) {
+      const alpha = await body.findByRole("option", { name: /^Альфа/ });
+      expectChoiceIndicatorGeometry(choiceIndicatorFor(alpha), expectedSizes[index] ?? 24);
+      if (index < expectedSizes.length - 1) {
+        await userEvent.click(canvas.getByRole("button", { name: "Toggle indicator size" }));
+        await waitFor(() => {
+          expect(choiceIndicatorFor(body.getByRole("option", { name: /^Альфа/ }))
+            .getBoundingClientRect().width).toBe(expectedSizes[index + 1]);
+        });
+      }
+    }
+    canvasElement.style.zoom = "1.25";
+    expectChoiceIndicatorGeometry(
+      choiceIndicatorFor(body.getByRole("option", { name: /^Альфа/ })),
+      30
+    );
+    canvasElement.style.zoom = "";
+  }
+};
+
+export const MultiSelectChoiceIndicatorRuntimeBrands: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <MultiSelectChoiceIndicatorBrandFixture />,
+  play: async ({ canvasElement }) => {
+    if (matchMedia("(forced-colors: active)").matches) return;
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const assertSemanticColor = async (brandIndex: number, mode: "light" | "dark") => {
+      await waitFor(() => expect(canvas.getByLabelText("Integration brand state"))
+        .toHaveTextContent(`${brandIndex}:${mode}`));
+      const indicator = choiceIndicatorFor(await body.findByRole("option", { name: /^Альфа/ }));
+      const probe = canvasElement.querySelector<HTMLElement>("[data-primary-color-probe]");
+      if (!probe) throw new Error("Primary semantic color probe was not rendered.");
+      await waitFor(() => {
+        expect(getComputedStyle(indicator).backgroundColor)
+          .toBe(getComputedStyle(probe).backgroundColor);
+      });
+    };
+
+    for (let index = 0; index < integrationBrands.length; index += 1) {
+      await assertSemanticColor(index, "light");
+      await userEvent.click(canvas.getByRole("button", { name: "Next integration brand" }));
+    }
+    await userEvent.click(canvas.getByRole("button", { name: "Toggle integration mode" }));
+    for (let index = 0; index < integrationBrands.length; index += 1) {
+      await assertSemanticColor(index, "dark");
+      await userEvent.click(canvas.getByRole("button", { name: "Next integration brand" }));
+    }
+  }
+};
+
+export const MultiSelectChoiceIndicatorBottomSheet: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "mobile" } },
+  render: () => <MultiSelectChoiceIndicatorFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    await expect(await body.findByRole("dialog")).toHaveAttribute(
+      "data-modal-kind",
+      "bottom-sheet"
+    );
+    const listbox = body.getByRole("listbox");
+    await expect(listbox).toHaveAttribute("aria-multiselectable", "true");
+    const alpha = body.getByRole("option", { name: /^Альфа/ });
+    const indicator = choiceIndicatorFor(alpha);
+    expectChoiceIndicatorGeometry(indicator, 24);
+    await userEvent.click(indicator);
+    await expect(canvas.getByLabelText("ChoiceIndicator changes")).toHaveTextContent("1");
+    await expect(alpha).toHaveAttribute("aria-selected", "false");
+  }
+};
+
+export const VirtualizedMultiSelectChoiceIndicator: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <VirtualMultiSelectChoiceIndicatorFixture />,
+  play: async ({ canvasElement }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const listbox = await body.findByRole("listbox");
+    await expect(listbox).toHaveAttribute("data-select-virtualized");
+    const mountedOptions = body.getAllByRole("option");
+    expect(mountedOptions.length).toBeGreaterThan(0);
+    for (const option of mountedOptions) choiceIndicatorFor(option);
+    const first = body.getByRole("option", { name: "Виртуальный вариант 1" });
+    const indicator = choiceIndicatorFor(first);
+    await expect(first).toHaveAttribute("aria-selected", "true");
+    await userEvent.click(indicator);
+    await expect(first).toHaveAttribute("aria-selected", "false");
+    expectChoiceIndicatorGeometry(indicator, 24);
+  }
+};
+
 export const GroupedLargeSelectSemantics: Story = {
   args: {} as never,
   parameters: { viewport: { defaultViewport: "desktop" } },
@@ -1488,8 +1795,16 @@ export const GroupedLargeMultiSelectSemantics: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Grouped MultiSelect" }));
     const listbox = await body.findByRole("listbox");
     await expect(listbox).not.toHaveAttribute("data-select-virtualized");
-    await expect(within(listbox).getAllByRole("group")).toHaveLength(6);
+    const groups = within(listbox).getAllByRole("group");
+    await expect(groups).toHaveLength(6);
     await expect(listbox).toHaveAttribute("data-select-scroll-owner", "listbox");
+    const firstOption = within(listbox).getByRole("option", { name: "Вариант 1.1" });
+    const indicator = choiceIndicatorFor(firstOption);
+    await expect(firstOption).toHaveAttribute("aria-selected", "false");
+    await expect(groups[0]?.firstElementChild?.querySelector('[data-kind="checkbox"]')).toBeNull();
+    await userEvent.click(indicator);
+    await expect(firstOption).toHaveAttribute("aria-selected", "true");
+    await expect(choiceIndicatorFor(firstOption)).toHaveAttribute("data-checked");
   }
 };
 
