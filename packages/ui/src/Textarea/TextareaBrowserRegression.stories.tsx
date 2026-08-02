@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { Textarea } from "./Textarea";
 
 const meta = {
@@ -102,7 +102,39 @@ export const AutosizeGrowthAndControlledRecalculation: Story = {
     await expect(grownHeight).toBeGreaterThan(initialHeight);
     await expect(grownHeight).toBeLessThanOrEqual(maxHeight);
     await expect(computed.overflowY).toBe("auto");
-    await expect(textarea.selectionStart).toBe(textarea.value.length);
+  }
+};
+
+export const CaretPreservedDuringResizeOnlyMeasurement: Story = {
+  args: {} as never,
+  render: () => (
+    <div data-testid="caret-resize-container" style={{ maxWidth: "100%", width: 512 }}>
+      <Textarea
+        aria-label="Resize-only caret"
+        autoSize
+        defaultValue="Длинное содержимое проверяет перенос строк при изменении ширины без изменения самого значения. Позиция выделения должна оставаться стабильной во время повторного измерения высоты."
+        maxRows={8}
+        minRows={2}
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const container = canvas.getByTestId("caret-resize-container");
+    const textarea = canvas.getByRole("textbox", {
+      name: "Resize-only caret"
+    }) as HTMLTextAreaElement;
+    textarea.focus();
+    textarea.setSelectionRange(7, 18);
+    const initialHeight = textarea.getBoundingClientRect().height;
+
+    container.style.width = "256px";
+    await waitFor(() => {
+      expect(textarea.getBoundingClientRect().height).toBeGreaterThan(initialHeight);
+    });
+    await expect(textarea).toHaveFocus();
+    await expect(textarea.selectionStart).toBe(7);
+    await expect(textarea.selectionEnd).toBe(18);
   }
 };
 
@@ -135,7 +167,7 @@ export const NarrowCounterAndResize: Story = {
   }
 };
 
-export const ForcedColorsAndRtl: Story = {
+export const Rtl: Story = {
   args: {} as never,
   render: () => (
     <div dir="rtl" style={{ maxWidth: 480 }}>
@@ -151,5 +183,37 @@ export const ForcedColorsAndRtl: Story = {
     const textarea = within(canvasElement).getByRole("textbox", { name: "תיאור" });
     await expect(getComputedStyle(textarea).direction).toBe("rtl");
     await expect(textarea).toHaveAttribute("data-label-view", "inner");
+  }
+};
+
+export const ForcedColors: Story = {
+  args: {} as never,
+  render: () => (
+    <Textarea
+      defaultValue="Текст остаётся читаемым в системной цветовой схеме"
+      error="Системный контраст сохраняется"
+      label="Forced colors textarea"
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const textarea = canvas.getByRole("textbox", {
+      name: "Forced colors textarea"
+    }) as HTMLTextAreaElement;
+    const shell = textarea.closest<HTMLElement>("[data-multiline]");
+    if (!shell) throw new Error("Multiline FieldShell was not rendered.");
+
+    textarea.focus();
+    await expect(textarea.getBoundingClientRect().width).toBeGreaterThan(0);
+    await expect(textarea.getBoundingClientRect().height).toBeGreaterThan(0);
+    await expect(getComputedStyle(textarea).visibility).not.toBe("hidden");
+    await expect(textarea.value.length).toBeGreaterThan(0);
+    await expect(Number.parseFloat(getComputedStyle(shell).outlineWidth))
+      .toBeGreaterThan(0);
+
+    if (window.matchMedia("(forced-colors: active)").matches) {
+      await expect(getComputedStyle(shell).borderStyle).not.toBe("none");
+      await expect(getComputedStyle(textarea).forcedColorAdjust).not.toBe("none");
+    }
   }
 };

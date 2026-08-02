@@ -2,7 +2,10 @@ import type { StorybookConfig } from "@storybook/react-vite";
 import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath } from "node:url";
 import { mergeConfig } from "vite";
-import { workspaceAliases } from "../../../vitest.workspace-aliases";
+import {
+  workspaceAliases,
+  workspaceTokenCssAliases,
+} from "../../../vitest.workspace-aliases";
 
 const config: StorybookConfig = {
   stories: [
@@ -28,12 +31,7 @@ const config: StorybookConfig = {
       resolve: {
         alias: [
           ...workspaceAliases,
-          {
-            find: /^@mypoint\/tokens\/tokens\.css$/,
-            replacement: fileURLToPath(
-              new URL("../../../packages/tokens/generated/tokens.css", import.meta.url)
-            )
-          },
+          ...workspaceTokenCssAliases,
           {
             find: /^@mypoint\/ui$/,
             replacement: fileURLToPath(

@@ -4,6 +4,7 @@ import {
   type FocusEvent,
   type ReactNode,
   type TextareaHTMLAttributes,
+  useCallback,
   useRef,
   useState
 } from "react";
@@ -12,6 +13,7 @@ import { FormControl } from "../FormControl/FormControl";
 import { classNames } from "../shared/classNames";
 import type { FieldLabelView, FieldSize } from "../shared/field";
 import styles from "./Textarea.module.css";
+import { useNativeFormReset } from "./useNativeFormReset";
 import { useTextareaAutosize } from "./useTextareaAutosize";
 
 export type TextareaSize = FieldSize;
@@ -107,6 +109,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       minRows: resolvedMinRows,
       value: currentValue
     });
+    const handleNativeReset = useCallback((nextValue: string) => {
+      setUncontrolledValue(nextValue);
+      if (autoSize) queueMicrotask(measure);
+    }, [autoSize, measure]);
+    useNativeFormReset(textareaRef, value === undefined, handleNativeReset);
 
     const setTextareaRef = (node: HTMLTextAreaElement | null) => {
       textareaRef.current = node;

@@ -2,7 +2,7 @@
 
 import "@testing-library/jest-dom/vitest";
 import { useState } from "react";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axe from "axe-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -148,7 +148,99 @@ describe("Textarea", () => {
     expect(screen.getByText("3 / 20")).toBeInTheDocument();
   });
 
-  it("autosizes between row bounds and preserves selection", () => {
+  it("synchronizes count and a non-empty inner label after native form reset", async () => {
+    const user = userEvent.setup();
+    const initialValue = "Начальное";
+    render(
+      <form>
+        <Textarea
+          defaultValue={initialValue}
+          label="Описание"
+          labelView="inner"
+          showCount
+        />
+        <button type="reset">Сбросить</button>
+      </form>
+    );
+    const textarea = screen.getByRole("textbox", { name: "Описание" });
+    const shell = textarea.closest("[data-multiline]");
+
+    await user.clear(textarea);
+    await user.type(textarea, "Изменено");
+    expect(screen.getByText(String("Изменено".length))).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Сбросить" }));
+
+    await waitFor(() => expect(textarea).toHaveValue(initialValue));
+    expect(screen.getByText(String(initialValue.length))).toBeInTheDocument();
+    expect(shell).toHaveAttribute("data-label-floated");
+  });
+
+  it("clears count and inner-label presentation when reset restores an empty default", async () => {
+    const user = userEvent.setup();
+    render(
+      <form>
+        <Textarea
+          defaultValue=""
+          label="Пустое описание"
+          labelView="inner"
+          showCount
+        />
+        <button type="reset">Очистить</button>
+      </form>
+    );
+    const textarea = screen.getByRole("textbox", { name: "Пустое описание" });
+    const shell = textarea.closest("[data-multiline]");
+
+    await user.type(textarea, "Текст");
+    expect(shell).toHaveAttribute("data-label-floated");
+    await user.click(screen.getByRole("button", { name: "Очистить" }));
+
+    await waitFor(() => expect(textarea).toHaveValue(""));
+    expect(screen.getByText("0")).toBeInTheDocument();
+    expect(shell).not.toHaveAttribute("data-label-floated");
+  });
+
+  it("remeasures autosize after native form reset", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(window, "getComputedStyle").mockReturnValue({
+      borderBlockEndWidth: "0px",
+      borderBlockStartWidth: "0px",
+      lineHeight: "20px",
+      paddingBlockEnd: "12px",
+      paddingBlockStart: "12px"
+    } as CSSStyleDeclaration);
+    render(
+      <form>
+        <Textarea
+          aria-label="Reset autosize"
+          autoSize
+          defaultValue="Коротко"
+          maxRows={3}
+          minRows={2}
+        />
+        <button type="reset">Сбросить размер</button>
+      </form>
+    );
+    const textarea = screen.getByLabelText("Reset autosize") as HTMLTextAreaElement;
+    Object.defineProperty(textarea, "scrollHeight", {
+      configurable: true,
+      get: () => textarea.value.includes("\n") ? 120 : 20
+    });
+
+    fireEvent.change(textarea, {
+      target: { value: "Первая\nВторая\nТретья\nЧетвертая" }
+    });
+    await waitFor(() => expect(textarea.style.height).toBe("84px"));
+    expect(textarea.style.overflowY).toBe("auto");
+
+    const resetButton = screen.getByText("Сбросить размер", { selector: "button" });
+    await user.click(resetButton);
+    await waitFor(() => expect(textarea).toHaveValue("Коротко"));
+    await waitFor(() => expect(textarea.style.height).toBe("64px"));
+    expect(textarea.style.overflowY).toBe("hidden");
+  });
+
+  it("autosizes between row bounds and preserves selection during resize-only measurement", () => {
     vi.spyOn(window, "getComputedStyle").mockReturnValue({
       borderBlockEndWidth: "0px",
       borderBlockStartWidth: "0px",

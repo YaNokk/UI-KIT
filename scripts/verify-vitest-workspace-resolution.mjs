@@ -7,6 +7,7 @@ const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const expectedTokenSource = path.normalize(
   path.join(repositoryRoot, "packages/tokens/src/index.ts"),
 );
+const tokenCssSubpaths = ["tokens.css", "responsive.css", "tailwind.css"];
 const importer = path.join(
   repositoryRoot,
   "packages/ui/src/internal/select/useSelectPresentation.ts",
@@ -34,12 +35,28 @@ for (const configFile of configFiles) {
     `${configFile} must resolve @mypoint/tokens from workspace source`,
   );
 
-  const tokenCss = await resolve("@mypoint/tokens/tokens.css", importer);
-  assert.notEqual(
-    path.normalize(tokenCss ?? ""),
-    expectedTokenSource,
-    `${configFile} must not redirect token CSS subpaths to the JavaScript entry`,
-  );
+  for (const cssSubpath of tokenCssSubpaths) {
+    const tokenCss = await resolve(`@mypoint/tokens/${cssSubpath}`, importer);
+    assert.ok(
+      tokenCss,
+      `${configFile} must resolve @mypoint/tokens/${cssSubpath}`,
+    );
+
+    const normalizedTokenCss = path.normalize(tokenCss);
+    const expectedTokenCss = path.normalize(
+      path.join(repositoryRoot, `packages/tokens/generated/${cssSubpath}`),
+    );
+    assert.notEqual(
+      normalizedTokenCss,
+      expectedTokenSource,
+      `${configFile} must not redirect ${cssSubpath} to the JavaScript entry`,
+    );
+    assert.equal(
+      normalizedTokenCss,
+      expectedTokenCss,
+      `${configFile} must resolve ${cssSubpath} from generated token CSS`,
+    );
+  }
 }
 
 console.log(

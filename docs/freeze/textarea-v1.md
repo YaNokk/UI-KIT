@@ -23,6 +23,10 @@ Status: **candidate — not frozen**
 - `showCount` presents the current UTF-16 string length and optional
   `maxLength`. It is supporting description, does not replace native maxlength
   behavior and does not create validation errors.
+- Uncontrolled presentation state follows native form reset semantics:
+  `form.reset()` restores the textarea's current native `defaultValue`, then
+  synchronizes the counter, inner-label state and autosize measurement.
+  Controlled Textarea remains owned by its `value` prop.
 - Horizontal/both-axis resize, rich text, markdown, mentions, toolbars,
   validation timing and arbitrary public pixel heights are excluded.
 
@@ -41,9 +45,13 @@ preservation during measurement and accessibility.
 
 Focused real-browser stories verify native DOM, focus/error ownership,
 multiline inner-label geometry, autosize growth and maximum, controlled
-external recalculation, narrow wrapping, stable counter geometry, vertical
-resize and RTL. Package checks require the subpath; consumer and tree-shaking
-fixtures exercise it independently.
+external recalculation, resize-only caret preservation, narrow wrapping,
+stable counter geometry, vertical resize and RTL. Forced-colors evidence is a
+separate story and is exercised by the dedicated Chromium instance configured
+with `forcedColors: "active"`; it is not inferred from RTL. Package checks
+require the subpath; consumer and tree-shaking fixtures exercise it
+independently.
 
 Freeze remains blocked until `textarea:verify` and the complete repository
-workflow pass on one exact commit SHA.
+workflow pass on one exact commit SHA. This decision is independent from the
+InternationalPhoneInput candidate and cannot authorize its freeze.

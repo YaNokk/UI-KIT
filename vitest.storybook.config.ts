@@ -7,7 +7,10 @@ import { vitestTransform } from "storybook/internal/csf-tools";
 import type { Plugin } from "vite";
 import { defineConfig } from "vitest/config";
 import { expectedEnvironmentNames } from "./scripts/choice-control-storybook-manifest.mjs";
-import { workspaceAliases } from "./vitest.workspace-aliases";
+import {
+  workspaceAliases,
+  workspaceTokenCssAliases,
+} from "./vitest.workspace-aliases";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const storybookConfigDir = path.join(dirname, "apps/storybook/.storybook-test");
@@ -105,12 +108,7 @@ export default defineConfig({
   resolve: {
     alias: [
       ...workspaceAliases,
-      {
-        find: /^@mypoint\/tokens\/tokens\.css$/,
-        replacement: fileURLToPath(
-          new URL("./packages/tokens/generated/tokens.css", import.meta.url)
-        )
-      },
+      ...workspaceTokenCssAliases,
       {
         find: /^@mypoint\/ui$/,
         replacement: fileURLToPath(

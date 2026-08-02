@@ -1,6 +1,9 @@
 import { fileURLToPath } from "node:url";
 import { configDefaults, defineConfig } from "vitest/config";
-import { workspaceAliases } from "./vitest.workspace-aliases";
+import {
+  workspaceAliases,
+  workspaceTokenCssAliases,
+} from "./vitest.workspace-aliases";
 
 export default defineConfig({
   test: {
@@ -12,12 +15,7 @@ export default defineConfig({
   resolve: {
     alias: [
       ...workspaceAliases,
-      {
-        find: /^@mypoint\/tokens\/tokens\.css$/,
-        replacement: fileURLToPath(
-          new URL("./packages/tokens/generated/tokens.css", import.meta.url),
-        ),
-      },
+      ...workspaceTokenCssAliases,
       {
         find: /^@mypoint\/ui\/select$/,
         replacement: fileURLToPath(
