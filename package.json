@@ -20,6 +20,7 @@
     "choice-controls:storybook:collection-check": "node scripts/check-choice-control-storybook-collection.mjs",
     "choice-controls:storybook:report": "node scripts/run-choice-control-storybook-report.mjs",
     "choice-controls:storybook:execution-check": "node scripts/check-choice-control-storybook-execution.mjs",
+    "choice-controls:storybook:execution-test": "node scripts/test-choice-control-storybook-execution.mjs",
     "choice-controls:storybook:verify": "npm run choice-controls:storybook:collection-check && npm run choice-controls:storybook:report && npm run choice-controls:storybook:execution-check",
     "typecheck": "tsc -p tsconfig.check.json --noEmit",
     "pack:check": "node scripts/verify-package.mjs",

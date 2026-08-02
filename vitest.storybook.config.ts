@@ -6,6 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { vitestTransform } from "storybook/internal/csf-tools";
 import type { Plugin } from "vite";
 import { defineConfig } from "vitest/config";
+import { expectedEnvironmentNames } from "./scripts/choice-control-storybook-manifest.mjs";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const storybookConfigDir = path.join(dirname, "apps/storybook/.storybook-test");
@@ -130,17 +131,17 @@ export default defineConfig({
       instances: [
         {
           browser: "chromium",
-          name: "chromium"
+          name: expectedEnvironmentNames[0]
         },
         {
           browser: "chromium",
           context: { forcedColors: "active" },
-          name: "chromium-forced-colors"
+          name: expectedEnvironmentNames[1]
         },
         {
           browser: "chromium",
           context: { reducedMotion: "reduce" },
-          name: "chromium-reduced-motion"
+          name: expectedEnvironmentNames[2]
         }
       ]
     },

@@ -35,6 +35,12 @@ export default defineConfig({
         "ButtonLink/index": fileURLToPath(
           new URL("./src/ButtonLink/index.ts", import.meta.url)
         ),
+        "Checkbox/index": fileURLToPath(
+          new URL("./src/Checkbox/index.ts", import.meta.url)
+        ),
+        "CheckboxGroup/index": fileURLToPath(
+          new URL("./src/CheckboxGroup/index.ts", import.meta.url)
+        ),
         "BottomSheet/index": fileURLToPath(
           new URL("./src/BottomSheet/index.ts", import.meta.url)
         ),
@@ -65,6 +71,12 @@ export default defineConfig({
         "PasswordInput/index": fileURLToPath(
           new URL("./src/PasswordInput/index.ts", import.meta.url)
         ),
+        "Radio/index": fileURLToPath(
+          new URL("./src/Radio/index.ts", import.meta.url)
+        ),
+        "RadioGroup/index": fileURLToPath(
+          new URL("./src/RadioGroup/index.ts", import.meta.url)
+        ),
         "Select/index": fileURLToPath(
           new URL("./src/Select/index.ts", import.meta.url)
         ),
@@ -79,6 +91,9 @@ export default defineConfig({
         ),
         "StatusIndicator/index": fileURLToPath(
           new URL("./src/StatusIndicator/index.ts", import.meta.url)
+        ),
+        "Switch/index": fileURLToPath(
+          new URL("./src/Switch/index.ts", import.meta.url)
         ),
         "system-color/index": fileURLToPath(
           new URL("./src/system-color/index.ts", import.meta.url)

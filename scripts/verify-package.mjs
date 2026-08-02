@@ -19,10 +19,6 @@ const packages = [
     required: [
       "dist/index.js",
       "dist/index.d.ts",
-      "dist/Amount/index.js",
-      "dist/Amount/index.d.ts",
-      "dist/AmountInput/index.js",
-      "dist/AmountInput/index.d.ts",
       "dist/responsive.css",
       "dist/tokens.css",
       "dist/tailwind.css"
@@ -33,6 +29,10 @@ const packages = [
     required: [
       "dist/index.js",
       "dist/index.d.ts",
+      "dist/Amount/index.js",
+      "dist/Amount/index.d.ts",
+      "dist/AmountInput/index.js",
+      "dist/AmountInput/index.d.ts",
       "dist/Badge/index.js",
       "dist/Badge/index.d.ts",
       "dist/Button/index.js",

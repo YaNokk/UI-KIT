@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { createRoot } from "react-dom/client";
 import {
   canStepNumber,
   NumberInput,
@@ -6,7 +7,7 @@ import {
 } from "@mypoint/ui";
 import "@mypoint/ui/styles.css";
 
-export function TreeNumberInput() {
+function TreeNumberInput() {
   const actionsRef = useRef<NumberInputActions | null>(null);
   const canIncrement = canStepNumber({
     direction: 1,
@@ -25,3 +26,7 @@ export function TreeNumberInput() {
     />
   );
 }
+
+const root = document.createElement("div");
+document.body.append(root);
+createRoot(root).render(<TreeNumberInput />);

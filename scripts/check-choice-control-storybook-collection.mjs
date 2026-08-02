@@ -1,11 +1,17 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import {
+  allExpectedStories,
+  correctiveStories,
+  expectedEnvironmentNames,
+  storyFile
+} from "./choice-control-storybook-manifest.mjs";
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const configPath = resolve(repositoryRoot, "vitest.storybook.config.ts");
 const storyPath = resolve(
   repositoryRoot,
-  "packages/ui/src/internal/choice-control/ChoiceControlBrowserRegression.stories.tsx"
+  storyFile
 );
 
 const expectedConfigEntries = [
@@ -21,14 +27,6 @@ const expectedConfigEntries = [
     label: "Storybook browser include list",
     value: '"packages/ui/src/internal/choice-control/ChoiceControlBrowserRegression.stories.tsx"'
   }
-];
-
-const correctiveStories = [
-  "RadioDescriptionAssociation",
-  "SwitchBrandForeground",
-  "GroupInvalidOwnership",
-  "StandaloneFormSubmission",
-  "UncontrolledIndicatorStates"
 ];
 
 function countExact(source, value) {
@@ -60,7 +58,7 @@ assertExactCount(
 );
 assertExactCount(story, 'tags: ["test"]', 1, "Choice Control story test tag");
 
-for (const storyName of correctiveStories) {
+for (const storyName of allExpectedStories) {
   assertExactCount(
     story,
     `export const ${storyName}: Story =`,
@@ -69,7 +67,24 @@ for (const storyName of correctiveStories) {
   );
 }
 
+assertExactCount(
+  config,
+  'import { expectedEnvironmentNames } from "./scripts/choice-control-storybook-manifest.mjs";',
+  1,
+  "Shared environment manifest import"
+);
+for (const [index, environmentName] of expectedEnvironmentNames.entries()) {
+  assertExactCount(
+    config,
+    `name: expectedEnvironmentNames[${index}]`,
+    1,
+    `Storybook environment ${environmentName}`
+  );
+}
+
 console.log("Choice Control Storybook collection configuration passed.");
 console.log(`Story file: ${storyPath}`);
 console.log(`Corrective stories: ${correctiveStories.length}`);
 for (const storyName of correctiveStories) console.log(`- ${storyName}`);
+console.log(`Logical stories: ${allExpectedStories.length}`);
+console.log(`Environments: ${expectedEnvironmentNames.join(", ")}`);

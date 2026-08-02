@@ -17,9 +17,20 @@ jobs:
       - run: npm run motion:check
       - run: npx playwright install --with-deps chromium
       - run: npm run choice-controls:storybook:collection-check
-      - run: npm run test:storybook
       - run: npm run choice-controls:storybook:report
       - run: npm run choice-controls:storybook:execution-check
+      - run: npm run choice-controls:storybook:execution-test
+      - name: Upload Choice Controls Storybook evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: choice-controls-storybook-${{ github.sha }}
+          path: |
+            .artifacts/choice-controls-storybook-report.json
+            .artifacts/choice-controls-storybook-summary.json
+          if-no-files-found: error
+          retention-days: 30
+      - run: npm run test:storybook
       - run: npm run build-storybook
       - run: npm run build
       - run: npm run pack:check

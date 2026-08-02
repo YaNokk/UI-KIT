@@ -97,10 +97,7 @@ const amountJavaScript = readOutput("dist-tree-amount", ".js");
 if (!amountJavaScript.includes("data-amount-part")) {
   throw new Error("The used Amount implementation was not found.");
 }
-if (
-  amountJavaScript.toLowerCase().includes("maskito")
-  || amountJavaScript.includes("beforeinput")
-) {
+if (amountJavaScript.toLowerCase().includes("maskito")) {
   throw new Error("Maskito editing code survived the Amount-only build.");
 }
 

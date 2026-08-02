@@ -1,9 +1,11 @@
+import { createRoot } from "react-dom/client";
 import { QuantityInput } from "@mypoint/retail-ui";
 import "@mypoint/retail-ui/styles.css";
 import "@mypoint/ui/styles.css";
 
-export function TreeQuantityInput() {
-  return (
+const root = document.createElement("div");
+document.body.append(root);
+createRoot(root).render(
     <QuantityInput
       aria-label="Tree-shaken quantity"
       decreaseLabel="Decrease tree-shaken quantity"
@@ -11,5 +13,4 @@ export function TreeQuantityInput() {
       min={1}
       value={2}
     />
-  );
-}
+);
