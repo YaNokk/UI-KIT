@@ -68,6 +68,9 @@ including browser Storybook, package/consumer and tree-shaking checks.
   (Copyright 2020 @catamphetamine). The source dependency is generation-only;
   the runtime uses one packaged asset, no remote requests, Unicode emoji or
   injected SVG strings. Unknown codes render a decorative globe fallback.
+- The published `@mypoint/ui` package contains the sprite at a stable private
+  asset path. Consumer bundlers may fingerprint that asset in application
+  builds; the fingerprint is not part of the component API.
 - A static registry integrity test proves every country returned by
   `libphonenumber-js` has exactly one valid ISO2 flag symbol. The registry is
   internal and has no package export. The measured React registry added
@@ -77,6 +80,13 @@ including browser Storybook, package/consumer and tree-shaking checks.
   `docs/reports/international-phone-input-flag-bundle-size.md`.
 
 ## Pending freeze gates
+
+Exact-SHA workflow run `30762461323` for implementation SHA
+`921eb5f3f119188d404491535fa2db9427baeab1` completed with failure in
+`select-multiselect:verify`; downstream Storybook and package gates were
+skipped. Job `91535338241` therefore does not authorize freeze. Detailed local
+visual, artifact and workflow evidence is recorded in
+`docs/reports/international-phone-input-final-verification.md`.
 
 Run the repository's full CI matrix at one commit SHA. In particular, the
 candidate includes focused real-browser stories for shared trigger toggling,

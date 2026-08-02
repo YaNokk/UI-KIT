@@ -1,10 +1,15 @@
 /// <reference types="@vitest/browser/providers/playwright" />
 
 import { defineConfig } from "vitest/config";
+import { workspaceAliases } from "./vitest.workspace-aliases";
 
 export default defineConfig({
+  resolve: {
+    alias: workspaceAliases,
+  },
   optimizeDeps: {
-    include: ["react/jsx-dev-runtime"]
+    exclude: ["@mypoint/tokens"],
+    include: ["react/jsx-dev-runtime"],
   },
   test: {
     browser: {

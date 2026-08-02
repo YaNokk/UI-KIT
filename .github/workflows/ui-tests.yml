@@ -20,6 +20,8 @@ jobs:
       - run: npm run lint
       - run: npm run motion:check
       - run: npx playwright install --with-deps chromium
+      - name: Verify workspace test resolution
+        run: npm run workspace-test-resolution:check
       - name: Run Choice Controls verification for ${{ github.sha }}
         run: npm run choice-controls:verify
       - name: Upload Choice Controls Storybook evidence
@@ -34,6 +36,10 @@ jobs:
           retention-days: 30
       - name: Run Select and MultiSelect verification for ${{ github.sha }}
         run: npm run select-multiselect:verify
+      - name: Run InternationalPhoneInput verification for ${{ github.sha }}
+        run: npm run international-phone-input:verify
+      - name: Run Textarea verification for ${{ github.sha }}
+        run: npm run textarea:verify
       - run: npm run test:storybook
       - run: npm run build-storybook
       - run: npm run build

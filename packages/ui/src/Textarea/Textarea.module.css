@@ -1,0 +1,104 @@
+.shell {
+  --textarea-padding-block: var(--ds-space-3);
+
+  align-items: stretch;
+  height: auto;
+  min-height: 0;
+}
+
+.shell [data-field-part="content"],
+.shell [data-field-part="control"] {
+  align-items: stretch;
+  height: auto;
+}
+
+.shell [data-field-part="control"] {
+  padding-block: var(--ds-space-0);
+}
+
+.textarea {
+  appearance: none;
+  box-sizing: border-box;
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  margin: var(--ds-space-0);
+  padding-block: var(--textarea-padding-block);
+  padding-inline-end: var(--field-control-padding-inline-end);
+  padding-inline-start: var(--field-control-padding-inline-start);
+  color: inherit;
+  font: inherit;
+  line-height: var(--field-value-line-height);
+  overflow-wrap: anywhere;
+  cursor: text;
+  background: transparent;
+  border: 0;
+  border-radius: inherit;
+  outline: 0;
+}
+
+.textarea::placeholder {
+  color: var(--ds-control-placeholder);
+  opacity: 1;
+}
+
+.textarea:disabled {
+  color: var(--ds-text-disabled);
+  cursor: not-allowed;
+}
+
+.textarea:read-only:not(:disabled) {
+  cursor: text;
+}
+
+.sm {
+  --textarea-padding-block: var(--ds-space-2);
+}
+
+.md {
+  --textarea-padding-block: var(--ds-space-3);
+}
+
+.lg {
+  --textarea-padding-block: var(--ds-space-4);
+}
+
+.inner .textarea {
+  padding-block-end: var(--ds-space-2);
+  padding-block-start: calc(
+    var(--field-label-floated-top)
+    + var(--field-label-line-height)
+    + var(--ds-space-2)
+  );
+}
+
+.resize-none,
+.resizeNone {
+  resize: none;
+}
+
+.resize-vertical {
+  resize: vertical;
+}
+
+.supportingRow {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  min-width: 0;
+  gap: var(--ds-space-2);
+}
+
+.supportingRow > :first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.counter {
+  flex: none;
+  margin-inline-start: auto;
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

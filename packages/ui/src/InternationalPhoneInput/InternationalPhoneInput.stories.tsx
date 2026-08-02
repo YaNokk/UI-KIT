@@ -2,6 +2,7 @@ import { useState, type ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within } from "storybook/test";
 import { DesignSystemProvider } from "../DesignSystemProvider/DesignSystemProvider";
+import { CountryFlag } from "../internal/country-flags/CountryFlag";
 import {
   InternationalPhoneInput,
   type PhoneCountryCode
@@ -206,4 +207,60 @@ export const ForcedColors: Story = {
 
 export const ReducedMotion: Story = {
   parameters: { backgrounds: { default: "light" } }
+};
+
+export const FinalStateMatrix: Story = {
+  render: (args) => (
+    <div style={{ display: "grid", gap: "var(--ds-space-3)" }}>
+      <InternationalPhoneInput {...args} id="phone-empty" label="Пустое поле" />
+      <InternationalPhoneInput
+        {...args}
+        defaultValue="+7"
+        id="phone-prefix"
+        label="Только префикс"
+      />
+      <InternationalPhoneInput
+        {...args}
+        defaultValue="+7495"
+        id="phone-partial"
+        label="Частичный номер"
+      />
+      <InternationalPhoneInput
+        {...args}
+        defaultValue="+74957888878"
+        hint="Номер для связи"
+        id="phone-complete"
+        label="Полный номер"
+      />
+      <InternationalPhoneInput
+        {...args}
+        defaultValue="+7495"
+        error="Проверьте номер телефона"
+        id="phone-invalid"
+        label="Ошибка"
+      />
+    </div>
+  )
+};
+
+const representativeFlags = ["RU", "PL", "US", "GB", "JP", "BR", "ZA", "NP", "CH"] as const;
+
+export const RepresentativeFlagAssets: Story = {
+  render: () => (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--ds-space-4)" }}>
+      {representativeFlags.map((country) => (
+        <div
+          key={country}
+          style={{ display: "grid", gap: "var(--ds-space-1)", justifyItems: "center" }}
+        >
+          <CountryFlag country={country} size="md" />
+          <span>{country}</span>
+        </div>
+      ))}
+      <div style={{ display: "grid", gap: "var(--ds-space-1)", justifyItems: "center" }}>
+        <CountryFlag country={"ZZ" as PhoneCountryCode} size="md" />
+        <span>Fallback</span>
+      </div>
+    </div>
+  )
 };

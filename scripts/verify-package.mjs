@@ -74,6 +74,8 @@ const packages = [
       "dist/Switch/index.d.ts",
       "dist/Tag/index.js",
       "dist/Tag/index.d.ts",
+      "dist/Textarea/index.js",
+      "dist/Textarea/index.d.ts",
       "dist/system-color/index.js",
       "dist/system-color/index.d.ts",
       "dist/styles.css"

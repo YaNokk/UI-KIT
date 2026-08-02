@@ -144,6 +144,10 @@
       "types": "./dist/Text/index.d.ts",
       "import": "./dist/Text/index.js"
     },
+    "./textarea": {
+      "types": "./dist/Textarea/index.d.ts",
+      "import": "./dist/Textarea/index.js"
+    },
     "./tooltip": {
       "types": "./dist/Tooltip/index.d.ts",
       "import": "./dist/Tooltip/index.js"

@@ -10,6 +10,7 @@ import { InternationalPhoneInput } from "@mypoint/ui/international-phone-input";
 import { Spinner } from "@mypoint/ui/spinner";
 import { StatusIndicator } from "@mypoint/ui/status-indicator";
 import { Tag } from "@mypoint/ui/tag";
+import { Textarea } from "@mypoint/ui/textarea";
 import type { SystemColor } from "@mypoint/ui/system-color";
 import { Button, LinkButton, ThemeProvider } from "@mypoint/ui";
 import { NumberInput } from "@mypoint/ui/number-input";
@@ -59,6 +60,7 @@ export function App() {
       />
       <NumberInput aria-label="Number" value={1.25} />
       <InternationalPhoneInput defaultCountry="PL" label="Phone" />
+      <Textarea label="Notes" showCount maxLength={200} />
       <QuantityInput
         aria-label="Quantity"
         decreaseLabel="Decrease quantity"

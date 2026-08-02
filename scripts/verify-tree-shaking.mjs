@@ -125,6 +125,21 @@ if (phoneInputJavaScript.includes("data-amount-part")) {
   throw new Error("Amount survived the InternationalPhoneInput-only build.");
 }
 
+runBuild("tree-textarea", "dist-tree-textarea");
+const textareaJavaScript = readOutput("dist-tree-textarea", ".js");
+if (
+  !textareaJavaScript.includes("Tree-shaken textarea")
+  || !textareaJavaScript.includes("data-textarea-count")
+) {
+  throw new Error("Textarea or its character count was not found.");
+}
+if (
+  textareaJavaScript.includes("data-country-flag")
+  || textareaJavaScript.includes("data-amount-part")
+) {
+  throw new Error("Phone or amount behavior survived the Textarea-only build.");
+}
+
 runBuild("tree-quantity-input", "dist-tree-quantity-input");
 const quantityInputJavaScript = readOutput("dist-tree-quantity-input", ".js");
 if (

@@ -162,6 +162,12 @@ export type {
   TextTone,
   TextVariant
 } from "./Text/index.js";
+export { Textarea } from "./Textarea/index.js";
+export type {
+  TextareaProps,
+  TextareaResize,
+  TextareaSize
+} from "./Textarea/index.js";
 export { Tooltip } from "./Tooltip/index.js";
 export type {
   TooltipPlacement,

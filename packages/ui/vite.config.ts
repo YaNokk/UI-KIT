@@ -129,6 +129,9 @@ export default defineConfig({
         ),
         "Text/index": fileURLToPath(
           new URL("./src/Text/index.ts", import.meta.url)
+        ),
+        "Textarea/index": fileURLToPath(
+          new URL("./src/Textarea/index.ts", import.meta.url)
         )
       },
       formats: ["es"],

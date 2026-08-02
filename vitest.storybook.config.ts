@@ -7,6 +7,7 @@ import { vitestTransform } from "storybook/internal/csf-tools";
 import type { Plugin } from "vite";
 import { defineConfig } from "vitest/config";
 import { expectedEnvironmentNames } from "./scripts/choice-control-storybook-manifest.mjs";
+import { workspaceAliases } from "./vitest.workspace-aliases";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const storybookConfigDir = path.join(dirname, "apps/storybook/.storybook-test");
@@ -53,6 +54,9 @@ const storybookCsfTransform: Plugin = {
       && !normalizedId.includes(
         "/packages/ui/src/InternationalPhoneInput/InternationalPhoneInputBrowserRegression.stories.tsx"
       )
+      && !normalizedId.includes(
+        "/packages/ui/src/Textarea/TextareaBrowserRegression.stories.tsx"
+      )
     ) {
       return undefined;
     }
@@ -72,7 +76,8 @@ const storybookCsfTransform: Plugin = {
         "../../../packages/ui/src/internal/single-line-control-typography/SingleLineControlTypography.stories.tsx",
         "../../../packages/ui/src/internal/choice-control/ChoiceControlBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/choice-control/ChoiceControlsVisualCalibration.stories.tsx",
-        "../../../packages/ui/src/InternationalPhoneInput/InternationalPhoneInputBrowserRegression.stories.tsx"
+        "../../../packages/ui/src/InternationalPhoneInput/InternationalPhoneInputBrowserRegression.stories.tsx",
+        "../../../packages/ui/src/Textarea/TextareaBrowserRegression.stories.tsx"
       ],
       tagsFilter: { include: ["test"], exclude: [], skip: [] }
     });
@@ -89,6 +94,7 @@ const storybookCsfTransform: Plugin = {
 
 export default defineConfig({
   optimizeDeps: {
+    exclude: ["@mypoint/tokens"],
     include: [
       "@storybook/addon-vitest/internal/test-utils",
       "markdown-to-jsx",
@@ -98,12 +104,7 @@ export default defineConfig({
   plugins: [storybookCsfTransform, tailwindcss()],
   resolve: {
     alias: [
-      {
-        find: /^@mypoint\/tokens$/,
-        replacement: fileURLToPath(
-          new URL("./packages/tokens/src/index.ts", import.meta.url)
-        )
-      },
+      ...workspaceAliases,
       {
         find: /^@mypoint\/tokens\/tokens\.css$/,
         replacement: fileURLToPath(
@@ -137,7 +138,8 @@ export default defineConfig({
       "packages/ui/src/internal/single-line-control-typography/SingleLineControlTypography.stories.tsx",
       "packages/ui/src/internal/choice-control/ChoiceControlBrowserRegression.stories.tsx",
       "packages/ui/src/internal/choice-control/ChoiceControlsVisualCalibration.stories.tsx",
-      "packages/ui/src/InternationalPhoneInput/InternationalPhoneInputBrowserRegression.stories.tsx"
+      "packages/ui/src/InternationalPhoneInput/InternationalPhoneInputBrowserRegression.stories.tsx",
+      "packages/ui/src/Textarea/TextareaBrowserRegression.stories.tsx"
     ],
     browser: {
       enabled: true,
