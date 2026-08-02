@@ -54,7 +54,8 @@ describe("Select", () => {
 
     const trigger = screen.getByRole("button", { name: /Клиент/ });
     expect(trigger).toHaveAttribute("data-select-trigger");
-    expect(trigger.querySelector("[data-select-chevron]"))
+    expect(trigger.closest("[data-field-part=\"shell\"]")
+      ?.querySelector("[data-select-chevron]"))
       .toHaveAttribute("aria-hidden", "true");
     expect(trigger).toHaveTextContent("Выберите клиента");
     expect(trigger.querySelector("[data-control-text-clip]")).toContainElement(
@@ -303,7 +304,8 @@ describe("Select", () => {
     await user.click(screen.getByRole("button", { name: /Клиент/ }));
     const trigger = screen.getByRole("button", { name: /Клиент/ });
     expect(trigger).toHaveAttribute("aria-busy", "true");
-    expect(trigger.querySelector("[data-select-spinner]"))
+    expect(trigger.closest("[data-field-part=\"shell\"]")
+      ?.querySelector("[data-select-spinner]"))
       .toHaveAttribute("aria-hidden", "true");
     expect(await screen.findByRole("status")).toHaveTextContent("Загрузка");
     expect(screen.queryAllByRole("option")).toHaveLength(0);

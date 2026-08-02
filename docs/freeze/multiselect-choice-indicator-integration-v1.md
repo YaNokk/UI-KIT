@@ -1,6 +1,14 @@
 # MultiSelect ChoiceIndicator Integration v1 — freeze report
 
-Status: **frozen**
+Status: **visual correction required; freeze withdrawn**
+
+Withdrawal date: 2026-08-02
+
+Reason: tag-remove hover exceeded chip bounds, narrow popup width changed when
+trailing addons appeared, the option `ChoiceIndicator` was visually oversized,
+and inner-label padding shifted trailing addons. The verification below is
+retained as historical evidence for the original integration and must not be
+treated as an active freeze declaration.
 
 Base commit: `aeba7678e50184868a8fee323f7b9d13ce34e0bc`
 
@@ -122,12 +130,13 @@ pseudo-element implementations; Storybook reports unmatched optional story
 globs, ignored dependency `use client` directives and large chunks; the UI build
 retains the existing empty `modal/index` and `system-color/index` chunks.
 
-## Freeze decision
+## Withdrawn freeze decision
 
-MultiSelect ChoiceIndicator Integration v1 is frozen for the private dependency
+MultiSelect ChoiceIndicator Integration v1 was frozen for the private dependency
 direction, visual-only `aria-hidden` contract, `sm → sm` and `md/lg → md` size
 mapping, first-line option layout, selected/unselected/disabled visual mapping,
 option-owned interaction and focus, Popover / BottomSheet parity, runtime-brand
 and forced-colors behavior, virtualization compatibility and grouped-option
 compatibility. Public MultiSelect props and Choice Controls v1 contracts are
-unchanged. Future modifications require a versioned corrective pass.
+unchanged. That freeze is now withdrawn pending the corrective geometry pass,
+focused browser assertions and full CI evidence.

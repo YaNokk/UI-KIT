@@ -173,12 +173,18 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   const selectedSummaryId = useId();
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
+  const [shellElement, setShellElement] = useState<HTMLDivElement | null>(null);
   const skipFocusRestoreRef = useRef(false);
   const viewportRef = useRef<HTMLSpanElement | null>(null);
   const sizerRef = useRef<HTMLSpanElement | null>(null);
   const searchRef = useRef<HTMLInputElement | null>(null);
   const firstEnabledActionRef = useRef<HTMLButtonElement | null>(null);
   const listboxRef = useRef<HTMLDivElement | null>(null);
+
+  const setShellNode = useCallback((node: HTMLDivElement | null) => {
+    shellRef.current = node;
+    setShellElement(node);
+  }, []);
 
   useImperativeHandle(ref, () => triggerRef.current as HTMLElement, []);
 
@@ -413,6 +419,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   const renderPanel = (triggerElement: ReactElement) => (
     <SelectPanel
       outsidePressBoundaryRef={shellRef}
+      referenceElement={shellElement}
       messages={messages}
       multiple
       onOpenChange={handleOpenChange}
@@ -474,8 +481,9 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
       {({ label: controlLabel, ...controlProps }) => (
         <FieldShell
           disabled={disabled}
-          endAdornment={showClearButton ? (
-            <span className={triggerStyles.actions} data-field-interactive="">
+          endAdornment={(
+            <span className={triggerStyles.actions}>
+              {showClearButton ? (
                 <IconButton
                   aria-label={messages.clear}
                   data-multiselect-clear=""
@@ -489,22 +497,42 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                   size="sm"
                   variant="ghost"
                 />
+              ) : null}
+              <span aria-hidden="true" className={styles.triggerStatus}>
+                {loading || refreshing ? (
+                  <Spinner
+                    data-select-spinner=""
+                    size={size === "lg" ? "md" : "sm"}
+                    tone="secondary"
+                  />
+                ) : null}
+                {!loading ? <span
+                  aria-hidden="true"
+                  className={classNames(
+                    triggerStyles.chevron,
+                    open && triggerStyles.chevronOpen
+                  )}
+                  data-multiselect-chevron=""
+                >
+                  <ChevronDown />
+                </span> : null}
+              </span>
             </span>
-          ) : undefined}
+          )}
           invalid={invalid}
           label={controlLabel}
           labelFloated={open || value.length > 0}
           labelView={labelView}
-          onFocusRequest={() => triggerRef.current?.focus()}
+          onFocusRequest={() => {
+            triggerRef.current?.focus();
+            if (interactive) handleOpenChange(!open);
+          }}
           readOnly={readOnly}
-          ref={shellRef}
+          ref={setShellNode}
           size={size}
         >
           <span className={classNames(
-            styles.multiControl,
-            loading && size !== "lg" && styles.statusLoadingCompact,
-            refreshing && size !== "lg" && styles.statusRefreshingCompact,
-            refreshing && size === "lg" && styles.statusRefreshingLarge
+            styles.multiControl
           )}>
             {renderPanel(<button
               {...controlProps}
@@ -535,25 +563,6 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                   ))}
                 </span>
               ) : null}
-              <span aria-hidden="true" className={styles.triggerStatus}>
-                {loading || refreshing ? (
-                  <Spinner
-                    data-select-spinner=""
-                    size={size === "lg" ? "md" : "sm"}
-                    tone="secondary"
-                  />
-                ) : null}
-                {!loading ? <span
-                  aria-hidden="true"
-                  className={classNames(
-                    triggerStyles.chevron,
-                    open && triggerStyles.chevronOpen
-                  )}
-                  data-multiselect-chevron=""
-                >
-                  <ChevronDown />
-                </span> : null}
-              </span>
             </button>)}
             <span
               className={styles.tagViewport}

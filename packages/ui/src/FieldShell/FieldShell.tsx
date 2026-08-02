@@ -67,6 +67,23 @@ export const FieldShell = forwardRef<HTMLDivElement, FieldShellProps>(
       onFocusRequest();
     };
 
+    const handleAdornmentMouseDown = (event: MouseEvent<HTMLSpanElement>) => {
+      const target = event.target;
+      if (
+        target instanceof Element
+        && target.closest(
+          "[data-field-interactive],button,a,input,select,textarea,"
+          + "label,[contenteditable=\"true\"],[tabindex]:not([tabindex=\"-1\"])"
+        )
+      ) {
+        return;
+      }
+      // Decorative field zones delegate activation to the native control.
+      // Preserve its current focus until click delegation runs so an open
+      // overlay cannot close on blur and immediately reopen from the click.
+      event.preventDefault();
+    };
+
     return (
       <div
         {...nativeProps}
@@ -96,6 +113,7 @@ export const FieldShell = forwardRef<HTMLDivElement, FieldShellProps>(
             data-field-part="start-adornment"
             data-position="start"
             onClick={handleAdornmentClick}
+            onMouseDown={handleAdornmentMouseDown}
           >
             {startAdornment}
           </span>
@@ -116,6 +134,7 @@ export const FieldShell = forwardRef<HTMLDivElement, FieldShellProps>(
             data-field-part="end-adornment"
             data-position="end"
             onClick={handleAdornmentClick}
+            onMouseDown={handleAdornmentMouseDown}
           >
             {endAdornment}
           </span>

@@ -208,6 +208,7 @@ function SelectListboxViewInner<Value extends string>(
         className={styles.choiceIndicator}
         disabled={row.disabled}
         kind="checkbox"
+        presentation="option"
         size={choiceIndicatorSize}
       />
     ) : (

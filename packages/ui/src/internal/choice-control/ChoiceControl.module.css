@@ -67,6 +67,16 @@
   block-size: var(--ds-size-icon-lg);
 }
 
+.indicator[data-presentation="option"].sm:not([data-kind="switch"]) {
+  inline-size: var(--ds-size-icon-sm);
+  block-size: var(--ds-size-icon-sm);
+}
+
+.indicator[data-presentation="option"].md:not([data-kind="switch"]) {
+  inline-size: var(--ds-size-icon-md);
+  block-size: var(--ds-size-icon-md);
+}
+
 .indicator[data-kind="checkbox"] {
   border-radius: var(--ds-radius-sm);
 }

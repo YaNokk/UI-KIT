@@ -1,6 +1,4 @@
 .multiControl {
-  --multiselect-trigger-status-width: var(--ds-size-icon-md);
-
   position: relative;
   display: flex;
   flex: 1 1 auto;
@@ -27,11 +25,7 @@
   block-size: 100%;
   pointer-events: none;
   padding-inline: var(--field-control-padding-inline-start)
-    calc(
-      var(--multiselect-trigger-status-width)
-      + var(--field-gap)
-      + var(--field-control-padding-inline-end)
-    );
+    var(--field-control-padding-inline-end);
 }
 
 .triggerStatus {
@@ -41,22 +35,6 @@
   gap: var(--ds-space-1);
 }
 
-.statusLoadingCompact {
-  --multiselect-trigger-status-width: var(--ds-size-icon-sm);
-}
-
-.statusRefreshingCompact {
-  --multiselect-trigger-status-width: calc(
-    var(--ds-size-icon-sm) + var(--ds-space-1) + var(--ds-size-icon-md)
-  );
-}
-
-.statusRefreshingLarge {
-  --multiselect-trigger-status-width: calc(
-    var(--ds-size-icon-md) + var(--ds-space-1) + var(--ds-size-icon-md)
-  );
-}
-
 .tag {
   display: inline-flex;
   flex: 0 1 auto;
@@ -64,6 +42,7 @@
   gap: var(--ds-space-1);
   min-inline-size: 0;
   max-inline-size: 100%;
+  overflow: hidden;
   padding-block: 0;
   padding-inline: var(--ds-space-2) var(--ds-space-1);
   block-size: var(--ds-space-5);
@@ -85,6 +64,7 @@
 }
 
 .tagRemove {
+  box-sizing: border-box;
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -104,6 +84,15 @@
   .tagRemove:hover {
     background: var(--ds-action-soft-background-hover);
   }
+}
+
+.tagRemove:active {
+  background: var(--ds-action-soft-background-active);
+}
+
+.tagRemove:focus-visible {
+  outline: var(--ds-focus-ring-width) solid var(--ds-focus-ring);
+  outline-offset: calc(-1 * var(--ds-focus-ring-width));
 }
 
 .tagRemove > svg {

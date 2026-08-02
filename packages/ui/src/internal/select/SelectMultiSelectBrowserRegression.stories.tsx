@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { User } from "lucide-react";
-import { expect, userEvent, waitFor, within } from "storybook/test";
+import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
 import { Dialog } from "../../Dialog/Dialog";
 import { DesignSystemProvider } from "../../DesignSystemProvider/DesignSystemProvider";
 import { Input } from "../../Input/Input";
@@ -757,6 +757,112 @@ function VirtualMultiSelectChoiceIndicatorFixture() {
   );
 }
 
+function SelectNarrowPopupFixture() {
+  const [value, setValue] = useState<string | null>(null);
+  return (
+    <div className={styles.width320} data-narrow-select="">
+      <Select
+        block
+        clearable
+        items={[
+          {
+            value: "alpha",
+            label: "Альфа",
+            textValue: "Альфа",
+            leading: <User aria-hidden="true" />
+          },
+          ...baseItems.slice(1)
+        ]}
+        label="Narrow Select"
+        labelView="inner"
+        onChange={setValue}
+        placeholder="Выберите значение"
+        value={value}
+      />
+    </div>
+  );
+}
+
+function MultiSelectNarrowPopupFixture() {
+  const [value, setValue] = useState<string[]>([]);
+  return (
+    <div className={styles.width320} data-narrow-multiselect="">
+      <MultiSelect
+        block
+        clearable
+        items={baseItems}
+        label="Narrow MultiSelect"
+        labelView="inner"
+        onChange={setValue}
+        placeholder="Выберите значения"
+        value={value}
+      />
+    </div>
+  );
+}
+
+function TagRemoveContainmentFixture() {
+  const [value, setValue] = useState<string[]>(["alpha", "beta"]);
+  const [changes, setChanges] = useState(0);
+  return (
+    <div className={styles.width320}>
+      <MultiSelect
+        block
+        items={baseItems}
+        label="Tag remove containment"
+        locale="ru-RU"
+        onChange={(nextValue) => {
+          setChanges((count) => count + 1);
+          setValue(nextValue);
+        }}
+        value={value}
+      />
+      <output aria-label="Tag remove changes">{changes}</output>
+    </div>
+  );
+}
+
+function InnerLabelAddonIsolationFixture() {
+  const items: SelectCollectionItem[] = [{
+    value: "alpha",
+    label: "Альфа",
+    textValue: "Альфа",
+    leading: <User aria-hidden="true" />
+  }];
+  return (
+    <div className={styles.stack}>
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <div data-addon-isolation-size={size} key={size}>
+          {(["outer", "inner"] as const).map((labelView) => (
+            <div data-addon-isolation-view={labelView} key={labelView}>
+              <Select
+                clearable
+                collectionState={{ status: "refreshing" }}
+                items={items}
+                label={`Select ${size} ${labelView}`}
+                labelView={labelView}
+                onChange={() => undefined}
+                size={size}
+                value="alpha"
+              />
+              <MultiSelect
+                clearable
+                collectionState={{ status: "refreshing" }}
+                items={items}
+                label={`MultiSelect ${size} ${labelView}`}
+                labelView={labelView}
+                onChange={() => undefined}
+                size={size}
+                value={["alpha"]}
+              />
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function choiceIndicatorFor(option: HTMLElement): HTMLElement {
   const indicator = option.querySelector<HTMLElement>(
     ':scope > [data-kind="checkbox"][aria-hidden="true"]'
@@ -789,6 +895,22 @@ function resolveVisualHitTarget(target: HTMLElement, trigger: HTMLElement) {
     throw new Error("Visual target does not resolve to its owning trigger.");
   }
   return hit;
+}
+
+function fieldShellFor(trigger: HTMLElement) {
+  const shell = trigger.closest<HTMLElement>("[data-field-part=\"shell\"]");
+  if (!shell) throw new Error("Select trigger FieldShell was not rendered.");
+  return shell;
+}
+
+function expectPopupMatchesShell(trigger: HTMLElement, surface: HTMLElement) {
+  const shellRect = fieldShellFor(trigger).getBoundingClientRect();
+  const surfaceRect = surface.getBoundingClientRect();
+  expect(Math.abs(surfaceRect.width - shellRect.width)).toBeLessThanOrEqual(0.5);
+  expect(Math.abs(surfaceRect.left - shellRect.left)).toBeLessThanOrEqual(0.5);
+  expect(Math.abs(surfaceRect.right - shellRect.right)).toBeLessThanOrEqual(0.5);
+  expect(surfaceRect.left).toBeGreaterThanOrEqual(0);
+  expect(surfaceRect.right).toBeLessThanOrEqual(trigger.ownerDocument.defaultView?.innerWidth ?? 0);
 }
 
 const meta = {
@@ -853,7 +975,9 @@ export const TriggerHitRegion: Story = {
     const transitions = canvas.getByLabelText("Hit region Select transitions");
     const valueOutput = canvas.getByLabelText("Hit region Select value");
     const valueText = trigger.querySelector<HTMLElement>("[data-control-text]");
-    const chevron = trigger.querySelector<HTMLElement>("[data-select-chevron]");
+    const chevron = fieldShellFor(trigger).querySelector<HTMLElement>(
+      "[data-select-chevron]"
+    );
     if (!valueText || !chevron) throw new Error("Select trigger anatomy is incomplete.");
     await expect(trigger).toHaveAttribute("data-select-trigger");
     await expect(chevron).toHaveAttribute("aria-hidden", "true");
@@ -905,8 +1029,9 @@ export const TriggerHitRegion: Story = {
     const refreshingTrigger = canvas.getByRole("button", {
       name: "Refreshing hit region Select"
     });
-    const spinner = refreshingTrigger.querySelector<HTMLElement>("[data-select-spinner]");
-    const refreshingChevron = refreshingTrigger.querySelector<HTMLElement>(
+    const refreshingShell = fieldShellFor(refreshingTrigger);
+    const spinner = refreshingShell.querySelector<HTMLElement>("[data-select-spinner]");
+    const refreshingChevron = refreshingShell.querySelector<HTMLElement>(
       "[data-select-chevron]"
     );
     if (!spinner || !refreshingChevron) {
@@ -928,7 +1053,7 @@ export const TriggerHitRegion: Story = {
     const placeholder = placeholderTrigger.querySelector<HTMLElement>(
       "[data-field-placeholder]"
     );
-    const placeholderChevron = placeholderTrigger.querySelector<HTMLElement>(
+    const placeholderChevron = fieldShellFor(placeholderTrigger).querySelector<HTMLElement>(
       "[data-select-chevron]"
     );
     if (!placeholder || !placeholderChevron) {
@@ -954,7 +1079,7 @@ export const MultiSelectTriggerHitRegion: Story = {
     const summaryTransitions = canvas.getByLabelText("Summary MultiSelect transitions");
     const placeholder = summaryTrigger.closest("[data-field-part=\"shell\"]")
       ?.querySelector<HTMLElement>("[data-field-placeholder]");
-    const summaryChevron = summaryTrigger.querySelector<HTMLElement>(
+    const summaryChevron = fieldShellFor(summaryTrigger).querySelector<HTMLElement>(
       "[data-multiselect-chevron]"
     );
     if (!placeholder || !summaryChevron) {
@@ -1002,7 +1127,7 @@ export const MultiSelectTriggerHitRegion: Story = {
     const chipBody = chipsShell?.querySelector<HTMLElement>(
       "[data-field-chip] [data-control-text-clip]"
     );
-    const chipsChevron = chipsTrigger.querySelector<HTMLElement>(
+    const chipsChevron = fieldShellFor(chipsTrigger).querySelector<HTMLElement>(
       "[data-multiselect-chevron]"
     );
     if (!chipBody || !chipsChevron) throw new Error("MultiSelect chip anatomy is incomplete.");
@@ -1051,7 +1176,9 @@ export const LoadingSpinnerHitRegion: Story = {
       transitionsLabel: string;
     }) => {
       const trigger = canvas.getByRole("button", { name });
-      const spinner = trigger.querySelector<HTMLElement>("[data-select-spinner]");
+      const spinner = fieldShellFor(trigger).querySelector<HTMLElement>(
+        "[data-select-spinner]"
+      );
       if (!spinner) throw new Error(`${name} spinner was not rendered.`);
       await expect(trigger).toHaveAttribute(marker);
       await expect(trigger).toHaveAttribute("aria-busy", "true");
@@ -1084,10 +1211,11 @@ export const LoadingSpinnerHitRegion: Story = {
     const refreshingMulti = canvas.getByRole("button", {
       name: "Refreshing spinner MultiSelect"
     });
-    const refreshingSpinner = refreshingMulti.querySelector<HTMLElement>(
+    const refreshingShell = fieldShellFor(refreshingMulti);
+    const refreshingSpinner = refreshingShell.querySelector<HTMLElement>(
       "[data-select-spinner]"
     );
-    const refreshingChevron = refreshingMulti.querySelector<HTMLElement>(
+    const refreshingChevron = refreshingShell.querySelector<HTMLElement>(
       "[data-multiselect-chevron]"
     );
     if (!refreshingSpinner || !refreshingChevron) {
@@ -1122,7 +1250,7 @@ export const TriggerHitRegionGeometry: Story = {
       const selectTrigger = row.querySelector<HTMLElement>("[data-select-trigger]");
       const multiTrigger = row.querySelector<HTMLElement>("[data-multiselect-trigger]");
       if (!selectTrigger || !multiTrigger) throw new Error("Trigger markers are missing.");
-      const selectChevron = selectTrigger.querySelector<HTMLElement>(
+      const selectChevron = fieldShellFor(selectTrigger).querySelector<HTMLElement>(
         "[data-select-chevron]"
       );
       const selectClear = row.querySelector<HTMLElement>("[data-select-clear]");
@@ -1131,8 +1259,10 @@ export const TriggerHitRegionGeometry: Story = {
         "[data-control-text-clip]"
       );
       expect(selectChevron).not.toBeNull();
-      expect(selectTrigger.querySelector("[data-select-spinner]")).not.toBeNull();
-      expect(multiTrigger.querySelector("[data-multiselect-chevron]")).not.toBeNull();
+      expect(fieldShellFor(selectTrigger).querySelector("[data-select-spinner]"))
+        .not.toBeNull();
+      expect(fieldShellFor(multiTrigger).querySelector("[data-multiselect-chevron]"))
+        .not.toBeNull();
       expect(selectTrigger.querySelector("button")).toBeNull();
       expect(multiTrigger.querySelector("button")).toBeNull();
       expect(selectClear).not.toBeNull();
@@ -1376,12 +1506,14 @@ export const ReadOnlyContract: Story = {
     };
 
     const valueText = selectValue.querySelector<HTMLElement>("[data-control-text]");
-    const leading = selectValue.querySelector<HTMLElement>(".lucide-user");
-    const valueChevron = selectValue.querySelector<HTMLElement>("[data-select-chevron]");
+    const leading = fieldShellFor(selectValue).querySelector<HTMLElement>(".lucide-user");
+    const valueChevron = fieldShellFor(selectValue).querySelector<HTMLElement>(
+      "[data-select-chevron]"
+    );
     const placeholder = selectPlaceholder.querySelector<HTMLElement>(
       "[data-field-placeholder]"
     );
-    const placeholderChevron = selectPlaceholder.querySelector<HTMLElement>(
+    const placeholderChevron = fieldShellFor(selectPlaceholder).querySelector<HTMLElement>(
       "[data-select-chevron]"
     );
     if (!valueText || !leading || !valueChevron || !placeholder || !placeholderChevron) {
@@ -1398,14 +1530,14 @@ export const ReadOnlyContract: Story = {
     const summary = summaryShell?.querySelector<HTMLElement>(
       "[data-field-selection-presentation=\"summary\"]"
     );
-    const summaryChevron = multiSummary.querySelector<HTMLElement>(
+    const summaryChevron = fieldShellFor(multiSummary).querySelector<HTMLElement>(
       "[data-multiselect-chevron]"
     );
     const chipsShell = multiChips.closest("[data-field-part=\"shell\"]");
     const chipBody = chipsShell?.querySelector<HTMLElement>(
       "[data-field-chip] [data-control-text-clip]"
     );
-    const chipsChevron = multiChips.querySelector<HTMLElement>(
+    const chipsChevron = fieldShellFor(multiChips).querySelector<HTMLElement>(
       "[data-multiselect-chevron]"
     );
     if (!summary || !summaryChevron || !chipBody || !chipsChevron) {
@@ -1451,6 +1583,172 @@ export const MultiSelectWidthStability: Story = {
     await expect(shell.getBoundingClientRect().width).toBe(initialWidth);
   }
 };
+
+export const TagRemoveContainment: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <TagRemoveContainmentFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const chip = canvasElement.querySelector<HTMLElement>("[data-field-chip]");
+    const remove = canvas.getByRole("button", { name: "Убрать Альфа" });
+    if (!chip) throw new Error("MultiSelect chip was not rendered.");
+
+    const assertContainedAndStable = (expected: DOMRect) => {
+      const chipRect = chip.getBoundingClientRect();
+      const removeRect = remove.getBoundingClientRect();
+      expect(Math.abs(chipRect.width - expected.width)).toBeLessThanOrEqual(0.5);
+      expect(Math.abs(chipRect.height - expected.height)).toBeLessThanOrEqual(0.5);
+      expect(removeRect.left).toBeGreaterThanOrEqual(chipRect.left);
+      expect(removeRect.top).toBeGreaterThanOrEqual(chipRect.top);
+      expect(removeRect.right).toBeLessThanOrEqual(chipRect.right);
+      expect(removeRect.bottom).toBeLessThanOrEqual(chipRect.bottom);
+    };
+
+    const initialRect = chip.getBoundingClientRect();
+    assertContainedAndStable(initialRect);
+    await userEvent.hover(remove);
+    assertContainedAndStable(initialRect);
+    fireEvent.mouseDown(remove);
+    assertContainedAndStable(initialRect);
+    fireEvent.mouseUp(remove);
+    await userEvent.click(remove);
+    await expect(canvas.getByLabelText("Tag remove changes")).toHaveTextContent("1");
+
+    canvasElement.style.zoom = "1.25";
+    const zoomedChip = canvasElement.querySelector<HTMLElement>("[data-field-chip]");
+    const zoomedRemove = canvas.getByRole("button", { name: "Убрать Бета" });
+    if (!zoomedChip) throw new Error("Zoomed MultiSelect chip was not rendered.");
+    const chipRect = zoomedChip.getBoundingClientRect();
+    const removeRect = zoomedRemove.getBoundingClientRect();
+    expect(removeRect.left).toBeGreaterThanOrEqual(chipRect.left);
+    expect(removeRect.top).toBeGreaterThanOrEqual(chipRect.top);
+    expect(removeRect.right).toBeLessThanOrEqual(chipRect.right);
+    expect(removeRect.bottom).toBeLessThanOrEqual(chipRect.bottom);
+    canvasElement.style.zoom = "";
+  }
+};
+
+export const TagRemoveHoverActive = TagRemoveContainment;
+
+export const SelectNarrow320PopupWidth: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <SelectNarrowPopupFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole("button", { name: "Narrow Select" });
+    expect(Math.abs(fieldShellFor(trigger).getBoundingClientRect().width - 320))
+      .toBeLessThanOrEqual(0.5);
+
+    await userEvent.click(trigger);
+    let surface = (await body.findByRole("listbox")).closest<HTMLElement>(
+      "[data-select-surface]"
+    );
+    if (!surface) throw new Error("Select popover surface was not rendered.");
+    expectPopupMatchesShell(trigger, surface);
+
+    await userEvent.click(body.getByRole("option", { name: "Альфа" }));
+    await userEvent.click(trigger);
+    surface = canvasElement.ownerDocument.querySelector<HTMLElement>("[data-select-surface]");
+    if (!surface) throw new Error("Selected Select popover surface was not rendered.");
+    expect(fieldShellFor(trigger).querySelector("[data-select-clear]")).not.toBeNull();
+    expect(fieldShellFor(trigger).querySelector("[data-field-part=\"start-adornment\"]"))
+      .not.toBeNull();
+    expectPopupMatchesShell(trigger, surface);
+  }
+};
+
+export const PopoverReferenceWidth = SelectNarrow320PopupWidth;
+
+export const MultiSelectNarrow320PopupWidth: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <MultiSelectNarrowPopupFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole("button", { name: "Narrow MultiSelect" });
+    const shell = fieldShellFor(trigger);
+    const initialWidth = shell.getBoundingClientRect().width;
+    expect(Math.abs(initialWidth - 320)).toBeLessThanOrEqual(0.5);
+    await userEvent.click(trigger);
+    const surface = await body.findByRole("listbox").then((listbox) =>
+      listbox.closest<HTMLElement>("[data-select-surface]")
+    );
+    if (!surface) throw new Error("MultiSelect popover surface was not rendered.");
+    expectPopupMatchesShell(trigger, surface);
+    await userEvent.click(body.getByRole("option", { name: "Альфа" }));
+    await waitFor(() => expect(shell.querySelector("[data-multiselect-clear]")).not.toBeNull());
+    expect(shell.getBoundingClientRect().width).toBe(initialWidth);
+    expectPopupMatchesShell(trigger, surface);
+  }
+};
+
+export const Narrow320AddonTransitions = MultiSelectNarrow320PopupWidth;
+
+export const InnerLabelAddonIsolation: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <InnerLabelAddonIsolationFixture />,
+  play: async ({ canvasElement }) => {
+    const centerY = (element: Element) => {
+      const rect = element.getBoundingClientRect();
+      return rect.top + rect.height / 2;
+    };
+    for (const size of ["sm", "md", "lg"] as const) {
+      const row = canvasElement.querySelector<HTMLElement>(
+        `[data-addon-isolation-size="${size}"]`
+      );
+      const outer = row?.querySelector<HTMLElement>("[data-addon-isolation-view=\"outer\"]");
+      const inner = row?.querySelector<HTMLElement>("[data-addon-isolation-view=\"inner\"]");
+      if (!outer || !inner) throw new Error(`Missing ${size} addon isolation row.`);
+      const outerShells = outer.querySelectorAll<HTMLElement>("[data-field-part=\"shell\"]");
+      const innerShells = inner.querySelectorAll<HTMLElement>("[data-field-part=\"shell\"]");
+      expect(outerShells).toHaveLength(2);
+      expect(innerShells).toHaveLength(2);
+      for (let index = 0; index < outerShells.length; index += 1) {
+        const outerShell = outerShells[index];
+        const innerShell = innerShells[index];
+        if (!outerShell || !innerShell) throw new Error("Addon isolation shell is missing.");
+        expect(Math.abs(
+          outerShell.getBoundingClientRect().height - innerShell.getBoundingClientRect().height
+        )).toBeLessThanOrEqual(0.5);
+        for (const selector of [
+          ...(index === 0 ? ["[data-field-part=\"start-adornment\"]"] : []),
+          "[data-select-spinner]",
+          index === 0 ? "[data-select-clear]" : "[data-multiselect-clear]",
+          index === 0 ? "[data-select-chevron]" : "[data-multiselect-chevron]"
+        ]) {
+          const outerAddon = outerShell.querySelector(selector);
+          const innerAddon = innerShell.querySelector(selector);
+          if (!outerAddon || !innerAddon) throw new Error(`Missing addon ${selector}.`);
+          expect(Math.abs(
+            (centerY(outerAddon) - outerShell.getBoundingClientRect().top)
+            - (centerY(innerAddon) - innerShell.getBoundingClientRect().top)
+          )).toBeLessThanOrEqual(0.5);
+        }
+        const outerEnd = outerShell.querySelector<HTMLElement>(
+          "[data-field-part=\"end-adornment\"]"
+        );
+        const innerEnd = innerShell.querySelector<HTMLElement>(
+          "[data-field-part=\"end-adornment\"]"
+        );
+        if (!outerEnd || !innerEnd) throw new Error("Trailing addon slot is missing.");
+        const outerInset = outerShell.getBoundingClientRect().right
+          - outerEnd.getBoundingClientRect().right;
+        const innerInset = innerShell.getBoundingClientRect().right
+          - innerEnd.getBoundingClientRect().right;
+        expect(Math.abs(outerInset - innerInset)).toBeLessThanOrEqual(0.5);
+      }
+    }
+  }
+};
+
+export const InnerLabelLeadingTrailingMatrix = InnerLabelAddonIsolation;
+export const InnerLabelLoadingClearChevron = InnerLabelAddonIsolation;
+export const InnerLabelGeometrySmMdLg = InnerLabelAddonIsolation;
 
 export const VirtualizedMountedActiveDescendant: Story = {
   args: {} as never,
@@ -1613,7 +1911,7 @@ export const MultiSelectChoiceIndicatorIntegration: Story = {
       await expect(indicator).not.toHaveAttribute("tabindex");
       expect(indicator.querySelector("input, button, [role=checkbox], [tabindex]"))
         .toBeNull();
-      expectChoiceIndicatorGeometry(indicator, 24);
+      expectChoiceIndicatorGeometry(indicator, 20);
     }
     expect(listbox.querySelector("input, [role=checkbox]"))
       .toBeNull();
@@ -1674,10 +1972,10 @@ export const MultiSelectChoiceIndicatorSizes: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const body = within(canvasElement.ownerDocument.body);
-    const expectedSizes = [20, 24, 24];
+    const expectedSizes = [16, 20, 20];
     for (let index = 0; index < expectedSizes.length; index += 1) {
       const alpha = await body.findByRole("option", { name: /^Альфа/ });
-      expectChoiceIndicatorGeometry(choiceIndicatorFor(alpha), expectedSizes[index] ?? 24);
+      expectChoiceIndicatorGeometry(choiceIndicatorFor(alpha), expectedSizes[index] ?? 20);
       if (index < expectedSizes.length - 1) {
         await userEvent.click(canvas.getByRole("button", { name: "Toggle indicator size" }));
         await waitFor(() => {
@@ -1689,11 +1987,13 @@ export const MultiSelectChoiceIndicatorSizes: Story = {
     canvasElement.style.zoom = "1.25";
     expectChoiceIndicatorGeometry(
       choiceIndicatorFor(body.getByRole("option", { name: /^Альфа/ })),
-      30
+      25
     );
     canvasElement.style.zoom = "";
   }
 };
+
+export const CompactOptionIndicatorSizes = MultiSelectChoiceIndicatorSizes;
 
 export const MultiSelectChoiceIndicatorRuntimeBrands: Story = {
   args: {} as never,
@@ -1727,6 +2027,8 @@ export const MultiSelectChoiceIndicatorRuntimeBrands: Story = {
   }
 };
 
+export const CompactOptionIndicatorStates = MultiSelectChoiceIndicatorIntegration;
+
 export const MultiSelectChoiceIndicatorBottomSheet: Story = {
   args: {} as never,
   parameters: { viewport: { defaultViewport: "mobile" } },
@@ -1742,12 +2044,14 @@ export const MultiSelectChoiceIndicatorBottomSheet: Story = {
     await expect(listbox).toHaveAttribute("aria-multiselectable", "true");
     const alpha = body.getByRole("option", { name: /^Альфа/ });
     const indicator = choiceIndicatorFor(alpha);
-    expectChoiceIndicatorGeometry(indicator, 24);
+    expectChoiceIndicatorGeometry(indicator, 20);
     await userEvent.click(indicator);
     await expect(canvas.getByLabelText("ChoiceIndicator changes")).toHaveTextContent("1");
     await expect(alpha).toHaveAttribute("aria-selected", "false");
   }
 };
+
+export const BottomSheetParity = MultiSelectChoiceIndicatorBottomSheet;
 
 export const VirtualizedMultiSelectChoiceIndicator: Story = {
   args: {} as never,
@@ -1765,7 +2069,7 @@ export const VirtualizedMultiSelectChoiceIndicator: Story = {
     await expect(first).toHaveAttribute("aria-selected", "true");
     await userEvent.click(indicator);
     await expect(first).toHaveAttribute("aria-selected", "false");
-    expectChoiceIndicatorGeometry(indicator, 24);
+    expectChoiceIndicatorGeometry(indicator, 20);
   }
 };
 

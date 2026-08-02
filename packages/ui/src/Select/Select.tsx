@@ -163,9 +163,15 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const skipFocusRestoreRef = useRef(false);
   const shellRef = useRef<HTMLDivElement | null>(null);
+  const [shellElement, setShellElement] = useState<HTMLDivElement | null>(null);
   const searchRef = useRef<HTMLInputElement | null>(null);
   const firstEnabledActionRef = useRef<HTMLButtonElement | null>(null);
   const listboxRef = useRef<HTMLDivElement | null>(null);
+
+  const setShellNode = useCallback((node: HTMLDivElement | null) => {
+    shellRef.current = node;
+    setShellElement(node);
+  }, []);
 
   useImperativeHandle(ref, () => triggerRef.current as HTMLElement, []);
 
@@ -278,6 +284,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
   const renderPanel = (triggerElement: ReactElement) => (
     <SelectPanel
       outsidePressBoundaryRef={shellRef}
+      referenceElement={shellElement}
       messages={messages}
       multiple={false}
       onOpenChange={handleOpenChange}
@@ -338,8 +345,9 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
       {({ label: controlLabel, ...controlProps }) => (
         <FieldShell
           disabled={disabled}
-          endAdornment={showClearButton ? (
-            <span className={styles.actions} data-field-interactive="">
+          endAdornment={(
+            <span className={styles.actions}>
+              {showClearButton ? (
                 <IconButton
                   aria-label={messages.clear}
                   data-select-clear=""
@@ -353,16 +361,40 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
                   size="sm"
                   variant="ghost"
                 />
+              ) : null}
+              <span aria-hidden="true" className={styles.triggerStatus}>
+                {loading || refreshing ? (
+                  <Spinner
+                    data-select-spinner=""
+                    size={size === "lg" ? "md" : "sm"}
+                    tone="secondary"
+                  />
+                ) : null}
+                {!loading ? <span
+                  aria-hidden="true"
+                  className={classNames(
+                    styles.chevron,
+                    open && styles.chevronOpen
+                  )}
+                  data-select-chevron=""
+                >
+                  <ChevronDown />
+                </span> : null}
+              </span>
             </span>
-          ) : undefined}
+          )}
           invalid={invalid}
           label={controlLabel}
           labelFloated={open || value !== null}
           labelView={labelView}
-          onFocusRequest={() => triggerRef.current?.focus()}
+          onFocusRequest={() => {
+            triggerRef.current?.focus();
+            if (interactive) handleOpenChange(!open);
+          }}
           readOnly={readOnly}
-          ref={shellRef}
+          ref={setShellNode}
           size={size}
+          startAdornment={displayOption?.leading}
         >
           {renderPanel(<button
             {...controlProps}
@@ -382,11 +414,6 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
             type="button"
           >
             <span className={styles.valueContent}>
-              {displayOption?.leading != null ? (
-                <span aria-hidden="true" className={styles.valueLeading}>
-                  {displayOption.leading}
-                </span>
-              ) : null}
               <span
                 className={classNames(
                   styles.valueText,
@@ -407,25 +434,6 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
                   data-field-value-typography=""
                 >{displayOption === null ? placeholder : displayOption.label}</span>
               </span>
-            </span>
-            <span aria-hidden="true" className={styles.triggerStatus}>
-              {loading || refreshing ? (
-                <Spinner
-                  data-select-spinner=""
-                  size={size === "lg" ? "md" : "sm"}
-                  tone="secondary"
-                />
-              ) : null}
-              {!loading ? <span
-                aria-hidden="true"
-                className={classNames(
-                  styles.chevron,
-                  open && styles.chevronOpen
-                )}
-                data-select-chevron=""
-              >
-                <ChevronDown />
-              </span> : null}
             </span>
           </button>)}
         </FieldShell>

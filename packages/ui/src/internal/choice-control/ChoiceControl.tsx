@@ -18,6 +18,7 @@ export interface ChoiceIndicatorProps {
   indeterminate?: boolean;
   invalid?: boolean;
   kind: ChoiceIndicatorKind;
+  presentation?: "option";
   size: ChoiceControlSize;
 }
 
@@ -28,6 +29,7 @@ export function ChoiceIndicator({
   indeterminate = false,
   invalid = false,
   kind,
+  presentation,
   size
 }: ChoiceIndicatorProps) {
   const selected = checked || (kind === "checkbox" && indeterminate);
@@ -41,6 +43,7 @@ export function ChoiceIndicator({
       data-indeterminate={indeterminate ? "" : undefined}
       data-invalid={invalid ? "" : undefined}
       data-kind={kind}
+      data-presentation={presentation}
     >
       {kind === "checkbox" ? <Check className={styles.checkmark} /> : null}
       {kind === "checkbox" ? <Minus className={styles.indeterminateMark} /> : null}
