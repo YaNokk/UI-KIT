@@ -91,9 +91,13 @@ export function CountryPicker({
 
   const handleOpenChange = useCallback((nextOpen: boolean) => {
     if (nextOpen && !interactive) return;
-    if (!nextOpen) search.resetQuery();
-    setOpen(nextOpen);
-  }, [interactive, search.resetQuery]);
+    if (nextOpen) {
+      state.openWithSelection(country === null ? [] : [country]);
+      return;
+    }
+    search.resetQuery();
+    setOpen(false);
+  }, [country, interactive, search.resetQuery, state.openWithSelection]);
 
   const focusInput = useCallback(() => {
     requestAnimationFrame(() => {

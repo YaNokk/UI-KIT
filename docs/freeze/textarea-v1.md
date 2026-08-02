@@ -47,10 +47,11 @@ Focused real-browser stories verify native DOM, focus/error ownership,
 multiline inner-label geometry, autosize growth and maximum, controlled
 external recalculation, resize-only caret preservation, narrow wrapping,
 stable counter geometry, vertical resize and RTL. Forced-colors evidence is a
-separate story and is exercised by the dedicated Chromium instance configured
-with `forcedColors: "active"`; it is not inferred from RTL. Package checks
-require the subpath; consumer and tree-shaking fixtures exercise it
-independently.
+separate story run only by `vitest.textarea-forced-colors.config.ts`; its sole
+Chromium instance sets `forcedColors: "active"` and the story hard-fails unless
+the matching media query is active. It is not inferred from RTL or a
+conditional smoke assertion. Package checks require the subpath; consumer and
+tree-shaking fixtures exercise it independently.
 
 Freeze remains blocked until `textarea:verify` and the complete repository
 workflow pass on one exact commit SHA. This decision is independent from the

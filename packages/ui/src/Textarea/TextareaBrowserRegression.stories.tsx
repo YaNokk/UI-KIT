@@ -188,6 +188,7 @@ export const Rtl: Story = {
 
 export const ForcedColors: Story = {
   args: {} as never,
+  tags: ["forced-colors-only"],
   render: () => (
     <Textarea
       defaultValue="Текст остаётся читаемым в системной цветовой схеме"
@@ -203,6 +204,7 @@ export const ForcedColors: Story = {
     const shell = textarea.closest<HTMLElement>("[data-multiline]");
     if (!shell) throw new Error("Multiline FieldShell was not rendered.");
 
+    await expect(window.matchMedia("(forced-colors: active)").matches).toBe(true);
     textarea.focus();
     await expect(textarea.getBoundingClientRect().width).toBeGreaterThan(0);
     await expect(textarea.getBoundingClientRect().height).toBeGreaterThan(0);
@@ -211,9 +213,7 @@ export const ForcedColors: Story = {
     await expect(Number.parseFloat(getComputedStyle(shell).outlineWidth))
       .toBeGreaterThan(0);
 
-    if (window.matchMedia("(forced-colors: active)").matches) {
-      await expect(getComputedStyle(shell).borderStyle).not.toBe("none");
-      await expect(getComputedStyle(textarea).forcedColorAdjust).not.toBe("none");
-    }
+    await expect(getComputedStyle(shell).borderStyle).not.toBe("none");
+    await expect(getComputedStyle(textarea).forcedColorAdjust).not.toBe("none");
   }
 };

@@ -52,6 +52,10 @@ including browser Storybook, package/consumer and tree-shaking checks.
   threshold and uses the existing `virtua` Select path in both Popover and
   BottomSheet. Search reduces the collection before row rendering and matches
   localized name, ISO2 and calling code.
+- Opening the virtualized country picker makes the selected country the active
+  row and uses the existing virtual scroll API to mount it in the visible
+  window. Tests search before querying any other offscreen country; logical
+  collection completeness is never inferred from the mounted DOM window.
 - The shared Select/MultiSelect flat-list threshold remains 500 and preserves
   its historical strict `>` boundary: 500 rows are not virtualized and 501 are.
   CountryPicker alone passes a private threshold of 200 to

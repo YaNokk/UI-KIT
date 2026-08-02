@@ -44,6 +44,50 @@ function AllowlistHarness() {
   );
 }
 
+function SelectedCountryHarness({ country }: { country: PhoneCountryCode }) {
+  const [value, setValue] = useState("");
+  return (
+    <div style={{ inlineSize: "min(100%, 28rem)" }}>
+      <InternationalPhoneInput
+        country={country}
+        label="Телефон"
+        onValueChange={setValue}
+        value={value}
+      />
+    </div>
+  );
+}
+
+type StoryQueries = ReturnType<typeof within>;
+
+async function openCountryPicker(canvas: StoryQueries, body: StoryQueries) {
+  await userEvent.click(canvas.getByRole("button", { name: /Выбрать страну/ }));
+  const listbox = await body.findByRole("listbox");
+  const search = await body.findByPlaceholderText("Поиск страны");
+  return { listbox, search };
+}
+
+async function searchCountry(
+  body: StoryQueries,
+  query: string,
+  expectedName: RegExp
+) {
+  const search = await body.findByPlaceholderText("Поиск страны");
+  await userEvent.clear(search);
+  await userEvent.type(search, query);
+  return body.findByRole("option", { name: expectedName });
+}
+
+async function chooseCountry(
+  body: StoryQueries,
+  query: string,
+  expectedName: RegExp
+) {
+  const option = await searchCountry(body, query, expectedName);
+  await userEvent.click(option);
+  return option;
+}
+
 function assetFlag(root: ParentNode, country: string) {
   const flag = root.querySelector<HTMLElement>(`[data-country-flag='${country}']`);
   const svg = flag?.querySelector<SVGSVGElement>("svg");
@@ -56,7 +100,7 @@ export const PopoverGeometryTypingPasteAndFocus: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const documentBody = within(canvasElement.ownerDocument.body);
-    const input = canvas.getByRole("textbox", { name: "Телефон" });
+    const input = canvas.getByRole("textbox", { name: "Телефон" }) as HTMLInputElement;
     const shell = canvasElement.querySelector<HTMLElement>("[data-field-part='shell']");
     if (!shell) throw new Error("Phone FieldShell was not rendered.");
 
@@ -67,17 +111,19 @@ export const PopoverGeometryTypingPasteAndFocus: Story = {
     await expect(input).toHaveValue("+48 12 312 31 23");
     await expect(canvas.getByRole("button", { name: /Польша/ })).toBeVisible();
 
-    await userEvent.click(canvas.getByRole("button", { name: /Выбрать страну/ }));
-    const listbox = await documentBody.findByRole("listbox");
-    const surface = listbox.closest<HTMLElement>("[data-select-surface]");
+    const { listbox } = await openCountryPicker(canvas, documentBody);
+    const surface = listbox.closest("[data-select-surface]") as HTMLElement | null;
     if (!surface) throw new Error("Country Popover surface was not rendered.");
     await expect(Math.abs(surface.getBoundingClientRect().width - shell.getBoundingClientRect().width))
       .toBeLessThanOrEqual(1);
-    await userEvent.click(documentBody.getByRole("option", { name: /Германия/ }));
+    await chooseCountry(documentBody, "герм", /Германия/);
     await expect(input).toHaveFocus();
     await expect(documentBody.queryByRole("listbox")).not.toBeInTheDocument();
+    await expect(canvas.getByRole("button", { name: /Германия, \+49/ })).toBeVisible();
     await expect(canvasElement.querySelector("[data-country-flag='DE']"))
       .toHaveAttribute("aria-hidden", "true");
+    await expect(input).toHaveValue(expect.stringMatching(/^\+49(?:\s|$)/));
+    await expect(input.selectionStart ?? 0).toBeGreaterThanOrEqual(3);
   }
 };
 
@@ -107,9 +153,8 @@ export const CompactBottomSheetParity: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const body = within(canvasElement.ownerDocument.body);
-    await userEvent.click(canvas.getByRole("button", { name: /Выбрать страну/ }));
-    await expect(await body.findByRole("listbox")).toBeVisible();
-    await userEvent.click(body.getByRole("option", { name: /Польша/ }));
+    await openCountryPicker(canvas, body);
+    await chooseCountry(body, "поль", /Польша/);
     await expect(canvas.getByRole("textbox", { name: "Телефон" })).toHaveFocus();
   }
 };
@@ -134,8 +179,7 @@ export const AllCountriesVirtualized: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const body = within(canvasElement.ownerDocument.body);
-    await userEvent.click(canvas.getByRole("button", { name: /Выбрать страну: Россия/ }));
-    const listbox = await body.findByRole("listbox");
+    const { listbox } = await openCountryPicker(canvas, body);
     await expect(listbox).toHaveAttribute("data-select-virtualized");
     const mountedOptions = within(listbox).getAllByRole("option");
     await expect(mountedOptions.length).toBeLessThan(getPhoneCountries().length);
@@ -144,12 +188,28 @@ export const AllCountriesVirtualized: Story = {
   }
 };
 
+export const VirtualizedSelectedCountryVisibleOnOpen: Story = {
+  render: () => <SelectedCountryHarness country="JP" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const { listbox } = await openCountryPicker(canvas, body);
+    await expect(listbox).toHaveAttribute("data-select-virtualized");
+    const japan = await body.findByRole("option", { name: /Япония/ });
+    await expect(japan).toHaveAttribute("aria-selected", "true");
+    const listboxRect = listbox.getBoundingClientRect();
+    const optionRect = japan.getBoundingClientRect();
+    await expect(optionRect.top).toBeGreaterThanOrEqual(listboxRect.top);
+    await expect(optionRect.bottom).toBeLessThanOrEqual(listboxRect.bottom);
+  }
+};
+
 export const CountryAllowlist: Story = {
   render: () => <AllowlistHarness />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const body = within(canvasElement.ownerDocument.body);
-    await userEvent.click(canvas.getByRole("button", { name: /Выбрать страну/ }));
+    await openCountryPicker(canvas, body);
     const listbox = await body.findByRole("listbox");
     await expect(listbox).not.toHaveAttribute("data-select-virtualized");
     const options = within(listbox).getAllByRole("option");
@@ -325,7 +385,7 @@ export const BottomSheetAllCountries: Story = {
       "bottom-sheet"
     );
     await expect(body.getByPlaceholderText("Поиск страны")).toBeVisible();
-    await expect(body.getByRole("option", { name: /Австралия/ })).toBeVisible();
+    await expect(await searchCountry(body, "австр", /Австралия/)).toBeVisible();
   }
 };
 

@@ -82,7 +82,11 @@ const storybookCsfTransform: Plugin = {
         "../../../packages/ui/src/InternationalPhoneInput/InternationalPhoneInputBrowserRegression.stories.tsx",
         "../../../packages/ui/src/Textarea/TextareaBrowserRegression.stories.tsx"
       ],
-      tagsFilter: { include: ["test"], exclude: [], skip: [] }
+      tagsFilter: {
+        include: ["test"],
+        exclude: ["forced-colors-only"],
+        skip: []
+      }
     });
 
     return {

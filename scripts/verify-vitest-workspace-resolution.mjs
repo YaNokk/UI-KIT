@@ -16,6 +16,7 @@ const configFiles = [
   "vitest.select-state.config.ts",
   "vitest.choice-controls-state.config.ts",
   "vitest.storybook.config.ts",
+  "vitest.textarea-forced-colors.config.ts",
 ];
 
 for (const configFile of configFiles) {
