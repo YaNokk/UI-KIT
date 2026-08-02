@@ -1,21 +1,25 @@
 # Choice Controls v1 verification
 
-Status: local behavioral, state-capture and package verification complete; CI verification pending.
+Status: Choice Controls v1 verification complete; runtime evidence uploaded; visual freeze declared.
 
-Visual freeze is not declared by this document. Durable freeze governance remains blocked until the workflow succeeds for the committed verification infrastructure and uploads its evidence artifact.
+The complete `UI Tests / storybook-browser` job succeeded for the documentation baseline and runtime tree recorded below. This document is a later docs-only declaration; it does not alter the verified runtime implementation.
 
 ## Identity
 
 | Field | Value |
 | --- | --- |
-| Implementation base SHA | `fbe8fdfb37c1c2d9d96f76054954953f1ead9b3e` |
-| v1.5 infrastructure base SHA | `0ec9903b52546598187d1ca936a54f5ea73bb1f3` |
-| Verification infrastructure commit SHA | `db9594111aa721bd983649c7f922b106652693a6` |
-| Verified runtime SHA | `db9594111aa721bd983649c7f922b106652693a6` |
+| Visual implementation SHA | `9656c00d0c4c28311dc6e909d9ed6fb1a94c9266` |
+| CI gate implementation SHA | `db9594111aa721bd983649c7f922b106652693a6` |
+| Documentation baseline SHA | `0332741811d848153c096d868c708ddb56c6c6e0` |
+| Verified CI commit SHA | `0332741811d848153c096d868c708ddb56c6c6e0` |
 | Workflow | `UI Tests` |
 | Job | `storybook-browser` |
-| Workflow run URL / run ID | pending |
-| CI artifact name | pending run; configured as `choice-controls-storybook-${{ github.sha }}` |
+| Job status | `success` |
+| Workflow run ID | `30742854925` |
+| Workflow run URL | `https://github.com/YaNokk/UI-KIT/actions/runs/30742854925` |
+| Job URL | `https://github.com/YaNokk/UI-KIT/actions/runs/30742854925/job/91483261830` |
+| CI artifact name | `choice-controls-storybook-0332741811d848153c096d868c708ddb56c6c6e0` |
+| Artifact ID / upload status | `8831891949` / `success` |
 | Artifact retention | 30 days |
 
 The local report generator resolves `HEAD` before browser execution and again after both reports are written. The execution verifier rejects evidence whose `verifiedCommit` differs from the checkout `HEAD`.
@@ -35,13 +39,15 @@ The workflow uploads both paths with `actions/upload-artifact@v4`, `if: always()
 
 ## Canonical local verification
 
-Use one entry point for the complete focused Choice Controls gate:
+Use one entry point for the canonical focused Choice Controls verification:
 
 ```text
 npm run choice-controls:verify
 ```
 
 The lower-level Storybook and state-capture scripts remain implementation details for diagnosis. CI uses the canonical command as a required step tied to `${{ github.sha }}`.
+
+The full repository freeze gate is the focused verification plus full Storybook, build, package, consumer, tree-shaking and governance checks. `choice-controls:verify` is not described as the full repository gate.
 
 ## Local verification result
 
@@ -102,9 +108,26 @@ The package correction adds the five already-declared Choice Control subpath ent
 
 ## CI verification result
 
-CI verification pending. No workflow run exists yet for committed v1.3 gate infrastructure `db9594111aa721bd983649c7f922b106652693a6`, so this document does not claim CI success, artifact upload or formal durable freeze.
+GitHub Actions run `30742854925` checked out exact commit `0332741811d848153c096d868c708ddb56c6c6e0`. The `storybook-browser` job completed with conclusion `success` on 2026-08-02 at 10:02:52 UTC.
 
-After the workflow runs, record its run ID/URL, commit SHA, status and uploaded artifact identity in the Identity section. Formal freeze governance requires the `UI Tests / storybook-browser` job to pass and `choice-controls-storybook-<commit SHA>` to be available.
+| CI gate | Result |
+| --- | --- |
+| Checkout identity | passed; exact verified SHA `0332741811d848153c096d868c708ddb56c6c6e0` |
+| Unit tests | passed; 41 files, 351/351 tests |
+| Canonical focused verification | passed; 24/24 executions, 0 skipped, 0 failed |
+| Negative execution fixtures | passed; 14/14 |
+| Real state capture | passed in `chromium-state-capture`; 2/2 tests |
+| Runtime evidence upload | passed; artifact ID `8831891949`, 2006 bytes |
+| Full Storybook | passed; 24 files, 270/270 tests |
+| Storybook static build | passed |
+| Package build | passed; tokens, UI and retail UI |
+| Package verification | passed; all three tarballs verified |
+| Consumer fixture | passed; typecheck and production build |
+| Tree-shaking | passed; static/dynamic subpath isolation verified |
+| Governance | tokens, typecheck, lint, typography and motion passed |
+| Full job | `success` |
+
+The artifact was uploaded as `choice-controls-storybook-0332741811d848153c096d868c708ddb56c6c6e0`, is retained for 30 days and expires on 2026-09-01 at 10:01:20 UTC. Artifact upload occurred before later package gates, and the final freeze relies on the successful full job, not on artifact presence alone.
 
 ## Known warnings and limitations
 
@@ -112,6 +135,7 @@ After the workflow runs, record its run ID/URL, commit SHA, status and uploaded 
 - Unit tests emit existing non-fatal jsdom capability warnings for `window.scrollTo`, canvas `getContext` and pseudo-element computed styles.
 - Storybook reports unmatched story globs for `packages/patterns` and `prototypes`, ignored dependency-level `use client` directives, and chunks above 500 kB.
 - The UI build reports existing empty `modal/index` and `system-color/index` chunks.
+- GitHub Actions reports that Node.js 20-based action runtimes are deprecated and currently forced to Node.js 24; the workflow's project Node remains 22.23.1.
 - Vitest JSON does not expose browser instance names. Environment names therefore come from the shared manifest imported by the actual Storybook config; the verifier proves one complete eight-story suite per configured environment count.
 - Forced-colors automation does not replace manual review with representative Windows high-contrast themes and assistive technology.
 
@@ -119,8 +143,12 @@ After the workflow runs, record its run ID/URL, commit SHA, status and uploaded 
 
 Local behavioral verification complete.
 
+Local state-capture verification complete.
+
 Local package verification complete.
 
-CI verification and runtime evidence upload pending.
+CI verification complete.
 
-Ready for CI visual-freeze verification. Visual freeze is not declared.
+Runtime evidence uploaded.
+
+Choice Controls v1 visual freeze declared.
