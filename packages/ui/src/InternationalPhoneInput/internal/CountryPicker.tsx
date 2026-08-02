@@ -205,6 +205,7 @@ export function CountryPicker({
         selectedValues={selectedValues}
         status={state.status}
         statusMessage={state.status === "empty" ? noCountriesText : state.statusMessage}
+        virtualizationThreshold={200}
       />
     </SelectPanel>
   );

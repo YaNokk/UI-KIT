@@ -52,15 +52,29 @@ including browser Storybook, package/consumer and tree-shaking checks.
   threshold and uses the existing `virtua` Select path in both Popover and
   BottomSheet. Search reduces the collection before row rendering and matches
   localized name, ISO2 and calling code.
-- Flags are private typed 3:2 React SVG assets from
+- The shared Select/MultiSelect flat-list threshold remains 500 and preserves
+  its historical strict `>` boundary: 500 rows are not virtualized and 501 are.
+  CountryPicker alone passes a private threshold of 200 to
+  `SelectListboxView`; no public virtualization prop was added. Grouped lists
+  remain non-virtualized.
+- Shared Select/MultiSelect trigger-toggle coverage lives in the dedicated
+  `SharedFloatingTriggerBrowserRegression` fixture. Both
+  `select-multiselect:verify` and `international-phone-input:verify` reuse the
+  focused `floating-trigger:verify` gate, while phone-specific stories run only
+  in the phone gate.
+- Flags are private generated 3:2 SVG sprite assets sourced from
   `country-flag-icons@1.6.20`. The source project is
   `gitlab.com/catamphetamine/country-flag-icons`, licensed under MIT
-  (Copyright 2020 @catamphetamine). The runtime uses no remote requests,
-  Unicode emoji or injected SVG strings; unknown codes render a decorative
-  globe fallback.
+  (Copyright 2020 @catamphetamine). The source dependency is generation-only;
+  the runtime uses one packaged asset, no remote requests, Unicode emoji or
+  injected SVG strings. Unknown codes render a decorative globe fallback.
 - A static registry integrity test proves every country returned by
-  `libphonenumber-js` has exactly one valid ISO2 flag entry. The registry is
-  internal and has no package export.
+  `libphonenumber-js` has exactly one valid ISO2 flag symbol. The registry is
+  internal and has no package export. The measured React registry added
+  214,910 B raw / 48,526 B gzip consumer JS; the sprite reduces the JS delta to
+  1,912 B raw / 896 B gzip and emits one 159,764 B raw / 43,886 B gzip asset.
+  Full evidence and methodology are recorded in
+  `docs/reports/international-phone-input-flag-bundle-size.md`.
 
 ## Pending freeze gates
 

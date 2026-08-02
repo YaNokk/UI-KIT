@@ -1,10 +1,8 @@
 import { Globe2 } from "lucide-react";
 import type { PhoneCountryCode } from "../phone/phone-number-adapter";
 import { classNames } from "../../shared/classNames";
-import {
-  countryFlagRegistry,
-  hasCountryFlagAsset
-} from "./country-flag-registry";
+import { hasCountryFlagAsset } from "./country-flag-registry";
+import countryFlagSpriteUrl from "./country-flags.sprite.svg?url";
 import styles from "./CountryFlag.module.css";
 
 export interface CountryFlagProps {
@@ -29,7 +27,6 @@ export function CountryFlag({ country, size = "sm" }: CountryFlagProps) {
     );
   }
 
-  const FlagAsset = countryFlagRegistry[iso2];
   return (
     <span
       aria-hidden="true"
@@ -38,7 +35,9 @@ export function CountryFlag({ country, size = "sm" }: CountryFlagProps) {
       data-country-flag-asset=""
       data-size={size}
     >
-      <FlagAsset aria-hidden="true" focusable="false" />
+      <svg aria-hidden="true" focusable="false" viewBox="0 0 3 2">
+        <use href={`${countryFlagSpriteUrl}#flag-${iso2}`} />
+      </svg>
     </span>
   );
 }

@@ -1,9 +1,32 @@
 import { fileURLToPath } from "node:url";
+import { readFileSync } from "node:fs";
 import { defineConfig } from "vite";
 
 const sourceRoot = fileURLToPath(new URL("./src", import.meta.url));
+const countryFlagSpritePath = fileURLToPath(new URL(
+  "./src/internal/country-flags/country-flags.sprite.svg",
+  import.meta.url
+));
 
 export default defineConfig({
+  plugins: [{
+    name: "emit-country-flag-sprite",
+    enforce: "pre",
+    resolveId(source) {
+      return source.endsWith("country-flags.sprite.svg?url")
+        ? "\0country-flag-sprite-url"
+        : null;
+    },
+    load(id) {
+      if (id !== "\0country-flag-sprite-url") return null;
+      const referenceId = this.emitFile({
+        type: "asset",
+        fileName: "assets/country-flags.sprite.svg",
+        source: readFileSync(countryFlagSpritePath)
+      });
+      return `export default import.meta.ROLLUP_FILE_URL_${referenceId};`;
+    }
+  }],
   build: {
     target: "es2022",
     sourcemap: true,

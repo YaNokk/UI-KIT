@@ -34,6 +34,16 @@ const virtualItems: SelectCollectionItem[] = Array.from(
   })
 );
 
+const thresholdCounts = [201, 499, 500, 501] as const;
+const thresholdItems = new Map(thresholdCounts.map((count) => [
+  count,
+  Array.from({ length: count }, (_, index) => ({
+    value: `threshold-${count}-${index}`,
+    label: `Граница ${count}, вариант ${index + 1}`,
+    textValue: `Граница ${count}, вариант ${index + 1}`
+  })) satisfies SelectCollectionItem[]
+]));
+
 const groupedLargeItems: SelectCollectionItem[] = Array.from(
   { length: 6 },
   (_, groupIndex) => ({
@@ -181,6 +191,24 @@ function VirtualFixture() {
       searchable
       value={value}
     />
+  );
+}
+
+function VirtualizationThresholdFixture() {
+  const [values, setValues] = useState<Record<number, string | null>>({});
+  return (
+    <div className={styles.stack}>
+      {thresholdCounts.map((count) => (
+        <Select
+          items={thresholdItems.get(count) ?? []}
+          key={count}
+          label={`Threshold ${count}`}
+          locale="ru-RU"
+          onChange={(value) => setValues((current) => ({ ...current, [count]: value }))}
+          value={values[count] ?? null}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -2056,6 +2084,30 @@ export const VirtualizedMountedActiveDescendant: Story = {
     await expect(virtualOwner).not.toBeNull();
     await expect(listbox.getAttribute("data-select-scroll-owner")).toBeNull();
     await expect(body.queryAllByRole("option").length).toBeLessThan(200);
+  }
+};
+
+export const DefaultVirtualizationThresholdBoundary: Story = {
+  args: {} as never,
+  parameters: { viewport: { defaultViewport: "desktop" } },
+  render: () => <VirtualizationThresholdFixture />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    for (const count of thresholdCounts) {
+      const trigger = canvas.getByRole("button", { name: `Threshold ${count}` });
+      await userEvent.click(trigger);
+      const listbox = await body.findByRole("listbox");
+      if (count <= 500) {
+        await expect(listbox).not.toHaveAttribute("data-select-virtualized");
+        await expect(within(listbox).getAllByRole("option")).toHaveLength(count);
+      } else {
+        await expect(listbox).toHaveAttribute("data-select-virtualized");
+        await expect(within(listbox).getAllByRole("option").length).toBeLessThan(count);
+      }
+      await userEvent.click(trigger);
+      await expect(body.queryByRole("listbox")).not.toBeInTheDocument();
+    }
   }
 };
 

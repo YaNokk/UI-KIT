@@ -18,6 +18,9 @@ describe("CountryFlag", () => {
     expect(root).toHaveTextContent("");
     expect(svg).toHaveAttribute("aria-hidden", "true");
     expect(svg).toHaveAttribute("focusable", "false");
+    expect(svg?.querySelector("use")?.getAttribute("href")).toMatch(
+      /country-flags\.sprite\.svg#flag-RU$/
+    );
   });
 
   it("uses a neutral SVG fallback for an unknown country", () => {

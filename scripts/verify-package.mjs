@@ -53,6 +53,7 @@ const packages = [
       "dist/Input/index.d.ts",
       "dist/InternationalPhoneInput/index.js",
       "dist/InternationalPhoneInput/index.d.ts",
+      "dist/assets/country-flags.sprite.svg",
       "dist/internal/country-flags/CountryFlag.js",
       "dist/internal/country-flags/country-flag-registry.js",
       "dist/NumberInput/index.js",
@@ -188,8 +189,8 @@ const countryFlagRegistryJavaScript = readFileSync(
   ),
   "utf8"
 );
-if (!countryFlagRegistryJavaScript.includes("country-flag-icons/react/3x2")) {
-  throw new Error("The private country flag registry is missing from the UI package.");
+if (countryFlagRegistryJavaScript.includes("country-flag-icons")) {
+  throw new Error("The generated country flag registry retained a runtime dependency.");
 }
 if (countryFlagRegistryJavaScript.includes("regionalIndicator")) {
   throw new Error("Unicode emoji flag generation survived in the UI package.");
@@ -199,8 +200,19 @@ const uiPackageJson = JSON.parse(readFileSync(
   resolve(repositoryRoot, "packages/ui/package.json"),
   "utf8"
 ));
+if (uiPackageJson.dependencies?.["country-flag-icons"]) {
+  throw new Error("country-flag-icons must remain a root-only generation dependency.");
+}
 if (Object.keys(uiPackageJson.exports ?? {}).some((key) => key.includes("country-flag"))) {
   throw new Error("Private country flag internals must not have a package export.");
+}
+
+const countryFlagJavaScript = readFileSync(
+  resolve(repositoryRoot, "packages/ui/dist/internal/country-flags/CountryFlag.js"),
+  "utf8"
+);
+if (!countryFlagJavaScript.includes("_country-flag-sprite-url.js")) {
+  throw new Error("CountryFlag does not reference the emitted private sprite asset.");
 }
 
 writeFileSync(

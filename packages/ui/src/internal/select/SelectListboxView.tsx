@@ -26,7 +26,7 @@ import type { SelectResolvedStatus } from "./useSelectState";
 import type { SelectMessages } from "./types";
 import styles from "./SelectListbox.module.css";
 
-const VIRTUALIZATION_THRESHOLD = 200;
+const DEFAULT_VIRTUALIZATION_THRESHOLD = 500;
 
 export interface SelectListboxViewProps<Value extends string> {
   rows: SelectRow<Value>[];
@@ -44,6 +44,7 @@ export interface SelectListboxViewProps<Value extends string> {
   onPickRow: (row: SelectInteractiveRow<Value>) => void;
   firstEnabledActionRef?: RefObject<HTMLButtonElement | null>;
   autoFocus?: boolean;
+  virtualizationThreshold?: number;
 }
 
 interface RowContentSlots {
@@ -96,7 +97,8 @@ function SelectListboxViewInner<Value extends string>(
     onHoverRow,
     onPickRow,
     firstEnabledActionRef,
-    autoFocus = true
+    autoFocus = true,
+    virtualizationThreshold = DEFAULT_VIRTUALIZATION_THRESHOLD
   }: SelectListboxViewProps<Value>,
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
@@ -119,7 +121,7 @@ function SelectListboxViewInner<Value extends string>(
     );
   }, [optionRows, activeRowId]);
   const virtualized =
-    optionRows.length > VIRTUALIZATION_THRESHOLD
+    optionRows.length > virtualizationThreshold
     && !optionRows.some((row) => row.type === "group-header")
     && typeof ResizeObserver === "function"
     && typeof ResizeObserver.prototype?.observe === "function";
