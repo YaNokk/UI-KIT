@@ -53,6 +53,8 @@ const packages = [
       "dist/Input/index.d.ts",
       "dist/InternationalPhoneInput/index.js",
       "dist/InternationalPhoneInput/index.d.ts",
+      "dist/internal/country-flags/CountryFlag.js",
+      "dist/internal/country-flags/country-flag-registry.js",
       "dist/NumberInput/index.js",
       "dist/NumberInput/index.d.ts",
       "dist/PasswordInput/index.js",
@@ -177,6 +179,28 @@ const uiJavaScript = readFileSync(
 );
 if (!/from\s+["']react["']/.test(uiJavaScript)) {
   throw new Error("React is not visibly external in the UI package output.");
+}
+
+const countryFlagRegistryJavaScript = readFileSync(
+  resolve(
+    repositoryRoot,
+    "packages/ui/dist/internal/country-flags/country-flag-registry.js"
+  ),
+  "utf8"
+);
+if (!countryFlagRegistryJavaScript.includes("country-flag-icons/react/3x2")) {
+  throw new Error("The private country flag registry is missing from the UI package.");
+}
+if (countryFlagRegistryJavaScript.includes("regionalIndicator")) {
+  throw new Error("Unicode emoji flag generation survived in the UI package.");
+}
+
+const uiPackageJson = JSON.parse(readFileSync(
+  resolve(repositoryRoot, "packages/ui/package.json"),
+  "utf8"
+));
+if (Object.keys(uiPackageJson.exports ?? {}).some((key) => key.includes("country-flag"))) {
+  throw new Error("Private country flag internals must not have a package export.");
 }
 
 writeFileSync(

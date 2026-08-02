@@ -26,7 +26,7 @@ import type { SelectResolvedStatus } from "./useSelectState";
 import type { SelectMessages } from "./types";
 import styles from "./SelectListbox.module.css";
 
-const VIRTUALIZATION_THRESHOLD = 500;
+const VIRTUALIZATION_THRESHOLD = 200;
 
 export interface SelectListboxViewProps<Value extends string> {
   rows: SelectRow<Value>[];

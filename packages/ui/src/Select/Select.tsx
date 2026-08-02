@@ -389,7 +389,7 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
           labelView={labelView}
           onFocusRequest={() => {
             triggerRef.current?.focus();
-            if (interactive) handleOpenChange(!open);
+            if (interactive) triggerRef.current?.click();
           }}
           readOnly={readOnly}
           ref={shellRef}

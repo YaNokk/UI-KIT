@@ -1,9 +1,9 @@
 import {
   cloneElement,
   type HTMLProps,
-  type MouseEventHandler,
   type ReactElement,
-  type Ref
+  type Ref,
+  type SyntheticEvent
 } from "react";
 
 type TriggerProps = Record<string, unknown> & {
@@ -20,13 +20,13 @@ function assignRef<T>(ref: Ref<T> | undefined, value: T | null) {
   }
 }
 
-function composeEventHandlers(
-  first: MouseEventHandler<Element> | undefined,
-  second: MouseEventHandler<Element> | undefined
+function composeEventHandlers<Event extends SyntheticEvent<Element>>(
+  first: ((event: Event) => void) | undefined,
+  second: ((event: Event) => void) | undefined
 ) {
   if (!first) return second;
   if (!second) return first;
-  return (event: Parameters<MouseEventHandler<Element>>[0]) => {
+  return (event: Event) => {
     first(event);
     if (!event.defaultPrevented) second(event);
   };
@@ -47,6 +47,14 @@ export function renderFloatingTrigger(
     onClick: composeEventHandlers(
       (triggerProps as HTMLProps<Element>).onClick,
       additionalProps.onClick
+    ),
+    onMouseDown: composeEventHandlers(
+      (triggerProps as HTMLProps<Element>).onMouseDown,
+      additionalProps.onMouseDown
+    ),
+    onPointerDown: composeEventHandlers(
+      (triggerProps as HTMLProps<Element>).onPointerDown,
+      additionalProps.onPointerDown
     )
   });
 

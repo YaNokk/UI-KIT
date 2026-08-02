@@ -11,10 +11,10 @@ const meta = {
   title: "Components/InternationalPhoneInput",
   component: InternationalPhoneInput,
   args: {
-    countries: ["RU", "PL", "DE", "GB", "US"],
     defaultCountry: "RU",
     id: "international-phone",
-    label: "Телефон"
+    label: "Телефон",
+    name: "phone"
   },
   parameters: {
     docs: {
@@ -54,6 +54,14 @@ export const Default: Story = {
     await userEvent.type(input, "4957888878");
     await expect(input).toHaveValue("+7 495 788 88 78");
   }
+};
+
+export const AllCountries: Story = {
+  render: (args) => (
+    <form autoComplete="on" onSubmit={(event) => event.preventDefault()}>
+      <ControlledExample {...args} />
+    </form>
+  )
 };
 
 export const Controlled: Story = {

@@ -1,8 +1,13 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { createRef, useRef, type RefObject } from "react";
-import { cleanup, render, screen } from "@testing-library/react";
+import {
+  createRef,
+  useRef,
+  type MouseEventHandler,
+  type RefObject
+} from "react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { resolveSelectMessages } from "./messages";
 import { SelectPanel } from "./SelectPanel";
@@ -81,5 +86,80 @@ describe("SelectPanelTriggerRefLifecycle", () => {
     expect(triggerRef.current).toBeNull();
     expect(trigger.isConnected).toBe(false);
     expect(focus).not.toHaveBeenCalled();
+  });
+});
+
+describe("SelectPanel shared pointer-toggle contract", () => {
+  const renderPanel = ({
+    consumerOnClick,
+    interactive = true,
+    onOpenChange,
+    open = false
+  }: {
+    consumerOnClick?: MouseEventHandler<HTMLButtonElement>;
+    interactive?: boolean;
+    onOpenChange: (open: boolean) => void;
+    open?: boolean;
+  }) => render(
+    <SelectPanel
+      interactive={interactive}
+      messages={resolveSelectMessages("en-US")}
+      multiple={false}
+      onOpenChange={onOpenChange}
+      open={open}
+      trigger={(
+        <button onClick={consumerOnClick} type="button">
+          Shared trigger
+        </button>
+      )}
+    >
+      <div role="listbox">Options</div>
+    </SelectPanel>
+  );
+
+  it("composes the consumer click before one shared state transition", () => {
+    const calls: string[] = [];
+    renderPanel({
+      consumerOnClick: () => calls.push("consumer"),
+      onOpenChange: (open) => calls.push(`open:${String(open)}`)
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Shared trigger" }));
+
+    expect(calls).toEqual(["consumer", "open:true"]);
+  });
+
+  it("honors consumer defaultPrevented", () => {
+    const onOpenChange = vi.fn();
+    renderPanel({
+      consumerOnClick: (event) => event.preventDefault(),
+      onOpenChange
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Shared trigger" }));
+
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it("requests close from the same trigger when already open", () => {
+    const onOpenChange = vi.fn();
+    renderPanel({ onOpenChange, open: true });
+    const trigger = screen.getByRole("button", { name: "Shared trigger" });
+
+    expect(fireEvent.pointerDown(trigger)).toBe(false);
+    expect(fireEvent.mouseDown(trigger)).toBe(false);
+    fireEvent.click(trigger);
+
+    expect(onOpenChange).toHaveBeenCalledOnce();
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("does not toggle a non-interactive trigger", () => {
+    const onOpenChange = vi.fn();
+    renderPanel({ interactive: false, onOpenChange });
+
+    fireEvent.click(screen.getByRole("button", { name: "Shared trigger" }));
+
+    expect(onOpenChange).not.toHaveBeenCalled();
   });
 });

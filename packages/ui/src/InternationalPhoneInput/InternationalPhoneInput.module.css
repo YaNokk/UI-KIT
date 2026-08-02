@@ -81,17 +81,6 @@
   stroke-width: var(--ds-icon-stroke-default);
 }
 
-.flag {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  inline-size: var(--ds-size-icon-md);
-  block-size: var(--ds-size-icon-sm);
-  overflow: hidden;
-  font: var(--ds-typography-body-lg);
-  white-space: nowrap;
-}
-
 .chevron {
   transition: transform var(--ds-motion-control-state-duration)
     var(--ds-motion-control-state-easing);

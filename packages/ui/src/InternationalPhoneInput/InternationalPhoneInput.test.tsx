@@ -39,6 +39,54 @@ describe("InternationalPhoneInput", () => {
     );
   });
 
+  it("forwards native browser autofill identifiers", () => {
+    render(
+      <form autoComplete="on">
+        <InternationalPhoneInput
+          autoComplete="tel"
+          id="contact-phone"
+          label="Телефон"
+          name="phone"
+        />
+      </form>
+    );
+
+    const input = screen.getByRole("textbox", { name: "Телефон" });
+    expect(input).toHaveAttribute("autocomplete", "tel");
+    expect(input).toHaveAttribute("id", "contact-phone");
+    expect(input).toHaveAttribute("name", "phone");
+    expect(input).toHaveAttribute("type", "tel");
+    expect(input).toHaveAttribute("inputmode", "tel");
+    expect(input).toHaveProperty("form", input.closest("form"));
+  });
+
+  it("commits a browser autofill DOM replacement on blur", async () => {
+    const onValueChange = vi.fn();
+    render(
+      <InternationalPhoneInput
+        defaultCountry="RU"
+        label="Телефон"
+        onValueChange={onValueChange}
+      />
+    );
+    const input = screen.getByRole("textbox", { name: "Телефон" });
+    fireEvent.focus(input);
+    const nativeValueSetter = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value"
+    )?.set;
+    if (!nativeValueSetter) throw new Error("Native input value setter is unavailable.");
+    nativeValueSetter.call(input, "+7 911 854-48-71");
+
+    fireEvent.blur(input);
+
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      "+79118544871",
+      expect.objectContaining({ country: "RU", source: "input" })
+    );
+    await waitFor(() => expect(input).toHaveValue("+7 911 854 48 71"));
+  });
+
   it("normalizes pasted national values under the selected country", () => {
     const onValueChange = vi.fn();
     render(

@@ -9,6 +9,7 @@ import {
   type RefObject
 } from "react";
 import { Input } from "../../Input/Input";
+import { CountryFlag } from "../../internal/country-flags";
 import type { PhoneCountryCode } from "../../internal/phone/phone-number-adapter";
 import type { SelectInteractiveRow, SelectOption } from "../../internal/select/collection";
 import { resolveSelectMessages } from "../../internal/select/messages";
@@ -18,7 +19,6 @@ import { SelectPanel } from "../../internal/select/SelectPanel";
 import { useSelectState } from "../../internal/select/useSelectState";
 import { classNames } from "../../shared/classNames";
 import styles from "../InternationalPhoneInput.module.css";
-import { CountryFlag } from "./CountryFlag";
 import type { PhoneCountry } from "./phone-country-data";
 
 export interface CountryPickerProps {
@@ -57,7 +57,7 @@ export function CountryPicker({
       value: item.iso2,
       label: item.displayName,
       textValue: item.textValue,
-      leading: <CountryFlag country={item.iso2} />,
+      leading: <CountryFlag country={item.iso2} size="md" />,
       trailing: `+${item.callingCode}`
     })),
     [countries]
@@ -139,7 +139,7 @@ export function CountryPicker({
       ref={triggerRef}
       type="button"
     >
-      {current === null ? <Globe2 /> : <CountryFlag country={current.iso2} />}
+      {current === null ? <Globe2 /> : <CountryFlag country={current.iso2} size="sm" />}
       {interactive ? (
         <ChevronDown
           aria-hidden="true"
@@ -177,6 +177,7 @@ export function CountryPicker({
   return (
     <SelectPanel
       geometryReferenceRef={fieldRef}
+      outsidePressBoundaryRef={fieldRef}
       focusTriggerRef={triggerRef}
       header={searchField}
       initialFocusRef={searchRef}

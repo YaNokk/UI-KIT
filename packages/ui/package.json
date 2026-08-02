@@ -167,6 +167,7 @@
     "@maskito/phone": "^4.0.1",
     "@mypoint/tokens": "^0.1.0",
     "@radix-ui/react-dialog": "1.1.23",
+    "country-flag-icons": "^1.6.20",
     "libphonenumber-js": "^1.13.10",
     "lucide-react": "^1.27.0",
     "virtua": "^0.41.5"

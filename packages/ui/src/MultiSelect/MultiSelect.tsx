@@ -525,7 +525,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
           labelView={labelView}
           onFocusRequest={() => {
             triggerRef.current?.focus();
-            if (interactive) handleOpenChange(!open);
+            if (interactive) triggerRef.current?.click();
           }}
           readOnly={readOnly}
           ref={shellRef}

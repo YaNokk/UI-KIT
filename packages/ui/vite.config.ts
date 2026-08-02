@@ -119,6 +119,7 @@ export default defineConfig({
         || id === "@maskito/core"
         || id === "@maskito/kit"
         || id === "@maskito/phone"
+        || id.startsWith("country-flag-icons")
         || id.startsWith("libphonenumber-js")
         || id === "@mypoint/tokens"
         || id === "@radix-ui/react-dialog"

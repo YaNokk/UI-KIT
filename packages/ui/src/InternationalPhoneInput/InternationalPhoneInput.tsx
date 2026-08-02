@@ -283,11 +283,14 @@ export const InternationalPhoneInput = forwardRef<
     emitValue
   ]);
 
-  const applyInternationalPasteValue = useCallback((rawValue: string) => {
+  const applyInternationalValue = useCallback((
+    rawValue: string,
+    source: "input" | "paste"
+  ) => {
     const nextValue = normalizePhoneValue(rawValue);
     const nextCountry = detectPhoneCountry(nextValue, allowedCountries);
     if (nextCountry === null) {
-      applyNationalEditingValue(rawValue, "paste");
+      applyNationalEditingValue(rawValue, source);
       return;
     }
     if (nextCountry !== effectiveCountry) {
@@ -297,7 +300,7 @@ export const InternationalPhoneInput = forwardRef<
         source: "number"
       });
     }
-    emitValue(nextValue, nextCountry, "paste");
+    emitValue(nextValue, nextCountry, source);
   }, [
     allowedCountries,
     applyNationalEditingValue,
@@ -315,7 +318,7 @@ export const InternationalPhoneInput = forwardRef<
     const pasted = event.clipboardData.getData("text");
     if (!pasted) return;
     event.preventDefault();
-    if (pasted.trimStart().startsWith("+")) applyInternationalPasteValue(pasted);
+    if (pasted.trimStart().startsWith("+")) applyInternationalValue(pasted, "paste");
     else applyNationalEditingValue(pasted, "paste");
   };
 
@@ -428,7 +431,25 @@ export const InternationalPhoneInput = forwardRef<
             inputMode="tel"
             onBlur={(event: FocusEvent<HTMLInputElement>) => {
               setFocused(false);
-              if (semanticValue === "") setDisplayValue("");
+              const domValue = event.currentTarget.value;
+              const normalizedDomValue = normalizePhoneValue(domValue);
+              const callingCode = effectiveCountry === null
+                ? null
+                : getCountryCallingCode(effectiveCountry);
+              const focusSeed = callingCode === null ? "" : `+${callingCode}`;
+              if (
+                normalizedDomValue !== ""
+                && normalizedDomValue !== semanticValue
+                && !(semanticValue === "" && normalizedDomValue === focusSeed)
+              ) {
+                if (domValue.trimStart().startsWith("+")) {
+                  applyInternationalValue(domValue, "input");
+                } else {
+                  applyNationalEditingValue(domValue, "input");
+                }
+              } else if (semanticValue === "") {
+                setDisplayValue("");
+              }
               onBlur?.(event);
             }}
             onChange={handleChange}

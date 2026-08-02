@@ -12,6 +12,10 @@ including browser Storybook, package/consumer and tree-shaking checks.
   internal and available in change metadata.
 - The component uses one `FormControl` + `FieldShell` with a private country
   trigger, native `type=tel` input and clear action.
+- Browser autofill uses the native `type="tel"` and `autocomplete="tel"`
+  contract. Consumers provide the stable form-specific `name`; the canonical
+  All Countries story demonstrates `name="phone"` inside an autocomplete-enabled
+  form so address-manager autofill can recognize the control.
 - Country metadata comes from `libphonenumber-js/min`, is localized from the
   Design System locale boundary and can be restricted by an allowlist.
 - Maskito owns editing formatting; the private adapter owns normalization,
@@ -41,12 +45,29 @@ including browser Storybook, package/consumer and tree-shaking checks.
 - Clearing preserves the protected calling-code prefix by default and places
   the caret after it. `preserveCountryCallingCode={false}` emits an empty value
   without discarding the selected country.
+- Omitting `countries` exposes the complete `libphonenumber-js` country set,
+  ordered by localized display name with ISO2 as a deterministic tie-breaker.
+  Supplying `countries` is an explicit allowlist and never changes locale.
+- The complete country collection crosses the shared flat-list virtualization
+  threshold and uses the existing `virtua` Select path in both Popover and
+  BottomSheet. Search reduces the collection before row rendering and matches
+  localized name, ISO2 and calling code.
+- Flags are private typed 3:2 React SVG assets from
+  `country-flag-icons@1.6.20`. The source project is
+  `gitlab.com/catamphetamine/country-flag-icons`, licensed under MIT
+  (Copyright 2020 @catamphetamine). The runtime uses no remote requests,
+  Unicode emoji or injected SVG strings; unknown codes render a decorative
+  globe fallback.
+- A static registry integrity test proves every country returned by
+  `libphonenumber-js` has exactly one valid ISO2 flag entry. The registry is
+  internal and has no package export.
 
 ## Pending freeze gates
 
 Run the repository's full CI matrix at one commit SHA. In particular, the
-candidate includes focused real-browser stories for trigger toggling, prefix
-protection, caret boundaries, localized search and country-switching paste,
+candidate includes focused real-browser stories for shared trigger toggling,
+prefix protection, caret boundaries, full-list virtualization, responsive
+country parity, SVG flag geometry, localized search and country-switching paste,
 but still requires exact-SHA CI evidence for those stories plus autofill,
 320 px layout, Popover width, BottomSheet parity, forced
 colors, reduced motion and RTL. Package build, pack, clean-consumer and

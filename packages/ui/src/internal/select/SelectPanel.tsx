@@ -5,6 +5,8 @@ import {
   type ReactElement,
   type ReactNode,
   type FocusEvent,
+  type MouseEventHandler,
+  type PointerEventHandler,
   type MutableRefObject,
   type RefObject
 } from "react";
@@ -83,6 +85,26 @@ export function SelectPanel({
     requestedOpen.current = nextOpen;
     onOpenChange(nextOpen);
   }, [onOpenChange]);
+  const handleTriggerClick = useCallback<MouseEventHandler<Element>>((event) => {
+    if (event.defaultPrevented || !interactive) return;
+    requestOpenChange(!open);
+  }, [interactive, open, requestOpenChange]);
+  const handleTriggerPointerDown = useCallback<PointerEventHandler<Element>>(
+    (event) => {
+      if (event.defaultPrevented || !interactive || !open) return;
+      // Keep focus inside the mounted panel until the click toggle runs.
+      // Otherwise focus-out closes first and the following click reopens.
+      event.preventDefault();
+    },
+    [interactive, open]
+  );
+  const handleTriggerMouseDown = useCallback<MouseEventHandler<Element>>(
+    (event) => {
+      if (event.defaultPrevented || !interactive || !open) return;
+      event.preventDefault();
+    },
+    [interactive, open]
+  );
 
   useEffect(() => {
     if (previousOpen.current && !open) {
@@ -152,9 +174,11 @@ export function SelectPanel({
     trigger,
     floating.getReferenceProps,
     setTriggerNode,
-    interactive
-      ? { onClick: () => requestOpenChange(!open) }
-      : {}
+    {
+      onClick: handleTriggerClick,
+      onMouseDown: handleTriggerMouseDown,
+      onPointerDown: handleTriggerPointerDown
+    }
   );
 
   const handlePopoverFocusOut = (event: FocusEvent<HTMLDivElement>) => {

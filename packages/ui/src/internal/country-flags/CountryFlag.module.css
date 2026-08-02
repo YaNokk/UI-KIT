@@ -1,0 +1,22 @@
+.root {
+  display: block;
+  flex: none;
+  overflow: hidden;
+  aspect-ratio: 3 / 2;
+  border-radius: var(--ds-radius-xs);
+}
+
+.sm {
+  inline-size: var(--ds-size-icon-md);
+}
+
+.md {
+  inline-size: var(--ds-size-icon-lg);
+}
+
+.root > svg,
+.root[data-country-flag-fallback] {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
