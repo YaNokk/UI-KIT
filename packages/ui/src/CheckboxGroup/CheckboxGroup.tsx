@@ -35,6 +35,15 @@ export interface CheckboxGroupProps<Value extends string = string> {
   ) => void;
   options: readonly CheckboxGroupOption<Value>[];
   orientation?: ChoiceGroupOrientation;
+  /**
+   * Marks the group as required in the visual/form metadata layer.
+   *
+   * Does not apply the native `required` attribute to child checkboxes and does
+   * not implement "at least one selected" validation. The form/application layer
+   * owns that validation.
+   *
+   * @default false
+   */
   required?: boolean;
   size?: ChoiceControlSize;
   value?: readonly Value[];

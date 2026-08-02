@@ -92,18 +92,34 @@ export const SwitchBrandForeground: Story = {
       {switchBrands.map((fixture) => (
         <DesignSystemProvider
           {...("brand" in fixture ? { brand: fixture.brand } : {})}
-          data-switch-brand={fixture.name}
           key={fixture.name}
         >
-          <div className="flex items-center gap-3 p-2">
+          <div className="flex items-center gap-3 p-2" data-switch-brand={fixture.name}>
             <Switch defaultChecked label={`${fixture.name} switch`} />
             <Button variant="primary">{`${fixture.name} primary`}</Button>
+            <span
+              aria-hidden="true"
+              className="inline-block size-1"
+              data-primary-background-probe=""
+              data-testid="primary-background-probe"
+              style={{ backgroundColor: "var(--ds-action-primary-background)" }}
+            />
+            <span
+              aria-hidden="true"
+              className="inline-block size-1"
+              data-primary-foreground-probe=""
+              data-testid="primary-foreground-probe"
+              style={{ backgroundColor: "var(--ds-action-primary-foreground)" }}
+            />
           </div>
         </DesignSystemProvider>
       ))}
-      <div>
+      <div data-disabled-switch-scope="">
         <span
+          aria-hidden="true"
+          className="inline-block size-1"
           data-disabled-thumb-probe=""
+          data-testid="disabled-thumb-probe"
           style={{ backgroundColor: "var(--ds-icon-disabled)" }}
         />
         <Switch defaultChecked disabled label="disabled checked switch" />
@@ -111,37 +127,58 @@ export const SwitchBrandForeground: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     const forcedColors = matchMedia("(forced-colors: active)").matches;
 
     for (const fixture of switchBrands) {
       const scope = canvasElement.querySelector(`[data-switch-brand="${fixture.name}"]`);
       if (!(scope instanceof HTMLElement)) throw new Error(`Missing ${fixture.name}`);
-      const control = within(scope).getByRole("switch", { name: `${fixture.name} switch` });
-      const button = within(scope).getByRole("button", { name: `${fixture.name} primary` });
+      const scoped = within(scope);
+      const control = scoped.getByRole("switch", { name: `${fixture.name} switch` });
+      const button = scoped.getByRole("button", { name: `${fixture.name} primary` });
+      const backgroundProbe = scoped.getByTestId("primary-background-probe");
+      const foregroundProbe = scoped.getByTestId("primary-foreground-probe");
       const indicator = indicatorFor(control);
       const thumb = indicator.firstElementChild;
       if (!(thumb instanceof HTMLElement)) throw new Error(`Missing ${fixture.name} thumb`);
 
       if (!forcedColors) {
         expect(getComputedStyle(indicator).backgroundColor)
-          .toBe(getComputedStyle(button).backgroundColor);
+          .toBe(getComputedStyle(backgroundProbe).backgroundColor);
         expect(getComputedStyle(thumb).backgroundColor)
-          .toBe(getComputedStyle(button).color);
+          .toBe(getComputedStyle(foregroundProbe).backgroundColor);
+        expect(getComputedStyle(button).backgroundColor)
+          .toBe(getComputedStyle(backgroundProbe).backgroundColor);
+        expect(getComputedStyle(button).color)
+          .toBe(getComputedStyle(foregroundProbe).backgroundColor);
+      } else {
+        expect(getComputedStyle(indicator).forcedColorAdjust).toBe("none");
+        expect(getComputedStyle(indicator).borderWidth).not.toBe("0px");
+        expect(indicator.getBoundingClientRect().width).toBeGreaterThan(0);
+        expect(thumb.getBoundingClientRect().width).toBeGreaterThan(0);
+        expect(getComputedStyle(indicator).backgroundColor)
+          .not.toBe(getComputedStyle(thumb).backgroundColor);
       }
     }
 
-    const disabled = canvas.getByRole("switch", { name: "disabled checked switch" });
+    const disabledScope = canvasElement.querySelector("[data-disabled-switch-scope]");
+    if (!(disabledScope instanceof HTMLElement)) throw new Error("Missing disabled scope");
+    const disabledScoped = within(disabledScope);
+    const disabled = disabledScoped.getByRole("switch", { name: "disabled checked switch" });
     const disabledIndicator = indicatorFor(disabled);
     const disabledThumb = disabledIndicator.firstElementChild;
-    const disabledProbe = canvasElement.querySelector("[data-disabled-thumb-probe]");
+    const disabledProbe = disabledScoped.getByTestId("disabled-thumb-probe");
     if (!(disabledThumb instanceof HTMLElement)) throw new Error("Missing disabled thumb");
     if (!(disabledProbe instanceof HTMLElement)) throw new Error("Missing disabled probe");
-    expect(getComputedStyle(disabledThumb).backgroundColor).toBe(
-      forcedColors
-        ? getComputedStyle(disabledIndicator).color
-        : getComputedStyle(disabledProbe).backgroundColor
-    );
+    if (!forcedColors) {
+      expect(getComputedStyle(disabledThumb).backgroundColor)
+        .toBe(getComputedStyle(disabledProbe).backgroundColor);
+    } else {
+      expect(getComputedStyle(disabledIndicator).forcedColorAdjust).toBe("none");
+      expect(getComputedStyle(disabledIndicator).borderWidth).not.toBe("0px");
+      expect(disabledThumb.getBoundingClientRect().width).toBeGreaterThan(0);
+      expect(getComputedStyle(disabledIndicator).backgroundColor)
+        .not.toBe(getComputedStyle(disabledThumb).backgroundColor);
+    }
   }
 };
 

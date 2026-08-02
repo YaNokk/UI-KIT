@@ -58,6 +58,27 @@ describe("CheckboxGroup", () => {
     }
   });
 
+  it("keeps required as visual/form metadata without native at-least-one validation", () => {
+    const { container } = render(
+      <form>
+        <CheckboxGroup label="Required channels" options={options} required />
+      </form>
+    );
+    const form = container.querySelector("form");
+    if (!form) throw new Error("Expected form fixture");
+    const group = screen.getByRole("group", { name: "Required channels" });
+    const marker = screen.getByText("*");
+
+    expect(group).toHaveAttribute("data-required");
+    expect(group).not.toHaveAttribute("aria-required");
+    expect(marker).toBeVisible();
+    expect(marker).toHaveAttribute("aria-hidden", "true");
+    expect(form.checkValidity()).toBe(true);
+    for (const checkbox of screen.getAllByRole("checkbox")) {
+      expect(checkbox).not.toBeRequired();
+    }
+  });
+
   it("keeps group invalid state on the fieldset and replaces description", () => {
     render(
       <CheckboxGroup
