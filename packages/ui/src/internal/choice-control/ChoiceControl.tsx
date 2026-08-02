@@ -76,6 +76,7 @@ export function ChoiceControlContent({
     <span
       className={styles.content}
       data-disabled={disabled ? "" : undefined}
+      data-message={message != null ? "" : undefined}
       data-size={size}
     >
       {label == null ? null : <span className={styles.labelText} id={labelId}>{label}</span>}

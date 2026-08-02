@@ -71,7 +71,13 @@
   border-radius: var(--ds-radius-sm);
 }
 
-.indicator[data-kind="checkbox"] > svg {
+.indicator[data-kind="checkbox"].sm > svg {
+  inline-size: calc(var(--ds-size-icon-sm) - var(--ds-space-1));
+  block-size: calc(var(--ds-size-icon-sm) - var(--ds-space-1));
+  stroke-width: calc(var(--ds-icon-stroke-default) + 1);
+}
+
+.indicator[data-kind="checkbox"].md > svg {
   inline-size: var(--ds-size-icon-sm);
   block-size: var(--ds-size-icon-sm);
   stroke-width: calc(var(--ds-icon-stroke-default) + 1);
@@ -135,14 +141,18 @@
 
 .indicator[data-kind="switch"] {
   justify-content: flex-start;
-  padding: var(--ds-border-width-strong);
+  padding: var(--ds-space-0);
   background-color: var(--ds-border-strong);
   border-color: var(--ds-border-strong);
 }
 
 .indicator[data-kind="switch"].sm {
   --switch-thumb-size: var(--ds-size-icon-sm);
-  --switch-thumb-translation: var(--ds-space-2);
+  --switch-thumb-translation: calc(
+    var(--ds-size-control-sm)
+    - (2 * var(--ds-border-width-strong))
+    - var(--switch-thumb-size)
+  );
 
   inline-size: var(--ds-size-control-sm);
   block-size: var(--ds-size-icon-md);
@@ -150,7 +160,11 @@
 
 .indicator[data-kind="switch"].md {
   --switch-thumb-size: var(--ds-size-icon-md);
-  --switch-thumb-translation: var(--ds-space-3);
+  --switch-thumb-translation: calc(
+    var(--ds-size-control-md)
+    - (2 * var(--ds-border-width-strong))
+    - var(--switch-thumb-size)
+  );
 
   inline-size: var(--ds-size-control-md);
   block-size: var(--ds-size-icon-lg);
@@ -240,6 +254,16 @@
 
 .content[data-size="sm"] .labelText {
   font: var(--ds-typography-body-sm);
+}
+
+.content[data-size="sm"]:not([data-message]) {
+  min-block-size: var(--ds-size-icon-md);
+  justify-content: center;
+}
+
+.content[data-size="md"]:not([data-message]) {
+  min-block-size: var(--ds-size-icon-lg);
+  justify-content: center;
 }
 
 .message {
