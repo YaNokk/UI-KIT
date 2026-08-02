@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useRef,
   type ReactElement,
@@ -125,15 +126,20 @@ export function SelectPanel({
     role: undefined
   });
 
-  const setTriggerNode = (node: HTMLElement | null) => {
-    if (node === null && geometryReferenceRef) return;
+  const setTriggerNode = useCallback((node: HTMLElement | null) => {
     if (node === referenceElementRef.current) return;
     referenceElementRef.current = node;
-    floating.refs.setReference(
-      geometryReferenceRef ? virtualReferenceRef.current : node
-    );
     if (triggerRef) triggerRef.current = node;
-  };
+
+    if (geometryReferenceRef) {
+      if (node !== null) {
+        floating.refs.setReference(virtualReferenceRef.current);
+      }
+      return;
+    }
+
+    floating.refs.setReference(node);
+  }, [floating.refs, geometryReferenceRef, triggerRef]);
 
   const renderedTrigger = renderFloatingTrigger(
     trigger,

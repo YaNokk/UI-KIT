@@ -1,6 +1,6 @@
 # MultiSelect ChoiceIndicator Integration v1 — freeze report
 
-Status: **visual correction required; freeze withdrawn**
+Status: **corrective implementation complete; visual approval Blocked; CI verification pending; freeze withdrawn**
 
 Withdrawal date: 2026-08-02
 
@@ -17,6 +17,20 @@ Verification date: 2026-08-02
 This pass integrates the private frozen `ChoiceIndicator` into MultiSelect
 option rows without reopening the Choice Controls v1 or Select / MultiSelect v1
 public contracts.
+
+## Corrective v1.2 status
+
+The active corrective geometry is now 16×16 px for `sm` and 20×20 px for `md`/`lg`.
+The 20/24/24 mapping and approvals below are retained only as historical evidence
+for the withdrawn original integration; they are not the active geometry contract.
+
+The v1.2 implementation adds a canonical `npm run select-multiselect:verify` gate,
+required exact-SHA workflow placement, and trigger-reference replacement/unmount
+lifecycle coverage. Local automated verification passed, including 355/355 unit
+tests in three consecutive runs, the 141/141 focused browser matrix and the 339/339
+complete Storybook suite. Human visual approval is recorded as **Blocked** because
+no explicit approval was supplied in this task. Exact-SHA CI run evidence is pending,
+so this document does not declare CI success or restore the freeze.
 
 ## Dependency and migration
 
@@ -139,4 +153,6 @@ option-owned interaction and focus, Popover / BottomSheet parity, runtime-brand
 and forced-colors behavior, virtualization compatibility and grouped-option
 compatibility. Public MultiSelect props and Choice Controls v1 contracts are
 unchanged. That freeze is now withdrawn pending the corrective geometry pass,
-focused browser assertions and full CI evidence.
+explicit human visual approval and full exact-SHA CI evidence. The corrective
+implementation and local automated assertions are complete; the two approval gates
+remain open.

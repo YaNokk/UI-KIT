@@ -32,6 +32,8 @@ jobs:
             .artifacts/choice-controls-storybook-summary.json
           if-no-files-found: error
           retention-days: 30
+      - name: Run Select and MultiSelect verification for ${{ github.sha }}
+        run: npm run select-multiselect:verify
       - run: npm run test:storybook
       - run: npm run build-storybook
       - run: npm run build
