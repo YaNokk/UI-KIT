@@ -165,7 +165,8 @@ export default defineConfig({
     ],
     browser: {
       enabled: true,
-      api: { host: "127.0.0.1" },
+      // Keep the browser API outside Windows/Hyper-V dynamic exclusion ranges.
+      api: { host: "127.0.0.1", port: 64000 },
       provider: "playwright",
       headless: true,
       instances: [
