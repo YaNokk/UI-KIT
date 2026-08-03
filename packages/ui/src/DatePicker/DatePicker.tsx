@@ -8,6 +8,7 @@ import { resolveWeekStartsOn } from "../internal/date/locale";
 import type { DateValue, WeekStartsOn } from "../internal/date/types";
 import { useControllableValue } from "../internal/date/useControllableValue";
 import { PickerOverlay } from "../internal/date-picker/PickerOverlay";
+import { usePickerDraft } from "../internal/date-picker/usePickerDraft";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import { resolveDateMessages } from "../internal/date/resolveDateMessages";
 
@@ -56,56 +57,73 @@ export function DatePicker({
   const messages = resolveDateMessages(locale);
   const [value, setValue] = useControllableValue(controlledValue, defaultValue, onChange);
   const [open, setOpen] = useControllableValue(controlledOpen, defaultOpen, onOpenChange);
-  const [draft, setDraft] = useState<DateValue | null>(value);
   const [month, setMonth] = useState(() => value ? dateValueToLocalDate(value) : new Date());
+  const [calendarViewKey, setCalendarViewKey] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const pickerDraft = usePickerDraft({ value, open, commitMode, setValue });
+  const { draft, displayValue } = pickerDraft;
 
   useEffect(() => {
     if (open) {
-      setDraft(value);
       setMonth(value ? dateValueToLocalDate(value) : new Date());
     }
   }, [open, value]);
+  useEffect(() => {
+    if (open) setCalendarViewKey((key) => key + 1);
+  }, [open]);
 
   useEffect(() => {
     const form = inputRef.current?.form;
     if (!form) return;
     const reset = () => queueMicrotask(() => {
       setValue(defaultValue);
-      setDraft(defaultValue);
+      pickerDraft.setDraft(defaultValue);
       setMonth(defaultValue ? dateValueToLocalDate(defaultValue) : new Date());
     });
     form.addEventListener("reset", reset);
     return () => form.removeEventListener("reset", reset);
-  }, [defaultValue, setValue]);
+  }, [defaultValue, pickerDraft.setDraft, setValue]);
 
   const context = useMemo(() => ({ now: new Date(), locale, minDate, maxDate }), [locale, maxDate, minDate]);
 
-  const close = () => setOpen(false);
+  const handleOpenChange = (next: boolean) => {
+    if (next) {
+      pickerDraft.openDraft();
+      setMonth(value ? dateValueToLocalDate(value) : new Date());
+    } else {
+      pickerDraft.discard();
+    }
+    setOpen(next);
+  };
+  const close = () => handleOpenChange(false);
   const select = (next: DateValue) => {
-    setDraft(next);
+    pickerDraft.update(next);
+    setMonth(dateValueToLocalDate(next));
     if (commitMode === "immediate") {
-      setValue(next);
       close();
     }
   };
   const trigger = (
     <DateInput
       {...inputProps}
+      defaultValue={defaultValue}
       disabled={disabled}
       endAdornment={<CalendarDays />}
       isDateUnavailable={isDateUnavailable}
       locale={locale}
       maxDate={maxDate}
       minDate={minDate}
-      onChange={setValue}
+      onChange={(next) => {
+        pickerDraft.update(next);
+        if (next) setMonth(dateValueToLocalDate(next));
+      }}
       onClick={(event) => {
         inputProps.onClick?.(event);
-        if (!event.defaultPrevented && !disabled && !readOnly) setOpen(true);
+        if (!event.defaultPrevented && !disabled && !readOnly && !open) handleOpenChange(true);
       }}
       readOnly={readOnly}
       ref={inputRef}
-      value={value}
+      value={displayValue}
     />
   );
 
@@ -115,13 +133,10 @@ export function DatePicker({
       footer={commitMode === "apply" ? (
         <>
           <Button onClick={close} variant="secondary">{messages.cancel}</Button>
-          <Button disabled={!draft} onClick={() => { if (draft) setValue(draft); close(); }} variant="primary">{messages.apply}</Button>
+          <Button disabled={!draft} onClick={() => { if (draft) pickerDraft.apply(); close(); }} variant="primary">{messages.apply}</Button>
         </>
       ) : undefined}
-      onOpenChange={(next) => {
-        if (!next) setDraft(value);
-        setOpen(next);
-      }}
+      onOpenChange={handleOpenChange}
       open={open}
       title={messages.chooseDate}
       trigger={trigger}
@@ -143,11 +158,12 @@ export function DatePicker({
         month={month}
         onMonthChange={setMonth}
         onSelect={select}
+        resetViewKey={calendarViewKey}
         value={draft}
         weekStartsOn={weekStartsOn}
       />
       {commitMode === "immediate" ? (
-        <Button onClick={() => { setValue(null); close(); }} size="sm" variant="secondary">{messages.reset}</Button>
+        <Button onClick={() => { pickerDraft.update(null); close(); }} size="sm" variant="secondary">{messages.reset}</Button>
       ) : null}
     </PickerOverlay>
   );

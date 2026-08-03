@@ -86,4 +86,68 @@ describe("DateTimePicker", () => {
     await Promise.resolve();
     expect(input).toHaveValue("08/02/2026, 18:30");
   });
+
+  it("keeps manual trigger edits in draft until Apply and discards them on Cancel", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <DateTimePicker
+        defaultOpen
+        defaultValue="2026-08-11T18:30"
+        label="Date and time"
+        locale="en-US"
+        onChange={onChange}
+      />
+    );
+    const trigger = screen.getByRole("textbox", { name: "Date and time" });
+    trigger.focus();
+    await user.keyboard("{Control>}a{/Control}09");
+    expect(screen.getByRole("button", { name: "Open month selection" })).toHaveTextContent("August 2026");
+    await user.keyboard("{Control>}a{/Control}081220260930");
+    expect(trigger).toHaveValue("08/12/2026, 09:30");
+    expect(screen.getByRole("button", { name: "Open month selection" })).toHaveTextContent("August 2026");
+    expect(onChange).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(trigger).toHaveValue("08/11/2026, 18:30");
+    expect(onChange).not.toHaveBeenCalled();
+
+    await user.click(trigger);
+    await user.keyboard("{Control>}a{/Control}091220260930");
+    expect(screen.getByRole("button", { name: "Open month selection" })).toHaveTextContent("September 2026");
+    await user.click(screen.getByRole("button", { name: "Apply" }));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenLastCalledWith("2026-09-12T09:30");
+  });
+
+  it("commits one complete manual trigger edit in immediate mode", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <DateTimePicker
+        commitMode="immediate"
+        defaultOpen
+        defaultValue="2026-08-11T18:30"
+        label="Date and time"
+        locale="en-US"
+        onChange={onChange}
+      />
+    );
+    const trigger = screen.getByRole("textbox", { name: "Date and time" });
+    trigger.focus();
+    await user.keyboard("{Control>}a{/Control}081220260930");
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenLastCalledWith("2026-08-12T09:30");
+  });
+
+  it("reopens in calendar days view", async () => {
+    const user = userEvent.setup();
+    render(<DateTimePicker defaultOpen label="Date and time" locale="en-US" />);
+    await user.click(screen.getByRole("button", { name: "Open month selection" }));
+    await user.click(screen.getByRole("button", { name: "Open year selection" }));
+    expect(document.querySelector("[data-calendar-year-grid]")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await user.click(screen.getByRole("textbox", { name: "Date and time" }));
+    expect(screen.getByRole("grid")).toBeInTheDocument();
+    expect(document.querySelector("[data-calendar-year-grid]")).not.toBeInTheDocument();
+  });
 });

@@ -45,4 +45,48 @@ describe("DatePicker", () => {
     expect(screen.getByRole("button", { name: "Open month selection" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Предыдущий месяц" })).not.toBeInTheDocument();
   });
+
+  it("drafts manual trigger edits and commits them exactly once on Apply", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <DatePicker
+        commitMode="apply"
+        defaultOpen
+        defaultValue="2026-08-11"
+        label="Date"
+        locale="en-US"
+        onChange={onChange}
+      />
+    );
+    const trigger = screen.getByRole("textbox", { name: "Date" });
+    trigger.focus();
+    await user.keyboard("{Control>}a{/Control}09122026");
+    expect(trigger).toHaveValue("09/12/2026");
+    expect(screen.getByRole("button", { name: "Open month selection" })).toHaveTextContent("September 2026");
+    expect(onChange).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(trigger).toHaveValue("08/11/2026");
+    expect(onChange).not.toHaveBeenCalled();
+
+    await user.click(trigger);
+    await user.keyboard("{Control>}a{/Control}09122026");
+    await user.click(screen.getByRole("button", { name: "Apply" }));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenLastCalledWith("2026-09-12");
+  });
+
+  it("reopens in calendar days view", async () => {
+    const user = userEvent.setup();
+    render(<DatePicker commitMode="apply" defaultOpen defaultValue="2026-08-11" label="Date" locale="en-US" />);
+    const trigger = screen.getByRole("textbox", { name: "Date" });
+    await user.click(screen.getByRole("button", { name: "Open month selection" }));
+    await user.click(screen.getByRole("button", { name: "Open year selection" }));
+    expect(screen.queryByRole("grid")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await user.click(trigger);
+    expect(screen.getByRole("grid")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open month selection" })).toBeInTheDocument();
+  });
 });

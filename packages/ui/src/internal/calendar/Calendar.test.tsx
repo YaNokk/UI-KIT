@@ -50,4 +50,27 @@ describe("Calendar navigation", () => {
     );
     expect(screen.getByRole("button", { name: "Следующий месяц" })).toBeDisabled();
   });
+
+  it("returns from years to months and resets to days when resetViewKey changes", async () => {
+    const user = userEvent.setup();
+    const props = {
+      locale: "en-US",
+      month: new Date(2026, 7, 1),
+      onMonthChange: vi.fn(),
+      onSelect: vi.fn(),
+      weekStartsOn: 0 as const
+    };
+    const { rerender } = render(<Calendar {...props} resetViewKey={0} />);
+    await user.click(screen.getByRole("button", { name: "Open month selection" }));
+    await user.click(screen.getByRole("button", { name: "Open year selection" }));
+    expect(document.querySelector("[data-calendar-year-grid]")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Back to month selection" }));
+    expect(document.querySelector("[data-calendar-month-grid]")).toBeInTheDocument();
+    expect(document.querySelector("[data-calendar-year-grid]")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Open year selection" }));
+    rerender(<Calendar {...props} resetViewKey={1} />);
+    expect(screen.getByRole("grid", { name: "August 2026" })).toBeInTheDocument();
+    expect(document.querySelector("[data-calendar-year-grid]")).not.toBeInTheDocument();
+  });
 });

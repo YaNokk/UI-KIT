@@ -8,6 +8,7 @@ export interface DateMessages {
   previousPage: string;
   nextPage: string;
   backToDays: string;
+  backToMonthSelection: string;
   startDate: string;
   endDate: string;
   startDateTime: string;
@@ -50,6 +51,7 @@ const en: DateMessages = {
   selectMonth: "Select month", selectYear: "Select year",
   openMonthSelection: "Open month selection", openYearSelection: "Open year selection",
   previousPage: "Previous page", nextPage: "Next page", backToDays: "Back to calendar days",
+  backToMonthSelection: "Back to month selection",
   startDate: "From", endDate: "To", startDateTime: "Start date and time",
   endDateTime: "End date and time", chooseDate: "Choose a date", chooseDateTime: "Choose date and time",
   chooseRange: "Choose a date range", chooseDateTimeRange: "Choose date and time range",
@@ -71,6 +73,7 @@ const ru: DateMessages = {
   selectMonth: "Выберите месяц", selectYear: "Выберите год",
   openMonthSelection: "Открыть выбор месяца", openYearSelection: "Открыть выбор года",
   previousPage: "Предыдущая страница", nextPage: "Следующая страница", backToDays: "Вернуться к дням календаря",
+  backToMonthSelection: "Вернуться к выбору месяца",
   startDate: "От", endDate: "До", startDateTime: "Дата и время начала",
   endDateTime: "Дата и время окончания", chooseDate: "Выберите дату", chooseDateTime: "Выберите дату и время",
   chooseRange: "Выберите период", chooseDateTimeRange: "Выберите период и время",

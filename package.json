@@ -37,6 +37,7 @@
     "date-calendar-navigation:verify": "vitest run packages/ui/src/internal/calendar && npm run test:storybook -- packages/ui/src/internal/calendar/CalendarBrowserRegression.stories.tsx",
     "date-range-input:verify": "vitest run packages/ui/src/internal/date/range-input packages/ui/src/DateRangeInput packages/ui/src/DateTimeRangeInput",
     "date-calendar-mode:verify": "vitest run packages/ui/src/internal/calendar && npm run test:storybook -- packages/ui/src/internal/calendar/CalendarBrowserRegression.stories.tsx",
+    "date-picker-draft:verify": "vitest run packages/ui/src/internal/date-picker/usePickerDraft.test.ts packages/ui/src/DatePicker packages/ui/src/DateTimePicker packages/ui/src/DateRangePicker packages/ui/src/DateTimeRangePicker",
     "date-time-picker:verify": "vitest run packages/ui/src/DateTimePicker && npm run test:storybook -- packages/ui/src/DateTimePicker/DateTimePickerBrowserRegression.stories.tsx",
     "date-picker:verify": "vitest run packages/ui/src/DatePicker && npm run test:storybook -- packages/ui/src/DatePicker/DatePickerBrowserRegression.stories.tsx",
     "date-range-picker:verify": "vitest run packages/ui/src/DateRangeInput packages/ui/src/DateRangePicker && npm run test:storybook -- packages/ui/src/DateRangePicker/DateRangePickerBrowserRegression.stories.tsx",
@@ -52,6 +53,7 @@
     "publish:local": "node scripts/publish-local.mjs",
     "release:check": "node scripts/verify-release-version.mjs",
     "storybook": "storybook dev -p 6006 -c apps/storybook/.storybook",
+    "storybook:lan": "storybook dev -p 6006 --host 0.0.0.0 -c apps/storybook/.storybook",
     "storybook:mcp:check": "node scripts/verify-storybook-mcp.mjs",
     "build-storybook": "storybook build -c apps/storybook/.storybook -o storybook-static"
   },

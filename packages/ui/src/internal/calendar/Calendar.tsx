@@ -28,6 +28,7 @@ export interface CalendarProps {
   onMonthChange: (month: Date) => void;
   onSelect: (date: DateValue) => void;
   onHoverDateChange?: (date: DateValue | null) => void;
+  resetViewKey?: string | number | undefined;
 }
 
 function getWeekdayLabels(locale: string, weekStartsOn: WeekStartsOn) {
@@ -57,7 +58,8 @@ export function Calendar({
   isDateUnavailable,
   onMonthChange,
   onSelect,
-  onHoverDateChange
+  onHoverDateChange,
+  resetViewKey
 }: CalendarProps) {
   const [view, setView] = useState<"days" | "months" | "years">("days");
   const currentMonth = clampCalendarMonth(month, minDate, maxDate);
@@ -73,6 +75,10 @@ export function Calendar({
   const visibleMonths = Array.from({ length: months }, (_, index) => addMonths(currentMonth, index));
   const previousMonth = clampCalendarMonth(addMonths(currentMonth, -1), minDate, maxDate);
   const nextMonth = clampCalendarMonth(addMonths(currentMonth, 1), minDate, maxDate);
+
+  useEffect(() => {
+    setView("days");
+  }, [resetViewKey]);
 
   const isSelectable = (candidate: DateValue) => !(
     (minDate && compareDateValues(candidate, minDate) < 0)
@@ -171,7 +177,7 @@ export function Calendar({
       {view === "years" ? <>
         <header className={styles.navigation}>
           <IconButton aria-label={messages.previousPage} disabled={minYear !== null && yearPageStart <= minYear} icon={<ChevronLeft />} onClick={() => setYearPageStart((start) => start - 12)} size="sm" />
-          <Button aria-label={messages.backToDays} onClick={() => setView("days")} size="sm" variant="soft">{yearPageStart}–{yearPageStart + 11}</Button>
+          <Button aria-label={messages.backToMonthSelection} onClick={() => setView("months")} size="sm" variant="soft">{yearPageStart}–{yearPageStart + 11}</Button>
           <IconButton aria-label={messages.nextPage} disabled={maxYear !== null && yearPageStart + 11 >= maxYear} icon={<ChevronRight />} onClick={() => setYearPageStart((start) => start + 12)} size="sm" />
         </header>
         <div className={styles.modeGrid} data-calendar-year-grid="">

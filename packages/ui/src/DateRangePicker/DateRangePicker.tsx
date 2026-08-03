@@ -18,6 +18,7 @@ import type {
 } from "../internal/date/types";
 import { useControllableValue } from "../internal/date/useControllableValue";
 import { PickerOverlay } from "../internal/date-picker/PickerOverlay";
+import { usePickerDraft } from "../internal/date-picker/usePickerDraft";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import styles from "./DateRangePicker.module.css";
 import { resolveDateMessages } from "../internal/date/resolveDateMessages";
@@ -61,7 +62,7 @@ export function DateRangePicker({
   maxDate,
   isDateUnavailable,
   presets,
-  currentPeriodMode = "elapsed",
+  currentPeriodMode = "full",
   maxDuration,
   locale: explicitLocale,
   weekStartsOn: explicitWeekStartsOn,
@@ -80,10 +81,12 @@ export function DateRangePicker({
   const messages = resolveDateMessages(locale);
   const [value, setValue] = useControllableValue(controlledValue, defaultValue, onChange);
   const [open, setOpen] = useControllableValue(controlledOpen, defaultOpen, onOpenChange);
-  const [draft, setDraft] = useState(value);
   const [hoverDate, setHoverDate] = useState<DateValue | null>(null);
   const [month, setMonth] = useState(() => value.from ? dateValueToLocalDate(value.from) : new Date());
+  const [calendarViewKey, setCalendarViewKey] = useState(0);
   const inputGroupRef = useRef<HTMLInputElement | null>(null);
+  const pickerDraft = usePickerDraft({ value, open, commitMode: "apply", setValue });
+  const { draft, displayValue } = pickerDraft;
   const resolvedPresets = useMemo(() => presets ?? createStandardDateRangePresets({
     locale,
     currentPeriodMode,
@@ -93,28 +96,41 @@ export function DateRangePicker({
 
   useEffect(() => {
     if (open) {
-      setDraft(value);
       setMonth(value.from ? dateValueToLocalDate(value.from) : new Date());
     }
   }, [open, value]);
+  useEffect(() => {
+    if (open) setCalendarViewKey((key) => key + 1);
+  }, [open]);
 
   useEffect(() => {
     const form = inputGroupRef.current?.closest("form");
     if (!form) return;
     const reset = () => queueMicrotask(() => {
       setValue(defaultValue);
-      setDraft(defaultValue);
+      pickerDraft.setDraft(defaultValue);
       setMonth(defaultValue.from ? dateValueToLocalDate(defaultValue.from) : new Date());
     });
     form.addEventListener("reset", reset);
     return () => form.removeEventListener("reset", reset);
-  }, [defaultValue, setValue]);
+  }, [defaultValue, pickerDraft.setDraft, setValue]);
+
+  const handleOpenChange = (next: boolean) => {
+    if (next) {
+      pickerDraft.openDraft();
+      setMonth(value.from ? dateValueToLocalDate(value.from) : new Date());
+    } else {
+      pickerDraft.discard();
+    }
+    setOpen(next);
+  };
 
   const canApply = isDateRangeComplete(draft) && isDateRangeDurationValid(draft, maxDuration);
   const trigger = (
-    <div onClick={() => { if (!disabled && !readOnly) setOpen(true); }}>
+    <div onClick={() => { if (!disabled && !readOnly && !open) handleOpenChange(true); }}>
       <DateRangeInput
         block={block}
+        defaultValue={defaultValue}
         disabled={disabled}
         error={error}
         fromName={fromName}
@@ -124,12 +140,16 @@ export function DateRangePicker({
         locale={locale}
         maxDate={maxDate}
         minDate={minDate}
-        onChange={(next) => { if (isDateRangeComplete(next)) setValue(next); }}
+        onChange={(next) => {
+          if (!isDateRangeComplete(next) || !next.from) return;
+          pickerDraft.update(next);
+          setMonth(dateValueToLocalDate(next.from));
+        }}
         readOnly={readOnly}
         ref={inputGroupRef}
         required={required}
         toName={toName}
-        value={value}
+        value={displayValue}
       />
       <span hidden><CalendarDays /></span>
     </div>
@@ -140,15 +160,12 @@ export function DateRangePicker({
       closeLabel={messages.close}
       footer={(
         <>
-          <Button onClick={() => setDraft(EMPTY_RANGE)} variant="soft">{messages.reset}</Button>
-          <Button onClick={() => { setDraft(value); setOpen(false); }} variant="secondary">{messages.cancel}</Button>
-          <Button disabled={!canApply} onClick={() => { if (canApply) setValue(draft); setOpen(false); }} variant="primary">{messages.apply}</Button>
+          <Button onClick={() => pickerDraft.update(EMPTY_RANGE)} variant="soft">{messages.reset}</Button>
+          <Button onClick={() => handleOpenChange(false)} variant="secondary">{messages.cancel}</Button>
+          <Button disabled={!canApply} onClick={() => { if (canApply) pickerDraft.apply(); handleOpenChange(false); }} variant="primary">{messages.apply}</Button>
         </>
       )}
-      onOpenChange={(next) => {
-        if (!next) setDraft(value);
-        setOpen(next);
-      }}
+      onOpenChange={handleOpenChange}
       open={open}
       title={messages.chooseRange}
       trigger={trigger}
@@ -164,7 +181,7 @@ export function DateRangePicker({
                 className={styles.preset}
                 key={preset.id}
                 onClick={() => {
-                  setDraft(resolved);
+                  pickerDraft.update(resolved);
                   if (resolved.from) setMonth(dateValueToLocalDate(resolved.from));
                 }}
                 size="sm"
@@ -190,8 +207,9 @@ export function DateRangePicker({
             months={2}
             onHoverDateChange={setHoverDate}
             onMonthChange={setMonth}
-            onSelect={(selected) => setDraft(selectRangeDate(draft, selected).value)}
+            onSelect={(selected) => pickerDraft.update(selectRangeDate(draft, selected).value)}
             range={draft}
+            resetViewKey={calendarViewKey}
             weekStartsOn={weekStartsOn}
           />
         </div>

@@ -92,4 +92,56 @@ describe("DateTimeRangePicker", () => {
       </DesignSystemProvider>
     )).toThrow(RangeError);
   });
+
+  it("drafts 18:30 manual trigger edits and applies exactly once after Cancel", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <DateTimeRangePicker
+        defaultOpen
+        defaultValue={{ from: "2026-08-11T09:00", to: "2026-08-22T18:00" }}
+        label="Period"
+        locale="en-US"
+        minuteStep={15}
+        onChange={onChange}
+        timeZone="Europe/Kaliningrad"
+      />
+    );
+    const trigger = screen.getByRole("textbox", { name: "Period" });
+    trigger.focus();
+    await user.keyboard("{Control>}a{/Control}091220260930092320261830");
+    expect(trigger).toHaveValue("09/12/2026, 09:30 — 09/23/2026, 18:30");
+    expect(screen.getByRole("button", { name: "Open month selection" })).toHaveTextContent("September 2026");
+    expect(onChange).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(trigger).toHaveValue("08/11/2026, 09:00 — 08/22/2026, 18:00");
+    expect(onChange).not.toHaveBeenCalled();
+
+    await user.click(trigger);
+    await user.keyboard("{Control>}a{/Control}091220260930092320261830");
+    await user.click(screen.getByRole("button", { name: "Apply" }));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenLastCalledWith({
+      from: "2026-09-12T09:30",
+      to: "2026-09-23T18:30"
+    });
+  });
+
+  it("reopens in calendar days view", async () => {
+    const user = userEvent.setup();
+    render(
+      <DateTimeRangePicker
+        defaultOpen
+        label="Period"
+        locale="en-US"
+        timeZone="Europe/Kaliningrad"
+      />
+    );
+    await user.click(screen.getByRole("button", { name: "Open month selection" }));
+    await user.click(screen.getByRole("button", { name: "Open year selection" }));
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await user.click(screen.getByRole("textbox", { name: "Period" }));
+    expect(screen.getAllByRole("grid")).toHaveLength(2);
+    expect(document.querySelector("[data-calendar-year-grid]")).not.toBeInTheDocument();
+  });
 });

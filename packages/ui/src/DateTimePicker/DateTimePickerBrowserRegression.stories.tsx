@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within } from "storybook/test";
 import { DateTimePicker } from "./DateTimePicker";
@@ -9,6 +10,51 @@ const meta = {
 } satisfies Meta<typeof DateTimePicker>;
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+function ManualDraftHarness() {
+  const [value, setValue] = useState<"2026-08-11T18:30" | "2026-09-12T09:30">("2026-08-11T18:30");
+  const [calls, setCalls] = useState(0);
+  return (
+    <>
+      <DateTimePicker
+        defaultOpen
+        label="Date and time"
+        locale="en-US"
+        onChange={(next) => {
+          setCalls((current) => current + 1);
+          setValue(next as typeof value);
+        }}
+        value={value}
+      />
+      <output data-testid="commit-state">{value}|{calls}</output>
+    </>
+  );
+}
+
+export const ApplyModeManualDraftLifecycle: Story = {
+  render: () => <ManualDraftHarness />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole("textbox", { name: "Date and time" });
+    trigger.focus();
+    await userEvent.keyboard("{Control>}a{/Control}091220260930");
+    await expect(trigger).toHaveValue("09/12/2026, 09:30");
+    await expect(canvas.getByTestId("commit-state")).toHaveTextContent("2026-08-11T18:30|0");
+    await userEvent.click(body.getByRole("button", { name: "Cancel" }));
+    await expect(trigger).toHaveValue("08/11/2026, 18:30");
+    await userEvent.click(trigger);
+    await userEvent.click(body.getByRole("button", { name: "Open month selection" }));
+    await userEvent.click(body.getByRole("button", { name: "Open year selection" }));
+    await userEvent.click(body.getByRole("button", { name: "Cancel" }));
+    await userEvent.click(trigger);
+    await expect(body.getByRole("grid")).toBeVisible();
+    trigger.focus();
+    await userEvent.keyboard("{Control>}a{/Control}091220260930");
+    await userEvent.click(body.getByRole("button", { name: "Apply" }));
+    await expect(canvas.getByTestId("commit-state")).toHaveTextContent("2026-09-12T09:30|1");
+  }
+};
 
 export const PreservesTimeAndApplies: Story = {
   render: () => (

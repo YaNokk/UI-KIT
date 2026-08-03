@@ -9,11 +9,11 @@ import {
 
 const config: StorybookConfig = {
   stories: [
-    "../src/**/*.stories.@(ts|tsx)",
-    "../../../packages/ui/src/**/*.stories.@(ts|tsx)",
-    "../../../packages/patterns/src/**/*.stories.@(ts|tsx)",
-    "../../../packages/retail-ui/src/**/*.stories.@(ts|tsx)",
-    "../../../prototypes/**/*.stories.@(ts|tsx)"
+    "../src/**/!(__screenshots__)/*.stories.@(ts|tsx)",
+    "../../../packages/ui/src/**/!(__screenshots__)/*.stories.@(ts|tsx)",
+    "../../../packages/patterns/src/**/!(__screenshots__)/*.stories.@(ts|tsx)",
+    "../../../packages/retail-ui/src/**/!(__screenshots__)/*.stories.@(ts|tsx)",
+    "../../../prototypes/**/!(__screenshots__)/*.stories.@(ts|tsx)"
   ],
   addons: [
     "@storybook/addon-docs",

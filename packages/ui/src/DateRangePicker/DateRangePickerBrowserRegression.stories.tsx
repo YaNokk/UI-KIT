@@ -14,7 +14,18 @@ type Story = StoryObj<typeof meta>;
 
 function Harness() {
   const [value, setValue] = useState<DateRangeValue>({ from: null, to: null });
-  return <DateRangePicker label="Период" locale="ru-RU" onChange={setValue} value={value} />;
+  const [calls, setCalls] = useState(0);
+  return (
+    <>
+      <DateRangePicker
+        label="Период"
+        locale="ru-RU"
+        onChange={(next) => { setCalls((current) => current + 1); setValue(next); }}
+        value={value}
+      />
+      <output data-testid="commit-count">{calls}</output>
+    </>
+  );
 }
 
 export const DraftApplyAndCancel: Story = {
@@ -26,9 +37,15 @@ export const DraftApplyAndCancel: Story = {
     if (!fromInput) throw new Error("Date range start input was not rendered.");
     await userEvent.click(fromInput);
     await userEvent.click(await body.findByRole("button", { name: "Сегодня" }));
+    await expect(fromInput).not.toHaveValue("");
+    await expect(canvas.getByTestId("commit-count")).toHaveTextContent("0");
+    await userEvent.click(body.getByRole("button", { name: "Отмена" }));
     await expect(fromInput).toHaveValue("");
+    await userEvent.click(fromInput);
+    await userEvent.click(await body.findByRole("button", { name: "Сегодня" }));
     await userEvent.click(body.getByRole("button", { name: "Применить" }));
     await expect(fromInput).not.toHaveValue("");
+    await expect(canvas.getByTestId("commit-count")).toHaveTextContent("1");
   }
 };
 
