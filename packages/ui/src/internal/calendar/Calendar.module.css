@@ -1,3 +1,16 @@
+.root {
+  display: grid;
+  gap: var(--ds-space-3);
+  min-inline-size: 0;
+}
+
+.navigation {
+  display: grid;
+  grid-template-columns: var(--ds-size-control-sm) minmax(0, 1fr) minmax(0, 0.6fr) var(--ds-size-control-sm);
+  gap: var(--ds-space-2);
+  align-items: center;
+}
+
 .viewport {
   display: grid;
   grid-template-columns: repeat(var(--calendar-month-count, 1), minmax(0, 1fr));
@@ -9,13 +22,6 @@
   display: grid;
   gap: var(--ds-space-3);
   min-inline-size: 0;
-}
-
-.header {
-  display: grid;
-  grid-template-columns: var(--ds-size-control-sm) minmax(0, 1fr) var(--ds-size-control-sm);
-  gap: var(--ds-space-2);
-  align-items: center;
 }
 
 .monthLabel {
@@ -104,6 +110,11 @@
 }
 
 @media (--ds-below-md) {
+  .navigation {
+    grid-template-columns: var(--ds-size-control-sm) minmax(0, 1fr) minmax(0, 0.6fr) var(--ds-size-control-sm);
+    gap: var(--ds-space-1);
+  }
+
   .viewport {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--ds-space-5);

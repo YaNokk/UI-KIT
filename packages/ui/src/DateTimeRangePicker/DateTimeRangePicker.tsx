@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../Button/Button";
 import { DateTimeRangeInput, type DateTimeRangeInputProps } from "../DateTimeRangeInput/DateTimeRangeInput";
-import { TimeInput, type MinuteStep } from "../TimeInput/TimeInput";
+import type { MinuteStep } from "../TimeInput/TimeInput";
 import { Calendar } from "../internal/calendar/Calendar";
 import { dateValueToLocalDate } from "../internal/date/dateMath";
 import { equalDateTimeRanges } from "../internal/date/dateComparison";
@@ -9,6 +9,7 @@ import { createStandardDateTimeRangePresets } from "../internal/date/dateTimePre
 import { validateDateTimeRange } from "../internal/date/dateTimeRange";
 import { resolveWeekStartsOn } from "../internal/date/locale";
 import { joinLocalDateTime } from "../internal/date/parseLocalDateTimeValue";
+import { resolveDateMessages } from "../internal/date/resolveDateMessages";
 import { selectRangeDate } from "../internal/date/dateRange";
 import { zonedNow } from "../internal/date/timezone";
 import type {
@@ -46,6 +47,8 @@ export interface DateTimeRangePickerProps extends Omit<
   minValue?: LocalDateTimeValue | undefined;
   maxValue?: LocalDateTimeValue | undefined;
   minuteStep?: MinuteStep;
+  defaultStartTime?: TimeValue;
+  defaultEndTime?: TimeValue;
   maxDuration?: { days?: number; hours?: number };
   presets?: readonly DateTimeRangePreset[];
   weekStartsOn?: WeekStartsOn;
@@ -76,6 +79,7 @@ export function DateTimeRangePicker({
 }: DateTimeRangePickerProps) {
   useMemo(() => zonedNow(new Date(), timeZone), [timeZone]);
   const locale = useResolvedLocale(explicitLocale);
+  const messages = resolveDateMessages(locale);
   const weekStartsOn = resolveWeekStartsOn(locale, explicitWeekStartsOn);
   const [value, setValue] = useControllableValue(controlledValue, defaultValue, onChange);
   const [open, setOpen] = useControllableValue(controlledOpen, defaultOpen, onOpenChange);
@@ -123,17 +127,12 @@ export function DateTimeRangePicker({
     && (!draft.to || (!maxValue || draft.to <= maxValue))
     && (!draft.from || !isTimeUnavailable?.(draft.from, "from"))
     && (!draft.to || !isTimeUnavailable?.(draft.to, "to"));
-  const ru = locale.toLowerCase().startsWith("ru");
-  const labels = ru
-    ? { title: "Выберите период и время", close: "Закрыть", cancel: "Отмена", apply: "Применить", reset: "Сбросить", invalid: "Дата или время окончания раньше начала" }
-    : { title: "Choose date and time range", close: "Close", cancel: "Cancel", apply: "Apply", reset: "Reset", invalid: "End date or time is before start" };
   const trigger = (
     <div onClick={() => { if (!disabled && !readOnly) setOpen(true); }}>
       <DateTimeRangeInput
         {...inputProps}
-        defaultEndTime={defaultEndTime}
-        defaultStartTime={defaultStartTime}
         disabled={disabled}
+        error={open ? null : inputProps.error}
         isDateUnavailable={isDateUnavailable}
         isTimeUnavailable={isTimeUnavailable}
         locale={locale}
@@ -150,17 +149,17 @@ export function DateTimeRangePicker({
 
   return (
     <PickerOverlay
-      closeLabel={labels.close}
+      closeLabel={messages.close}
       footer={(
         <>
-          <Button onClick={() => setDraft(EMPTY_RANGE)} variant="soft">{labels.reset}</Button>
-          <Button onClick={() => { setDraft(value); setOpen(false); }} variant="secondary">{labels.cancel}</Button>
-          <Button disabled={!canApply} onClick={() => { if (canApply) setValue(draft); setOpen(false); }} variant="primary">{labels.apply}</Button>
+          <Button onClick={() => setDraft(EMPTY_RANGE)} variant="soft">{messages.reset}</Button>
+          <Button onClick={() => { setDraft(value); setOpen(false); }} variant="secondary">{messages.cancel}</Button>
+          <Button disabled={!canApply} onClick={() => { if (canApply) setValue(draft); setOpen(false); }} variant="primary">{messages.apply}</Button>
         </>
       )}
       onOpenChange={(next) => { if (!next) setDraft(value); setOpen(next); }}
       open={open}
-      title={labels.title}
+      title={messages.chooseDateTimeRange}
       trigger={trigger}
       wide
     >
@@ -198,21 +197,19 @@ export function DateTimeRangePicker({
             range={dateRange}
             weekStartsOn={weekStartsOn}
           />
-          <div className={styles.timeFields}>
-            <TimeInput
-              aria-label={ru ? "Время начала" : "Start time"}
+          <div className={styles.draftFields}>
+            <DateTimeRangeInput
+              disabled={disabled}
+              isDateUnavailable={isDateUnavailable}
+              isTimeUnavailable={isTimeUnavailable}
+              locale={locale}
+              maxValue={maxValue}
+              minValue={minValue}
               minuteStep={minuteStep}
-              onChange={(time) => setDraft({ ...draft, from: joinLocalDateTime(datePart(draft.from), time) })}
-              value={draft.from ? timePart(draft.from, defaultStartTime) : null}
-            />
-            <TimeInput
-              aria-label={ru ? "Время окончания" : "End time"}
-              minuteStep={minuteStep}
-              onChange={(time) => setDraft({ ...draft, to: joinLocalDateTime(datePart(draft.to), time) })}
-              value={draft.to ? timePart(draft.to, defaultEndTime) : null}
+              onChange={setDraft}
+              value={draft}
             />
           </div>
-          {draft.from && draft.to && !canApply ? <p className={`${styles.message} ${styles.error}`}>{labels.invalid}</p> : null}
         </div>
       </div>
     </PickerOverlay>

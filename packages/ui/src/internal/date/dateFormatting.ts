@@ -1,10 +1,11 @@
-import type { DateValue } from "./types";
+import type { DateValue, LocalDateTimeValue } from "./types";
 import { dateValueToLocalDate } from "./dateMath";
 import { parseDateValue } from "./parseDateValue";
+import { parseLocalDateTimeValue } from "./parseLocalDateTimeValue";
 
-type DatePartName = "day" | "month" | "year";
+export type DatePartName = "day" | "month" | "year";
 
-function getDatePattern(locale: string) {
+export function getLocalizedDatePattern(locale: string) {
   const parts = new Intl.DateTimeFormat(locale, {
     day: "2-digit",
     month: "2-digit",
@@ -42,7 +43,7 @@ export function parseLocalizedDate(text: string, locale: string): DateValue | nu
   if (parseDateValue(trimmed)) return trimmed as DateValue;
   const numbers = trimmed.match(/\d+/g);
   if (!numbers || numbers.length !== 3) return null;
-  const { order } = getDatePattern(locale);
+  const { order } = getLocalizedDatePattern(locale);
   if (order.length !== 3) return null;
   const record: Partial<Record<DatePartName, string>> = {};
   for (let index = 0; index < order.length; index += 1) {
@@ -56,9 +57,31 @@ export function parseLocalizedDate(text: string, locale: string): DateValue | nu
 }
 
 export function getDateInputPlaceholder(locale: string): string {
-  const { order, separator } = getDatePattern(locale);
+  const { order, separator } = getLocalizedDatePattern(locale);
   const labels: Record<DatePartName, string> = { day: "DD", month: "MM", year: "YYYY" };
   return order.map((part) => labels[part]).join(separator);
+}
+
+export function formatLocalDateTimeValue(
+  value: LocalDateTimeValue | null,
+  locale: string
+): string {
+  if (!value) return "";
+  const date = value.slice(0, 10) as DateValue;
+  return `${formatDateValue(date, locale)}, ${value.slice(11, 16)}`;
+}
+
+export function parseLocalizedDateTime(
+  text: string,
+  locale: string
+): LocalDateTimeValue | null {
+  const separatorIndex = text.lastIndexOf(",");
+  if (separatorIndex < 0) return null;
+  const date = parseLocalizedDate(text.slice(0, separatorIndex), locale);
+  const time = text.slice(separatorIndex + 1).trim();
+  if (!date || !/^\d{2}:\d{2}$/.test(time)) return null;
+  const value = `${date}T${time}`;
+  return parseLocalDateTimeValue(value) ? value as LocalDateTimeValue : null;
 }
 
 export function formatMonthLabel(date: Date, locale: string): string {

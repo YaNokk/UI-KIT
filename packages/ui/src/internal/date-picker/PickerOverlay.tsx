@@ -51,6 +51,7 @@ export function PickerOverlay({
       trigger={trigger}
     >
       <div className={styles.body}>
+        <div aria-level={2} className={styles.popoverTitle} role="heading">{title}</div>
         {children}
         {footer ? <div className={styles.footer}>{footer}</div> : null}
       </div>

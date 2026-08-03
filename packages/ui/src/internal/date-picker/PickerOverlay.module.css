@@ -13,6 +13,11 @@
   min-inline-size: 0;
 }
 
+.popoverTitle {
+  color: var(--ds-text-primary);
+  font: var(--ds-typography-heading-sm);
+}
+
 .footer {
   display: flex;
   flex-wrap: wrap;

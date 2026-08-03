@@ -4,6 +4,8 @@ import type { DateRangeValue, DateValue } from "../internal/date/types";
 import { useControllableValue } from "../internal/date/useControllableValue";
 import { classNames } from "../shared/classNames";
 import styles from "./DateRangeInput.module.css";
+import { useResolvedLocale } from "../internal/locale/LocaleContext";
+import { resolveDateMessages } from "../internal/date/resolveDateMessages";
 
 export interface DateRangeInputProps extends Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" | "onChange"> {
   value?: DateRangeValue;
@@ -51,6 +53,8 @@ export const DateRangeInput = forwardRef<HTMLDivElement, DateRangeInputProps>(
     ref
   ) {
     const [value, setValue] = useControllableValue(controlledValue, defaultValue, onChange);
+    const resolvedLocale = useResolvedLocale(locale);
+    const messages = resolveDateMessages(resolvedLocale);
     const rootRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
       const form = rootRef.current?.closest("form");
@@ -75,11 +79,11 @@ export const DateRangeInput = forwardRef<HTMLDivElement, DateRangeInputProps>(
         {label ? <div className={styles.label}>{label}{required ? " *" : null}</div> : null}
         <div className={styles.fields}>
           <DateInput
-            aria-label={typeof label === "string" ? `${label}: ${locale?.startsWith("ru") ? "от" : "from"}` : undefined}
+            aria-label={typeof label === "string" ? `${label}: ${messages.startDate}` : undefined}
             block
             disabled={disabled}
             isDateUnavailable={isDateUnavailable}
-            locale={locale}
+            locale={resolvedLocale}
             maxDate={maxDate}
             minDate={minDate}
             name={fromName}
@@ -90,11 +94,11 @@ export const DateRangeInput = forwardRef<HTMLDivElement, DateRangeInputProps>(
           />
           <span aria-hidden="true" className={styles.separator}>—</span>
           <DateInput
-            aria-label={typeof label === "string" ? `${label}: ${locale?.startsWith("ru") ? "до" : "to"}` : undefined}
+            aria-label={typeof label === "string" ? `${label}: ${messages.endDate}` : undefined}
             block
             disabled={disabled}
             isDateUnavailable={isDateUnavailable}
-            locale={locale}
+            locale={resolvedLocale}
             maxDate={maxDate}
             minDate={minDate}
             name={toName}

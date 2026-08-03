@@ -2,6 +2,7 @@ import {
   forwardRef,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type InputHTMLAttributes,
@@ -13,6 +14,9 @@ import { isTimeAllowed } from "../internal/date/dateValidation";
 import { useControllableValue } from "../internal/date/useControllableValue";
 import { useNativeFormReset } from "../internal/date/useNativeFormReset";
 import type { TimeValue } from "../internal/date/types";
+import { createTimeInputMask } from "../internal/date/input-mask/timeInputMask";
+import { useDateInputMask } from "../internal/date/input-mask/useDateInputMask";
+import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import type { FieldLabelView, FieldSize } from "../shared/field";
 
 export type MinuteStep = 1 | 5 | 10 | 15 | 30;
@@ -28,6 +32,7 @@ export interface TimeInputProps extends Omit<
   minuteStep?: MinuteStep;
   minTime?: TimeValue | undefined;
   maxTime?: TimeValue | undefined;
+  locale?: string | undefined;
   label?: ReactNode;
   hint?: ReactNode;
   error?: ReactNode;
@@ -46,6 +51,8 @@ export const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       minuteStep = 1,
       minTime,
       maxTime,
+      locale: explicitLocale,
+      lang,
       name,
       form,
       disabled = false,
@@ -55,10 +62,13 @@ export const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     forwardedRef
   ) {
     const initialValue = defaultValue;
+    const resolvedLocale = useResolvedLocale(explicitLocale);
     const [value, setValue] = useControllableValue(controlledValue, initialValue, onChange);
     const [text, setText] = useState(value ?? "");
     const [focused, setFocused] = useState(false);
     const inputRef = useRef<HTMLInputElement | null>(null);
+    const maskOptions = useMemo(() => createTimeInputMask(), []);
+    const maskRef = useDateInputMask(maskOptions);
     useEffect(() => { if (!focused) setText(value ?? ""); }, [focused, value]);
     const restore = useCallback(() => {
       setText(initialValue ?? "");
@@ -68,6 +78,7 @@ export const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
 
     const assignRef = (node: HTMLInputElement | null) => {
       inputRef.current = node;
+      maskRef(node);
       if (typeof forwardedRef === "function") forwardedRef(node);
       else if (forwardedRef) forwardedRef.current = node;
     };
@@ -80,6 +91,7 @@ export const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           disabled={disabled}
           form={form}
           inputMode="numeric"
+          lang={lang ?? resolvedLocale}
           onBlur={(event) => {
             setFocused(false);
             if (text && !isTimeAllowed(text as TimeValue, { minuteStep, minTime, maxTime })) {
@@ -87,7 +99,7 @@ export const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
             }
             onBlur?.(event);
           }}
-          onChange={(event) => {
+          onInput={(event) => {
             const next = event.currentTarget.value;
             setText(next);
             onInputValueChange?.(next);

@@ -1,32 +1,22 @@
 import { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactNode } from "react";
-import { DateInput } from "../DateInput/DateInput";
-import { TimeInput, type MinuteStep } from "../TimeInput/TimeInput";
-import { joinLocalDateTime } from "../internal/date/parseLocalDateTimeValue";
-import type {
-  DateTimeRangeValue,
-  DateValue,
-  LocalDateTimeValue,
-  TimeValue
-} from "../internal/date/types";
+import { DateTimeInput } from "../DateTimeInput/DateTimeInput";
+import type { MinuteStep } from "../TimeInput/TimeInput";
+import { resolveDateMessages } from "../internal/date/resolveDateMessages";
+import { parseLocalizedDateTime } from "../internal/date/dateFormatting";
+import { isDateAllowed, isTimeAllowed } from "../internal/date/dateValidation";
+import type { DateTimeRangeValue, DateValue, LocalDateTimeValue, TimeValue } from "../internal/date/types";
 import { useControllableValue } from "../internal/date/useControllableValue";
+import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import { classNames } from "../shared/classNames";
 import styles from "./DateTimeRangeInput.module.css";
 
 const EMPTY_RANGE: DateTimeRangeValue = { from: null, to: null };
-
-function split(value: LocalDateTimeValue | null): [DateValue | null, TimeValue | null] {
-  return value
-    ? [value.slice(0, 10) as DateValue, value.slice(11, 16) as TimeValue]
-    : [null, null];
-}
 
 export interface DateTimeRangeInputProps extends Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" | "onChange"> {
   value?: DateTimeRangeValue;
   defaultValue?: DateTimeRangeValue;
   onChange?: (value: DateTimeRangeValue) => void;
   minuteStep?: MinuteStep;
-  defaultStartTime?: TimeValue;
-  defaultEndTime?: TimeValue;
   minValue?: LocalDateTimeValue | undefined;
   maxValue?: LocalDateTimeValue | undefined;
   isDateUnavailable?: ((date: DateValue) => boolean) | undefined;
@@ -50,15 +40,13 @@ export const DateTimeRangeInput = forwardRef<HTMLDivElement, DateTimeRangeInputP
       defaultValue = EMPTY_RANGE,
       onChange,
       minuteStep = 1,
-      defaultStartTime = "00:00",
-      defaultEndTime = "23:59",
       minValue,
       maxValue,
       isDateUnavailable,
       isTimeUnavailable,
       fromName,
       toName,
-      locale,
+      locale: explicitLocale,
       label,
       hint,
       error,
@@ -71,6 +59,8 @@ export const DateTimeRangeInput = forwardRef<HTMLDivElement, DateTimeRangeInputP
     },
     ref
   ) {
+    const locale = useResolvedLocale(explicitLocale);
+    const messages = resolveDateMessages(locale);
     const [value, setValue] = useControllableValue(controlledValue, defaultValue, onChange);
     const rootRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
@@ -85,67 +75,61 @@ export const DateTimeRangeInput = forwardRef<HTMLDivElement, DateTimeRangeInputP
       if (typeof ref === "function") ref(node);
       else if (ref) ref.current = node;
     };
-    const [fromDate, fromTime] = split(value.from);
-    const [toDate, toTime] = split(value.to);
-    const update = (
-      boundary: "from" | "to",
-      date: DateValue | null,
-      time: TimeValue | null
-    ) => {
-      const next = joinLocalDateTime(date, time);
-      if (next && isTimeUnavailable?.(next, boundary)) return;
-      setValue({ ...value, [boundary]: next });
+    const rangeError = value.from && value.to && value.from > value.to ? messages.invalidRange : null;
+    const visibleError = error !== undefined ? error : rangeError;
+    const keepOnlyValidBoundary = (text: string, boundary: "from" | "to") => {
+      const candidate = parseLocalizedDateTime(text, locale);
+      const valid = candidate
+        && isDateAllowed(candidate.slice(0, 10) as DateValue, { isDateUnavailable })
+        && isTimeAllowed(candidate.slice(11, 16) as TimeValue, { minuteStep })
+        && (!minValue || candidate >= minValue)
+        && (!maxValue || candidate <= maxValue)
+        && !isTimeUnavailable?.(candidate, boundary);
+      if (!valid && value[boundary] !== null) setValue({ ...value, [boundary]: null });
     };
     return (
       <div {...nativeProps} className={classNames(styles.root, block && styles.block, className)} ref={assignRef} role="group">
         {label ? <div className={styles.label}>{label}{required ? " *" : null}</div> : null}
         <div className={styles.boundaries}>
-          <div className={styles.boundary}>
-            <DateInput
-              aria-label={typeof label === "string" ? `${label}: ${locale?.startsWith("ru") ? "начало" : "start"}` : undefined}
-              disabled={disabled}
-              isDateUnavailable={isDateUnavailable}
-              locale={locale}
-              maxDate={maxValue?.slice(0, 10) as DateValue | undefined}
-              minDate={minValue?.slice(0, 10) as DateValue | undefined}
-              onChange={(date) => update("from", date, fromTime ?? defaultStartTime)}
-              readOnly={readOnly}
-              value={fromDate}
-            />
-            <TimeInput
-              aria-label={locale?.startsWith("ru") ? "Время начала" : "Start time"}
-              disabled={disabled}
-              minuteStep={minuteStep}
-              onChange={(time) => update("from", fromDate, time)}
-              readOnly={readOnly}
-              value={fromTime}
-            />
-          </div>
-          <div className={styles.boundary}>
-            <DateInput
-              aria-label={typeof label === "string" ? `${label}: ${locale?.startsWith("ru") ? "окончание" : "end"}` : undefined}
-              disabled={disabled}
-              isDateUnavailable={isDateUnavailable}
-              locale={locale}
-              maxDate={maxValue?.slice(0, 10) as DateValue | undefined}
-              minDate={minValue?.slice(0, 10) as DateValue | undefined}
-              onChange={(date) => update("to", date, toTime ?? defaultEndTime)}
-              readOnly={readOnly}
-              value={toDate}
-            />
-            <TimeInput
-              aria-label={locale?.startsWith("ru") ? "Время окончания" : "End time"}
-              disabled={disabled}
-              minuteStep={minuteStep}
-              onChange={(time) => update("to", toDate, time)}
-              readOnly={readOnly}
-              value={toTime}
-            />
-          </div>
+          <DateTimeInput
+            block
+            disabled={disabled}
+            isDateUnavailable={isDateUnavailable}
+            isTimeUnavailable={(candidate) => Boolean(isTimeUnavailable?.(candidate, "from"))}
+            label={messages.startDateTime}
+            labelView="inner"
+            locale={locale}
+            maxValue={maxValue}
+            minValue={minValue}
+            minuteStep={minuteStep}
+            name={fromName}
+            onChange={(from) => setValue({ ...value, from })}
+            onInputValueChange={(text) => keepOnlyValidBoundary(text, "from")}
+            readOnly={readOnly}
+            required={required}
+            value={value.from}
+          />
+          <span aria-hidden="true" className={styles.separator}>—</span>
+          <DateTimeInput
+            block
+            disabled={disabled}
+            isDateUnavailable={isDateUnavailable}
+            isTimeUnavailable={(candidate) => Boolean(isTimeUnavailable?.(candidate, "to"))}
+            label={messages.endDateTime}
+            labelView="inner"
+            locale={locale}
+            maxValue={maxValue}
+            minValue={minValue}
+            minuteStep={minuteStep}
+            name={toName}
+            onChange={(to) => setValue({ ...value, to })}
+            onInputValueChange={(text) => keepOnlyValidBoundary(text, "to")}
+            readOnly={readOnly}
+            required={required}
+            value={value.to}
+          />
         </div>
-        {fromName ? <input disabled={disabled} name={fromName} type="hidden" value={value.from ?? ""} /> : null}
-        {toName ? <input disabled={disabled} name={toName} type="hidden" value={value.to ?? ""} /> : null}
-        {error ? <div className={classNames(styles.message, styles.error)}>{error}</div> : hint ? <div className={styles.message}>{hint}</div> : null}
+        {visibleError != null ? <div className={classNames(styles.message, styles.error)}>{visibleError}</div> : hint ? <div className={styles.message}>{hint}</div> : null}
       </div>
     );
   }

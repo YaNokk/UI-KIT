@@ -32,4 +32,17 @@ describe("DatePicker", () => {
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("grid")).not.toBeInTheDocument();
   });
+
+  it("lets an explicit locale override the provider locale", () => {
+    render(
+      <DesignSystemProvider locale="ru-RU">
+        <DatePicker defaultOpen locale="en-US" />
+      </DesignSystemProvider>
+    );
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Choose a date" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Previous month" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Select month")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Предыдущий месяц" })).not.toBeInTheDocument();
+  });
 });

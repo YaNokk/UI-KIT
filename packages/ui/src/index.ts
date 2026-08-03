@@ -9,6 +9,8 @@ export { DateInput } from "./DateInput/index.js";
 export type { DateInputCorrection, DateInputProps, DateValue } from "./DateInput/index.js";
 export { TimeInput } from "./TimeInput/index.js";
 export type { MinuteStep, TimeInputProps, TimeValue } from "./TimeInput/index.js";
+export { DateTimeInput } from "./DateTimeInput/index.js";
+export type { DateTimeInputProps, LocalDateTimeValue } from "./DateTimeInput/index.js";
 export { DatePicker } from "./DatePicker/index.js";
 export type { DatePickerProps, DatePreset, DatePresetContext } from "./DatePicker/index.js";
 export { DateRangeInput } from "./DateRangeInput/index.js";
@@ -23,8 +25,7 @@ export type {
 export { DateTimeRangeInput } from "./DateTimeRangeInput/index.js";
 export type {
   DateTimeRangeInputProps,
-  DateTimeRangeValue,
-  LocalDateTimeValue
+  DateTimeRangeValue
 } from "./DateTimeRangeInput/index.js";
 export { DateTimeRangePicker, createStandardDateTimeRangePresets } from "./DateTimeRangePicker/index.js";
 export type {

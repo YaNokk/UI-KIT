@@ -13,19 +13,8 @@
   border-inline-end: var(--ds-border-width-default) solid var(--ds-border-subtle);
 }
 
-.timeFields {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: var(--ds-space-3);
-}
-
-.message {
-  color: var(--ds-text-secondary);
-  font: var(--ds-typography-body-sm);
-}
-
-.error {
-  color: var(--ds-text-danger);
+.draftFields {
+  margin-block-start: var(--ds-space-3);
 }
 
 @media (--ds-below-md) {

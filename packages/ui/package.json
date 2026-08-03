@@ -55,6 +55,10 @@
       "types": "./dist/TimeInput/index.d.ts",
       "import": "./dist/TimeInput/index.js"
     },
+    "./date-time-input": {
+      "types": "./dist/DateTimeInput/index.d.ts",
+      "import": "./dist/DateTimeInput/index.js"
+    },
     "./date-picker": {
       "types": "./dist/DatePicker/index.d.ts",
       "import": "./dist/DatePicker/index.js"

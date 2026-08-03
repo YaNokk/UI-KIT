@@ -1,8 +1,6 @@
 declare const styles: {
   readonly layout: string;
   readonly presets: string;
-  readonly timeFields: string;
-  readonly message: string;
-  readonly error: string;
+  readonly draftFields: string;
 };
 export default styles;

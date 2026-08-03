@@ -1,7 +1,8 @@
 declare const styles: {
+  readonly root: string;
+  readonly navigation: string;
   readonly viewport: string;
   readonly month: string;
-  readonly header: string;
   readonly monthLabel: string;
   readonly grid: string;
   readonly weekday: string;

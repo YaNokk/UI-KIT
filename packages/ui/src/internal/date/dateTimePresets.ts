@@ -7,6 +7,7 @@ import type {
   DateTimeRangePresetContext,
   DateTimeRangeValue
 } from "./types";
+import { resolveDateMessages } from "./resolveDateMessages";
 
 export function createStandardDateTimeRangePresets(options?: {
   locale?: string;
@@ -38,7 +39,7 @@ export function createStandardDateTimeRangePresets(options?: {
   }));
   converted.splice(6, 0, {
     id: "last-24-hours",
-    label: locale.toLowerCase().startsWith("ru") ? "Последние 24 часа" : "Last 24 hours",
+    label: resolveDateMessages(locale).last24Hours,
     resolve: (context: DateTimeRangePresetContext) => {
       const now = zonedNow(context.now, context.timeZone);
       return {

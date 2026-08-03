@@ -20,29 +20,7 @@ import type {
   DateRangePresetContext,
   DateRangeValue
 } from "./types";
-
-const labels = {
-  "ru-RU": {
-    today: "Сегодня", yesterday: "Вчера", thisWeek: "Эта неделя",
-    previousWeek: "Прошлая неделя", last7: "Последние 7 дней",
-    last30: "Последние 30 дней", thisMonth: "Этот месяц",
-    previousMonth: "Прошлый месяц", thisQuarter: "Этот квартал",
-    previousQuarter: "Прошлый квартал", thisYear: "Этот год",
-    previousYear: "Прошлый год", allTime: "Всё время"
-  },
-  en: {
-    today: "Today", yesterday: "Yesterday", thisWeek: "This week",
-    previousWeek: "Previous week", last7: "Last 7 days",
-    last30: "Last 30 days", thisMonth: "This month",
-    previousMonth: "Previous month", thisQuarter: "This quarter",
-    previousQuarter: "Previous quarter", thisYear: "This year",
-    previousYear: "Previous year", allTime: "All time"
-  }
-} as const;
-
-function resolveLabels(locale: string) {
-  return locale.toLowerCase().startsWith("ru") ? labels["ru-RU"] : labels.en;
-}
+import { resolveDateMessages } from "./resolveDateMessages";
 
 function range(from: Date, to: Date): DateRangeValue {
   return { from: serializeDateValue(from), to: serializeDateValue(to) };
@@ -61,7 +39,7 @@ export function createStandardDateRangePresets(options?: {
   currentPeriodMode?: CurrentPeriodMode;
   includeAllTime?: boolean;
 }): DateRangePreset[] {
-  const localized = resolveLabels(options?.locale ?? "ru-RU");
+  const localized = resolveDateMessages(options?.locale ?? "ru-RU");
   const mode = options?.currentPeriodMode ?? "elapsed";
   const currentEnd = (full: Date, now: Date) => mode === "full" ? full : now;
   const presets: DateRangePreset[] = [
@@ -75,11 +53,11 @@ export function createStandardDateRangePresets(options?: {
       const date = subWeeks(now, 1);
       return range(startOfWeek(date, { weekStartsOn }), endOfWeek(date, { weekStartsOn }));
     }),
-    createPreset("last-7-days", localized.last7, ({ now }) => range(subDays(now, 6), now)),
-    createPreset("last-30-days", localized.last30, ({ now }) => range(subDays(now, 29), now)),
+    createPreset("last-7-days", localized.last7Days, ({ now }) => range(subDays(now, 6), now)),
+    createPreset("last-30-days", localized.last30Days, ({ now }) => range(subDays(now, 29), now)),
     createPreset("this-month", localized.thisMonth, ({ now }) =>
       range(startOfMonth(now), currentEnd(endOfMonth(now), now))),
-    createPreset("previous-month", localized.previousMonth, ({ now }) => {
+    createPreset("previous-month", localized.previousMonthPreset, ({ now }) => {
       const date = subMonths(now, 1); return range(startOfMonth(date), endOfMonth(date));
     }),
     createPreset("this-quarter", localized.thisQuarter, ({ now }) =>

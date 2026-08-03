@@ -9,6 +9,7 @@ import type { DateValue, WeekStartsOn } from "../internal/date/types";
 import { useControllableValue } from "../internal/date/useControllableValue";
 import { PickerOverlay } from "../internal/date-picker/PickerOverlay";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
+import { resolveDateMessages } from "../internal/date/resolveDateMessages";
 
 export interface DatePresetContext {
   now: Date;
@@ -52,6 +53,7 @@ export function DatePicker({
 }: DatePickerProps) {
   const locale = useResolvedLocale(explicitLocale);
   const weekStartsOn = resolveWeekStartsOn(locale, explicitWeekStartsOn);
+  const messages = resolveDateMessages(locale);
   const [value, setValue] = useControllableValue(controlledValue, defaultValue, onChange);
   const [open, setOpen] = useControllableValue(controlledOpen, defaultOpen, onOpenChange);
   const [draft, setDraft] = useState<DateValue | null>(value);
@@ -77,9 +79,6 @@ export function DatePicker({
     return () => form.removeEventListener("reset", reset);
   }, [defaultValue, setValue]);
 
-  const labels = locale.toLowerCase().startsWith("ru")
-    ? { title: "Выберите дату", close: "Закрыть", cancel: "Отмена", apply: "Применить", reset: "Сбросить" }
-    : { title: "Choose a date", close: "Close", cancel: "Cancel", apply: "Apply", reset: "Reset" };
   const context = useMemo(() => ({ now: new Date(), locale, minDate, maxDate }), [locale, maxDate, minDate]);
 
   const close = () => setOpen(false);
@@ -112,11 +111,11 @@ export function DatePicker({
 
   return (
     <PickerOverlay
-      closeLabel={labels.close}
+      closeLabel={messages.close}
       footer={commitMode === "apply" ? (
         <>
-          <Button onClick={close} variant="secondary">{labels.cancel}</Button>
-          <Button disabled={!draft} onClick={() => { if (draft) setValue(draft); close(); }} variant="primary">{labels.apply}</Button>
+          <Button onClick={close} variant="secondary">{messages.cancel}</Button>
+          <Button disabled={!draft} onClick={() => { if (draft) setValue(draft); close(); }} variant="primary">{messages.apply}</Button>
         </>
       ) : undefined}
       onOpenChange={(next) => {
@@ -124,7 +123,7 @@ export function DatePicker({
         setOpen(next);
       }}
       open={open}
-      title={labels.title}
+      title={messages.chooseDate}
       trigger={trigger}
     >
       {presets?.length ? (
@@ -148,7 +147,7 @@ export function DatePicker({
         weekStartsOn={weekStartsOn}
       />
       {commitMode === "immediate" ? (
-        <Button onClick={() => { setValue(null); close(); }} size="sm" variant="secondary">{labels.reset}</Button>
+        <Button onClick={() => { setValue(null); close(); }} size="sm" variant="secondary">{messages.reset}</Button>
       ) : null}
     </PickerOverlay>
   );

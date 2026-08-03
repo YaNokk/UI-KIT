@@ -159,6 +159,19 @@ if (dateRangeJavaScript.includes("TZDate")) {
   throw new Error("Timezone code survived the date-only picker build.");
 }
 
+runBuild("tree-date-time-input", "dist-tree-date-time-input");
+const dateTimeInputJavaScript = readOutput("dist-tree-date-time-input", ".js");
+if (!dateTimeInputJavaScript.includes("Tree-shaken date time input")) {
+  throw new Error("The used DateTimeInput implementation was not found.");
+}
+if (
+  dateTimeInputJavaScript.includes("data-calendar-viewport")
+  || dateTimeInputJavaScript.includes("TZDate")
+  || dateTimeInputJavaScript.includes("Choose date and time range")
+) {
+  throw new Error("Calendar, timezone, or range behavior survived the DateTimeInput-only build.");
+}
+
 runBuild("tree-date-time-range-picker", "dist-tree-date-time-range-picker");
 const dateTimeRangeJavaScript = readOutput("dist-tree-date-time-range-picker", ".js");
 if (

@@ -2,6 +2,7 @@ import {
   forwardRef,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type FocusEvent,
@@ -19,6 +20,8 @@ import { isDateAllowed } from "../internal/date/dateValidation";
 import { useControllableValue } from "../internal/date/useControllableValue";
 import { useNativeFormReset } from "../internal/date/useNativeFormReset";
 import type { DateValue } from "../internal/date/types";
+import { createDateInputMask } from "../internal/date/input-mask/dateInputMask";
+import { useDateInputMask } from "../internal/date/input-mask/useDateInputMask";
 import type { FieldLabelView, FieldSize } from "../shared/field";
 
 export type DateInputCorrection = "none" | "restore-last-valid" | "clamp";
@@ -61,6 +64,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
       locale: explicitLocale,
       name,
       form,
+      lang,
       placeholder,
       onBlur,
       onFocus,
@@ -76,6 +80,8 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
     const [text, setText] = useState(() => formatDateValue(value, locale));
     const [focused, setFocused] = useState(false);
     const inputRef = useRef<HTMLInputElement | null>(null);
+    const maskOptions = useMemo(() => createDateInputMask(locale), [locale]);
+    const maskRef = useDateInputMask(maskOptions);
 
     useEffect(() => {
       if (!focused) setText(formatDateValue(value, locale));
@@ -89,6 +95,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
 
     const assignRef = (node: HTMLInputElement | null) => {
       inputRef.current = node;
+      maskRef(node);
       if (typeof forwardedRef === "function") forwardedRef(node);
       else if (forwardedRef) forwardedRef.current = node;
     };
@@ -133,12 +140,13 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
           disabled={disabled}
           form={form}
           inputMode="numeric"
+          lang={lang ?? locale}
           onBlur={(event: FocusEvent<HTMLInputElement>) => {
             setFocused(false);
             correctText();
             onBlur?.(event);
           }}
-          onChange={(event) => commitText(event.currentTarget.value)}
+          onInput={(event) => commitText(event.currentTarget.value)}
           onFocus={(event: FocusEvent<HTMLInputElement>) => {
             setFocused(true);
             onFocus?.(event);

@@ -20,6 +20,7 @@ import { useControllableValue } from "../internal/date/useControllableValue";
 import { PickerOverlay } from "../internal/date-picker/PickerOverlay";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import styles from "./DateRangePicker.module.css";
+import { resolveDateMessages } from "../internal/date/resolveDateMessages";
 
 const EMPTY_RANGE: DateRangeValue = { from: null, to: null };
 
@@ -76,6 +77,7 @@ export function DateRangePicker({
 }: DateRangePickerProps) {
   const locale = useResolvedLocale(explicitLocale);
   const weekStartsOn = resolveWeekStartsOn(locale, explicitWeekStartsOn);
+  const messages = resolveDateMessages(locale);
   const [value, setValue] = useControllableValue(controlledValue, defaultValue, onChange);
   const [open, setOpen] = useControllableValue(controlledOpen, defaultOpen, onOpenChange);
   const [draft, setDraft] = useState(value);
@@ -108,10 +110,6 @@ export function DateRangePicker({
     return () => form.removeEventListener("reset", reset);
   }, [defaultValue, setValue]);
 
-  const ru = locale.toLowerCase().startsWith("ru");
-  const labels = ru
-    ? { title: "Выберите период", close: "Закрыть", cancel: "Отмена", apply: "Применить", reset: "Сбросить", start: "Выберите дату начала", end: "Выберите дату окончания" }
-    : { title: "Choose a date range", close: "Close", cancel: "Cancel", apply: "Apply", reset: "Reset", start: "Choose a start date", end: "Choose an end date" };
   const canApply = isDateRangeComplete(draft) && isDateRangeDurationValid(draft, maxDuration);
   const trigger = (
     <div onClick={() => { if (!disabled && !readOnly) setOpen(true); }}>
@@ -139,12 +137,12 @@ export function DateRangePicker({
 
   return (
     <PickerOverlay
-      closeLabel={labels.close}
+      closeLabel={messages.close}
       footer={(
         <>
-          <Button onClick={() => setDraft(EMPTY_RANGE)} variant="soft">{labels.reset}</Button>
-          <Button onClick={() => { setDraft(value); setOpen(false); }} variant="secondary">{labels.cancel}</Button>
-          <Button disabled={!canApply} onClick={() => { if (canApply) setValue(draft); setOpen(false); }} variant="primary">{labels.apply}</Button>
+          <Button onClick={() => setDraft(EMPTY_RANGE)} variant="soft">{messages.reset}</Button>
+          <Button onClick={() => { setDraft(value); setOpen(false); }} variant="secondary">{messages.cancel}</Button>
+          <Button disabled={!canApply} onClick={() => { if (canApply) setValue(draft); setOpen(false); }} variant="primary">{messages.apply}</Button>
         </>
       )}
       onOpenChange={(next) => {
@@ -152,7 +150,7 @@ export function DateRangePicker({
         setOpen(next);
       }}
       open={open}
-      title={labels.title}
+      title={messages.chooseRange}
       trigger={trigger}
       wide
     >
@@ -179,8 +177,8 @@ export function DateRangePicker({
         </div>
         <div>
           <p aria-live="polite" className={styles.summary}>
-            {draft.from ? `${formatDateValue(draft.from, locale)}${draft.to ? ` — ${formatDateValue(draft.to, locale)}` : ""}` : labels.start}
-            {draft.from && !draft.to ? ` · ${labels.end}` : ""}
+            {draft.from ? `${formatDateValue(draft.from, locale)}${draft.to ? ` — ${formatDateValue(draft.to, locale)}` : ""}` : messages.chooseRangeStart}
+            {draft.from && !draft.to ? ` · ${messages.chooseRangeEnd}` : ""}
           </p>
           <Calendar
             hoverDate={hoverDate}

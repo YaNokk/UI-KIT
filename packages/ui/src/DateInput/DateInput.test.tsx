@@ -31,6 +31,17 @@ describe("DateInput", () => {
     expect(input).toHaveValue("02.08.2026");
   });
 
+  it("normalizes a pasted alternate separator through Maskito", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<DateInput aria-label="Дата" locale="ru-RU" onChange={onChange} />);
+    const input = screen.getByRole("textbox", { name: "Дата" });
+    await user.click(input);
+    await user.paste("02/08/2026");
+    expect(input).toHaveValue("02.08.2026");
+    expect(onChange).toHaveBeenLastCalledWith("2026-08-02");
+  });
+
   it("submits canonical form data and follows native reset", async () => {
     const user = userEvent.setup();
     render(
