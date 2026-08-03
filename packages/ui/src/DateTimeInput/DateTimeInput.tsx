@@ -48,6 +48,7 @@ export interface DateTimeInputProps extends Omit<
   labelView?: FieldLabelView;
   size?: FieldSize;
   block?: boolean;
+  endAdornment?: ReactNode;
 }
 
 export const DateTimeInput = forwardRef<HTMLInputElement, DateTimeInputProps>(

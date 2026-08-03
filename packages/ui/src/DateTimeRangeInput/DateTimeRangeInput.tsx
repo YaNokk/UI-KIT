@@ -52,6 +52,7 @@ export interface DateTimeRangeInputProps extends Omit<
   labelView?: FieldLabelView;
   size?: FieldSize;
   block?: boolean | undefined;
+  endAdornment?: ReactNode;
 }
 
 export const DateTimeRangeInput = forwardRef<HTMLInputElement, DateTimeRangeInputProps>(

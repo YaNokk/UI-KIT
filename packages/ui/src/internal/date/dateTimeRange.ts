@@ -4,6 +4,10 @@ import { compareLocalDateTimeValues } from "./dateComparison";
 import { parseLocalDateTimeValue } from "./parseLocalDateTimeValue";
 import type { DateTimeRangeValue, LocalDateTimeValue } from "./types";
 
+export function isEmptyDateTimeRange(value: DateTimeRangeValue): boolean {
+  return value.from === null && value.to === null;
+}
+
 function localValueToDate(value: LocalDateTimeValue, timeZone?: string): Date {
   const parts = parseLocalDateTimeValue(value);
   if (!parts) throw new RangeError(`Invalid LocalDateTimeValue: ${value}`);

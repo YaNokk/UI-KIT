@@ -1,4 +1,3 @@
-import { CalendarDays } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Button } from "../Button/Button";
 import { DateRangeInput } from "../DateRangeInput/DateRangeInput";
@@ -7,7 +6,7 @@ import { equalDateRanges } from "../internal/date/dateComparison";
 import { formatDateValue } from "../internal/date/dateFormatting";
 import { dateValueToLocalDate } from "../internal/date/dateMath";
 import { createStandardDateRangePresets } from "../internal/date/datePresets";
-import { isDateRangeComplete, isDateRangeDurationValid, selectRangeDate } from "../internal/date/dateRange";
+import { isDateRangeComplete, isDateRangeDurationValid, isEmptyDateRange, selectRangeDate } from "../internal/date/dateRange";
 import { resolveWeekStartsOn } from "../internal/date/locale";
 import type {
   CurrentPeriodMode,
@@ -18,6 +17,7 @@ import type {
 } from "../internal/date/types";
 import { useControllableValue } from "../internal/date/useControllableValue";
 import { PickerOverlay } from "../internal/date-picker/PickerOverlay";
+import { CalendarTriggerAddon } from "../internal/date-picker/CalendarTriggerAddon";
 import { usePickerDraft } from "../internal/date-picker/usePickerDraft";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import styles from "./DateRangePicker.module.css";
@@ -139,13 +139,23 @@ export function DateRangePicker({
     else discardAndClose();
   };
 
-  const canApply = isDateRangeComplete(draft) && isDateRangeDurationValid(draft, maxDuration);
+  const canApply = isEmptyDateRange(draft)
+    || (isDateRangeComplete(draft) && isDateRangeDurationValid(draft, maxDuration));
   const trigger = (
     <div onClick={() => { if (!disabled && !readOnly && !open) openPicker(); }}>
       <DateRangeInput
         block={block}
         defaultValue={defaultValue}
         disabled={disabled}
+        endAdornment={(
+          <CalendarTriggerAddon
+            disabled={disabled}
+            label={messages.openCalendar}
+            onOpen={openPicker}
+            open={open}
+            readOnly={readOnly}
+          />
+        )}
         error={error}
         fromName={fromName}
         hint={hint}
@@ -165,7 +175,6 @@ export function DateRangePicker({
         toName={toName}
         value={displayValue}
       />
-      <span hidden><CalendarDays /></span>
     </div>
   );
 

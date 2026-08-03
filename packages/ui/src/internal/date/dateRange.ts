@@ -20,6 +20,10 @@ export function isDateRangeComplete(value: DateRangeValue): boolean {
   return value.from != null && value.to != null;
 }
 
+export function isEmptyDateRange(value: DateRangeValue): boolean {
+  return value.from === null && value.to === null;
+}
+
 export function isDateRangeDurationValid(
   value: DateRangeValue,
   maxDuration?: { days?: number }

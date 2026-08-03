@@ -75,14 +75,14 @@ describe("DateTimePicker", () => {
     render(
       <form>
         <DateTimePicker defaultValue="2026-08-02T18:30" label="Date and time" locale="en-US" />
-        <button type="reset">Reset</button>
+        <button type="reset">Reset form</button>
       </form>
     );
     const input = screen.getByRole("textbox", { name: "Date and time" });
     await user.click(input);
     await user.keyboard("{Control>}a{/Control}080320261900");
     expect(input).toHaveValue("08/03/2026, 19:00");
-    await user.click(screen.getByRole("button", { name: "Reset" }));
+    await user.click(screen.getByRole("button", { name: "Reset form" }));
     await Promise.resolve();
     expect(input).toHaveValue("08/02/2026, 18:30");
   });
@@ -119,6 +119,52 @@ describe("DateTimePicker", () => {
     expect(onChange).toHaveBeenLastCalledWith("2026-09-12T09:30");
     await user.click(trigger);
     expect(trigger).toHaveValue("09/12/2026, 09:30");
+  });
+
+  it("resets only the draft, then applies a clear exactly once", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <DateTimePicker
+        defaultOpen
+        defaultValue="2026-08-11T18:30"
+        label="Date and time"
+        locale="en-US"
+        onChange={onChange}
+      />
+    );
+    const trigger = screen.getByRole("textbox", { name: "Date and time" });
+    await user.click(screen.getByRole("button", { name: "Reset" }));
+    expect(screen.getByRole("button", { name: "Apply" })).toBeEnabled();
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(trigger).toHaveValue("08/11/2026, 18:30");
+    expect(onChange).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("button", { name: "Open calendar" }));
+    await user.click(screen.getByRole("button", { name: "Reset" }));
+    await user.click(screen.getByRole("button", { name: "Apply" }));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenLastCalledWith(null);
+    expect(trigger).toHaveValue("");
+    await user.click(screen.getByRole("button", { name: "Open calendar" }));
+    expect(trigger).toHaveValue("");
+  });
+
+  it("opens from the calendar addon and reports one transition", async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(<DateTimePicker label="Date and time" locale="en-US" onOpenChange={onOpenChange} />);
+    await user.click(screen.getByRole("button", { name: "Open calendar" }));
+    expect(screen.getByRole("dialog")).toBeVisible();
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+  });
+
+  it.each([{ disabled: true }, { readOnly: true }])("does not open its addon for protected state", async (props) => {
+    const user = userEvent.setup();
+    render(<DateTimePicker {...props} label="Date and time" locale="en-US" />);
+    await user.click(screen.getByRole("button", { name: "Open calendar" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("discards on outside press and reopens in days view", async () => {

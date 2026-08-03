@@ -19,6 +19,7 @@ export interface DateMessages {
   chooseDateTimeRange: string;
   chooseRangeStart: string;
   chooseRangeEnd: string;
+  openCalendar: string;
   apply: string;
   cancel: string;
   close: string;
@@ -56,6 +57,7 @@ const en: DateMessages = {
   endDateTime: "End date and time", chooseDate: "Choose a date", chooseDateTime: "Choose date and time",
   chooseRange: "Choose a date range", chooseDateTimeRange: "Choose date and time range",
   chooseRangeStart: "Choose a start date", chooseRangeEnd: "Choose an end date",
+  openCalendar: "Open calendar",
   apply: "Apply", cancel: "Cancel", close: "Close", reset: "Reset",
   today: "Today", yesterday: "Yesterday", thisWeek: "This week",
   previousWeek: "Previous week", last7Days: "Last 7 days",
@@ -78,6 +80,7 @@ const ru: DateMessages = {
   endDateTime: "Дата и время окончания", chooseDate: "Выберите дату", chooseDateTime: "Выберите дату и время",
   chooseRange: "Выберите период", chooseDateTimeRange: "Выберите период и время",
   chooseRangeStart: "Выберите дату начала", chooseRangeEnd: "Выберите дату окончания",
+  openCalendar: "Открыть календарь",
   apply: "Применить", cancel: "Отмена", close: "Закрыть", reset: "Сбросить",
   today: "Сегодня", yesterday: "Вчера", thisWeek: "Эта неделя",
   previousWeek: "Прошлая неделя", last7Days: "Последние 7 дней",

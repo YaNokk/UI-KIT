@@ -6,7 +6,7 @@ import { Calendar } from "../internal/calendar/Calendar";
 import { dateValueToLocalDate } from "../internal/date/dateMath";
 import { equalDateTimeRanges } from "../internal/date/dateComparison";
 import { createStandardDateTimeRangePresets } from "../internal/date/dateTimePresets";
-import { validateDateTimeRange } from "../internal/date/dateTimeRange";
+import { isEmptyDateTimeRange, validateDateTimeRange } from "../internal/date/dateTimeRange";
 import { isDateAllowed, isTimeAllowed } from "../internal/date/dateValidation";
 import { resolveWeekStartsOn } from "../internal/date/locale";
 import { joinLocalDateTime } from "../internal/date/parseLocalDateTimeValue";
@@ -25,6 +25,7 @@ import type {
 } from "../internal/date/types";
 import { useControllableValue } from "../internal/date/useControllableValue";
 import { PickerOverlay } from "../internal/date-picker/PickerOverlay";
+import { CalendarTriggerAddon } from "../internal/date-picker/CalendarTriggerAddon";
 import { usePickerDraft } from "../internal/date-picker/usePickerDraft";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import styles from "./DateTimeRangePicker.module.css";
@@ -154,7 +155,7 @@ export function DateTimeRangePicker({
     });
     setDraftComplete(Boolean(next.from && next.to));
   };
-  const canApply = draftComplete && isValidDraft(draft);
+  const canApply = isEmptyDateTimeRange(draft) || (draftComplete && isValidDraft(draft));
   const openPicker = () => {
     pickerDraft.openDraft();
     setDraftComplete(Boolean(value.from && value.to));
@@ -181,6 +182,15 @@ export function DateTimeRangePicker({
         {...inputProps}
         defaultValue={defaultValue}
         disabled={disabled}
+        endAdornment={(
+          <CalendarTriggerAddon
+            disabled={disabled}
+            label={messages.openCalendar}
+            onOpen={openPicker}
+            open={open}
+            readOnly={readOnly}
+          />
+        )}
         error={open ? null : inputProps.error}
         isDateUnavailable={isDateUnavailable}
         isTimeUnavailable={isTimeUnavailable}

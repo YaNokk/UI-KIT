@@ -14,6 +14,7 @@ import { serializeZonedDateTime, zonedNow } from "../internal/date/timezone";
 import type { DateTimePreset, DateValue, LocalDateTimeValue, TimeValue, WeekStartsOn } from "../internal/date/types";
 import { useControllableValue } from "../internal/date/useControllableValue";
 import { PickerOverlay } from "../internal/date-picker/PickerOverlay";
+import { CalendarTriggerAddon } from "../internal/date-picker/CalendarTriggerAddon";
 import { usePickerDraft } from "../internal/date-picker/usePickerDraft";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import styles from "./DateTimePicker.module.css";
@@ -145,11 +146,21 @@ export function DateTimePicker({
     if (next) openPicker();
     else discardAndClose();
   };
+  const canApply = draft === null || (draftComplete && isValidValue(draft));
   const trigger = (
     <DateTimeInput
       {...inputProps}
       defaultValue={defaultValue}
       disabled={disabled}
+      endAdornment={(
+        <CalendarTriggerAddon
+          disabled={disabled}
+          label={messages.openCalendar}
+          onOpen={openPicker}
+          open={open}
+          readOnly={readOnly}
+        />
+      )}
       isDateUnavailable={isDateUnavailable}
       isTimeUnavailable={isTimeUnavailable}
       locale={locale}
@@ -180,8 +191,9 @@ export function DateTimePicker({
     <PickerOverlay
       closeLabel={messages.close}
       footer={commitMode === "apply" ? <>
+        <Button onClick={() => updateDraft(null)} variant="soft">{messages.reset}</Button>
         <Button onClick={discardAndClose} variant="secondary">{messages.cancel}</Button>
-        <Button disabled={!draft || !draftComplete || !isValidValue(draft)} onClick={() => { if (draft && draftComplete && isValidValue(draft)) applyAndClose(); }} variant="primary">{messages.apply}</Button>
+        <Button disabled={!canApply} onClick={() => { if (canApply) applyAndClose(); }} variant="primary">{messages.apply}</Button>
       </> : undefined}
       onOpenChange={handleOverlayOpenChange}
       open={open}

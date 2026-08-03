@@ -15,7 +15,6 @@ export interface PickerDraftController<Value> {
   update: (value: Value) => void;
   openDraft: () => void;
   apply: () => void;
-  cancel: () => void;
   discard: () => void;
 }
 
@@ -56,7 +55,6 @@ export function usePickerDraft<Value>({
     update,
     openDraft,
     apply,
-    cancel: discard,
     discard
   };
 }

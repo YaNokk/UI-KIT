@@ -4,11 +4,11 @@ import { createCalendarGrid } from "./calendarGrid";
 import { parseLocalizedDate, formatDateValue } from "./dateFormatting";
 import { createStandardDateRangePresets } from "./datePresets";
 import { createStandardDateTimeRangePresets } from "./dateTimePresets";
-import { validateDateTimeRange } from "./dateTimeRange";
+import { isEmptyDateTimeRange, validateDateTimeRange } from "./dateTimeRange";
 import { parseDateValue, serializeDateParts } from "./parseDateValue";
 import { parseLocalDateTimeValue } from "./parseLocalDateTimeValue";
 import { parseTimeValue } from "./parseTimeValue";
-import { selectRangeDate } from "./dateRange";
+import { isEmptyDateRange, selectRangeDate } from "./dateRange";
 import { zonedNow } from "./timezone";
 
 describe("date adapter", () => {
@@ -41,6 +41,13 @@ describe("date adapter", () => {
       from: "2026-08-02",
       to: "2026-08-10"
     });
+  });
+
+  it("distinguishes empty ranges from partial and complete ranges", () => {
+    expect(isEmptyDateRange({ from: null, to: null })).toBe(true);
+    expect(isEmptyDateRange({ from: "2026-08-02", to: null })).toBe(false);
+    expect(isEmptyDateTimeRange({ from: null, to: null })).toBe(true);
+    expect(isEmptyDateTimeRange({ from: null, to: "2026-08-02T18:00" })).toBe(false);
   });
 
   it("resolves rolling and calendar presets deterministically", () => {

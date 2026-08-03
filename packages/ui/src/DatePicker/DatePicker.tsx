@@ -1,13 +1,14 @@
-import { CalendarDays } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Button } from "../Button/Button";
 import { DateInput, type DateInputProps } from "../DateInput/DateInput";
 import { Calendar } from "../internal/calendar/Calendar";
 import { dateValueToLocalDate } from "../internal/date/dateMath";
+import { isDateAllowed } from "../internal/date/dateValidation";
 import { resolveWeekStartsOn } from "../internal/date/locale";
 import type { DateValue, WeekStartsOn } from "../internal/date/types";
 import { useControllableValue } from "../internal/date/useControllableValue";
 import { PickerOverlay } from "../internal/date-picker/PickerOverlay";
+import { CalendarTriggerAddon } from "../internal/date-picker/CalendarTriggerAddon";
 import { usePickerDraft } from "../internal/date-picker/usePickerDraft";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import { resolveDateMessages } from "../internal/date/resolveDateMessages";
@@ -103,6 +104,7 @@ export function DatePicker({
     if (next) openPicker();
     else discardAndClose();
   };
+  const canApply = draft === null || isDateAllowed(draft, { minDate, maxDate, isDateUnavailable });
   const select = (next: DateValue) => {
     pickerDraft.update(next);
     setMonth(dateValueToLocalDate(next));
@@ -115,7 +117,15 @@ export function DatePicker({
       {...inputProps}
       defaultValue={defaultValue}
       disabled={disabled}
-      endAdornment={<CalendarDays />}
+      endAdornment={(
+        <CalendarTriggerAddon
+          disabled={disabled}
+          label={messages.openCalendar}
+          onOpen={openPicker}
+          open={open}
+          readOnly={readOnly}
+        />
+      )}
       isDateUnavailable={isDateUnavailable}
       locale={locale}
       maxDate={maxDate}
@@ -139,8 +149,9 @@ export function DatePicker({
       closeLabel={messages.close}
       footer={commitMode === "apply" ? (
         <>
+          <Button onClick={() => pickerDraft.update(null)} variant="soft">{messages.reset}</Button>
           <Button onClick={discardAndClose} variant="secondary">{messages.cancel}</Button>
-          <Button disabled={!draft} onClick={() => { if (draft) applyAndClose(); }} variant="primary">{messages.apply}</Button>
+          <Button disabled={!canApply} onClick={() => { if (canApply) applyAndClose(); }} variant="primary">{messages.apply}</Button>
         </>
       ) : undefined}
       onOpenChange={handleOverlayOpenChange}

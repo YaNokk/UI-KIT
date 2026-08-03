@@ -30,7 +30,7 @@ describe("usePickerDraft", () => {
       setValue: vi.fn()
     }));
     act(() => result.current.update("draft"));
-    act(() => result.current.cancel());
+    act(() => result.current.discard());
     expect(result.current.draft).toBe("committed");
     act(() => result.current.update("another"));
     act(() => result.current.discard());

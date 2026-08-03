@@ -34,7 +34,7 @@ describe("DateTimeRangePicker", () => {
     expect(screen.getByRole("textbox", { name: "Выберите период и время" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Сбросить" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Отмена" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Применить" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Применить" })).toBeEnabled();
   });
 
   it("rejects a same-day end time before the start time", () => {
@@ -127,6 +127,79 @@ describe("DateTimeRangePicker", () => {
     });
     await user.click(trigger);
     expect(trigger).toHaveValue("09/12/2026, 09:30 — 09/23/2026, 18:30");
+  });
+
+  it("resets only the draft, then applies an empty range exactly once", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <DateTimeRangePicker
+        defaultOpen
+        defaultValue={{ from: "2026-08-11T09:00", to: "2026-08-22T18:00" }}
+        label="Period"
+        locale="en-US"
+        onChange={onChange}
+        timeZone="Europe/Kaliningrad"
+      />
+    );
+    const trigger = screen.getByRole("textbox", { name: "Period" });
+    await user.click(screen.getByRole("button", { name: "Reset" }));
+    expect(screen.getByRole("button", { name: "Apply" })).toBeEnabled();
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(trigger).toHaveValue("08/11/2026, 09:00 — 08/22/2026, 18:00");
+    expect(onChange).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("button", { name: "Open calendar" }));
+    await user.click(screen.getByRole("button", { name: "Reset" }));
+    await user.click(screen.getByRole("button", { name: "Apply" }));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenLastCalledWith({ from: null, to: null });
+    expect(trigger).toHaveValue("");
+    await user.click(screen.getByRole("button", { name: "Open calendar" }));
+    expect(trigger).toHaveValue("");
+  });
+
+  it("keeps a partial date-time range Apply-disabled", () => {
+    render(
+      <DateTimeRangePicker
+        defaultOpen
+        defaultValue={{ from: "2026-08-11T09:00", to: null }}
+        locale="en-US"
+        timeZone="Europe/Kaliningrad"
+      />
+    );
+    expect(screen.getByRole("button", { name: "Apply" })).toBeDisabled();
+  });
+
+  it("opens from the calendar addon and reports one transition", async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(
+      <DateTimeRangePicker
+        label="Period"
+        locale="en-US"
+        onOpenChange={onOpenChange}
+        timeZone="Europe/Kaliningrad"
+      />
+    );
+    await user.click(screen.getByRole("button", { name: "Open calendar" }));
+    expect(screen.getByRole("dialog")).toBeVisible();
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+  });
+
+  it.each([{ disabled: true }, { readOnly: true }])("does not open its addon for protected state", async (props) => {
+    const user = userEvent.setup();
+    render(
+      <DateTimeRangePicker
+        {...props}
+        label="Period"
+        locale="en-US"
+        timeZone="Europe/Kaliningrad"
+      />
+    );
+    await user.click(screen.getByRole("button", { name: "Open calendar" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("preserves draft across equal controlled objects and accepts a changed external range", async () => {

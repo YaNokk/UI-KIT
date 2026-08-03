@@ -88,6 +88,60 @@ describe("DateRangePicker", () => {
     expect(trigger).toHaveValue("09/01/2026 — 09/12/2026");
   });
 
+  it("resets only the draft, then applies an empty range exactly once", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <DateRangePicker
+        defaultOpen
+        defaultValue={{ from: "2026-08-11", to: "2026-08-22" }}
+        label="Period"
+        locale="en-US"
+        onChange={onChange}
+      />
+    );
+    const trigger = screen.getByRole("textbox", { name: "Period" });
+    await user.click(screen.getByRole("button", { name: "Reset" }));
+    expect(screen.getByRole("button", { name: "Apply" })).toBeEnabled();
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(trigger).toHaveValue("08/11/2026 — 08/22/2026");
+    expect(onChange).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("button", { name: "Open calendar" }));
+    await user.click(screen.getByRole("button", { name: "Reset" }));
+    await user.click(screen.getByRole("button", { name: "Apply" }));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenLastCalledWith({ from: null, to: null });
+    expect(trigger).toHaveValue("");
+    await user.click(screen.getByRole("button", { name: "Open calendar" }));
+    expect(trigger).toHaveValue("");
+  });
+
+  it.each([
+    { from: "2026-08-11" as const, to: null },
+    { from: null, to: "2026-08-22" as const }
+  ])("keeps a partial range Apply-disabled: $from/$to", (defaultValue) => {
+    render(<DateRangePicker defaultOpen defaultValue={defaultValue} locale="en-US" />);
+    expect(screen.getByRole("button", { name: "Apply" })).toBeDisabled();
+  });
+
+  it("opens from the calendar addon and reports one transition", async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(<DateRangePicker label="Period" locale="en-US" onOpenChange={onOpenChange} />);
+    await user.click(screen.getByRole("button", { name: "Open calendar" }));
+    expect(screen.getByRole("dialog")).toBeVisible();
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+  });
+
+  it.each([{ disabled: true }, { readOnly: true }])("does not open its addon for protected state", async (props) => {
+    const user = userEvent.setup();
+    render(<DateRangePicker {...props} label="Period" locale="en-US" />);
+    await user.click(screen.getByRole("button", { name: "Open calendar" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
   it("preserves draft across equal controlled objects and accepts a changed external range", async () => {
     const user = userEvent.setup();
     const committed = { from: "2026-08-11", to: "2026-08-22" } as const;
