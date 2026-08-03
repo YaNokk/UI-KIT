@@ -148,43 +148,42 @@ export function DateTimePicker({
   };
   const canApply = draft === null || (draftComplete && isValidValue(draft));
   const trigger = (
-    <DateTimeInput
-      {...inputProps}
-      defaultValue={defaultValue}
-      disabled={disabled}
-      endAdornment={(
-        <CalendarTriggerAddon
-          disabled={disabled}
-          label={messages.openCalendar}
-          onOpen={openPicker}
-          open={open}
-          readOnly={readOnly}
-        />
-      )}
-      isDateUnavailable={isDateUnavailable}
-      isTimeUnavailable={isTimeUnavailable}
-      locale={locale}
-      maxValue={maxValue}
-      minValue={minValue}
-      minuteStep={minuteStep}
-      onChange={(next) => {
-        updateDraft(next);
-        if (next) setMonth(dateValueToLocalDate(next.slice(0, 10) as DateValue));
-      }}
-      onClick={(event) => {
-        inputProps.onClick?.(event);
-        if (!event.defaultPrevented && !disabled && !readOnly && !open) openPicker();
-      }}
-      onInputValueChange={(text) => {
-        inputProps.onInputValueChange?.(text);
-        if (!open) return;
-        const parsed = parseLocalizedDateTime(text, locale);
-        setDraftComplete(Boolean(parsed && isValidValue(parsed)));
-      }}
-      readOnly={readOnly}
-      ref={inputRef}
-      value={displayValue}
-    />
+    <div onClick={(event) => { if (!event.defaultPrevented && !disabled && !readOnly && !open) openPicker(); }}>
+      <DateTimeInput
+        {...inputProps}
+        defaultValue={defaultValue}
+        disabled={disabled}
+        endAdornment={(
+          <CalendarTriggerAddon
+            disabled={disabled}
+            label={messages.openCalendar}
+            onOpen={openPicker}
+            open={open}
+            readOnly={readOnly}
+          />
+        )}
+        isDateUnavailable={isDateUnavailable}
+        isTimeUnavailable={isTimeUnavailable}
+        locale={locale}
+        maxValue={maxValue}
+        minValue={minValue}
+        minuteStep={minuteStep}
+        onChange={(next) => {
+          updateDraft(next);
+          if (next) setMonth(dateValueToLocalDate(next.slice(0, 10) as DateValue));
+        }}
+        onClick={inputProps.onClick}
+        onInputValueChange={(text) => {
+          inputProps.onInputValueChange?.(text);
+          if (!open) return;
+          const parsed = parseLocalizedDateTime(text, locale);
+          setDraftComplete(Boolean(parsed && isValidValue(parsed)));
+        }}
+        readOnly={readOnly}
+        ref={inputRef}
+        value={displayValue}
+      />
+    </div>
   );
 
   return (

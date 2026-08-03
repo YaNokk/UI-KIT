@@ -7,6 +7,7 @@ import { formatDateValue } from "../internal/date/dateFormatting";
 import { dateValueToLocalDate } from "../internal/date/dateMath";
 import { createStandardDateRangePresets } from "../internal/date/datePresets";
 import { isDateRangeComplete, isDateRangeDurationValid, isEmptyDateRange, selectRangeDate } from "../internal/date/dateRange";
+import { isDateAllowed } from "../internal/date/dateValidation";
 import { resolveWeekStartsOn } from "../internal/date/locale";
 import type {
   CurrentPeriodMode,
@@ -139,8 +140,13 @@ export function DateRangePicker({
     else discardAndClose();
   };
 
-  const canApply = isEmptyDateRange(draft)
-    || (isDateRangeComplete(draft) && isDateRangeDurationValid(draft, maxDuration));
+  const isCompleteRangeAllowed = (candidate: DateRangeValue) => {
+    if (!isDateRangeComplete(candidate) || !candidate.from || !candidate.to) return false;
+    return isDateRangeDurationValid(candidate, maxDuration)
+      && isDateAllowed(candidate.from, { minDate, maxDate, isDateUnavailable })
+      && isDateAllowed(candidate.to, { minDate, maxDate, isDateUnavailable });
+  };
+  const canApply = isEmptyDateRange(draft) || isCompleteRangeAllowed(draft);
   const trigger = (
     <div onClick={() => { if (!disabled && !readOnly && !open) openPicker(); }}>
       <DateRangeInput
@@ -198,10 +204,12 @@ export function DateRangePicker({
         <div className={styles.presets}>
           {resolvedPresets.map((preset) => {
             const resolved = preset.resolve(context);
+            const available = isCompleteRangeAllowed(resolved);
             return (
               <Button
                 aria-pressed={equalDateRanges(resolved, draft)}
                 className={styles.preset}
+                disabled={!available}
                 key={preset.id}
                 onClick={() => {
                   pickerDraft.update(resolved);

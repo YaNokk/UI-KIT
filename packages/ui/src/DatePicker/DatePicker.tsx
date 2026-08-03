@@ -113,35 +113,34 @@ export function DatePicker({
     }
   };
   const trigger = (
-    <DateInput
-      {...inputProps}
-      defaultValue={defaultValue}
-      disabled={disabled}
-      endAdornment={(
-        <CalendarTriggerAddon
-          disabled={disabled}
-          label={messages.openCalendar}
-          onOpen={openPicker}
-          open={open}
-          readOnly={readOnly}
-        />
-      )}
-      isDateUnavailable={isDateUnavailable}
-      locale={locale}
-      maxDate={maxDate}
-      minDate={minDate}
-      onChange={(next) => {
-        pickerDraft.update(next);
-        if (next) setMonth(dateValueToLocalDate(next));
-      }}
-      onClick={(event) => {
-        inputProps.onClick?.(event);
-        if (!event.defaultPrevented && !disabled && !readOnly && !open) openPicker();
-      }}
-      readOnly={readOnly}
-      ref={inputRef}
-      value={displayValue}
-    />
+    <div onClick={(event) => { if (!event.defaultPrevented && !disabled && !readOnly && !open) openPicker(); }}>
+      <DateInput
+        {...inputProps}
+        defaultValue={defaultValue}
+        disabled={disabled}
+        endAdornment={(
+          <CalendarTriggerAddon
+            disabled={disabled}
+            label={messages.openCalendar}
+            onOpen={openPicker}
+            open={open}
+            readOnly={readOnly}
+          />
+        )}
+        isDateUnavailable={isDateUnavailable}
+        locale={locale}
+        maxDate={maxDate}
+        minDate={minDate}
+        onChange={(next) => {
+          pickerDraft.update(next);
+          if (next) setMonth(dateValueToLocalDate(next));
+        }}
+        onClick={inputProps.onClick}
+        readOnly={readOnly}
+        ref={inputRef}
+        value={displayValue}
+      />
+    </div>
   );
 
   return (

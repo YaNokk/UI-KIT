@@ -125,6 +125,80 @@ describe("DateRangePicker", () => {
     expect(screen.getByRole("button", { name: "Apply" })).toBeDisabled();
   });
 
+  it.each([
+    {
+      label: "before minDate",
+      defaultValue: { from: "2025-12-01" as const, to: "2026-02-01" as const },
+      minDate: "2026-01-01" as const,
+      maxDate: undefined,
+      isDateUnavailable: undefined
+    },
+    {
+      label: "after maxDate",
+      defaultValue: { from: "2026-11-01" as const, to: "2027-01-01" as const },
+      minDate: undefined,
+      maxDate: "2026-12-31" as const,
+      isDateUnavailable: undefined
+    },
+    {
+      label: "unavailable boundary",
+      defaultValue: { from: "2026-06-15" as const, to: "2026-06-20" as const },
+      minDate: undefined,
+      maxDate: undefined,
+      isDateUnavailable: (date: string) => date === "2026-06-15"
+    }
+  ])("keeps a complete range $label Apply-disabled", ({ defaultValue, minDate, maxDate, isDateUnavailable }) => {
+    render(
+      <DateRangePicker
+        defaultOpen
+        defaultValue={defaultValue}
+        isDateUnavailable={isDateUnavailable}
+        locale="en-US"
+        maxDate={maxDate}
+        minDate={minDate}
+      />
+    );
+    expect(screen.getByRole("button", { name: "Apply" })).toBeDisabled();
+  });
+
+  it("disables invalid custom presets and enables an allowed preset", async () => {
+    const user = userEvent.setup();
+    const presets = [
+      { id: "before", label: "Before min", resolve: () => ({ from: "2025-12-01" as const, to: "2026-02-01" as const }) },
+      { id: "after", label: "After max", resolve: () => ({ from: "2026-11-01" as const, to: "2027-01-01" as const }) },
+      { id: "unavailable", label: "Unavailable boundary", resolve: () => ({ from: "2026-06-15" as const, to: "2026-06-20" as const }) },
+      { id: "valid", label: "Allowed range", resolve: () => ({ from: "2026-07-01" as const, to: "2026-07-10" as const }) }
+    ];
+    render(
+      <DateRangePicker
+        defaultOpen
+        isDateUnavailable={(date) => date === "2026-06-15"}
+        locale="en-US"
+        maxDate="2026-12-31"
+        minDate="2026-01-01"
+        presets={presets}
+      />
+    );
+    expect(screen.getByRole("button", { name: "Apply" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Before min" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "After max" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Unavailable boundary" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Allowed range" })).toBeEnabled();
+    await user.click(screen.getByRole("button", { name: "Allowed range" }));
+    expect(screen.getByRole("button", { name: "Apply" })).toBeEnabled();
+  });
+
+  it("disables a standard preset that crosses a partial bound", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-08-03T12:00:00"));
+    try {
+      render(<DateRangePicker defaultOpen locale="en-US" minDate="2026-08-01" />);
+      expect(screen.getByRole("button", { name: "This year" })).toBeDisabled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("opens from the calendar addon and reports one transition", async () => {
     const user = userEvent.setup();
     const onOpenChange = vi.fn();

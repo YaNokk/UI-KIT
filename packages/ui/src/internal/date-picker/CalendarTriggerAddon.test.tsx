@@ -37,7 +37,9 @@ describe("CalendarTriggerAddon", () => {
     const user = userEvent.setup();
     const onOpen = vi.fn();
     render(<CalendarTriggerAddon label="Open calendar" onOpen={onOpen} {...props} />);
-    await user.click(screen.getByRole("button", { name: "Open calendar" }));
+    const button = screen.getByRole("button", { name: "Open calendar" });
+    if (props.disabled || props.readOnly) expect(button).toBeDisabled();
+    await user.click(button);
     expect(onOpen).not.toHaveBeenCalled();
   });
 });

@@ -32,6 +32,54 @@ function DraftHarness() {
   );
 }
 
+function CalendarAddonHarness() {
+  const [openState, setOpenState] = useState("closed");
+  const [calls, setCalls] = useState(0);
+  return (
+    <>
+      <DatePicker
+        commitMode="apply"
+        label="Date"
+        locale="en-US"
+        onOpenChange={(next) => {
+          setCalls((current) => current + 1);
+          setOpenState(next ? "open" : "closed");
+        }}
+      />
+      <output data-testid="open-state">{openState}|{calls}</output>
+    </>
+  );
+}
+
+export const CalendarAddonKeyboardLifecycle: Story = {
+  render: () => <CalendarAddonHarness />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole("textbox", { name: "Date" });
+    const addon = canvas.getByRole("button", { name: "Open calendar" });
+
+    trigger.focus();
+    await userEvent.tab();
+    await expect(addon).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(body.getByRole("dialog")).toBeVisible();
+    await expect(canvas.getByTestId("open-state")).toHaveTextContent("open|1");
+
+    await userEvent.click(addon);
+    await expect(canvas.getByTestId("open-state")).toHaveTextContent("open|1");
+    await userEvent.click(body.getByRole("button", { name: "Cancel" }));
+    await expect(canvas.getByTestId("open-state")).toHaveTextContent("closed|2");
+
+    trigger.focus();
+    await userEvent.tab();
+    await expect(addon).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await expect(body.getByRole("dialog")).toBeVisible();
+    await expect(canvas.getByTestId("open-state")).toHaveTextContent("open|3");
+  }
+};
+
 export const ManualDraftCancelApplyAndReopen: Story = {
   render: () => <DraftHarness />,
   play: async ({ canvasElement }) => {

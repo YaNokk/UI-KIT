@@ -20,7 +20,7 @@ export function CalendarTriggerAddon({
     <IconButton
       aria-label={label}
       data-field-interactive=""
-      disabled={disabled}
+      disabled={disabled || readOnly}
       icon={<CalendarDays />}
       onClick={(event) => {
         event.preventDefault();
