@@ -28,14 +28,20 @@ function Harness() {
   );
 }
 
-export const SelectorsAndBounds: Story = {
+export const ModesAndBounds: Story = {
   render: () => <Harness />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByLabelText("Выберите месяц")).toBeVisible();
-    await expect(canvas.getByLabelText("Выберите год")).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Открыть выбор месяца" })).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Открыть выбор месяца" }));
+    await expect(canvas.getByRole("button", { name: "Открыть выбор года" })).toBeVisible();
+    await expect(canvasElement.querySelector("[data-calendar-month-grid]")).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Открыть выбор года" }));
+    await expect(canvasElement.querySelector("[data-calendar-year-grid]")).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "2026" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Вернуться к дням календаря" }));
     await userEvent.click(canvas.getByRole("button", { name: "Следующий месяц" }));
-    await expect(canvas.getByText("сентябрь 2026 г.")).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Открыть выбор месяца" })).toHaveTextContent("сентябрь 2026 г.");
     await expect(canvasElement.ownerDocument.activeElement).toHaveAttribute("role", "gridcell");
   }
 };

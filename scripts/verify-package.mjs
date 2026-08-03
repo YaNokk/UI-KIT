@@ -49,6 +49,8 @@ const packages = [
       "dist/TimeInput/index.d.ts",
       "dist/DateTimeInput/index.js",
       "dist/DateTimeInput/index.d.ts",
+      "dist/DateTimePicker/index.js",
+      "dist/DateTimePicker/index.d.ts",
       "dist/DatePicker/index.js",
       "dist/DatePicker/index.d.ts",
       "dist/DateRangeInput/index.js",

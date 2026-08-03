@@ -83,7 +83,7 @@ export function DateRangePicker({
   const [draft, setDraft] = useState(value);
   const [hoverDate, setHoverDate] = useState<DateValue | null>(null);
   const [month, setMonth] = useState(() => value.from ? dateValueToLocalDate(value.from) : new Date());
-  const inputGroupRef = useRef<HTMLDivElement | null>(null);
+  const inputGroupRef = useRef<HTMLInputElement | null>(null);
   const resolvedPresets = useMemo(() => presets ?? createStandardDateRangePresets({
     locale,
     currentPeriodMode,

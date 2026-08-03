@@ -58,3 +58,15 @@ export interface DateTimeRangePreset {
   label: ReactNode;
   resolve: (context: DateTimeRangePresetContext) => DateTimeRangeValue;
 }
+
+export interface DateTimePresetContext {
+  now: Date;
+  locale: string;
+  timeZone?: string | undefined;
+}
+
+export interface DateTimePreset {
+  id: string;
+  label: ReactNode;
+  resolve: (context: DateTimePresetContext) => LocalDateTimeValue;
+}

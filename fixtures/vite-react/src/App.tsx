@@ -16,6 +16,7 @@ import { Button, LinkButton, ThemeProvider } from "@mypoint/ui";
 import { DateInput } from "@mypoint/ui/date-input";
 import { TimeInput } from "@mypoint/ui/time-input";
 import { DateTimeInput } from "@mypoint/ui/date-time-input";
+import { DateTimePicker } from "@mypoint/ui/date-time-picker";
 import { DatePicker } from "@mypoint/ui/date-picker";
 import { DateRangeInput } from "@mypoint/ui/date-range-input";
 import { DateRangePicker } from "@mypoint/ui/date-range-picker";
@@ -72,6 +73,7 @@ export function App() {
       <DateInput label="Date" value="2026-08-02" />
       <TimeInput label="Time" value="10:15" />
       <DateTimeInput label="Date and time" value="2026-08-02T10:15" />
+      <DateTimePicker label="Pick date and time" value="2026-08-02T10:15" />
       <DatePicker label="Pick date" value="2026-08-02" />
       <DateRangeInput label="Date range" value={{ from: "2026-08-01", to: "2026-08-02" }} />
       <DateRangePicker label="Pick range" value={{ from: "2026-08-01", to: "2026-08-02" }} />

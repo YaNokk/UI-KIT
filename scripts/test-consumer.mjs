@@ -20,6 +20,9 @@ const fixtureApp = readFileSync(resolve(fixtureRoot, "src", "App.tsx"), "utf8");
 if (!fixtureApp.includes('from "@mypoint/ui/date-time-input"')) {
   throw new Error("Consumer fixture must exercise the DateTimeInput package subpath.");
 }
+if (!fixtureApp.includes('from "@mypoint/ui/date-time-picker"')) {
+  throw new Error("Consumer fixture must exercise the DateTimePicker package subpath.");
+}
 
 function run(args) {
   const result = spawnSync(process.execPath, [npmCli, ...args], {

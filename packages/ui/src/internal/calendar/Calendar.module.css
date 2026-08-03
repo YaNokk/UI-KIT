@@ -6,9 +6,15 @@
 
 .navigation {
   display: grid;
-  grid-template-columns: var(--ds-size-control-sm) minmax(0, 1fr) minmax(0, 0.6fr) var(--ds-size-control-sm);
+  grid-template-columns: var(--ds-size-control-sm) minmax(0, 1fr) var(--ds-size-control-sm);
   gap: var(--ds-space-2);
   align-items: center;
+}
+
+.modeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ds-space-2);
 }
 
 .viewport {
@@ -111,7 +117,7 @@
 
 @media (--ds-below-md) {
   .navigation {
-    grid-template-columns: var(--ds-size-control-sm) minmax(0, 1fr) minmax(0, 0.6fr) var(--ds-size-control-sm);
+    grid-template-columns: var(--ds-size-control-sm) minmax(0, 1fr) var(--ds-size-control-sm);
     gap: var(--ds-space-1);
   }
 

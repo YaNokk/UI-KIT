@@ -1,0 +1,11 @@
+.content {
+  display: grid;
+  gap: var(--ds-space-3);
+  min-inline-size: 0;
+}
+
+.presets {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--ds-space-1);
+}

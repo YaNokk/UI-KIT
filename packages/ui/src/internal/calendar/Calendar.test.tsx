@@ -9,7 +9,7 @@ import { Calendar } from "./Calendar";
 afterEach(cleanup);
 
 describe("Calendar navigation", () => {
-  it("exposes localized month/year selectors and clamps arrow navigation", async () => {
+  it("exposes calendar-native month/year modes and clamps navigation", async () => {
     const user = userEvent.setup();
     const onMonthChange = vi.fn();
     const { rerender } = render(
@@ -23,16 +23,19 @@ describe("Calendar navigation", () => {
         weekStartsOn={1}
       />
     );
-    expect(screen.getByLabelText("Выберите месяц")).toBeInTheDocument();
-    expect(screen.getByLabelText("Выберите год")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Открыть выбор месяца" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Следующий месяц" }));
     expect(onMonthChange).toHaveBeenLastCalledWith(new Date(2026, 8, 1));
-    await user.click(screen.getByLabelText("Выберите месяц"));
-    await user.click(screen.getByRole("option", { name: "сентябрь" }));
+    await user.click(screen.getByRole("button", { name: "Открыть выбор месяца" }));
+    expect(document.querySelector("[data-calendar-month-grid]")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "сентябрь" }));
     expect(onMonthChange).toHaveBeenLastCalledWith(new Date(2026, 8, 1));
-    await user.click(screen.getByLabelText("Выберите год"));
-    await user.click(screen.getByRole("option", { name: "2027" }));
+    await user.click(screen.getByRole("button", { name: "Открыть выбор месяца" }));
+    await user.click(screen.getByRole("button", { name: "Открыть выбор года" }));
+    expect(document.querySelector("[data-calendar-year-grid]")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "2027" }));
     expect(onMonthChange).toHaveBeenLastCalledWith(new Date(2027, 1, 1));
+    await user.click(screen.getByRole("button", { name: "Вернуться к дням календаря" }));
 
     rerender(
       <Calendar

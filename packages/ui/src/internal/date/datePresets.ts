@@ -40,7 +40,7 @@ export function createStandardDateRangePresets(options?: {
   includeAllTime?: boolean;
 }): DateRangePreset[] {
   const localized = resolveDateMessages(options?.locale ?? "ru-RU");
-  const mode = options?.currentPeriodMode ?? "elapsed";
+  const mode = options?.currentPeriodMode ?? "full";
   const currentEnd = (full: Date, now: Date) => mode === "full" ? full : now;
   const presets: DateRangePreset[] = [
     createPreset("today", localized.today, ({ now }) => range(now, now)),

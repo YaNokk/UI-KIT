@@ -29,9 +29,9 @@ describe("DateTimeRangePicker", () => {
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Выберите период и время" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Предыдущий месяц" })).toBeInTheDocument();
-    expect(screen.getByLabelText("Выберите месяц")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Открыть выбор месяца" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Последние 24 часа" })).toBeInTheDocument();
-    expect(screen.getAllByText("Дата и время начала").length).toBeGreaterThan(0);
+    expect(screen.getByRole("textbox", { name: "Выберите период и время" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Сбросить" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Отмена" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Применить" })).toBeDisabled();
@@ -63,10 +63,9 @@ describe("DateTimeRangePicker", () => {
       </DesignSystemProvider>
     );
     await user.click(screen.getByRole("gridcell", { name: "Wednesday, August 5, 2026" }));
-    expect(
-      screen.getAllByRole("textbox", { name: "Start date and time" })
-        .some((input) => (input as HTMLInputElement).value === "08/05/2026, 18:00")
-    ).toBe(true);
+    expect(screen.getByRole("textbox", { name: "Choose date and time range" })).toHaveValue(
+      "08/05/2026, 18:00 — "
+    );
   });
 
   it("disables Apply while a boundary contains partial input", async () => {
@@ -80,9 +79,7 @@ describe("DateTimeRangePicker", () => {
         />
       </DesignSystemProvider>
     );
-    const startInputs = screen.getAllByRole("textbox", { name: "Start date and time" });
-    const surfaceInput = startInputs.at(-1);
-    if (!surfaceInput) throw new Error("Picker surface DateTimeInput was not rendered.");
+    const surfaceInput = screen.getByRole("textbox", { name: "Choose date and time range" });
     await user.click(surfaceInput);
     await user.keyboard("{Control>}a{/Control}08");
     expect(screen.getByRole("button", { name: "Apply" })).toBeDisabled();

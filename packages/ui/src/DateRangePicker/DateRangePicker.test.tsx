@@ -45,15 +45,13 @@ describe("DateRangePicker", () => {
         </form>
       </DesignSystemProvider>
     );
-    const [fromInput, toInput] = screen.getAllByRole("textbox");
-    if (!fromInput || !toInput) throw new Error("Date range inputs were not rendered.");
-    await user.click(fromInput);
+    const input = screen.getByRole("textbox");
+    await user.click(input);
     await user.click(screen.getByRole("button", { name: "Сегодня" }));
     await user.click(screen.getByRole("button", { name: "Применить" }));
-    expect(fromInput).not.toHaveValue("01.08.2026");
+    expect(input).not.toHaveValue("01.08.2026 — 02.08.2026");
     await user.click(screen.getByRole("button", { name: "Reset" }));
     await Promise.resolve();
-    expect(fromInput).toHaveValue("01.08.2026");
-    expect(toInput).toHaveValue("02.08.2026");
+    expect(input).toHaveValue("01.08.2026 — 02.08.2026");
   });
 });

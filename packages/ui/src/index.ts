@@ -11,6 +11,8 @@ export { TimeInput } from "./TimeInput/index.js";
 export type { MinuteStep, TimeInputProps, TimeValue } from "./TimeInput/index.js";
 export { DateTimeInput } from "./DateTimeInput/index.js";
 export type { DateTimeInputProps, LocalDateTimeValue } from "./DateTimeInput/index.js";
+export { DateTimePicker } from "./DateTimePicker/index.js";
+export type { DateTimePickerProps, DateTimePreset, DateTimePresetContext } from "./DateTimePicker/index.js";
 export { DatePicker } from "./DatePicker/index.js";
 export type { DatePickerProps, DatePreset, DatePresetContext } from "./DatePicker/index.js";
 export { DateRangeInput } from "./DateRangeInput/index.js";

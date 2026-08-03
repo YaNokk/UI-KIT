@@ -48,7 +48,7 @@ describe("DateTimeInput", () => {
     );
     expect(screen.getByRole("textbox", { name: "Наследуемая локаль" })).toHaveAttribute(
       "placeholder",
-      "DD.MM.YYYY, HH:mm"
+      "ДД.ММ.ГГГГ, ЧЧ:ММ"
     );
     expect(screen.getByRole("textbox", { name: "Явная локаль" })).toHaveAttribute(
       "placeholder",

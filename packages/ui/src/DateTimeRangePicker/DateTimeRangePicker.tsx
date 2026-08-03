@@ -7,8 +7,10 @@ import { dateValueToLocalDate } from "../internal/date/dateMath";
 import { equalDateTimeRanges } from "../internal/date/dateComparison";
 import { createStandardDateTimeRangePresets } from "../internal/date/dateTimePresets";
 import { validateDateTimeRange } from "../internal/date/dateTimeRange";
+import { isDateAllowed, isTimeAllowed } from "../internal/date/dateValidation";
 import { resolveWeekStartsOn } from "../internal/date/locale";
 import { joinLocalDateTime } from "../internal/date/parseLocalDateTimeValue";
+import { parseLocalizedDateTimeRange } from "../internal/date/range-input/parseLocalizedDateRange";
 import { resolveDateMessages } from "../internal/date/resolveDateMessages";
 import { selectRangeDate } from "../internal/date/dateRange";
 import { zonedNow } from "../internal/date/timezone";
@@ -84,18 +86,20 @@ export function DateTimeRangePicker({
   const [value, setValue] = useControllableValue(controlledValue, defaultValue, onChange);
   const [open, setOpen] = useControllableValue(controlledOpen, defaultOpen, onOpenChange);
   const [draft, setDraft] = useState(value);
+  const [draftComplete, setDraftComplete] = useState(Boolean(value.from && value.to));
   const [hoverDate, setHoverDate] = useState<DateValue | null>(null);
   const [month, setMonth] = useState(() => {
     const initialDate = datePart(value.from);
     return initialDate ? dateValueToLocalDate(initialDate) : new Date();
   });
-  const inputGroupRef = useRef<HTMLDivElement | null>(null);
+  const inputGroupRef = useRef<HTMLInputElement | null>(null);
   const resolvedPresets = useMemo(() => presets ?? createStandardDateTimeRangePresets({ locale }), [locale, presets]);
   const context = useMemo(() => ({ now: new Date(), locale, timeZone, weekStartsOn, minValue, maxValue }), [locale, maxValue, minValue, timeZone, weekStartsOn]);
 
   useEffect(() => {
     if (open) {
       setDraft(value);
+      setDraftComplete(Boolean(value.from && value.to));
       const nextDate = datePart(value.from);
       setMonth(nextDate ? dateValueToLocalDate(nextDate) : new Date());
     }
@@ -115,18 +119,30 @@ export function DateTimeRangePicker({
   }, [defaultValue, setValue]);
 
   const dateRange: DateRangeValue = { from: datePart(draft.from), to: datePart(draft.to) };
+  const isValidDraft = (candidate: DateTimeRangeValue) => {
+    if (!candidate.from || !candidate.to) return false;
+    const fromDate = datePart(candidate.from);
+    const toDate = datePart(candidate.to);
+    if (!fromDate || !toDate) return false;
+    return validateDateTimeRange(candidate, maxDuration, timeZone)
+      && isDateAllowed(fromDate, { isDateUnavailable })
+      && isDateAllowed(toDate, { isDateUnavailable })
+      && isTimeAllowed(candidate.from.slice(11, 16) as TimeValue, { minuteStep })
+      && isTimeAllowed(candidate.to.slice(11, 16) as TimeValue, { minuteStep })
+      && (!minValue || candidate.from >= minValue)
+      && (!maxValue || candidate.to <= maxValue)
+      && !isTimeUnavailable?.(candidate.from, "from")
+      && !isTimeUnavailable?.(candidate.to, "to");
+  };
   const updateDates = (selected: DateValue) => {
     const next = selectRangeDate(dateRange, selected).value;
     setDraft({
       from: joinLocalDateTime(next.from, timePart(draft.from, defaultStartTime)),
       to: joinLocalDateTime(next.to, timePart(draft.to, defaultEndTime))
     });
+    setDraftComplete(Boolean(next.from && next.to));
   };
-  const canApply = validateDateTimeRange(draft, maxDuration, timeZone)
-    && (!draft.from || (!minValue || draft.from >= minValue))
-    && (!draft.to || (!maxValue || draft.to <= maxValue))
-    && (!draft.from || !isTimeUnavailable?.(draft.from, "from"))
-    && (!draft.to || !isTimeUnavailable?.(draft.to, "to"));
+  const canApply = draftComplete && isValidDraft(draft);
   const trigger = (
     <div onClick={() => { if (!disabled && !readOnly) setOpen(true); }}>
       <DateTimeRangeInput
@@ -173,6 +189,7 @@ export function DateTimeRangePicker({
                 key={preset.id}
                 onClick={() => {
                   setDraft(resolved);
+                  setDraftComplete(Boolean(resolved.from && resolved.to));
                   const resolvedDate = datePart(resolved.from);
                   if (resolvedDate) setMonth(dateValueToLocalDate(resolvedDate));
                 }}
@@ -199,6 +216,7 @@ export function DateTimeRangePicker({
           />
           <div className={styles.draftFields}>
             <DateTimeRangeInput
+              aria-label={messages.chooseDateTimeRange}
               disabled={disabled}
               isDateUnavailable={isDateUnavailable}
               isTimeUnavailable={isTimeUnavailable}
@@ -207,6 +225,10 @@ export function DateTimeRangePicker({
               minValue={minValue}
               minuteStep={minuteStep}
               onChange={setDraft}
+              onInputValueChange={(text) => {
+                const parsed = parseLocalizedDateTimeRange(text, locale);
+                setDraftComplete(Boolean(parsed && isValidDraft(parsed)));
+              }}
               value={draft}
             />
           </div>

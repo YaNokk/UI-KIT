@@ -1,115 +1,143 @@
-import { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactNode } from "react";
-import { DateInput } from "../DateInput/DateInput";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FocusEvent,
+  type InputHTMLAttributes,
+  type ReactNode
+} from "react";
+import { Input } from "../Input/Input";
+import type { DateInputCorrection } from "../DateInput/DateInput";
+import { useDateInputMask } from "../internal/date/input-mask/useDateInputMask";
+import { isDateAllowed } from "../internal/date/dateValidation";
+import { getDateInputPlaceholder } from "../internal/date/dateFormatting";
+import { createDateRangeInputMask } from "../internal/date/range-input/createDateRangeInputMask";
+import { DATE_RANGE_SEPARATOR } from "../internal/date/range-input/dateRangeInputTypes";
+import { formatDateRangeValue } from "../internal/date/range-input/formatDateRangeValue";
+import { parseLocalizedDateRange } from "../internal/date/range-input/parseLocalizedDateRange";
 import type { DateRangeValue, DateValue } from "../internal/date/types";
 import { useControllableValue } from "../internal/date/useControllableValue";
-import { classNames } from "../shared/classNames";
-import styles from "./DateRangeInput.module.css";
+import { useNativeFormReset } from "../internal/date/useNativeFormReset";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
-import { resolveDateMessages } from "../internal/date/resolveDateMessages";
+import type { FieldLabelView, FieldSize } from "../shared/field";
 
-export interface DateRangeInputProps extends Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" | "onChange"> {
+const EMPTY_RANGE: DateRangeValue = { from: null, to: null };
+
+export interface DateRangeInputProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "value" | "defaultValue" | "onChange" | "type" | "size" | "name"
+> {
   value?: DateRangeValue;
   defaultValue?: DateRangeValue;
   onChange?: (value: DateRangeValue) => void;
+  onInputValueChange?: (value: string) => void;
   minDate?: DateValue | undefined;
   maxDate?: DateValue | undefined;
   isDateUnavailable?: ((date: DateValue) => boolean) | undefined;
+  correction?: DateInputCorrection;
   fromName?: string | undefined;
   toName?: string | undefined;
   locale?: string | undefined;
   label?: ReactNode;
   hint?: ReactNode;
   error?: ReactNode;
-  disabled?: boolean | undefined;
-  readOnly?: boolean | undefined;
-  required?: boolean | undefined;
+  labelView?: FieldLabelView;
+  size?: FieldSize;
   block?: boolean | undefined;
 }
 
-const EMPTY_RANGE: DateRangeValue = { from: null, to: null };
-
-export const DateRangeInput = forwardRef<HTMLDivElement, DateRangeInputProps>(
-  function DateRangeInput(
-    {
-      value: controlledValue,
-      defaultValue = EMPTY_RANGE,
-      onChange,
-      minDate,
-      maxDate,
-      isDateUnavailable,
-      fromName,
-      toName,
-      locale,
-      label,
-      hint,
-      error,
-      disabled,
-      readOnly,
-      required,
-      block,
-      className,
-      ...nativeProps
-    },
-    ref
-  ) {
+export const DateRangeInput = forwardRef<HTMLInputElement, DateRangeInputProps>(
+  function DateRangeInput({
+    value: controlledValue,
+    defaultValue = EMPTY_RANGE,
+    onChange,
+    onInputValueChange,
+    minDate,
+    maxDate,
+    isDateUnavailable,
+    correction = "restore-last-valid",
+    fromName,
+    toName,
+    locale: explicitLocale,
+    form,
+    lang,
+    placeholder,
+    onBlur,
+    disabled = false,
+    block = false,
+    ...inputProps
+  }, forwardedRef) {
+    const locale = useResolvedLocale(explicitLocale);
     const [value, setValue] = useControllableValue(controlledValue, defaultValue, onChange);
-    const resolvedLocale = useResolvedLocale(locale);
-    const messages = resolveDateMessages(resolvedLocale);
-    const rootRef = useRef<HTMLDivElement | null>(null);
+    const [text, setText] = useState(() => formatDateRangeValue(value, locale));
+    const [focused, setFocused] = useState(false);
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const maskRef = useDateInputMask(useMemo(() => createDateRangeInputMask(locale), [locale]));
+
     useEffect(() => {
-      const form = rootRef.current?.closest("form");
-      if (!form) return;
-      const reset = () => queueMicrotask(() => setValue(defaultValue));
-      form.addEventListener("reset", reset);
-      return () => form.removeEventListener("reset", reset);
-    }, [defaultValue, setValue]);
-    const assignRef = (node: HTMLDivElement | null) => {
-      rootRef.current = node;
-      if (typeof ref === "function") ref(node);
-      else if (ref) ref.current = node;
+      if (!focused) setText(formatDateRangeValue(value, locale));
+    }, [focused, locale, value]);
+    const restore = useCallback(() => {
+      setText(formatDateRangeValue(defaultValue, locale));
+      if (controlledValue === undefined) setValue(defaultValue);
+    }, [controlledValue, defaultValue, locale, setValue]);
+    useNativeFormReset(inputRef, restore);
+
+    const assignRef = (node: HTMLInputElement | null) => {
+      inputRef.current = node;
+      maskRef(node);
+      if (typeof forwardedRef === "function") forwardedRef(node);
+      else if (forwardedRef) forwardedRef.current = node;
     };
+    const validRange = (candidate: DateRangeValue) => Boolean(
+      candidate.from && candidate.to
+      && candidate.from <= candidate.to
+      && isDateAllowed(candidate.from, { minDate, maxDate, isDateUnavailable })
+      && isDateAllowed(candidate.to, { minDate, maxDate, isDateUnavailable })
+    );
+    const commitText = (next: string) => {
+      setText(next);
+      onInputValueChange?.(next);
+      if (!next) {
+        setValue(EMPTY_RANGE);
+        return;
+      }
+      const parsed = parseLocalizedDateRange(next, locale);
+      if (parsed && validRange(parsed)) setValue(parsed);
+    };
+
     return (
-      <div
-        {...nativeProps}
-        aria-invalid={error ? true : undefined}
-        className={classNames(styles.root, block && styles.block, className)}
-        ref={assignRef}
-        role="group"
-      >
-        {label ? <div className={styles.label}>{label}{required ? " *" : null}</div> : null}
-        <div className={styles.fields}>
-          <DateInput
-            aria-label={typeof label === "string" ? `${label}: ${messages.startDate}` : undefined}
-            block
-            disabled={disabled}
-            isDateUnavailable={isDateUnavailable}
-            locale={resolvedLocale}
-            maxDate={maxDate}
-            minDate={minDate}
-            name={fromName}
-            onChange={(from) => setValue({ ...value, from })}
-            readOnly={readOnly}
-            required={required}
-            value={value.from}
-          />
-          <span aria-hidden="true" className={styles.separator}>—</span>
-          <DateInput
-            aria-label={typeof label === "string" ? `${label}: ${messages.endDate}` : undefined}
-            block
-            disabled={disabled}
-            isDateUnavailable={isDateUnavailable}
-            locale={resolvedLocale}
-            maxDate={maxDate}
-            minDate={minDate}
-            name={toName}
-            onChange={(to) => setValue({ ...value, to })}
-            readOnly={readOnly}
-            required={required}
-            value={value.to}
-          />
-        </div>
-        {error ? <div className={classNames(styles.message, styles.error)}>{error}</div> : hint ? <div className={styles.message}>{hint}</div> : null}
-      </div>
+      <>
+        <Input
+          {...inputProps}
+          autoComplete="off"
+          block={block}
+          disabled={disabled}
+          form={form}
+          inputMode="numeric"
+          lang={lang ?? locale}
+          onBlur={(event: FocusEvent<HTMLInputElement>) => {
+            setFocused(false);
+            const parsed = parseLocalizedDateRange(text, locale);
+            if (parsed && validRange(parsed)) setText(formatDateRangeValue(parsed, locale));
+            else if (correction === "restore-last-valid") setText(formatDateRangeValue(value, locale));
+            onBlur?.(event);
+          }}
+          onFocus={(event) => {
+            setFocused(true);
+            inputProps.onFocus?.(event);
+          }}
+          onInput={(event) => commitText(event.currentTarget.value)}
+          placeholder={placeholder ?? `${getDateInputPlaceholder(locale)}${DATE_RANGE_SEPARATOR}${getDateInputPlaceholder(locale)}`}
+          ref={assignRef}
+          value={text}
+        />
+        {fromName ? <input disabled={disabled} form={form} name={fromName} type="hidden" value={value.from ?? ""} /> : null}
+        {toName ? <input disabled={disabled} form={form} name={toName} type="hidden" value={value.to ?? ""} /> : null}
+      </>
     );
   }
 );

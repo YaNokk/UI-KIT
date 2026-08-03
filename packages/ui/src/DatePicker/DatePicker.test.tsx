@@ -42,7 +42,7 @@ describe("DatePicker", () => {
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Choose a date" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Previous month" })).toBeInTheDocument();
-    expect(screen.getByLabelText("Select month")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open month selection" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Предыдущий месяц" })).not.toBeInTheDocument();
   });
 });

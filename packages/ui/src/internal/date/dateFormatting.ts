@@ -58,8 +58,15 @@ export function parseLocalizedDate(text: string, locale: string): DateValue | nu
 
 export function getDateInputPlaceholder(locale: string): string {
   const { order, separator } = getLocalizedDatePattern(locale);
-  const labels: Record<DatePartName, string> = { day: "DD", month: "MM", year: "YYYY" };
+  const russian = locale.toLowerCase().startsWith("ru");
+  const labels: Record<DatePartName, string> = russian
+    ? { day: "ДД", month: "ММ", year: "ГГГГ" }
+    : { day: "DD", month: "MM", year: "YYYY" };
   return order.map((part) => labels[part]).join(separator);
+}
+
+export function getTimeInputPlaceholder(locale: string): string {
+  return locale.toLowerCase().startsWith("ru") ? "ЧЧ:ММ" : "HH:mm";
 }
 
 export function formatLocalDateTimeValue(

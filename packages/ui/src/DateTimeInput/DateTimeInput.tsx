@@ -15,6 +15,7 @@ import type { MinuteStep } from "../TimeInput/TimeInput";
 import {
   formatLocalDateTimeValue,
   getDateInputPlaceholder,
+  getTimeInputPlaceholder,
   parseLocalizedDateTime
 } from "../internal/date/dateFormatting";
 import { createDateTimeInputMask } from "../internal/date/input-mask/dateTimeInputMask";
@@ -159,7 +160,7 @@ export const DateTimeInput = forwardRef<HTMLInputElement, DateTimeInputProps>(
             setFocused(true);
             onFocus?.(event);
           }}
-          placeholder={placeholder ?? `${getDateInputPlaceholder(locale)}, HH:mm`}
+          placeholder={placeholder ?? `${getDateInputPlaceholder(locale)}, ${getTimeInputPlaceholder(locale)}`}
           ref={assignRef}
           value={text}
         />

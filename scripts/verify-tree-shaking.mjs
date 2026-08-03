@@ -159,6 +159,24 @@ if (dateRangeJavaScript.includes("TZDate")) {
   throw new Error("Timezone code survived the date-only picker build.");
 }
 
+runBuild("tree-date-range-input", "dist-tree-date-range-input");
+const dateRangeInputJavaScript = readOutput("dist-tree-date-range-input", ".js");
+if (!dateRangeInputJavaScript.includes("Tree-shaken date range input")) {
+  throw new Error("The used DateRangeInput implementation was not found.");
+}
+if (dateRangeInputJavaScript.includes("data-calendar-viewport")) {
+  throw new Error("Calendar behavior survived the DateRangeInput-only build.");
+}
+
+runBuild("tree-date-time-range-input", "dist-tree-date-time-range-input");
+const dateTimeRangeInputJavaScript = readOutput("dist-tree-date-time-range-input", ".js");
+if (!dateTimeRangeInputJavaScript.includes("Tree-shaken date time range input")) {
+  throw new Error("The used DateTimeRangeInput implementation was not found.");
+}
+if (dateTimeRangeInputJavaScript.includes("data-calendar-viewport")) {
+  throw new Error("Calendar behavior survived the DateTimeRangeInput-only build.");
+}
+
 runBuild("tree-date-time-input", "dist-tree-date-time-input");
 const dateTimeInputJavaScript = readOutput("dist-tree-date-time-input", ".js");
 if (!dateTimeInputJavaScript.includes("Tree-shaken date time input")) {
@@ -179,6 +197,15 @@ if (
   || !dateTimeRangeJavaScript.includes("data-calendar-viewport")
 ) {
   throw new Error("The used DateTimeRangePicker implementation was not found.");
+}
+
+runBuild("tree-date-time-picker", "dist-tree-date-time-picker");
+const dateTimePickerJavaScript = readOutput("dist-tree-date-time-picker", ".js");
+if (!dateTimePickerJavaScript.includes("Tree-shaken date time picker") || !dateTimePickerJavaScript.includes("data-calendar-viewport")) {
+  throw new Error("The used DateTimePicker implementation was not found.");
+}
+if (dateTimePickerJavaScript.includes("last-24-hours")) {
+  throw new Error("Range behavior survived the DateTimePicker-only build.");
 }
 if (
   textareaJavaScript.includes("data-country-flag")

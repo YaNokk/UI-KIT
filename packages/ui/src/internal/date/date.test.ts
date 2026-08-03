@@ -56,7 +56,7 @@ describe("date adapter", () => {
     });
     expect(presets.find((preset) => preset.id === "this-month")?.resolve(context)).toEqual({
       from: "2026-08-01",
-      to: "2026-08-02"
+      to: "2026-08-31"
     });
   });
 

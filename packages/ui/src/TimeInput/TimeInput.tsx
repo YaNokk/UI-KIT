@@ -10,6 +10,7 @@ import {
 } from "react";
 import { Input } from "../Input/Input";
 import { parseTimeValue } from "../internal/date/parseTimeValue";
+import { getTimeInputPlaceholder } from "../internal/date/dateFormatting";
 import { isTimeAllowed } from "../internal/date/dateValidation";
 import { useControllableValue } from "../internal/date/useControllableValue";
 import { useNativeFormReset } from "../internal/date/useNativeFormReset";
@@ -112,7 +113,7 @@ export const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
             setFocused(true);
             props.onFocus?.(event);
           }}
-          placeholder="HH:mm"
+          placeholder={props.placeholder ?? getTimeInputPlaceholder(resolvedLocale)}
           ref={assignRef}
           value={text}
         />

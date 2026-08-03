@@ -1,9 +1,8 @@
 import { addDays, addMonths, addYears, endOfWeek, isSameMonth, startOfWeek } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useMemo, useRef, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { Button } from "../../Button/Button";
 import { IconButton } from "../../IconButton/IconButton";
-import { Select } from "../../Select/Select";
-import type { SelectOption } from "../../internal/select/collection";
 import { classNames } from "../../shared/classNames";
 import { createCalendarGrid } from "../date/calendarGrid";
 import { compareDateValues } from "../date/dateComparison";
@@ -38,20 +37,6 @@ function getWeekdayLabels(locale: string, weekStartsOn: WeekStartsOn) {
   );
 }
 
-function getMonthOptions(locale: string, year: number, minDate?: DateValue, maxDate?: DateValue) {
-  return Array.from({ length: 12 }, (_, monthIndex): SelectOption => {
-    const date = new Date(year, monthIndex, 1);
-    const clamped = clampCalendarMonth(date, minDate, maxDate);
-    const label = new Intl.DateTimeFormat(locale, { month: "long" }).format(date);
-    return {
-      value: String(monthIndex),
-      label,
-      textValue: label,
-      disabled: !isSameMonth(date, clamped)
-    };
-  });
-}
-
 function clampFocusedDate(date: Date, minDate?: DateValue, maxDate?: DateValue) {
   const value = serializeDateValue(date);
   if (minDate && value < minDate) return dateValueToLocalDate(minDate);
@@ -74,24 +59,15 @@ export function Calendar({
   onSelect,
   onHoverDateChange
 }: CalendarProps) {
+  const [view, setView] = useState<"days" | "months" | "years">("days");
   const currentMonth = clampCalendarMonth(month, minDate, maxDate);
   const today = serializeDateValue(new Date());
   const messages = resolveDateMessages(locale);
   const weekdays = useMemo(() => getWeekdayLabels(locale, weekStartsOn), [locale, weekStartsOn]);
-  const monthOptions = useMemo(
-    () => getMonthOptions(locale, currentMonth.getFullYear(), minDate, maxDate),
-    [currentMonth, locale, maxDate, minDate]
-  );
   const currentYear = currentMonth.getFullYear();
-  const minYear = minDate ? Number(minDate.slice(0, 4)) : currentYear - 100;
-  const maxYear = maxDate ? Number(maxDate.slice(0, 4)) : currentYear + 20;
-  const yearOptions = useMemo(
-    () => Array.from({ length: maxYear - minYear + 1 }, (_, index): SelectOption => {
-      const year = String(minYear + index);
-      return { value: year, label: year, textValue: year };
-    }),
-    [maxYear, minYear]
-  );
+  const minYear = minDate ? Number(minDate.slice(0, 4)) : null;
+  const maxYear = maxDate ? Number(maxDate.slice(0, 4)) : null;
+  const [yearPageStart, setYearPageStart] = useState(() => Math.floor(currentYear / 12) * 12);
   const buttonRefs = useRef(new Map<DateValue, HTMLButtonElement>());
   const pendingFocusRef = useRef<DateValue | "fallback" | null>(null);
   const visibleMonths = Array.from({ length: months }, (_, index) => addMonths(currentMonth, index));
@@ -170,43 +146,41 @@ export function Calendar({
 
   return (
     <div className={styles.root}>
-      <header className={styles.navigation}>
-        <IconButton
-          aria-label={messages.previousMonth}
-          disabled={isSameMonth(previousMonth, currentMonth)}
-          icon={<ChevronLeft />}
-          onClick={() => navigateMonth(previousMonth)}
-          size="sm"
-        />
-        <Select
-          aria-label={messages.selectMonth}
-          block
-          items={monthOptions}
-          onChange={(next) => {
-            if (next !== null) navigateMonth(new Date(currentYear, Number(next), 1));
-          }}
-          size="sm"
-          value={String(currentMonth.getMonth())}
-        />
-        <Select
-          aria-label={messages.selectYear}
-          block
-          items={yearOptions}
-          onChange={(next) => {
-            if (next !== null) navigateMonth(new Date(Number(next), currentMonth.getMonth(), 1));
-          }}
-          size="sm"
-          value={String(currentYear)}
-        />
-        <IconButton
-          aria-label={messages.nextMonth}
-          disabled={isSameMonth(nextMonth, currentMonth)}
-          icon={<ChevronRight />}
-          onClick={() => navigateMonth(nextMonth)}
-          size="sm"
-        />
-      </header>
-      <div
+      {view === "days" ? <header className={styles.navigation}>
+          <IconButton aria-label={messages.previousMonth} disabled={isSameMonth(previousMonth, currentMonth)} icon={<ChevronLeft />} onClick={() => navigateMonth(previousMonth)} size="sm" />
+          <Button aria-label={messages.openMonthSelection} onClick={() => setView("months")} size="sm" variant="soft">
+            {formatMonthLabel(currentMonth, locale)}
+          </Button>
+          <IconButton aria-label={messages.nextMonth} disabled={isSameMonth(nextMonth, currentMonth)} icon={<ChevronRight />} onClick={() => navigateMonth(nextMonth)} size="sm" />
+        </header> : null}
+      {view === "months" ? <>
+        <header className={styles.navigation}>
+          <IconButton aria-label={messages.backToDays} icon={<ChevronLeft />} onClick={() => setView("days")} size="sm" />
+          <Button aria-label={messages.openYearSelection} onClick={() => { setYearPageStart(Math.floor(currentYear / 12) * 12); setView("years"); }} size="sm" variant="soft">{currentYear}</Button>
+          <span />
+        </header>
+        <div className={styles.modeGrid} data-calendar-month-grid="">
+          {Array.from({ length: 12 }, (_, monthIndex) => {
+            const candidate = new Date(currentYear, monthIndex, 1);
+            const disabled = !isSameMonth(candidate, clampCalendarMonth(candidate, minDate, maxDate));
+            const label = new Intl.DateTimeFormat(locale, { month: "long" }).format(candidate);
+            return <Button disabled={disabled} key={monthIndex} onClick={() => { navigateMonth(candidate); setView("days"); }} size="sm" variant={monthIndex === currentMonth.getMonth() ? "primary" : "soft"}>{label}</Button>;
+          })}
+        </div>
+      </> : null}
+      {view === "years" ? <>
+        <header className={styles.navigation}>
+          <IconButton aria-label={messages.previousPage} disabled={minYear !== null && yearPageStart <= minYear} icon={<ChevronLeft />} onClick={() => setYearPageStart((start) => start - 12)} size="sm" />
+          <Button aria-label={messages.backToDays} onClick={() => setView("days")} size="sm" variant="soft">{yearPageStart}–{yearPageStart + 11}</Button>
+          <IconButton aria-label={messages.nextPage} disabled={maxYear !== null && yearPageStart + 11 >= maxYear} icon={<ChevronRight />} onClick={() => setYearPageStart((start) => start + 12)} size="sm" />
+        </header>
+        <div className={styles.modeGrid} data-calendar-year-grid="">
+          {Array.from({ length: 12 }, (_, index) => yearPageStart + index).map((year) => (
+            <Button disabled={(minYear !== null && year < minYear) || (maxYear !== null && year > maxYear)} key={year} onClick={() => { navigateMonth(new Date(year, currentMonth.getMonth(), 1)); setView("months"); }} size="sm" variant={year === currentYear ? "primary" : "soft"}>{year}</Button>
+          ))}
+        </div>
+      </> : null}
+      {view === "days" ? <div
         className={styles.viewport}
         data-calendar-viewport=""
         style={{ "--calendar-month-count": months } as React.CSSProperties}
@@ -267,7 +241,7 @@ export function Calendar({
             </section>
           );
         })}
-      </div>
+      </div> : null}
     </div>
   );
 }
