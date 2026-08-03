@@ -1,0 +1,41 @@
+.layout {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: var(--ds-space-5);
+  min-inline-size: 0;
+}
+
+.presets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  padding-inline-end: var(--ds-space-4);
+  border-inline-end: var(--ds-border-width-default) solid var(--ds-border-subtle);
+}
+
+.timeFields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--ds-space-3);
+}
+
+.message {
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-body-sm);
+}
+
+.error {
+  color: var(--ds-text-danger);
+}
+
+@media (--ds-below-md) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .presets {
+    flex-flow: row wrap;
+    padding-inline-end: var(--ds-space-0);
+    border-inline-end: 0;
+  }
+}

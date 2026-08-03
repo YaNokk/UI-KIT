@@ -27,6 +27,7 @@ export interface InputProps
     InputHTMLAttributes<HTMLInputElement>,
     "children" | "color" | "size" | "style"
   > {
+  block?: boolean;
   endAdornment?: ReactNode;
   error?: ReactNode;
   hint?: ReactNode;
@@ -40,6 +41,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   {
     "aria-describedby": ariaDescribedBy,
     "aria-invalid": ariaInvalid,
+    block = false,
     className,
     defaultValue,
     disabled = false,
@@ -99,6 +101,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 
   return (
     <FormControl
+      block={block}
       className={className}
       controlId={id}
       data-field-textlike=""

@@ -1,0 +1,40 @@
+.root {
+  display: grid;
+  gap: var(--ds-space-2);
+  min-inline-size: 0;
+}
+
+.block {
+  inline-size: 100%;
+}
+
+.label {
+  color: var(--ds-text-primary);
+  font: var(--ds-typography-body-sm);
+}
+
+.boundary {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(96px, 1fr);
+  gap: var(--ds-space-2);
+}
+
+.boundaries {
+  display: grid;
+  gap: var(--ds-space-3);
+}
+
+.message {
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-caption);
+}
+
+.error {
+  color: var(--ds-text-danger);
+}
+
+@media (--ds-below-md) {
+  .boundary {
+    grid-template-columns: minmax(0, 1fr) minmax(96px, 0.6fr);
+  }
+}

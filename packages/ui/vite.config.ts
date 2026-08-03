@@ -37,6 +37,13 @@ export default defineConfig({
         "DesignSystemProvider/index": fileURLToPath(
           new URL("./src/DesignSystemProvider/index.ts", import.meta.url)
         ),
+        "DateInput/index": fileURLToPath(new URL("./src/DateInput/index.ts", import.meta.url)),
+        "TimeInput/index": fileURLToPath(new URL("./src/TimeInput/index.ts", import.meta.url)),
+        "DatePicker/index": fileURLToPath(new URL("./src/DatePicker/index.ts", import.meta.url)),
+        "DateRangeInput/index": fileURLToPath(new URL("./src/DateRangeInput/index.ts", import.meta.url)),
+        "DateRangePicker/index": fileURLToPath(new URL("./src/DateRangePicker/index.ts", import.meta.url)),
+        "DateTimeRangeInput/index": fileURLToPath(new URL("./src/DateTimeRangeInput/index.ts", import.meta.url)),
+        "DateTimeRangePicker/index": fileURLToPath(new URL("./src/DateTimeRangePicker/index.ts", import.meta.url)),
         "Dialog/index": fileURLToPath(
           new URL("./src/Dialog/index.ts", import.meta.url)
         ),
@@ -150,7 +157,10 @@ export default defineConfig({
         || id === "@mypoint/tokens"
         || id === "@radix-ui/react-dialog"
         || id === "lucide-react"
-        || id === "virtua",
+        || id === "virtua"
+        || id === "date-fns"
+        || id.startsWith("date-fns/")
+        || id === "@date-fns/tz",
       output: {
         preserveModules: true,
         preserveModulesRoot: sourceRoot,

@@ -13,6 +13,13 @@ import { Tag } from "@mypoint/ui/tag";
 import { Textarea } from "@mypoint/ui/textarea";
 import type { SystemColor } from "@mypoint/ui/system-color";
 import { Button, LinkButton, ThemeProvider } from "@mypoint/ui";
+import { DateInput } from "@mypoint/ui/date-input";
+import { TimeInput } from "@mypoint/ui/time-input";
+import { DatePicker } from "@mypoint/ui/date-picker";
+import { DateRangeInput } from "@mypoint/ui/date-range-input";
+import { DateRangePicker } from "@mypoint/ui/date-range-picker";
+import { DateTimeRangeInput } from "@mypoint/ui/date-time-range-input";
+import { DateTimeRangePicker } from "@mypoint/ui/date-time-range-picker";
 import { NumberInput } from "@mypoint/ui/number-input";
 import { Radio } from "@mypoint/ui/radio";
 import { RadioGroup } from "@mypoint/ui/radio-group";
@@ -61,6 +68,13 @@ export function App() {
       <NumberInput aria-label="Number" value={1.25} />
       <InternationalPhoneInput defaultCountry="PL" label="Phone" />
       <Textarea label="Notes" showCount maxLength={200} />
+      <DateInput label="Date" value="2026-08-02" />
+      <TimeInput label="Time" value="10:15" />
+      <DatePicker label="Pick date" value="2026-08-02" />
+      <DateRangeInput label="Date range" value={{ from: "2026-08-01", to: "2026-08-02" }} />
+      <DateRangePicker label="Pick range" value={{ from: "2026-08-01", to: "2026-08-02" }} />
+      <DateTimeRangeInput label="Date time range" value={{ from: "2026-08-01T09:00", to: "2026-08-02T18:00" }} />
+      <DateTimeRangePicker label="Pick date time range" timeZone="Europe/Warsaw" value={{ from: "2026-08-01T09:00", to: "2026-08-02T18:00" }} />
       <QuantityInput
         aria-label="Quantity"
         decreaseLabel="Decrease quantity"

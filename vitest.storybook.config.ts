@@ -62,6 +62,15 @@ const storybookCsfTransform: Plugin = {
       && !normalizedId.includes(
         "/packages/ui/src/Textarea/TextareaBrowserRegression.stories.tsx"
       )
+      && !normalizedId.includes(
+        "/packages/ui/src/DatePicker/DatePickerBrowserRegression.stories.tsx"
+      )
+      && !normalizedId.includes(
+        "/packages/ui/src/DateRangePicker/DateRangePickerBrowserRegression.stories.tsx"
+      )
+      && !normalizedId.includes(
+        "/packages/ui/src/DateTimeRangePicker/DateTimeRangePickerBrowserRegression.stories.tsx"
+      )
     ) {
       return undefined;
     }
@@ -82,7 +91,10 @@ const storybookCsfTransform: Plugin = {
         "../../../packages/ui/src/internal/choice-control/ChoiceControlBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/choice-control/ChoiceControlsVisualCalibration.stories.tsx",
         "../../../packages/ui/src/InternationalPhoneInput/InternationalPhoneInputBrowserRegression.stories.tsx",
-        "../../../packages/ui/src/Textarea/TextareaBrowserRegression.stories.tsx"
+        "../../../packages/ui/src/Textarea/TextareaBrowserRegression.stories.tsx",
+        "../../../packages/ui/src/DatePicker/DatePickerBrowserRegression.stories.tsx",
+        "../../../packages/ui/src/DateRangePicker/DateRangePickerBrowserRegression.stories.tsx",
+        "../../../packages/ui/src/DateTimeRangePicker/DateTimeRangePickerBrowserRegression.stories.tsx"
       ],
       tagsFilter: defaultStorybookTagsFilter
     });
@@ -136,7 +148,10 @@ export default defineConfig({
       "packages/ui/src/internal/choice-control/ChoiceControlBrowserRegression.stories.tsx",
       "packages/ui/src/internal/choice-control/ChoiceControlsVisualCalibration.stories.tsx",
       "packages/ui/src/InternationalPhoneInput/InternationalPhoneInputBrowserRegression.stories.tsx",
-      "packages/ui/src/Textarea/TextareaBrowserRegression.stories.tsx"
+      "packages/ui/src/Textarea/TextareaBrowserRegression.stories.tsx",
+      "packages/ui/src/DatePicker/DatePickerBrowserRegression.stories.tsx",
+      "packages/ui/src/DateRangePicker/DateRangePickerBrowserRegression.stories.tsx",
+      "packages/ui/src/DateTimeRangePicker/DateTimeRangePickerBrowserRegression.stories.tsx"
     ],
     browser: {
       enabled: true,

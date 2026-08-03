@@ -1,0 +1,220 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "../Button/Button";
+import { DateTimeRangeInput, type DateTimeRangeInputProps } from "../DateTimeRangeInput/DateTimeRangeInput";
+import { TimeInput, type MinuteStep } from "../TimeInput/TimeInput";
+import { Calendar } from "../internal/calendar/Calendar";
+import { dateValueToLocalDate } from "../internal/date/dateMath";
+import { equalDateTimeRanges } from "../internal/date/dateComparison";
+import { createStandardDateTimeRangePresets } from "../internal/date/dateTimePresets";
+import { validateDateTimeRange } from "../internal/date/dateTimeRange";
+import { resolveWeekStartsOn } from "../internal/date/locale";
+import { joinLocalDateTime } from "../internal/date/parseLocalDateTimeValue";
+import { selectRangeDate } from "../internal/date/dateRange";
+import { zonedNow } from "../internal/date/timezone";
+import type {
+  DateRangeValue,
+  DateTimeRangePreset,
+  DateTimeRangeValue,
+  DateValue,
+  LocalDateTimeValue,
+  TimeValue,
+  WeekStartsOn
+} from "../internal/date/types";
+import { useControllableValue } from "../internal/date/useControllableValue";
+import { PickerOverlay } from "../internal/date-picker/PickerOverlay";
+import { useResolvedLocale } from "../internal/locale/LocaleContext";
+import styles from "./DateTimeRangePicker.module.css";
+
+const EMPTY_RANGE: DateTimeRangeValue = { from: null, to: null };
+
+function datePart(value: LocalDateTimeValue | null): DateValue | null {
+  return value ? value.slice(0, 10) as DateValue : null;
+}
+
+function timePart(value: LocalDateTimeValue | null, fallback: TimeValue): TimeValue {
+  return value ? value.slice(11, 16) as TimeValue : fallback;
+}
+
+export interface DateTimeRangePickerProps extends Omit<
+  DateTimeRangeInputProps,
+  "minValue" | "maxValue" | "minuteStep"
+> {
+  timeZone: string;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  minValue?: LocalDateTimeValue | undefined;
+  maxValue?: LocalDateTimeValue | undefined;
+  minuteStep?: MinuteStep;
+  maxDuration?: { days?: number; hours?: number };
+  presets?: readonly DateTimeRangePreset[];
+  weekStartsOn?: WeekStartsOn;
+}
+
+export function DateTimeRangePicker({
+  value: controlledValue,
+  defaultValue = EMPTY_RANGE,
+  onChange,
+  timeZone,
+  open: controlledOpen,
+  defaultOpen = false,
+  onOpenChange,
+  minValue,
+  maxValue,
+  minuteStep = 1,
+  defaultStartTime = "00:00",
+  defaultEndTime = "23:59",
+  maxDuration,
+  presets,
+  weekStartsOn: explicitWeekStartsOn,
+  locale: explicitLocale,
+  isDateUnavailable,
+  isTimeUnavailable,
+  disabled = false,
+  readOnly = false,
+  ...inputProps
+}: DateTimeRangePickerProps) {
+  useMemo(() => zonedNow(new Date(), timeZone), [timeZone]);
+  const locale = useResolvedLocale(explicitLocale);
+  const weekStartsOn = resolveWeekStartsOn(locale, explicitWeekStartsOn);
+  const [value, setValue] = useControllableValue(controlledValue, defaultValue, onChange);
+  const [open, setOpen] = useControllableValue(controlledOpen, defaultOpen, onOpenChange);
+  const [draft, setDraft] = useState(value);
+  const [hoverDate, setHoverDate] = useState<DateValue | null>(null);
+  const [month, setMonth] = useState(() => {
+    const initialDate = datePart(value.from);
+    return initialDate ? dateValueToLocalDate(initialDate) : new Date();
+  });
+  const inputGroupRef = useRef<HTMLDivElement | null>(null);
+  const resolvedPresets = useMemo(() => presets ?? createStandardDateTimeRangePresets({ locale }), [locale, presets]);
+  const context = useMemo(() => ({ now: new Date(), locale, timeZone, weekStartsOn, minValue, maxValue }), [locale, maxValue, minValue, timeZone, weekStartsOn]);
+
+  useEffect(() => {
+    if (open) {
+      setDraft(value);
+      const nextDate = datePart(value.from);
+      setMonth(nextDate ? dateValueToLocalDate(nextDate) : new Date());
+    }
+  }, [open, value]);
+
+  useEffect(() => {
+    const form = inputGroupRef.current?.closest("form");
+    if (!form) return;
+    const reset = () => queueMicrotask(() => {
+      setValue(defaultValue);
+      setDraft(defaultValue);
+      const resetDate = datePart(defaultValue.from);
+      setMonth(resetDate ? dateValueToLocalDate(resetDate) : new Date());
+    });
+    form.addEventListener("reset", reset);
+    return () => form.removeEventListener("reset", reset);
+  }, [defaultValue, setValue]);
+
+  const dateRange: DateRangeValue = { from: datePart(draft.from), to: datePart(draft.to) };
+  const updateDates = (selected: DateValue) => {
+    const next = selectRangeDate(dateRange, selected).value;
+    setDraft({
+      from: joinLocalDateTime(next.from, timePart(draft.from, defaultStartTime)),
+      to: joinLocalDateTime(next.to, timePart(draft.to, defaultEndTime))
+    });
+  };
+  const canApply = validateDateTimeRange(draft, maxDuration, timeZone)
+    && (!draft.from || (!minValue || draft.from >= minValue))
+    && (!draft.to || (!maxValue || draft.to <= maxValue))
+    && (!draft.from || !isTimeUnavailable?.(draft.from, "from"))
+    && (!draft.to || !isTimeUnavailable?.(draft.to, "to"));
+  const ru = locale.toLowerCase().startsWith("ru");
+  const labels = ru
+    ? { title: "Выберите период и время", close: "Закрыть", cancel: "Отмена", apply: "Применить", reset: "Сбросить", invalid: "Дата или время окончания раньше начала" }
+    : { title: "Choose date and time range", close: "Close", cancel: "Cancel", apply: "Apply", reset: "Reset", invalid: "End date or time is before start" };
+  const trigger = (
+    <div onClick={() => { if (!disabled && !readOnly) setOpen(true); }}>
+      <DateTimeRangeInput
+        {...inputProps}
+        defaultEndTime={defaultEndTime}
+        defaultStartTime={defaultStartTime}
+        disabled={disabled}
+        isDateUnavailable={isDateUnavailable}
+        isTimeUnavailable={isTimeUnavailable}
+        locale={locale}
+        maxValue={maxValue}
+        minValue={minValue}
+        minuteStep={minuteStep}
+        onChange={(next) => { if (validateDateTimeRange(next, maxDuration, timeZone)) setValue(next); }}
+        readOnly={readOnly}
+        ref={inputGroupRef}
+        value={value}
+      />
+    </div>
+  );
+
+  return (
+    <PickerOverlay
+      closeLabel={labels.close}
+      footer={(
+        <>
+          <Button onClick={() => setDraft(EMPTY_RANGE)} variant="soft">{labels.reset}</Button>
+          <Button onClick={() => { setDraft(value); setOpen(false); }} variant="secondary">{labels.cancel}</Button>
+          <Button disabled={!canApply} onClick={() => { if (canApply) setValue(draft); setOpen(false); }} variant="primary">{labels.apply}</Button>
+        </>
+      )}
+      onOpenChange={(next) => { if (!next) setDraft(value); setOpen(next); }}
+      open={open}
+      title={labels.title}
+      trigger={trigger}
+      wide
+    >
+      <div className={styles.layout}>
+        <div className={styles.presets}>
+          {resolvedPresets.map((preset) => {
+            const resolved = preset.resolve(context);
+            return (
+              <Button
+                aria-pressed={equalDateTimeRanges(resolved, draft)}
+                key={preset.id}
+                onClick={() => {
+                  setDraft(resolved);
+                  const resolvedDate = datePart(resolved.from);
+                  if (resolvedDate) setMonth(dateValueToLocalDate(resolvedDate));
+                }}
+                size="sm"
+                variant={equalDateTimeRanges(resolved, draft) ? "primary" : "soft"}
+              >{preset.label}</Button>
+            );
+          })}
+        </div>
+        <div>
+          <Calendar
+            hoverDate={hoverDate}
+            isDateUnavailable={isDateUnavailable}
+            locale={locale}
+            maxDate={maxValue?.slice(0, 10) as DateValue | undefined}
+            minDate={minValue?.slice(0, 10) as DateValue | undefined}
+            month={month}
+            months={2}
+            onHoverDateChange={setHoverDate}
+            onMonthChange={setMonth}
+            onSelect={updateDates}
+            range={dateRange}
+            weekStartsOn={weekStartsOn}
+          />
+          <div className={styles.timeFields}>
+            <TimeInput
+              aria-label={ru ? "Время начала" : "Start time"}
+              minuteStep={minuteStep}
+              onChange={(time) => setDraft({ ...draft, from: joinLocalDateTime(datePart(draft.from), time) })}
+              value={draft.from ? timePart(draft.from, defaultStartTime) : null}
+            />
+            <TimeInput
+              aria-label={ru ? "Время окончания" : "End time"}
+              minuteStep={minuteStep}
+              onChange={(time) => setDraft({ ...draft, to: joinLocalDateTime(datePart(draft.to), time) })}
+              value={draft.to ? timePart(draft.to, defaultEndTime) : null}
+            />
+          </div>
+          {draft.from && draft.to && !canApply ? <p className={`${styles.message} ${styles.error}`}>{labels.invalid}</p> : null}
+        </div>
+      </div>
+    </PickerOverlay>
+  );
+}

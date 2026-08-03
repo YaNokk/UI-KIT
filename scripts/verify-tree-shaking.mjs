@@ -133,6 +133,40 @@ if (
 ) {
   throw new Error("Textarea or its character count was not found.");
 }
+
+runBuild("tree-date-input", "dist-tree-date-input");
+const dateInputJavaScript = readOutput("dist-tree-date-input", ".js");
+if (!dateInputJavaScript.includes("Tree-shaken date input")) {
+  throw new Error("The used DateInput implementation was not found.");
+}
+if (
+  dateInputJavaScript.includes("data-calendar-viewport")
+  || dateInputJavaScript.includes("TZDate")
+  || dateInputJavaScript.includes("listbox")
+) {
+  throw new Error("Calendar, timezone, or select behavior survived the DateInput-only build.");
+}
+
+runBuild("tree-date-range-picker", "dist-tree-date-range-picker");
+const dateRangeJavaScript = readOutput("dist-tree-date-range-picker", ".js");
+if (
+  !dateRangeJavaScript.includes("Tree-shaken date range")
+  || !dateRangeJavaScript.includes("data-calendar-viewport")
+) {
+  throw new Error("The used DateRangePicker implementation was not found.");
+}
+if (dateRangeJavaScript.includes("TZDate")) {
+  throw new Error("Timezone code survived the date-only picker build.");
+}
+
+runBuild("tree-date-time-range-picker", "dist-tree-date-time-range-picker");
+const dateTimeRangeJavaScript = readOutput("dist-tree-date-time-range-picker", ".js");
+if (
+  !dateTimeRangeJavaScript.includes("Tree-shaken date time range")
+  || !dateTimeRangeJavaScript.includes("data-calendar-viewport")
+) {
+  throw new Error("The used DateTimeRangePicker implementation was not found.");
+}
 if (
   textareaJavaScript.includes("data-country-flag")
   || textareaJavaScript.includes("data-amount-part")

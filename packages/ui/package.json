@@ -47,6 +47,34 @@
       "types": "./dist/DesignSystemProvider/index.d.ts",
       "import": "./dist/DesignSystemProvider/index.js"
     },
+    "./date-input": {
+      "types": "./dist/DateInput/index.d.ts",
+      "import": "./dist/DateInput/index.js"
+    },
+    "./time-input": {
+      "types": "./dist/TimeInput/index.d.ts",
+      "import": "./dist/TimeInput/index.js"
+    },
+    "./date-picker": {
+      "types": "./dist/DatePicker/index.d.ts",
+      "import": "./dist/DatePicker/index.js"
+    },
+    "./date-range-input": {
+      "types": "./dist/DateRangeInput/index.d.ts",
+      "import": "./dist/DateRangeInput/index.js"
+    },
+    "./date-range-picker": {
+      "types": "./dist/DateRangePicker/index.d.ts",
+      "import": "./dist/DateRangePicker/index.js"
+    },
+    "./date-time-range-input": {
+      "types": "./dist/DateTimeRangeInput/index.d.ts",
+      "import": "./dist/DateTimeRangeInput/index.js"
+    },
+    "./date-time-range-picker": {
+      "types": "./dist/DateTimeRangePicker/index.d.ts",
+      "import": "./dist/DateTimeRangePicker/index.js"
+    },
     "./dialog": {
       "types": "./dist/Dialog/index.d.ts",
       "import": "./dist/Dialog/index.js"
@@ -165,12 +193,14 @@
     "react-dom": "^18.2.0 || ^19.0.0"
   },
   "dependencies": {
+    "@date-fns/tz": "^1.5.0",
     "@floating-ui/react": "0.27.20",
     "@maskito/core": "^4.0.1",
     "@maskito/kit": "^4.0.1",
     "@maskito/phone": "^4.0.1",
     "@mypoint/tokens": "^0.1.0",
     "@radix-ui/react-dialog": "1.1.23",
+    "date-fns": "^4.4.0",
     "libphonenumber-js": "^1.13.10",
     "lucide-react": "^1.27.0",
     "virtua": "^0.41.5"
