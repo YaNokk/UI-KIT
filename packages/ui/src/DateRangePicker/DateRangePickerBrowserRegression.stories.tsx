@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { DateRangePicker } from "./DateRangePicker";
 import type { DateRangeValue } from "../internal/date/types";
 
@@ -27,6 +27,44 @@ function Harness() {
     </>
   );
 }
+
+function ControlledRerenderHarness() {
+  const [from, setFrom] = useState<DateRangeValue["from"]>("2026-08-11");
+  const [to, setTo] = useState<DateRangeValue["to"]>("2026-08-22");
+  const [revision, setRevision] = useState(0);
+  const value = { from, to };
+  return (
+    <>
+      <DateRangePicker
+        defaultOpen
+        label="Period"
+        locale="en-US"
+        onChange={(next) => { setFrom(next.from); setTo(next.to); }}
+        value={value}
+      />
+      <button data-testid="unrelated-rerender" onClick={() => setRevision((current) => current + 1)} type="button">
+        Rerender {revision}
+      </button>
+    </>
+  );
+}
+
+export const EqualControlledObjectRerender: Story = {
+  render: () => <ControlledRerenderHarness />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole("textbox", { name: "Period" });
+    trigger.focus();
+    await userEvent.keyboard("{Control>}a{/Control}0901202609122026");
+    await expect(trigger).toHaveValue("09/01/2026 — 09/12/2026");
+    canvas.getByTestId("unrelated-rerender").click();
+    await waitFor(() => expect(canvas.getByTestId("unrelated-rerender")).toHaveTextContent("Rerender 1"));
+    await expect(trigger).toHaveValue("09/01/2026 — 09/12/2026");
+    await userEvent.click(body.getByRole("button", { name: "Cancel" }));
+    await expect(trigger).toHaveValue("08/11/2026 — 08/22/2026");
+  }
+};
 
 export const DraftApplyAndCancel: Story = {
   render: () => <Harness />,

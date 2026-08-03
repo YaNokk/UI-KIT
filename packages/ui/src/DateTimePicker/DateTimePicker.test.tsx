@@ -117,6 +117,36 @@ describe("DateTimePicker", () => {
     await user.click(screen.getByRole("button", { name: "Apply" }));
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenLastCalledWith("2026-09-12T09:30");
+    await user.click(trigger);
+    expect(trigger).toHaveValue("09/12/2026, 09:30");
+  });
+
+  it("discards on outside press and reopens in days view", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <>
+        <DateTimePicker
+          defaultOpen
+          defaultValue="2026-08-11T18:30"
+          label="Date and time"
+          locale="en-US"
+          onChange={onChange}
+        />
+        <button type="button">Outside</button>
+      </>
+    );
+    const trigger = screen.getByRole("textbox", { name: "Date and time" });
+    trigger.focus();
+    await user.keyboard("{Control>}a{/Control}091220260930");
+    await user.click(screen.getByRole("button", { name: "Open month selection" }));
+    await user.click(screen.getByRole("button", { name: "Open year selection" }));
+    await user.click(screen.getByRole("button", { name: "Outside" }));
+    expect(onChange).not.toHaveBeenCalled();
+    expect(trigger).toHaveValue("08/11/2026, 18:30");
+    await user.click(trigger);
+    expect(screen.getByRole("grid")).toBeInTheDocument();
+    expect(document.querySelector("[data-calendar-year-grid]")).not.toBeInTheDocument();
   });
 
   it("commits one complete manual trigger edit in immediate mode", async () => {

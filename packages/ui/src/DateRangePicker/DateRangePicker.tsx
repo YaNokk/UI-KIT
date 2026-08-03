@@ -85,7 +85,13 @@ export function DateRangePicker({
   const [month, setMonth] = useState(() => value.from ? dateValueToLocalDate(value.from) : new Date());
   const [calendarViewKey, setCalendarViewKey] = useState(0);
   const inputGroupRef = useRef<HTMLInputElement | null>(null);
-  const pickerDraft = usePickerDraft({ value, open, commitMode: "apply", setValue });
+  const pickerDraft = usePickerDraft({
+    value,
+    open,
+    commitMode: "apply",
+    setValue,
+    isEqual: equalDateRanges
+  });
   const { draft, displayValue } = pickerDraft;
   const resolvedPresets = useMemo(() => presets ?? createStandardDateRangePresets({
     locale,
@@ -98,7 +104,7 @@ export function DateRangePicker({
     if (open) {
       setMonth(value.from ? dateValueToLocalDate(value.from) : new Date());
     }
-  }, [open, value]);
+  }, [open, value.from, value.to]);
   useEffect(() => {
     if (open) setCalendarViewKey((key) => key + 1);
   }, [open]);
@@ -115,19 +121,27 @@ export function DateRangePicker({
     return () => form.removeEventListener("reset", reset);
   }, [defaultValue, pickerDraft.setDraft, setValue]);
 
-  const handleOpenChange = (next: boolean) => {
-    if (next) {
-      pickerDraft.openDraft();
-      setMonth(value.from ? dateValueToLocalDate(value.from) : new Date());
-    } else {
-      pickerDraft.discard();
-    }
-    setOpen(next);
+  const openPicker = () => {
+    pickerDraft.openDraft();
+    setMonth(value.from ? dateValueToLocalDate(value.from) : new Date());
+    setOpen(true);
+  };
+  const discardAndClose = () => {
+    pickerDraft.discard();
+    setOpen(false);
+  };
+  const applyAndClose = () => {
+    pickerDraft.apply();
+    setOpen(false);
+  };
+  const handleOverlayOpenChange = (next: boolean) => {
+    if (next) openPicker();
+    else discardAndClose();
   };
 
   const canApply = isDateRangeComplete(draft) && isDateRangeDurationValid(draft, maxDuration);
   const trigger = (
-    <div onClick={() => { if (!disabled && !readOnly && !open) handleOpenChange(true); }}>
+    <div onClick={() => { if (!disabled && !readOnly && !open) openPicker(); }}>
       <DateRangeInput
         block={block}
         defaultValue={defaultValue}
@@ -161,11 +175,11 @@ export function DateRangePicker({
       footer={(
         <>
           <Button onClick={() => pickerDraft.update(EMPTY_RANGE)} variant="soft">{messages.reset}</Button>
-          <Button onClick={() => handleOpenChange(false)} variant="secondary">{messages.cancel}</Button>
-          <Button disabled={!canApply} onClick={() => { if (canApply) pickerDraft.apply(); handleOpenChange(false); }} variant="primary">{messages.apply}</Button>
+          <Button onClick={discardAndClose} variant="secondary">{messages.cancel}</Button>
+          <Button disabled={!canApply} onClick={() => { if (canApply) applyAndClose(); }} variant="primary">{messages.apply}</Button>
         </>
       )}
-      onOpenChange={handleOpenChange}
+      onOpenChange={handleOverlayOpenChange}
       open={open}
       title={messages.chooseRange}
       trigger={trigger}

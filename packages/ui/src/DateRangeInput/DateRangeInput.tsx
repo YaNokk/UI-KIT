@@ -12,6 +12,7 @@ import {
 import { Input } from "../Input/Input";
 import type { DateInputCorrection } from "../DateInput/DateInput";
 import { useDateInputMask } from "../internal/date/input-mask/useDateInputMask";
+import { equalDateRanges } from "../internal/date/dateComparison";
 import { isDateAllowed } from "../internal/date/dateValidation";
 import { getDateInputPlaceholder } from "../internal/date/dateFormatting";
 import { createDateRangeInputMask } from "../internal/date/range-input/createDateRangeInputMask";
@@ -75,9 +76,15 @@ export const DateRangeInput = forwardRef<HTMLInputElement, DateRangeInputProps>(
     const [text, setText] = useState(() => formatDateRangeValue(value, locale));
     const [focused, setFocused] = useState(false);
     const inputRef = useRef<HTMLInputElement | null>(null);
+    const renderedValueRef = useRef(value);
     const maskRef = useDateInputMask(useMemo(() => createDateRangeInputMask(locale), [locale]));
 
     useEffect(() => {
+      if (!equalDateRanges(renderedValueRef.current, value)) {
+        renderedValueRef.current = value;
+        setText(formatDateRangeValue(value, locale));
+        return;
+      }
       if (!focused) setText(formatDateRangeValue(value, locale));
     }, [focused, locale, value]);
     const restore = useCallback(() => {

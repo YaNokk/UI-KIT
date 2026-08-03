@@ -86,21 +86,28 @@ export function DatePicker({
 
   const context = useMemo(() => ({ now: new Date(), locale, minDate, maxDate }), [locale, maxDate, minDate]);
 
-  const handleOpenChange = (next: boolean) => {
-    if (next) {
-      pickerDraft.openDraft();
-      setMonth(value ? dateValueToLocalDate(value) : new Date());
-    } else {
-      pickerDraft.discard();
-    }
-    setOpen(next);
+  const openPicker = () => {
+    pickerDraft.openDraft();
+    setMonth(value ? dateValueToLocalDate(value) : new Date());
+    setOpen(true);
   };
-  const close = () => handleOpenChange(false);
+  const discardAndClose = () => {
+    pickerDraft.discard();
+    setOpen(false);
+  };
+  const applyAndClose = () => {
+    pickerDraft.apply();
+    setOpen(false);
+  };
+  const handleOverlayOpenChange = (next: boolean) => {
+    if (next) openPicker();
+    else discardAndClose();
+  };
   const select = (next: DateValue) => {
     pickerDraft.update(next);
     setMonth(dateValueToLocalDate(next));
     if (commitMode === "immediate") {
-      close();
+      discardAndClose();
     }
   };
   const trigger = (
@@ -119,7 +126,7 @@ export function DatePicker({
       }}
       onClick={(event) => {
         inputProps.onClick?.(event);
-        if (!event.defaultPrevented && !disabled && !readOnly && !open) handleOpenChange(true);
+        if (!event.defaultPrevented && !disabled && !readOnly && !open) openPicker();
       }}
       readOnly={readOnly}
       ref={inputRef}
@@ -132,11 +139,11 @@ export function DatePicker({
       closeLabel={messages.close}
       footer={commitMode === "apply" ? (
         <>
-          <Button onClick={close} variant="secondary">{messages.cancel}</Button>
-          <Button disabled={!draft} onClick={() => { if (draft) pickerDraft.apply(); close(); }} variant="primary">{messages.apply}</Button>
+          <Button onClick={discardAndClose} variant="secondary">{messages.cancel}</Button>
+          <Button disabled={!draft} onClick={() => { if (draft) applyAndClose(); }} variant="primary">{messages.apply}</Button>
         </>
       ) : undefined}
-      onOpenChange={handleOpenChange}
+      onOpenChange={handleOverlayOpenChange}
       open={open}
       title={messages.chooseDate}
       trigger={trigger}
@@ -163,7 +170,7 @@ export function DatePicker({
         weekStartsOn={weekStartsOn}
       />
       {commitMode === "immediate" ? (
-        <Button onClick={() => { pickerDraft.update(null); close(); }} size="sm" variant="secondary">{messages.reset}</Button>
+        <Button onClick={() => { pickerDraft.update(null); discardAndClose(); }} size="sm" variant="secondary">{messages.reset}</Button>
       ) : null}
     </PickerOverlay>
   );

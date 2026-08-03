@@ -75,6 +75,34 @@ describe("DatePicker", () => {
     await user.click(screen.getByRole("button", { name: "Apply" }));
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenLastCalledWith("2026-09-12");
+    await user.click(trigger);
+    expect(trigger).toHaveValue("09/12/2026");
+  });
+
+  it("discards on Escape and reopens in days view", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <DatePicker
+        commitMode="apply"
+        defaultOpen
+        defaultValue="2026-08-11"
+        label="Date"
+        locale="en-US"
+        onChange={onChange}
+      />
+    );
+    const trigger = screen.getByRole("textbox", { name: "Date" });
+    trigger.focus();
+    await user.keyboard("{Control>}a{/Control}09122026");
+    await user.click(screen.getByRole("button", { name: "Open month selection" }));
+    await user.click(screen.getByRole("button", { name: "Open year selection" }));
+    await user.keyboard("{Escape}");
+    expect(onChange).not.toHaveBeenCalled();
+    expect(trigger).toHaveValue("08/11/2026");
+    await user.click(trigger);
+    expect(screen.getByRole("grid")).toBeInTheDocument();
+    expect(document.querySelector("[data-calendar-year-grid]")).not.toBeInTheDocument();
   });
 
   it("reopens in calendar days view", async () => {

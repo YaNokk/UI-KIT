@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { DateTimeRangePicker } from "./DateTimeRangePicker";
 import type { DateTimeRangeValue } from "../internal/date/types";
 
@@ -30,6 +30,45 @@ function ManualDraftHarness() {
     </>
   );
 }
+
+function ControlledRerenderHarness() {
+  const [from, setFrom] = useState<DateTimeRangeValue["from"]>("2026-08-11T09:00");
+  const [to, setTo] = useState<DateTimeRangeValue["to"]>("2026-08-22T18:00");
+  const [revision, setRevision] = useState(0);
+  const value = { from, to };
+  return (
+    <>
+      <DateTimeRangePicker
+        defaultOpen
+        label="Period"
+        locale="en-US"
+        onChange={(next) => { setFrom(next.from); setTo(next.to); }}
+        timeZone="Europe/Kaliningrad"
+        value={value}
+      />
+      <button data-testid="unrelated-rerender" onClick={() => setRevision((current) => current + 1)} type="button">
+        Rerender {revision}
+      </button>
+    </>
+  );
+}
+
+export const EqualControlledObjectRerender: Story = {
+  render: () => <ControlledRerenderHarness />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const trigger = canvas.getByRole("textbox", { name: "Period" });
+    trigger.focus();
+    await userEvent.keyboard("{Control>}a{/Control}091220260930092320261830");
+    await expect(trigger).toHaveValue("09/12/2026, 09:30 — 09/23/2026, 18:30");
+    canvas.getByTestId("unrelated-rerender").click();
+    await waitFor(() => expect(canvas.getByTestId("unrelated-rerender")).toHaveTextContent("Rerender 1"));
+    await expect(trigger).toHaveValue("09/12/2026, 09:30 — 09/23/2026, 18:30");
+    await userEvent.click(body.getByRole("button", { name: "Cancel" }));
+    await expect(trigger).toHaveValue("08/11/2026, 09:00 — 08/22/2026, 18:00");
+  }
+};
 
 export const Manual1830DraftLifecycle: Story = {
   render: () => <ManualDraftHarness />,

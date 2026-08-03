@@ -125,6 +125,71 @@ describe("DateTimeRangePicker", () => {
       from: "2026-09-12T09:30",
       to: "2026-09-23T18:30"
     });
+    await user.click(trigger);
+    expect(trigger).toHaveValue("09/12/2026, 09:30 — 09/23/2026, 18:30");
+  });
+
+  it("preserves draft across equal controlled objects and accepts a changed external range", async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <DateTimeRangePicker
+        defaultOpen
+        label="Period"
+        locale="en-US"
+        timeZone="Europe/Kaliningrad"
+        value={{ from: "2026-08-11T09:00", to: "2026-08-22T18:00" }}
+      />
+    );
+    const trigger = screen.getByRole("textbox", { name: "Period" });
+    trigger.focus();
+    await user.keyboard("{Control>}a{/Control}091220260930092320261830");
+    rerender(
+      <DateTimeRangePicker
+        defaultOpen
+        label="Period"
+        locale="en-US"
+        timeZone="Europe/Kaliningrad"
+        value={{ from: "2026-08-11T09:00", to: "2026-08-22T18:00" }}
+      />
+    );
+    expect(trigger).toHaveValue("09/12/2026, 09:30 — 09/23/2026, 18:30");
+
+    rerender(
+      <DateTimeRangePicker
+        defaultOpen
+        label="Period"
+        locale="en-US"
+        timeZone="Europe/Kaliningrad"
+        value={{ from: "2026-10-11T10:00", to: "2026-10-22T19:00" }}
+      />
+    );
+    expect(trigger).toHaveValue("10/11/2026, 10:00 — 10/22/2026, 19:00");
+  });
+
+  it("restores committed state after parent invalidation", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const picker = (
+      <DateTimeRangePicker
+        defaultOpen
+        defaultValue={{ from: "2026-08-11T09:00", to: "2026-08-22T18:00" }}
+        label="Period"
+        locale="en-US"
+        onChange={onChange}
+        timeZone="Europe/Kaliningrad"
+      />
+    );
+    const { rerender } = render(picker);
+    const trigger = screen.getByRole("textbox", { name: "Period" });
+    trigger.focus();
+    await user.keyboard("{Control>}a{/Control}091220260930092320261830");
+    rerender(<div>Parent closed</div>);
+    expect(onChange).not.toHaveBeenCalled();
+    rerender(picker);
+    expect(screen.getByRole("textbox", { name: "Period" })).toHaveValue(
+      "08/11/2026, 09:00 — 08/22/2026, 18:00"
+    );
+    expect(screen.getAllByRole("grid")).toHaveLength(2);
   });
 
   it("reopens in calendar days view", async () => {

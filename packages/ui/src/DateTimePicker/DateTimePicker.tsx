@@ -126,16 +126,24 @@ export function DateTimePicker({
     updateDraft(next);
     setMonth(dateValueToLocalDate(date));
   };
-  const handleOpenChange = (next: boolean) => {
-    if (next) {
-      pickerDraft.openDraft();
-      setDraftComplete(Boolean(value));
-      setMonth(value ? dateValueToLocalDate(value.slice(0, 10) as DateValue) : new Date());
-    } else {
-      pickerDraft.discard();
-      setDraftComplete(Boolean(value));
-    }
-    setOpen(next);
+  const openPicker = () => {
+    pickerDraft.openDraft();
+    setDraftComplete(Boolean(value));
+    setMonth(value ? dateValueToLocalDate(value.slice(0, 10) as DateValue) : new Date());
+    setOpen(true);
+  };
+  const discardAndClose = () => {
+    pickerDraft.discard();
+    setDraftComplete(Boolean(value));
+    setOpen(false);
+  };
+  const applyAndClose = () => {
+    pickerDraft.apply();
+    setOpen(false);
+  };
+  const handleOverlayOpenChange = (next: boolean) => {
+    if (next) openPicker();
+    else discardAndClose();
   };
   const trigger = (
     <DateTimeInput
@@ -154,7 +162,7 @@ export function DateTimePicker({
       }}
       onClick={(event) => {
         inputProps.onClick?.(event);
-        if (!event.defaultPrevented && !disabled && !readOnly && !open) handleOpenChange(true);
+        if (!event.defaultPrevented && !disabled && !readOnly && !open) openPicker();
       }}
       onInputValueChange={(text) => {
         inputProps.onInputValueChange?.(text);
@@ -172,10 +180,10 @@ export function DateTimePicker({
     <PickerOverlay
       closeLabel={messages.close}
       footer={commitMode === "apply" ? <>
-        <Button onClick={() => handleOpenChange(false)} variant="secondary">{messages.cancel}</Button>
-        <Button disabled={!draft || !draftComplete || !isValidValue(draft)} onClick={() => { if (draft && draftComplete && isValidValue(draft)) pickerDraft.apply(); handleOpenChange(false); }} variant="primary">{messages.apply}</Button>
+        <Button onClick={discardAndClose} variant="secondary">{messages.cancel}</Button>
+        <Button disabled={!draft || !draftComplete || !isValidValue(draft)} onClick={() => { if (draft && draftComplete && isValidValue(draft)) applyAndClose(); }} variant="primary">{messages.apply}</Button>
       </> : undefined}
-      onOpenChange={handleOpenChange}
+      onOpenChange={handleOverlayOpenChange}
       open={open}
       title={messages.chooseDateTime}
       trigger={trigger}

@@ -94,7 +94,13 @@ export function DateTimeRangePicker({
   });
   const [calendarViewKey, setCalendarViewKey] = useState(0);
   const inputGroupRef = useRef<HTMLInputElement | null>(null);
-  const pickerDraft = usePickerDraft({ value, open, commitMode: "apply", setValue });
+  const pickerDraft = usePickerDraft({
+    value,
+    open,
+    commitMode: "apply",
+    setValue,
+    isEqual: equalDateTimeRanges
+  });
   const { draft, displayValue } = pickerDraft;
   const resolvedPresets = useMemo(() => presets ?? createStandardDateTimeRangePresets({ locale }), [locale, presets]);
   const context = useMemo(() => ({ now: new Date(), locale, timeZone, weekStartsOn, minValue, maxValue }), [locale, maxValue, minValue, timeZone, weekStartsOn]);
@@ -105,7 +111,7 @@ export function DateTimeRangePicker({
       const nextDate = datePart(value.from);
       setMonth(nextDate ? dateValueToLocalDate(nextDate) : new Date());
     }
-  }, [open, value]);
+  }, [open, value.from, value.to]);
   useEffect(() => {
     if (open) setCalendarViewKey((key) => key + 1);
   }, [open]);
@@ -149,20 +155,28 @@ export function DateTimeRangePicker({
     setDraftComplete(Boolean(next.from && next.to));
   };
   const canApply = draftComplete && isValidDraft(draft);
-  const handleOpenChange = (next: boolean) => {
-    if (next) {
-      pickerDraft.openDraft();
-      setDraftComplete(Boolean(value.from && value.to));
-      const nextDate = datePart(value.from);
-      setMonth(nextDate ? dateValueToLocalDate(nextDate) : new Date());
-    } else {
-      pickerDraft.discard();
-      setDraftComplete(Boolean(value.from && value.to));
-    }
-    setOpen(next);
+  const openPicker = () => {
+    pickerDraft.openDraft();
+    setDraftComplete(Boolean(value.from && value.to));
+    const nextDate = datePart(value.from);
+    setMonth(nextDate ? dateValueToLocalDate(nextDate) : new Date());
+    setOpen(true);
+  };
+  const discardAndClose = () => {
+    pickerDraft.discard();
+    setDraftComplete(Boolean(value.from && value.to));
+    setOpen(false);
+  };
+  const applyAndClose = () => {
+    pickerDraft.apply();
+    setOpen(false);
+  };
+  const handleOverlayOpenChange = (next: boolean) => {
+    if (next) openPicker();
+    else discardAndClose();
   };
   const trigger = (
-    <div onClick={() => { if (!disabled && !readOnly && !open) handleOpenChange(true); }}>
+    <div onClick={() => { if (!disabled && !readOnly && !open) openPicker(); }}>
       <DateTimeRangeInput
         {...inputProps}
         defaultValue={defaultValue}
@@ -200,11 +214,11 @@ export function DateTimeRangePicker({
       footer={(
         <>
           <Button onClick={() => { pickerDraft.update(EMPTY_RANGE); setDraftComplete(false); }} variant="soft">{messages.reset}</Button>
-          <Button onClick={() => handleOpenChange(false)} variant="secondary">{messages.cancel}</Button>
-          <Button disabled={!canApply} onClick={() => { if (canApply) pickerDraft.apply(); handleOpenChange(false); }} variant="primary">{messages.apply}</Button>
+          <Button onClick={discardAndClose} variant="secondary">{messages.cancel}</Button>
+          <Button disabled={!canApply} onClick={() => { if (canApply) applyAndClose(); }} variant="primary">{messages.apply}</Button>
         </>
       )}
-      onOpenChange={handleOpenChange}
+      onOpenChange={handleOverlayOpenChange}
       open={open}
       title={messages.chooseDateTimeRange}
       trigger={trigger}

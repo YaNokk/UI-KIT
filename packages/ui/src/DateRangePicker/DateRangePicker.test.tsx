@@ -84,6 +84,72 @@ describe("DateRangePicker", () => {
     await user.click(screen.getByRole("button", { name: "Apply" }));
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenLastCalledWith({ from: "2026-09-01", to: "2026-09-12" });
+    await user.click(trigger);
+    expect(trigger).toHaveValue("09/01/2026 — 09/12/2026");
+  });
+
+  it("preserves draft across equal controlled objects and accepts a changed external range", async () => {
+    const user = userEvent.setup();
+    const committed = { from: "2026-08-11", to: "2026-08-22" } as const;
+    const { rerender } = render(
+      <DateRangePicker defaultOpen label="Period" locale="en-US" value={committed} />
+    );
+    const trigger = screen.getByRole("textbox", { name: "Period" });
+    trigger.focus();
+    await user.keyboard("{Control>}a{/Control}0901202609122026");
+    rerender(
+      <DateRangePicker
+        defaultOpen
+        label="Period"
+        locale="en-US"
+        value={{ from: "2026-08-11", to: "2026-08-22" }}
+      />
+    );
+    expect(trigger).toHaveValue("09/01/2026 — 09/12/2026");
+
+    rerender(
+      <DateRangePicker
+        defaultOpen
+        label="Period"
+        locale="en-US"
+        value={{ from: "2026-10-01", to: "2026-10-12" }}
+      />
+    );
+    expect(trigger).toHaveValue("10/01/2026 — 10/12/2026");
+  });
+
+  it("discards through the mobile close action and reopens in days view", async () => {
+    Object.defineProperty(window, "matchMedia", {
+      configurable: true,
+      value: vi.fn().mockImplementation(() => ({
+        matches: true,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn()
+      }))
+    });
+    Object.defineProperty(window, "scrollTo", { configurable: true, value: vi.fn() });
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <DateRangePicker
+        defaultValue={{ from: "2026-08-11", to: "2026-08-22" }}
+        label="Period"
+        locale="en-US"
+        onChange={onChange}
+      />
+    );
+    const trigger = screen.getByRole("textbox", { name: "Period" });
+    await user.click(trigger);
+    trigger.focus();
+    await user.keyboard("{Control>}a{/Control}0901202609122026");
+    await user.click(screen.getByRole("button", { name: "Open month selection" }));
+    await user.click(screen.getByRole("button", { name: "Open year selection" }));
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    expect(onChange).not.toHaveBeenCalled();
+    expect(trigger).toHaveValue("08/11/2026 — 08/22/2026");
+    await user.click(trigger);
+    expect(screen.getAllByRole("grid")).toHaveLength(2);
+    expect(document.querySelector("[data-calendar-year-grid]")).not.toBeInTheDocument();
   });
 
   it("reopens in calendar days view", async () => {

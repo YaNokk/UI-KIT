@@ -49,15 +49,39 @@ describe("usePickerDraft", () => {
     expect(result.current.displayValue).toBe("external");
   });
 
-  it("reinitializes draft on an externally controlled open transition", () => {
+  it("preserves a range draft for a new but semantically equal committed object", () => {
+    type Range = { from: string | null; to: string | null };
+    const isEqual = (left: Range, right: Range) => left.from === right.from && left.to === right.to;
     const { result, rerender } = renderHook(
-      ({ open }) => usePickerDraft({ value: "committed", open, commitMode: "apply", setValue: vi.fn() }),
+      ({ value }) => usePickerDraft({ value, open: true, commitMode: "apply", setValue: vi.fn(), isEqual }),
+      { initialProps: { value: { from: "2026-08-11", to: "2026-08-22" } as Range } }
+    );
+    const edited = { from: "2026-09-01", to: "2026-09-12" };
+    act(() => result.current.update(edited));
+    rerender({ value: { from: "2026-08-11", to: "2026-08-22" } });
+    expect(result.current.draft).toBe(edited);
+    expect(result.current.displayValue).toBe(edited);
+
+    const external = { from: "2026-10-01", to: "2026-10-12" };
+    rerender({ value: external });
+    expect(result.current.draft).toBe(external);
+    expect(result.current.displayValue).toBe(external);
+  });
+
+  it("keeps the applied value atomic across close and reopen", () => {
+    const setValue = vi.fn();
+    const { result, rerender } = renderHook(
+      ({ open }) => usePickerDraft({ value: "committed", open, commitMode: "apply", setValue }),
       { initialProps: { open: true } }
     );
-    act(() => result.current.update("stale draft"));
+    act(() => result.current.update("applied"));
+    act(() => result.current.apply());
     rerender({ open: false });
     rerender({ open: true });
-    expect(result.current.draft).toBe("committed");
-    expect(result.current.displayValue).toBe("committed");
+    act(() => result.current.openDraft());
+    expect(setValue).toHaveBeenCalledTimes(1);
+    expect(setValue).toHaveBeenLastCalledWith("applied");
+    expect(result.current.draft).toBe("applied");
+    expect(result.current.displayValue).toBe("applied");
   });
 });
