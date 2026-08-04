@@ -1,0 +1,15 @@
+@import '@alfalab/core-components-vars/src/index.css';
+
+.flagIcon {
+    max-width: 24px;
+    max-height: 24px;
+}
+
+.flagPlaceholder {
+    width: 24px;
+    height: 16px;
+    max-height: 16px;
+    border-radius: var(--border-radius-2);
+    margin-top: var(--gap-2);
+    background-color: var(--color-light-neutral-translucent-300);
+}

@@ -1,0 +1,42 @@
+@import '@alfalab/core-components-vars/src/index.css';
+
+.component {
+    height: 100%;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+}
+
+.flagIconContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    margin-right: var(--gap-4);
+}
+
+.emptyCountryIcon {
+    color: var(--color-light-neutral-translucent-700);
+}
+
+.disabled {
+    cursor: var(--disabled-cursor);
+}
+
+.inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding-left: var(--gap-12);
+    outline: none;
+}
+
+.size-72 .inner {
+    padding-left: var(--gap-16);
+}
+
+.focusVisible {
+    @mixin focus-outline;
+}

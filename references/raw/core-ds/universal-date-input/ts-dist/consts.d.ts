@@ -1,0 +1,10 @@
+import { type DateSegments, type DateTemplate, type View } from './types';
+export declare const DATE_RANGE_SEPARATOR = " \u2013 ";
+export declare const DATE_TIME_SEPARATOR = ", ";
+export declare const HOURS_MINUTES_SEPARATOR = ":";
+export declare const TEMPLATES: Record<View, DateTemplate>;
+export declare const DATE_MAX_VALUES: DateSegments<number>;
+export declare const DEFAULT_MIN_DATE: number;
+export declare const DEFAULT_MAX_DATE: number;
+export declare const DATE_FORMAT = "dd.MM.yyyy";
+export declare const DATE_TIME_FORMAT = "dd.MM.yyyy, HH:mm";

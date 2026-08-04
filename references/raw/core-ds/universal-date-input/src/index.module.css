@@ -1,0 +1,41 @@
+@import '@alfalab/core-components-vars/src/index.css';
+@import '../../calendar/src/vars.css';
+@import './vars.css';
+
+.wrapper {
+    display: inline-block;
+    outline: none;
+    position: relative;
+}
+
+.block {
+    width: 100%;
+}
+
+.calendarIcon {
+    width: 24px;
+    height: 100%;
+    display: block;
+    color: var(--calendar-icon-color);
+
+    &.size-40 {
+        width: 16px;
+    }
+}
+
+.calendarContainer {
+    display: inline-block;
+    box-sizing: border-box;
+    border-radius: var(--calendar-popover-border-radius);
+    border: 1px solid var(--color-light-neutral-300);
+    width: var(--calendar-width);
+
+    @media (max-width: 374px) {
+        width: 100%;
+        min-width: 288px;
+    }
+}
+
+.blink.blink.blink {
+    background-color: var(--color-light-status-muted-negative);
+}

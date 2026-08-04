@@ -1,0 +1,45 @@
+@import '@alfalab/core-components-vars/src/index.css';
+
+.component {
+    position: static;
+    display: flex;
+    min-width: initial;
+    height: 100%;
+}
+
+.option {
+    display: flex;
+    align-items: flex-start;
+    padding: var(--gap-12);
+
+    &.mobile,
+    &.size-72 {
+        padding-left: var(--gap-16);
+    }
+}
+
+.flag {
+    flex-shrink: 0;
+    margin-right: var(--gap-8);
+}
+
+.countryName {
+    margin-right: var(--gap-8);
+}
+
+.dialCode {
+    color: var(--color-light-text-secondary);
+}
+
+.flagIconWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    margin-left: var(--gap-12);
+}
+
+.emptyCountryIcon {
+    color: var(--color-light-neutral-translucent-700);
+}

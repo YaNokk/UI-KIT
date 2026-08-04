@@ -1,0 +1,26 @@
+@import '@alfalab/core-components-vars/src/index.css';
+
+.component {
+    position: static;
+    display: flex;
+    min-width: initial;
+    height: 100%;
+}
+
+.option {
+    display: flex;
+    align-items: flex-start;
+}
+
+.flag {
+    flex-shrink: 0;
+    margin-right: var(--gap-8);
+}
+
+.countryName {
+    margin-right: var(--gap-8);
+}
+
+.dialCode {
+    color: var(--color-light-text-secondary);
+}

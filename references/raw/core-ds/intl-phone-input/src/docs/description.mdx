@@ -1,0 +1,60 @@
+
+import { Plate } from '@alfalab/core-components-plate';
+import { Link } from '@alfalab/core-components-link';
+
+<Plate
+    view='attention'
+    limitContentWidth={false}
+    title={
+        <>
+            Компонент больше не поддерживается, переходите на новый компонент {''}
+             <Link href='https://core-ds.github.io/core-components/master/?path=/docs/internationalphoneinput--docs'>
+                 InternationalPhoneInput.
+            </Link>
+        </>
+    }
+    titleView='light'
+/>
+
+## Пример
+
+```jsx live
+render(() => {
+    const options = [
+        { key: '+7 921 681 53 98' },
+        { key: '+7 921 681 52 97' },
+        { key: '+7 921 681 52 96' },
+        { key: '+7 921 681 52 95' },
+        { key: '+7 921 681 52 94' },
+    ];
+
+    const matchOption = (option, inputValue) =>
+        option.key.toLowerCase().includes((inputValue || '').toLowerCase());
+
+    const [value, setValue] = React.useState('+7');
+    const [selectedCountry, setSelectedCountry] = React.useState('RU');
+
+    const handleChange = (newValue) => setValue(newValue);
+
+    const handleCountryChange = (countryCode) => setSelectedCountry(countryCode);
+
+    const filteredOptions = options.filter((option) => matchOption(option, value));
+
+    return (
+        <div style={{ width: '320px' }}>
+            <IntlPhoneInput
+                value={value}
+                onChange={handleChange}
+                options={filteredOptions}
+                block={true}
+                label='Номер телефона'
+                defaultCountryIso2='RU'
+                readOnly={false}
+                onCountryChange={handleCountryChange}
+            />
+            <br />
+            Код выбранной страны: <strong>{selectedCountry}</strong>
+        </div>
+    );
+});
+```

@@ -1,0 +1,43 @@
+import { ArgTypes } from '@storybook/addon-docs';
+import { UniversalDateInput } from '../Component.responsive';
+
+## Подключение
+
+```jsx
+// responsive версия
+import { UniversalDateInput } from '@alfalab/core-components/universal-date-input';
+
+// desktop версия
+import { UniversalDateInputDesktop } from '@alfalab/core-components/universal-date-input/desktop';
+
+// mobile версия
+import { UniversalDateInputMobile } from '@alfalab/core-components/universal-date-input/mobile';
+```
+
+## Использование dataTestId
+
+В компоненте используются модификаторы для `dataTestId`.  
+Компонент является оберткой над FormControl, поэтому наследует все его модификаторы.  
+Для удобного поиска элементов можно воспользоваться функцией `getUniversalDateInputTestIds`.  
+Импорт из `@alfalab/core-components/universal-date-input/shared`.
+
+Функция возвращает объект:
+
+```jsx
+{
+    input: dataTestId,
+    componentWrapper: `${dataTestId}-wrapper`,
+    popover: `${dataTestId}-popover`,
+    calendar: `${dataTestId}-calendar`,    
+    inputWrapper: `${dataTestId}-form-control`,
+    inputWrapperInner: `${dataTestId}-form-control-inner`,
+    leftAddons: `${dataTestId}-form-control-left-addons`,
+    rightAddons: `${dataTestId}-form-control-right-addons`,
+    error: `${dataTestId}-form-control-error-message`,
+    hint: `${dataTestId}-form-control-hint`,
+};
+```
+
+## Свойства
+
+<ArgTypes of={UniversalDateInput} />
