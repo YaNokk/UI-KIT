@@ -5,9 +5,9 @@
 Репозиторий сейчас публикует три ESM-пакета:
 
 ```text
-@mypoint/tokens    0.1.1
-@mypoint/ui        0.1.1
-@mypoint/retail-ui 0.1.1
+@mypoint/tokens    0.1.2
+@mypoint/ui        0.1.2
+@mypoint/retail-ui 0.1.2
 ```
 
 Custom icon catalog пока отсутствует. Если появится оправданная package
