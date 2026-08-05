@@ -124,6 +124,41 @@ describe("Modal foundation", () => {
     expect(floatingContainer?.closest("[data-theme='dark']")).not.toBeNull();
   });
 
+  it("applies runtime layers to the portal and modal-local floating roots", async () => {
+    render(
+      <Dialog
+        closeLabel="Close layered dialog"
+        onOpenChange={() => undefined}
+        open
+        title="Layered dialog"
+      >
+        Content
+      </Dialog>
+    );
+
+    const surface = await screen.findByRole("dialog", {
+      name: "Layered dialog"
+    });
+    const portal = surface.parentElement;
+    const guard = portal?.querySelector<HTMLElement>("[data-modal-guard]");
+    const floatingContainer = surface.querySelector<HTMLElement>(
+      "[data-modal-floating-container]"
+    );
+
+    if (!portal || !guard || !floatingContainer) {
+      throw new Error("Missing modal layer roots");
+    }
+
+    const portalLayer = Number(portal.style.zIndex);
+    const guardLayer = Number(guard.style.zIndex);
+    const surfaceLayer = Number(surface.style.zIndex);
+    const floatingLayer = Number(floatingContainer.style.zIndex);
+
+    expect(portalLayer).toBe(guardLayer);
+    expect(surfaceLayer).toBeGreaterThan(portalLayer);
+    expect(floatingLayer).toBeGreaterThan(surfaceLayer);
+  });
+
   it("renders canonical dialog semantics and reports close-button once", async () => {
     const user = userEvent.setup();
     const onReason = vi.fn();

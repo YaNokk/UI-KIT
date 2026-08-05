@@ -45,6 +45,9 @@ const storybookCsfTransform: Plugin = {
         "/packages/ui/src/internal/select/SharedFloatingTriggerBrowserRegression.stories.tsx"
       )
       && !normalizedId.includes(
+        "/packages/ui/src/internal/modal/ModalLayeringBrowserRegression.stories.tsx"
+      )
+      && !normalizedId.includes(
         "/packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx"
       )
       && !normalizedId.includes(
@@ -95,6 +98,7 @@ const storybookCsfTransform: Plugin = {
         "../../../packages/ui/src/FieldShell/InnerLabelGeometry.stories.tsx",
         "../../../packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/select/SharedFloatingTriggerBrowserRegression.stories.tsx",
+        "../../../packages/ui/src/internal/modal/ModalLayeringBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/single-line-control-typography/SingleLineControlTypography.stories.tsx",
@@ -155,6 +159,7 @@ export default defineConfig({
       "packages/ui/src/FieldShell/InnerLabelGeometry.stories.tsx",
       "packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx",
       "packages/ui/src/internal/select/SharedFloatingTriggerBrowserRegression.stories.tsx",
+      "packages/ui/src/internal/modal/ModalLayeringBrowserRegression.stories.tsx",
       "packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx",
       "packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx",
       "packages/ui/src/internal/single-line-control-typography/SingleLineControlTypography.stories.tsx",

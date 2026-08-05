@@ -217,7 +217,10 @@ export function ModalPrimitive({
   return (
     <DialogPrimitive.Root open={view.active} onOpenChange={handleOpenChange}>
       <Portal>
-        <div className={styles.portal}>
+        <div
+          className={styles.portal}
+          style={{ zIndex: view.guardLayer }}
+        >
           {view.top ? (
             <div
               aria-hidden="true"
@@ -350,6 +353,7 @@ export function ModalPrimitive({
                     className={styles.floatingContainer}
                     data-modal-floating-container=""
                     ref={handleFloatingContainerRef}
+                    style={{ zIndex: view.floatingLayer }}
                   />
                   {kind === "bottom-sheet" ? (
                     <div aria-hidden="true" className={styles.dragHandle} />
