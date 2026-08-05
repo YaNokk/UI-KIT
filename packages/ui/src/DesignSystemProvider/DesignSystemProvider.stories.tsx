@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor, within } from "storybook/test";
 import { Amount } from "../Amount/Amount";
 import { Button } from "../Button/Button";
 import { Portal } from "../Portal/Portal";
@@ -97,6 +98,25 @@ function ExplicitPortalTargetExample() {
 export const ExplicitPortalTarget: Story = {
   args: {
     children: null
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(canvas.getByText("Explicit portal content")).toBeVisible()
+    );
+
+    const provider = canvas.getByText("Provider content").closest<HTMLElement>(
+      "[data-ds-root]"
+    );
+    const target = canvasElement.querySelector<HTMLElement>(
+      "[data-explicit-portal-root]"
+    );
+    expect(provider).not.toBeNull();
+    expect(target).toHaveAttribute("data-brand-theme", "");
+    expect(target).toHaveAttribute("data-theme", "dark");
+    expect(target?.style.getPropertyValue("--ds-brand-accent")).toBe(
+      provider?.style.getPropertyValue("--ds-brand-accent")
+    );
   },
   render: () => <ExplicitPortalTargetExample />
 };

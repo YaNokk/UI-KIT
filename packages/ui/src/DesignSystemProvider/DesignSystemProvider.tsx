@@ -11,6 +11,7 @@ import {
 import { LocaleProvider } from "../internal/locale/LocaleContext";
 import { ModalRuntimeProvider } from "../internal/modal/ModalRuntime";
 import { PortalScopeProvider } from "../Portal/Portal";
+import { ExternalPortalThemeBridge } from "./ExternalPortalThemeBridge";
 import styles from "./DesignSystemProvider.module.css";
 
 export interface DesignSystemProviderProps
@@ -69,6 +70,7 @@ export function DesignSystemProvider({
       {...(mode === undefined ? {} : { mode })}
       data-ds-root=""
     >
+      <ExternalPortalThemeBridge container={portalContainer} />
       <RuntimeScope
         {...(locale === undefined ? {} : { locale })}
         {...(portalContainer === undefined ? {} : { portalContainer })}

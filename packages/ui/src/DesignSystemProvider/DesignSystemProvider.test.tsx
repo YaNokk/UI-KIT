@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, render, screen } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createBrandCssVariables } from "@mypoint/tokens";
 import { Amount } from "../Amount/Amount";
 import { AmountInput } from "../AmountInput/AmountInput";
 import { Portal } from "../Portal/Portal";
@@ -15,15 +16,30 @@ const greenBrand = { accentColor: "#16a34a" };
 const purpleBrand = { accentColor: "#7c3aed" };
 
 function installMatchMedia(matches = false) {
+  let currentMatches = matches;
+  const listeners = new Set<() => void>();
   Object.defineProperty(window, "matchMedia", {
     configurable: true,
     value: vi.fn().mockImplementation(() => ({
-      addEventListener: vi.fn(),
-      matches,
+      addEventListener: (_type: string, listener: () => void) => {
+        listeners.add(listener);
+      },
+      get matches() {
+        return currentMatches;
+      },
       media: "(prefers-color-scheme: dark)",
-      removeEventListener: vi.fn()
+      removeEventListener: (_type: string, listener: () => void) => {
+        listeners.delete(listener);
+      }
     }))
   });
+
+  return {
+    setMatches(nextMatches: boolean) {
+      currentMatches = nextMatches;
+      act(() => listeners.forEach((listener) => listener()));
+    }
+  };
 }
 
 beforeEach(() => installMatchMedia());
@@ -105,6 +121,125 @@ describe("DesignSystemProvider", () => {
     target.remove();
   });
 
+  it.each(["light", "dark"] as const)(
+    "synchronizes the initial %s theme to an external portal root",
+    (mode) => {
+      const target = document.createElement("div");
+      const expectedVariables = createBrandCssVariables(greenBrand, mode);
+      const { unmount } = render(
+        <DesignSystemProvider
+          brand={greenBrand}
+          mode={mode}
+          portalContainer={target}
+        >
+          Content
+        </DesignSystemProvider>
+      );
+
+      expect(target).toHaveAttribute("data-brand-theme", "");
+      expect(target).toHaveAttribute("data-theme", mode);
+      for (const [name, value] of Object.entries(expectedVariables)) {
+        expect(target.style.getPropertyValue(name)).toBe(value);
+      }
+      unmount();
+    }
+  );
+
+  it("updates external portal brand and explicit mode at runtime", () => {
+    const target = document.createElement("div");
+    const { rerender } = render(
+      <DesignSystemProvider
+        brand={greenBrand}
+        mode="light"
+        portalContainer={target}
+      >
+        Content
+      </DesignSystemProvider>
+    );
+
+    rerender(
+      <DesignSystemProvider
+        brand={purpleBrand}
+        mode="dark"
+        portalContainer={target}
+      >
+        Content
+      </DesignSystemProvider>
+    );
+
+    const expectedVariables = createBrandCssVariables(purpleBrand, "dark");
+    expect(target).toHaveAttribute("data-theme", "dark");
+    expect(target.style.getPropertyValue("--ds-brand-accent")).toBe(
+      expectedVariables["--ds-brand-accent"]
+    );
+    expect(target.style.getPropertyValue("--ds-brand-accent-soft")).toBe(
+      expectedVariables["--ds-brand-accent-soft"]
+    );
+  });
+
+  it("updates an external portal when the system preference changes", () => {
+    const system = installMatchMedia(false);
+    const target = document.createElement("div");
+    render(
+      <DesignSystemProvider mode="system" portalContainer={target}>
+        Content
+      </DesignSystemProvider>
+    );
+
+    expect(target).toHaveAttribute("data-theme", "light");
+    system.setMatches(true);
+    expect(target).toHaveAttribute("data-theme", "dark");
+  });
+
+  it("cleans the old root when portalContainer is replaced", () => {
+    const firstRoot = document.createElement("div");
+    const secondRoot = document.createElement("div");
+    const { rerender } = render(
+      <DesignSystemProvider
+        brand={greenBrand}
+        mode="dark"
+        portalContainer={firstRoot}
+      >
+        Content
+      </DesignSystemProvider>
+    );
+
+    rerender(
+      <DesignSystemProvider
+        brand={greenBrand}
+        mode="dark"
+        portalContainer={secondRoot}
+      >
+        Content
+      </DesignSystemProvider>
+    );
+
+    expect(firstRoot).not.toHaveAttribute("data-brand-theme");
+    expect(firstRoot).not.toHaveAttribute("data-theme");
+    expect(firstRoot.style.getPropertyValue("--ds-brand-accent")).toBe("");
+    expect(secondRoot).toHaveAttribute("data-brand-theme", "");
+    expect(secondRoot).toHaveAttribute("data-theme", "dark");
+  });
+
+  it("cleans synchronized state from the external root on unmount", () => {
+    const target = document.createElement("div");
+    const { unmount } = render(
+      <DesignSystemProvider
+        brand={greenBrand}
+        mode="light"
+        portalContainer={target}
+      >
+        Content
+      </DesignSystemProvider>
+    );
+
+    unmount();
+
+    expect(target).not.toHaveAttribute("data-brand-theme");
+    expect(target).not.toHaveAttribute("data-theme");
+    expect(target.style.getPropertyValue("--ds-brand-accent")).toBe("");
+  });
+
   it("uses its own scoped portal host by default", () => {
     render(
       <DesignSystemProvider
@@ -119,7 +254,9 @@ describe("DesignSystemProvider", () => {
     const provider = screen.getByTestId("provider");
     const content = screen.getByTestId("scoped-portal");
     expect(content.parentElement).toHaveAttribute("data-ds-portal-root");
+    expect(content.parentElement).not.toHaveAttribute("data-theme");
     expect(provider).toContainElement(content.parentElement);
+    expect(content.closest("[data-theme='dark']")).toBe(provider);
   });
 
   it("gives nested providers independent portal hosts", () => {

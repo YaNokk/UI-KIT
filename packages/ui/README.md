@@ -73,6 +73,22 @@ component usage:
 normal Portal content inside that theme/brand scope. `ThemeProvider` remains a
 public advanced primitive for local theme/brand-only scopes.
 
+For an external global portal root, use valid body-level markup:
+
+```html
+<body>
+  <div id="root"></div>
+  <div id="ds-portal-root"></div>
+</body>
+```
+
+Passing that element as `portalContainer` automatically synchronizes the
+resolved `data-theme`, `data-brand-theme` and generated brand/theme CSS
+variables. Do not copy custom properties manually. Use one portal root per
+active provider. Internal and modal-local portal containers inherit their
+theme normally. Fonts remain separate, document-global resources delivered by
+the optional `@mypoint/ui/fonts.css` entry.
+
 React и ReactDOM предоставляются consumer-приложением. Tailwind в consumer не
 требуется.
 

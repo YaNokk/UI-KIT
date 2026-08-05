@@ -81,7 +81,7 @@ undefined
 → use this provider's own internal portal host
 
 HTMLElement
-→ use that explicit target
+→ use that explicit target and synchronize the resolved theme to it
 
 null
 → bypass provider hosts and reset to the library default document.body target
@@ -91,6 +91,27 @@ An inner provider with `undefined` creates its own host rather than inheriting
 the outer host. Individual `Portal.container` values still have highest
 priority. Outside every provider, `Portal` continues to use `document.body`.
 Consumers do not need `portalContainer` merely to preserve provider theming.
+
+When an external `portalContainer` is supplied, `DesignSystemProvider`
+automatically synchronizes `data-brand-theme`, the resolved `data-theme`, and
+all generated brand/theme CSS custom properties to that container. Consumers
+must not copy custom properties manually.
+
+Use one external portal root for each active provider and place it inside
+`body`, outside the application root:
+
+```html
+<body>
+  <div id="root"></div>
+  <div id="ds-portal-root"></div>
+</body>
+```
+
+Provider-owned internal roots inherit the visual scope. Modal-local floating
+containers remain descendants of modal content and inherit the same scope, so
+neither receives a second synchronized copy. Font delivery is separate:
+`@font-face` rules from the optional `@mypoint/ui/fonts.css` entry are
+document-global and are not copied by the portal bridge.
 
 ## SSR and hydration
 

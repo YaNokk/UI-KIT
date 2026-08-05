@@ -18,7 +18,7 @@ its own host. Portal resolution is:
 
 ```text
 portalContainer HTMLElement
-→ explicit target
+→ explicit target with synchronized resolved theme attributes and variables
 
 portalContainer undefined
 → this provider's internal host
@@ -26,6 +26,18 @@ portalContainer undefined
 portalContainer null
 → library default document.body target
 ```
+
+An external target receives `data-brand-theme`, resolved `data-theme` and the
+exact generated brand/theme CSS variables from the provider scope. Updates to
+brand, explicit/system mode and target replacement are synchronized; the old
+target is cleaned. Consumers must not copy CSS variables manually. One active
+provider owns one external root. The root belongs inside `body`, outside the
+application root.
+
+Internal provider roots and modal-local floating containers inherit their
+theme and are not synchronized separately. Font delivery remains independent:
+optional document-global `@font-face` declarations come from
+`@mypoint/ui/fonts.css`, not from the portal bridge.
 
 Component locale props override provider locale. Locale never selects currency,
 application country or phone region. Brand and mode produce scoped semantic CSS

@@ -13,6 +13,7 @@ import {
   type HTMLAttributes,
   type ReactNode
 } from "react";
+import { ResolvedThemeContext } from "./ResolvedThemeContext";
 
 export type ThemePreference = ThemeMode | "system";
 
@@ -93,6 +94,10 @@ export function ThemeProvider({
     () => ({ brand: configuredBrand, mode: configuredMode }),
     [configuredBrand, configuredMode]
   );
+  const resolvedSnapshot = useMemo(
+    () => ({ mode: resolvedMode, variables: brandVariables }),
+    [brandVariables, resolvedMode]
+  );
   const themeStyle = {
     ...style,
     ...brandVariables
@@ -100,14 +105,16 @@ export function ThemeProvider({
 
   return (
     <ThemeConfigurationContext.Provider value={configuration}>
-      <div
-        {...props}
-        data-brand-theme=""
-        data-theme={resolvedMode}
-        style={themeStyle}
-      >
-        {children}
-      </div>
+      <ResolvedThemeContext.Provider value={resolvedSnapshot}>
+        <div
+          {...props}
+          data-brand-theme=""
+          data-theme={resolvedMode}
+          style={themeStyle}
+        >
+          {children}
+        </div>
+      </ResolvedThemeContext.Provider>
     </ThemeConfigurationContext.Provider>
   );
 }

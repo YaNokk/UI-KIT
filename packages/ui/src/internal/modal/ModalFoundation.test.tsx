@@ -101,6 +101,29 @@ function FocusDiscoveryFixture({ explicitInvalid }: { explicitInvalid: boolean }
 }
 
 describe("Modal foundation", () => {
+  it("keeps the modal-local floating container inside the inherited theme scope", async () => {
+    render(
+      <DesignSystemProvider mode="dark">
+        <Dialog
+          closeLabel="Close themed dialog"
+          onOpenChange={() => undefined}
+          open
+          title="Themed dialog"
+        >
+          Content
+        </Dialog>
+      </DesignSystemProvider>
+    );
+
+    const surface = await screen.findByRole("dialog", { name: "Themed dialog" });
+    const floatingContainer = surface.querySelector(
+      "[data-modal-floating-container]"
+    );
+    expect(floatingContainer).not.toBeNull();
+    expect(floatingContainer).not.toHaveAttribute("data-theme");
+    expect(floatingContainer?.closest("[data-theme='dark']")).not.toBeNull();
+  });
+
   it("renders canonical dialog semantics and reports close-button once", async () => {
     const user = userEvent.setup();
     const onReason = vi.fn();
