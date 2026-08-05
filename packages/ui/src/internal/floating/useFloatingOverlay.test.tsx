@@ -5,6 +5,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { StrictMode, useRef, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useFloatingOverlay } from "./useFloatingOverlay";
+import { ModalLayerContext } from "../modal/ModalRuntime";
 
 afterEach(() => {
   cleanup();
@@ -143,7 +144,42 @@ function OutsidePressBoundaryFixture({
   );
 }
 
+function PortalContainerProbe() {
+  const floating = useFloatingOverlay({
+    dismissOnEscape: true,
+    dismissOnOutsidePress: true,
+    interaction: "click",
+    onOpenChange: () => undefined,
+    open: true,
+    placement: "bottom-start"
+  });
+  return (
+    <output data-testid="portal-container">
+      {floating.portalContainer?.dataset.testid ?? "global"}
+    </output>
+  );
+}
+
 describe("useFloatingOverlay semantics", () => {
+  it("uses the modal-owned container and keeps undefined as global fallback", () => {
+    const modalContainer = document.createElement("div");
+    modalContainer.dataset.testid = "modal";
+    const { rerender } = render(<PortalContainerProbe />);
+    expect(screen.getByTestId("portal-container")).toHaveTextContent("global");
+
+    rerender(
+      <ModalLayerContext.Provider value={{
+        floatingContainer: modalContainer,
+        floatingLayer: 502,
+        modalId: "modal",
+        surfaceLayer: 501
+      }}>
+        <PortalContainerProbe />
+      </ModalLayerContext.Provider>
+    );
+    expect(screen.getByTestId("portal-container")).toHaveTextContent("modal");
+  });
+
   it("supports a DS-owned listbox role without dialog semantics", () => {
     render(<SemanticFixture />);
 

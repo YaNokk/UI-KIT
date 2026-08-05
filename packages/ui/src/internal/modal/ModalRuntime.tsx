@@ -288,6 +288,7 @@ export const ModalFocusReturnContext =
   createContext<ModalFocusReturnValue | null>(null);
 
 export interface ModalLayerValue {
+  floatingContainer: HTMLElement | null;
   floatingLayer: number;
   modalId: string;
   surfaceLayer: number;

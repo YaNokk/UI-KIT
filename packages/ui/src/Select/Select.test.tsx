@@ -81,9 +81,9 @@ describe("Select", () => {
 
     const trigger = screen.getByRole("button", { name: /Клиент/ });
     expect(trigger).toHaveAttribute("data-select-trigger");
-    expect(trigger.closest("[data-field-part=\"shell\"]")
-      ?.querySelector("[data-select-chevron]"))
-      .toHaveAttribute("aria-hidden", "true");
+    const chevron = trigger.querySelector<HTMLElement>("[data-select-chevron]");
+    expect(chevron).toHaveAttribute("aria-hidden", "true");
+    expect(trigger).toContainElement(chevron);
     expect(trigger).toHaveTextContent("Выберите клиента");
     expect(trigger.querySelector("[data-control-text-clip]")).toContainElement(
       trigger.querySelector("[data-control-text]")
@@ -102,6 +102,24 @@ describe("Select", () => {
     expect(listbox.querySelector("[data-choice-control-label]"))
       .toHaveAttribute("data-control-text-role", "choiceControlLabel");
     // trigger keeps a single role with expanded state
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("opens when the pointer activates the chevron area", async () => {
+    const user = userEvent.setup();
+    render(<ControlledSelect items={baseItems} />);
+
+    const trigger = document.querySelector<HTMLButtonElement>(
+      "[data-select-trigger]"
+    );
+    if (!trigger) throw new Error("Select trigger was not rendered");
+    const chevron = trigger.closest("[data-field-part=\"shell\"]")
+      ?.querySelector<HTMLElement>("[data-select-chevron]");
+    expect(chevron).not.toBeNull();
+
+    await user.click(chevron as HTMLElement);
+
+    expect(await screen.findByRole("listbox")).toBeInTheDocument();
     expect(trigger).toHaveAttribute("aria-expanded", "true");
   });
 
@@ -656,5 +674,43 @@ describe("Select", () => {
     }
     expect(onOpenChange).not.toHaveBeenCalled();
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("keeps a searchable panel inside the Dialog focus scope", async () => {
+    const user = userEvent.setup();
+    function Harness() {
+      const [value, setValue] = useState<string | null>(null);
+      return (
+        <Dialog
+          closeLabel="Close Dialog"
+          onOpenChange={() => undefined}
+          open
+          title="Parent Dialog"
+        >
+          <Select
+            items={baseItems}
+            label="Client"
+            locale="en"
+            onChange={setValue}
+            searchable
+            value={value}
+          />
+        </Dialog>
+      );
+    }
+    render(<Harness />);
+
+    await user.click(screen.getByRole("button", { name: "Client" }));
+    const search = await screen.findByRole("textbox", { name: "Search options" });
+    const floatingContainer = document.querySelector(
+      "[data-modal-floating-container]"
+    );
+
+    expect(floatingContainer).toContainElement(
+      document.querySelector("[data-select-surface]")
+    );
+    expect(search).toHaveFocus();
+    await user.type(search, "a");
+    expect(search).toHaveValue("a");
   });
 });

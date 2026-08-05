@@ -118,6 +118,7 @@ export const InternationalPhoneInput = forwardRef<
     "aria-describedby": ariaDescribedBy,
     "aria-invalid": ariaInvalid,
     autoComplete = "tel",
+    block = false,
     className,
     clearable = true,
     clearLabel,
@@ -378,6 +379,7 @@ export const InternationalPhoneInput = forwardRef<
 
   return (
     <FormControl
+      block={block}
       className={className}
       controlId={id}
       describedBy={ariaDescribedBy}

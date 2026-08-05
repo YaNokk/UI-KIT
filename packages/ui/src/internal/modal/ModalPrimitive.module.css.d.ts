@@ -6,6 +6,7 @@ declare const styles: {
   readonly dragHandle: string;
   readonly drawer: string;
   readonly footer: string;
+  readonly floatingContainer: string;
   readonly guard: string;
   readonly header: string;
   readonly heading: string;

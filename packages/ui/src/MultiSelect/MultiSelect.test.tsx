@@ -158,9 +158,11 @@ describe("MultiSelect", () => {
     const { container } = render(<ControlledMulti items={baseItems} value={["a", "b"]} />);
     const trigger = screen.getByRole("button", { name: /Теги/ });
     expect(trigger).toHaveAttribute("data-multiselect-trigger");
-    expect(trigger.closest("[data-field-part=\"shell\"]")
-      ?.querySelector("[data-multiselect-chevron]"))
-      .toHaveAttribute("aria-hidden", "true");
+    const chevron = trigger.querySelector<HTMLElement>(
+      "[data-multiselect-chevron]"
+    );
+    expect(chevron).toHaveAttribute("aria-hidden", "true");
+    expect(trigger).toContainElement(chevron);
     expect(trigger.parentElement).toHaveTextContent("Альфа");
     expect(trigger.parentElement).toHaveTextContent("Бета");
     expect(container.querySelector("[data-field-chip] [data-control-text-clip]"))

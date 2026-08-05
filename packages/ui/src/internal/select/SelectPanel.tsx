@@ -198,7 +198,7 @@ export function SelectPanel({
     <>
       {renderedTrigger}
       {presentation === "popover" && open ? (
-        <Portal>
+        <Portal container={floating.portalContainer}>
           <FloatingLayerContext.Provider value={floating.childLayer}>
             <div
               {...floating.getFloatingProps({ onBlur: handlePopoverFocusOut })}

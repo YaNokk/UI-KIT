@@ -79,6 +79,16 @@
   padding-block-start: var(--field-content-padding-top);
 }
 
+.inner.floated [data-field-vertical-invariant],
+.inner:focus-within [data-field-vertical-invariant] {
+  transform: translateY(
+    calc(
+      (var(--field-content-padding-bottom) - var(--field-content-padding-top))
+      / 2
+    )
+  );
+}
+
 .inner .control {
   line-height: var(--field-value-line-height);
 }

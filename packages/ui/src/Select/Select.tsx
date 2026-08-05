@@ -345,44 +345,23 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
       {({ label: controlLabel, ...controlProps }) => (
         <FieldShell
           disabled={disabled}
-          endAdornment={(
+          endAdornment={showClearButton ? (
             <span className={styles.actions}>
-              {showClearButton ? (
-                <IconButton
-                  aria-label={messages.clear}
-                  data-select-clear=""
-                  disabled={disabled}
-                  icon={<X />}
-                  onClick={handleClear}
-                  onMouseDown={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                  }}
-                  size="sm"
-                  variant="ghost"
-                />
-              ) : null}
-              <span aria-hidden="true" className={styles.triggerStatus}>
-                {loading || refreshing ? (
-                  <Spinner
-                    data-select-spinner=""
-                    size={size === "lg" ? "md" : "sm"}
-                    tone="secondary"
-                  />
-                ) : null}
-                {!loading ? <span
-                  aria-hidden="true"
-                  className={classNames(
-                    styles.chevron,
-                    open && styles.chevronOpen
-                  )}
-                  data-select-chevron=""
-                >
-                  <ChevronDown />
-                </span> : null}
-              </span>
+              <IconButton
+                aria-label={messages.clear}
+                data-select-clear=""
+                disabled={disabled}
+                icon={<X />}
+                onClick={handleClear}
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }}
+                size="sm"
+                variant="ghost"
+              />
             </span>
-          )}
+          ) : undefined}
           invalid={invalid}
           label={controlLabel}
           labelFloated={open || value !== null}
@@ -436,6 +415,29 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
                   data-field-value-typography=""
                 >{displayOption === null ? placeholder : displayOption.label}</span>
               </span>
+            </span>
+            <span
+              aria-hidden="true"
+              className={styles.triggerStatus}
+              data-field-vertical-invariant=""
+            >
+              {loading || refreshing ? (
+                <Spinner
+                  data-select-spinner=""
+                  size={size === "lg" ? "md" : "sm"}
+                  tone="secondary"
+                />
+              ) : null}
+              {!loading ? <span
+                aria-hidden="true"
+                className={classNames(
+                  styles.chevron,
+                  open && styles.chevronOpen
+                )}
+                data-select-chevron=""
+              >
+                <ChevronDown />
+              </span> : null}
             </span>
           </button>)}
         </FieldShell>

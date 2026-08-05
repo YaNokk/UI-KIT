@@ -1,6 +1,6 @@
 import { useState, type ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, within } from "storybook/test";
+import { expect, userEvent, within } from "storybook/test";
 import { Dialog } from "../Dialog/Dialog";
 import { DesignSystemProvider } from "../DesignSystemProvider/DesignSystemProvider";
 import type { SelectCollectionItem } from "../internal/select/collection";
@@ -480,4 +480,44 @@ export const GroupedLargeNoVirtualization: Story = {
 export const TypographySmMdLg: Story = {
   args: {} as never,
   render: () => <div className="grid w-80 gap-3"><SelectHarness size="sm" /><SelectHarness size="md" /><SelectHarness size="lg" open /></div>
+};
+
+function SearchableDialogHarness() {
+  const [value, setValue] = useState<string | null>(null);
+  return (
+    <Dialog
+      closeLabel="Close dialog"
+      onOpenChange={() => undefined}
+      open
+      title="Select in dialog"
+    >
+      <Select
+        items={customerItems}
+        label="Client"
+        locale="en"
+        onChange={setValue}
+        searchable
+        size="lg"
+        value={value}
+      />
+    </Dialog>
+  );
+}
+
+export const SearchableInsideDialog: Story = {
+  args: {} as never,
+  render: () => <SearchableDialogHarness />,
+  play: async ({ canvasElement }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const trigger = await body.findByRole("button", { name: "Client" });
+    const chevron = trigger.closest("[data-field-part=\"shell\"]")
+      ?.querySelector<HTMLElement>("[data-select-chevron]");
+    if (!chevron) throw new Error("Select chevron was not rendered");
+
+    await userEvent.click(chevron);
+    const search = await body.findByRole("textbox", { name: "Search options" });
+    await expect(search).toHaveFocus();
+    await userEvent.type(search, "Ivan");
+    await expect(search).toHaveValue("Ivan");
+  }
 };

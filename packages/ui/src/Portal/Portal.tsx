@@ -46,7 +46,7 @@ export function PortalScopeProvider({
 
 export interface PortalProps {
   children: ReactNode;
-  container?: HTMLElement | null;
+  container?: HTMLElement | null | undefined;
   disabled?: boolean;
 }
 

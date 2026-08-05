@@ -56,7 +56,7 @@ export function Popover({
         floating.refs.setReference
       )}
       {open ? (
-        <Portal>
+        <Portal container={floating.portalContainer}>
           <FloatingLayerContext.Provider value={floating.childLayer}>
             <div
               {...floating.getFloatingProps()}

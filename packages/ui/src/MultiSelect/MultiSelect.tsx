@@ -481,44 +481,23 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
       {({ label: controlLabel, ...controlProps }) => (
         <FieldShell
           disabled={disabled}
-          endAdornment={(
+          endAdornment={showClearButton ? (
             <span className={triggerStyles.actions}>
-              {showClearButton ? (
-                <IconButton
-                  aria-label={messages.clear}
-                  data-multiselect-clear=""
-                  disabled={disabled}
-                  icon={<X />}
-                  onClick={handleClear}
-                  onMouseDown={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                  }}
-                  size="sm"
-                  variant="ghost"
-                />
-              ) : null}
-              <span aria-hidden="true" className={styles.triggerStatus}>
-                {loading || refreshing ? (
-                  <Spinner
-                    data-select-spinner=""
-                    size={size === "lg" ? "md" : "sm"}
-                    tone="secondary"
-                  />
-                ) : null}
-                {!loading ? <span
-                  aria-hidden="true"
-                  className={classNames(
-                    triggerStyles.chevron,
-                    open && triggerStyles.chevronOpen
-                  )}
-                  data-multiselect-chevron=""
-                >
-                  <ChevronDown />
-                </span> : null}
-              </span>
+              <IconButton
+                aria-label={messages.clear}
+                data-multiselect-clear=""
+                disabled={disabled}
+                icon={<X />}
+                onClick={handleClear}
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }}
+                size="sm"
+                variant="ghost"
+              />
             </span>
-          )}
+          ) : undefined}
           invalid={invalid}
           label={controlLabel}
           labelFloated={open || value.length > 0}
@@ -563,6 +542,29 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                   ))}
                 </span>
               ) : null}
+              <span
+                aria-hidden="true"
+                className={styles.triggerStatus}
+                data-field-vertical-invariant=""
+              >
+                {loading || refreshing ? (
+                  <Spinner
+                    data-select-spinner=""
+                    size={size === "lg" ? "md" : "sm"}
+                    tone="secondary"
+                  />
+                ) : null}
+                {!loading ? <span
+                  aria-hidden="true"
+                  className={classNames(
+                    triggerStyles.chevron,
+                    open && triggerStyles.chevronOpen
+                  )}
+                  data-multiselect-chevron=""
+                >
+                  <ChevronDown />
+                </span> : null}
+              </span>
             </button>)}
             <span
               className={styles.tagViewport}

@@ -30,6 +30,20 @@
   outline: none;
 }
 
+.floatingContainer {
+  /*
+   * Floating UI's absolute strategy converts viewport reference geometry into
+   * this local offset-parent space, including transform-centered dialogs.
+   */
+  position: fixed;
+  inset: var(--ds-space-0);
+  pointer-events: none;
+}
+
+.floatingContainer > * {
+  pointer-events: auto;
+}
+
 .dialog {
   inset-block-start: 50%;
   inset-inline-start: 50%;

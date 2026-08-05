@@ -156,6 +156,7 @@ export function useFloatingOverlay({
     onOpenChange,
     open,
     placement: placement as Placement,
+    strategy: "absolute",
     whileElementsMounted: autoUpdate
   });
   const click = useClick(floating.context, {
@@ -315,6 +316,7 @@ export function useFloatingOverlay({
     getReferenceProps: interactions.getReferenceProps,
     layer,
     placement: floating.placement,
+    portalContainer: modalLayer?.floatingContainer ?? undefined,
     refs: floating.refs,
     setArrowElement
   };

@@ -2,11 +2,13 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import {
   useContext,
+  useCallback,
   useEffect,
   useId,
   useLayoutEffect,
   useMemo,
   useRef,
+  useState,
   type CSSProperties,
   type ReactNode
 } from "react";
@@ -103,10 +105,16 @@ export function ModalPrimitive({
   const openRef = useRef(open);
   const callbackRef = useRef(onOpenChange);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const [floatingContainer, setFloatingContainer] =
+    useState<HTMLDivElement | null>(null);
   const openerRef = useRef<HTMLElement | null>(null);
   const previousOpenRef = useRef(false);
   const pendingReasonRef = useRef<ModalCloseReason | null>(null);
   const guardPointerRef = useRef<GuardPointerSequence | null>(null);
+  const handleFloatingContainerRef = useCallback(
+    (node: HTMLDivElement | null) => setFloatingContainer(node),
+    []
+  );
 
   openRef.current = open;
   callbackRef.current = onOpenChange;
@@ -332,11 +340,17 @@ export function ModalPrimitive({
               >
                 <ModalLayerContext.Provider
                   value={{
+                    floatingContainer,
                     floatingLayer: view.floatingLayer,
                     modalId: id,
                     surfaceLayer: view.surfaceLayer
                   }}
                 >
+                  <div
+                    className={styles.floatingContainer}
+                    data-modal-floating-container=""
+                    ref={handleFloatingContainerRef}
+                  />
                   {kind === "bottom-sheet" ? (
                     <div aria-hidden="true" className={styles.dragHandle} />
                   ) : null}

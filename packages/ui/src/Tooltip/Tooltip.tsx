@@ -116,7 +116,7 @@ export function Tooltip({
     <>
       {trigger}
       {presentation === "floating" && effectiveOpen ? (
-        <Portal>
+        <Portal container={floating.portalContainer}>
           <FloatingLayerContext.Provider value={floating.childLayer}>
             <div
               {...floating.getFloatingProps()}

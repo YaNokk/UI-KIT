@@ -12,6 +12,18 @@ import { InternationalPhoneInput } from "./InternationalPhoneInput";
 afterEach(cleanup);
 
 describe("InternationalPhoneInput", () => {
+  it("consumes the block layout prop instead of forwarding it to the input", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    render(<InternationalPhoneInput block label="Phone" locale="en" />);
+
+    expect(screen.getByRole("textbox", { name: "Phone" }))
+      .not.toHaveAttribute("block");
+    expect(error).not.toHaveBeenCalledWith(
+      expect.stringContaining("non-boolean attribute"),
+      expect.anything()
+    );
+  });
+
   it("emits canonical value with formatting and validation metadata", () => {
     const onValueChange = vi.fn();
     render(
