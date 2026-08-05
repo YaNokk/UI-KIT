@@ -33,9 +33,9 @@ try {
   run(["run", "tree-shaking:test"]);
   run(["run", "registry:configure", "--", "--publish"]);
   generatedAuthentication = true;
-  run(["publish", "--workspace=@mypoint/tokens", "--userconfig=.npmrc"]);
-  run(["publish", "--workspace=@mypoint/ui", "--userconfig=.npmrc"]);
-  run(["publish", "--workspace=@mypoint/retail-ui", "--userconfig=.npmrc"]);
+  run(["publish", "--workspace=@mypoint/tokens", `--userconfig=${npmrcPath}`]);
+  run(["publish", "--workspace=@mypoint/ui", `--userconfig=${npmrcPath}`]);
+  run(["publish", "--workspace=@mypoint/retail-ui", `--userconfig=${npmrcPath}`]);
 } finally {
   if (generatedAuthentication && existsSync(npmrcPath)) {
     rmSync(npmrcPath);
