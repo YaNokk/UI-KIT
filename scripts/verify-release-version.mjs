@@ -8,7 +8,11 @@ if (!tag || !/^v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(tag)) {
 }
 
 const expectedVersion = tag.slice(1);
-for (const packagePath of ["packages/tokens/package.json", "packages/ui/package.json"]) {
+for (const packagePath of [
+  "packages/tokens/package.json",
+  "packages/ui/package.json",
+  "packages/retail-ui/package.json"
+]) {
   const manifest = JSON.parse(
     readFileSync(resolve(repositoryRoot, packagePath), "utf8")
   );
@@ -19,4 +23,4 @@ for (const packagePath of ["packages/tokens/package.json", "packages/ui/package.
   }
 }
 
-console.log(`Release tag ${tag} matches both public package versions.`);
+console.log(`Release tag ${tag} matches all public package versions.`);

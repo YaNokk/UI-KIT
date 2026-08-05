@@ -29,6 +29,8 @@ try {
   run(["test"]);
   run(["run", "build"]);
   run(["run", "pack:check"]);
+  run(["run", "consumer:test"]);
+  run(["run", "tree-shaking:test"]);
   run(["run", "registry:configure", "--", "--publish"]);
   generatedAuthentication = true;
   run(["publish", "--workspace=@mypoint/tokens", "--userconfig=.npmrc"]);

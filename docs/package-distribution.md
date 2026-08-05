@@ -2,11 +2,12 @@
 
 ## Public packages
 
-Репозиторий сейчас публикует два ESM-пакета:
+Репозиторий сейчас публикует три ESM-пакета:
 
 ```text
-@mypoint/tokens 0.1.0
-@mypoint/ui     0.1.0
+@mypoint/tokens    0.1.1
+@mypoint/ui        0.1.1
+@mypoint/retail-ui 0.1.1
 ```
 
 Custom icon catalog пока отсутствует. Если появится оправданная package

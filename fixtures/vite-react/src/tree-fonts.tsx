@@ -7,5 +7,5 @@ const root = document.createElement("div");
 document.body.append(root);
 
 createRoot(root).render(
-  <Button>Button with optional Inter assets</Button>
+  <Button variant="primary">Button with optional Inter assets</Button>
 );
