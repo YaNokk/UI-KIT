@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -35,6 +35,16 @@ function readOutput(directory, extension) {
     .join("\n");
 }
 
+function findOutputFiles(directory, extension) {
+  const root = resolve(consumerRoot, directory);
+  if (!existsSync(root)) return [];
+  const visit = (current) => readdirSync(current).flatMap((entry) => {
+    const path = resolve(current, entry);
+    return statSync(path).isDirectory() ? visit(path) : [path];
+  });
+  return visit(root).filter((path) => path.endsWith(extension));
+}
+
 if (!existsSync(resolve(consumerRoot, "node_modules", "@mypoint", "ui"))) {
   throw new Error("Consumer is not prepared. Run npm run consumer:test first.");
 }
@@ -42,6 +52,9 @@ if (!existsSync(resolve(consumerRoot, "node_modules", "@mypoint", "ui"))) {
 runBuild("tree", "dist-tree");
 const treeJavaScript = readOutput("dist-tree", ".js");
 const treeCss = readOutput("dist-tree", ".css");
+if (findOutputFiles("dist-tree", ".woff2").length !== 0 || treeCss.includes("@font-face")) {
+  throw new Error("Button-only styles.css build unexpectedly emitted optional Inter assets.");
+}
 
 if (treeJavaScript.includes("prefers-color-scheme: dark")) {
   throw new Error("Unused ThemeProvider implementation survived the Button-only build.");
@@ -51,6 +64,18 @@ if (!treeJavaScript.includes("aria-busy")) {
 }
 if (!treeCss.includes("--ds-action-primary-background")) {
   throw new Error("Required UI/token CSS was removed from the consumer bundle.");
+}
+
+runBuild("tree-fonts", "dist-tree-fonts");
+const fontTreeCss = readOutput("dist-tree-fonts", ".css");
+const fontTreeFiles = findOutputFiles("dist-tree-fonts", ".woff2");
+const expectedFontNames = ["inter-regular", "inter-medium", "inter-semibold"];
+if (
+  fontTreeFiles.length !== expectedFontNames.length
+  || expectedFontNames.some((name) => !fontTreeFiles.some((path) => path.includes(name)))
+  || !fontTreeCss.includes("@font-face")
+) {
+  throw new Error("Button-only fonts.css build did not emit exactly the approved Inter assets.");
 }
 
 runBuild("tree-icon", "dist-tree-icon");
@@ -252,5 +277,5 @@ if (!hasButtonLinkDynamicEntry) {
 }
 
 console.log(
-  "Tree-shaking passed: Amount excluded Maskito; ButtonLink/IconButton/Spinner stayed independent, unused ThemeProvider and icon catalog were removed, CSS retained, dynamic subpaths split."
+  "Tree-shaking passed: optional Inter assets stayed opt-in; Amount excluded Maskito; ButtonLink/IconButton/Spinner stayed independent, unused ThemeProvider and icon catalog were removed, CSS retained, dynamic subpaths split."
 );

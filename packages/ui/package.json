@@ -175,6 +175,7 @@
       "types": "./dist/Tag/index.d.ts",
       "import": "./dist/Tag/index.js"
     },
+    "./fonts.css": "./dist/fonts.css",
     "./styles.css": "./dist/styles.css",
     "./text": {
       "types": "./dist/Text/index.d.ts",

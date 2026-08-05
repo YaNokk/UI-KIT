@@ -71,7 +71,11 @@ const packages = [
       "dist/Input/index.d.ts",
       "dist/InternationalPhoneInput/index.js",
       "dist/InternationalPhoneInput/index.d.ts",
+      "dist/assets/LICENSE-Inter.txt",
       "dist/assets/country-flags.sprite.svg",
+      "dist/assets/inter-medium.woff2",
+      "dist/assets/inter-regular.woff2",
+      "dist/assets/inter-semibold.woff2",
       "dist/internal/country-flags/CountryFlag.js",
       "dist/internal/country-flags/country-flag-registry.js",
       "dist/NumberInput/index.js",
@@ -96,6 +100,7 @@ const packages = [
       "dist/Textarea/index.d.ts",
       "dist/system-color/index.js",
       "dist/system-color/index.d.ts",
+      "dist/fonts.css",
       "dist/styles.css"
     ]
   },
@@ -109,6 +114,12 @@ const packages = [
       "dist/styles.css"
     ]
   }
+];
+
+const approvedUiFontFiles = [
+  "dist/assets/inter-regular.woff2",
+  "dist/assets/inter-medium.woff2",
+  "dist/assets/inter-semibold.woff2"
 ];
 
 function assertInsideRepository(path) {
@@ -163,14 +174,30 @@ function validateContents(packageDefinition, report) {
     /(^|\/)(src|stories|tests|references|\.storybook|AGENTS\.md)(\/|$)/.test(path)
   );
   const missing = packageDefinition.required.filter((path) => !paths.includes(path));
+  const forbiddenFontFormats = packageDefinition.name === "@mypoint/ui"
+    ? paths.filter((path) => /\.(?:otf|ttf|woff)$/i.test(path))
+    : [];
+  const unapprovedUiFonts = packageDefinition.name === "@mypoint/ui"
+    ? paths.filter(
+        (path) => path.endsWith(".woff2") && !approvedUiFontFiles.includes(path)
+      )
+    : [];
 
-  if (unexpected.length || forbidden.length || missing.length) {
+  if (
+    unexpected.length
+    || forbidden.length
+    || missing.length
+    || forbiddenFontFormats.length
+    || unapprovedUiFonts.length
+  ) {
     throw new Error(
       [
         `Invalid artifact for ${packageDefinition.name}.`,
         `Missing: ${missing.join(", ") || "none"}.`,
         `Unexpected: ${unexpected.join(", ") || "none"}.`,
-        `Forbidden: ${forbidden.join(", ") || "none"}.`
+        `Forbidden: ${forbidden.join(", ") || "none"}.`,
+        `Forbidden font formats: ${forbiddenFontFormats.join(", ") || "none"}.`,
+        `Unapproved UI fonts: ${unapprovedUiFonts.join(", ") || "none"}.`
       ].join("\n")
     );
   }
@@ -220,8 +247,46 @@ const uiPackageJson = JSON.parse(readFileSync(
   resolve(repositoryRoot, "packages/ui/package.json"),
   "utf8"
 ));
+if (uiPackageJson.exports?.["./fonts.css"] !== "./dist/fonts.css") {
+  throw new Error("The optional ./fonts.css public export is missing or invalid.");
+}
 if (uiPackageJson.dependencies?.["country-flag-icons"]) {
   throw new Error("country-flag-icons must remain a root-only generation dependency.");
+}
+
+const fontCss = readFileSync(
+  resolve(repositoryRoot, "packages/ui/dist/fonts.css"),
+  "utf8"
+);
+const fontFaceBlocks = fontCss.match(/@font-face\s*\{[^}]*\}/g) ?? [];
+const contentOutsideFontFaces = fontCss.replace(/@font-face\s*\{[^}]*\}/g, "").trim();
+if (fontFaceBlocks.length !== 3 || contentOutsideFontFaces !== "") {
+  throw new Error("fonts.css must contain exactly three @font-face declarations.");
+}
+for (const [file, weight] of [
+  ["inter-regular.woff2", "400"],
+  ["inter-medium.woff2", "500"],
+  ["inter-semibold.woff2", "600"]
+]) {
+  const block = fontFaceBlocks.find((candidate) => candidate.includes(file));
+  if (!block || !block.includes(`font-weight: ${weight}`)) {
+    throw new Error(`fonts.css is missing the approved ${weight} font face (${file}).`);
+  }
+}
+
+const uiStyles = readFileSync(
+  resolve(repositoryRoot, "packages/ui/dist/styles.css"),
+  "utf8"
+);
+const uiRootJavaScript = readFileSync(
+  resolve(repositoryRoot, "packages/ui/dist/index.js"),
+  "utf8"
+);
+if (/@font-face|fonts\.css|\.woff2/i.test(uiStyles)) {
+  throw new Error("styles.css must remain independent from optional font delivery.");
+}
+if (/fonts\.css|\.woff2/i.test(uiRootJavaScript)) {
+  throw new Error("The UI JavaScript root must not import optional font delivery.");
 }
 if (Object.keys(uiPackageJson.exports ?? {}).some((key) => key.includes("country-flag"))) {
   throw new Error("Private country flag internals must not have a package export.");

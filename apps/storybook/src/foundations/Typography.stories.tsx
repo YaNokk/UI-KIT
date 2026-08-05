@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 
 const roles = [
   ["caption", "11 / 16", "400", "typo-caption"],
@@ -55,7 +56,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const AllRoles: Story = {};
+export const AllRoles: Story = {
+  play: async () => {
+    await document.fonts.ready;
+    expect(document.fonts.check('14px "Inter"')).toBe(true);
+  }
+};
 
 export const NarrowContainer: Story = {
   decorators: [(Story) => <div className="max-w-sm"><Story /></div>],

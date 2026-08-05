@@ -261,6 +261,7 @@ const expectedHeights: Record<string, number> = {
 async function verifyTypography(canvasElement: HTMLElement, fallback: boolean, roles: TypographyRole[]) {
   await document.fonts.ready;
   expect(document.fonts.status).toBe("loaded");
+  if (!fallback) expect(document.fonts.check('14px "Inter"')).toBe(true);
 
   for (const role of roles) {
     const elements = [...document.querySelectorAll(`[data-control-text-role="${role}"]`)];

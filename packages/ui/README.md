@@ -2,6 +2,24 @@
 
 ESM React-компоненты дизайн-системы MyPoint.
 
+Пакет не навязывает доставку шрифта. Базовый режим использует только стили:
+
+```tsx
+import "@mypoint/ui/styles.css";
+```
+
+Для точного визуального соответствия загрузите Inter 400/500/600 в
+consumer-приложении или явно подключите опциональный entry перед основными
+стилями:
+
+```tsx
+import "@mypoint/ui/fonts.css";
+import "@mypoint/ui/styles.css";
+```
+
+Без одного из этих вариантов компоненты используют системный fallback из
+token-driven стека `Inter, ui-sans-serif, system-ui, sans-serif`.
+
 ```tsx
 import "@mypoint/ui/styles.css";
 import {

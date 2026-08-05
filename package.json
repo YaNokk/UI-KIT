@@ -15,6 +15,7 @@
     "lint": "eslint . && npm run typography:check && npm run motion:check",
     "typography:check": "node scripts/check-single-line-control-typography.mjs",
     "motion:check": "node scripts/check-motion-foundation.mjs",
+    "fonts:verify": "node scripts/verify-fonts.mjs",
     "test": "vitest run packages",
     "test:storybook": "vitest --config vitest.storybook.config.ts --run",
     "workspace-test-resolution:check": "node scripts/verify-vitest-workspace-resolution.mjs",

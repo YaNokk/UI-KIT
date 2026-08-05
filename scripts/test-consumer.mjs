@@ -4,7 +4,8 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
-  rmSync
+  rmSync,
+  statSync
 } from "node:fs";
 import { resolve, sep } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -24,17 +25,58 @@ if (!fixtureApp.includes('from "@mypoint/ui/date-time-picker"')) {
   throw new Error("Consumer fixture must exercise the DateTimePicker package subpath.");
 }
 
-function run(args) {
+function run(args, extraEnvironment = {}) {
   const result = spawnSync(process.execPath, [npmCli, ...args], {
     cwd: consumerRoot,
     env: {
       ...process.env,
-      NPM_CONFIG_CACHE: npmCache
+      NPM_CONFIG_CACHE: npmCache,
+      ...extraEnvironment
     },
     stdio: "inherit"
   });
   if (result.status !== 0) {
     throw new Error(`Consumer command failed: npm ${args.join(" ")}`);
+  }
+}
+
+function findFiles(directory, predicate) {
+  if (!existsSync(directory)) return [];
+  const files = [];
+  for (const entry of readdirSync(directory)) {
+    const path = resolve(directory, entry);
+    if (statSync(path).isDirectory()) files.push(...findFiles(path, predicate));
+    else if (predicate(path)) files.push(path);
+  }
+  return files;
+}
+
+function verifyFontBuild(entry, outputDirectory, expectFonts) {
+  run(
+    ["run", "build", "--", "--outDir", outputDirectory],
+    { TREE_SHAKING_ENTRY: entry }
+  );
+  const outputRoot = resolve(consumerRoot, outputDirectory);
+  const fontFiles = findFiles(outputRoot, (path) => path.endsWith(".woff2"));
+  const css = findFiles(outputRoot, (path) => path.endsWith(".css"))
+    .map((path) => readFileSync(path, "utf8"))
+    .join("\n");
+
+  if (!expectFonts) {
+    if (fontFiles.length !== 0 || css.includes("@font-face")) {
+      throw new Error("The styles-only consumer unexpectedly emitted optional font assets.");
+    }
+    return;
+  }
+
+  const expectedNames = ["inter-regular", "inter-medium", "inter-semibold"];
+  if (
+    fontFiles.length !== expectedNames.length
+    || expectedNames.some((name) => !fontFiles.some((path) => path.includes(name)))
+    || !css.includes("@font-face")
+    || fontFiles.some((path) => !css.includes(path.split(/[\\/]/).at(-1)))
+  ) {
+    throw new Error("The font-enabled consumer did not emit exactly the approved Inter assets with valid CSS URLs.");
   }
 }
 
@@ -69,5 +111,7 @@ copyDirectory(fixtureRoot, consumerRoot);
 run(["install", "--no-package-lock", "--ignore-scripts", ...tarballs]);
 run(["run", "typecheck"]);
 run(["run", "build"]);
+verifyFontBuild("tree", "dist-fonts-off", false);
+verifyFontBuild("tree-fonts", "dist-fonts-on", true);
 
-console.log(`Packed-package consumer passed in ${consumerRoot}.`);
+console.log(`Packed-package consumer passed with optional font isolation in ${consumerRoot}.`);

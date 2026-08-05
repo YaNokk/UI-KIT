@@ -46,8 +46,32 @@ packages/ui/dist/
   IconButton/
   Spinner/
   theme/
+  fonts.css
+  assets/
+    inter-regular.woff2
+    inter-medium.woff2
+    inter-semibold.woff2
+    LICENSE-Inter.txt
   styles.css
 ```
+
+`@mypoint/ui` не навязывает доставку шрифта. Для точного визуального
+соответствия consumer выбирает один из двух вариантов:
+
+- самостоятельно загружает Inter в весах 400/500/600 и импортирует только
+  `@mypoint/ui/styles.css`;
+- импортирует `@mypoint/ui/fonts.css` перед `@mypoint/ui/styles.css` и получает
+  одобренные статические WOFF2 из UI-KIT.
+
+Без обоих вариантов token-driven стек использует системный fallback.
+`styles.css` сам по себе не содержит `@font-face` и не запрашивает font assets;
+`fonts.css + styles.css` запрашивает только Inter 400/500/600. Декларации
+`@font-face` глобальны для документа и поэтому действуют также в Dialog,
+Drawer, BottomSheet, Select, Popover, Tooltip и external portal container без
+копирования в portal root. Theme variables при этом остаются provider-scoped.
+
+Источник, версия, лицензия, хэши и условия распространения зафиксированы в
+`docs/licenses/inter.md`; полный текст OFL включается в package assets.
 
 `pack:check` допускает в tarball только `package.json`, `README.md` и `dist/**`.
 Tarballs и их manifest сохраняются в `.artifacts/packages/`.
@@ -56,7 +80,9 @@ Consumer fixture копируется в `.artifacts/consumer/` и устана�
 эти tarballs, а не workspace symlinks. Проверяются public types, root import,
 `@mypoint/ui/button`, `@mypoint/ui/button-link`,
 `@mypoint/ui/icon-button`, глобальный CSS и production Vite build.
-Также проверяется standalone import `@mypoint/ui/spinner`.
+Также проверяется standalone import `@mypoint/ui/spinner` и два font delivery
+графа: styles-only без WOFF2 и explicit `fonts.css + styles.css` ровно с тремя
+одобренными WOFF2.
 
 Tree-shaking check собирает отдельные Button-, ButtonLink-, IconButton- и Spinner-only
 entries, проверяет удаление неиспользуемого ThemeProvider и icon catalog,
@@ -93,6 +119,13 @@ export function App() {
     </ThemeProvider>
   );
 }
+```
+
+Опциональная доставка Inter самим UI-KIT:
+
+```tsx
+import "@mypoint/ui/fonts.css";
+import "@mypoint/ui/styles.css";
 ```
 
 Tailwind consumer-проекту не требуется. Не импортируйте `src` или внутренние

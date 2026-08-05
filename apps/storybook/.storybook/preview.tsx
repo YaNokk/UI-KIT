@@ -3,6 +3,7 @@ import {
   DesignSystemProvider,
   type ThemePreference
 } from "@mypoint/ui";
+import "../../../packages/ui/src/fonts.css";
 import "../src/styles.css";
 
 const accents = {

@@ -7,26 +7,47 @@ const countryFlagSpritePath = fileURLToPath(new URL(
   "./src/internal/country-flags/country-flags.sprite.svg",
   import.meta.url
 ));
+const optionalFontAssets = [
+  ["fonts.css", "./src/fonts.css"],
+  ["assets/inter-regular.woff2", "./src/assets/inter-regular.woff2"],
+  ["assets/inter-medium.woff2", "./src/assets/inter-medium.woff2"],
+  ["assets/inter-semibold.woff2", "./src/assets/inter-semibold.woff2"],
+  ["assets/LICENSE-Inter.txt", "./src/assets/LICENSE-Inter.txt"]
+] as const;
 
 export default defineConfig({
-  plugins: [{
-    name: "emit-country-flag-sprite",
-    enforce: "pre",
-    resolveId(source) {
-      return source.endsWith("country-flags.sprite.svg?url")
-        ? "\0country-flag-sprite-url"
-        : null;
+  plugins: [
+    {
+      name: "emit-optional-font-assets",
+      buildStart() {
+        for (const [fileName, sourcePath] of optionalFontAssets) {
+          this.emitFile({
+            type: "asset",
+            fileName,
+            source: readFileSync(fileURLToPath(new URL(sourcePath, import.meta.url)))
+          });
+        }
+      }
     },
-    load(id) {
-      if (id !== "\0country-flag-sprite-url") return null;
-      const referenceId = this.emitFile({
-        type: "asset",
-        fileName: "assets/country-flags.sprite.svg",
-        source: readFileSync(countryFlagSpritePath)
-      });
-      return `export default import.meta.ROLLUP_FILE_URL_${referenceId};`;
+    {
+      name: "emit-country-flag-sprite",
+      enforce: "pre",
+      resolveId(source) {
+        return source.endsWith("country-flags.sprite.svg?url")
+          ? "\0country-flag-sprite-url"
+          : null;
+      },
+      load(id) {
+        if (id !== "\0country-flag-sprite-url") return null;
+        const referenceId = this.emitFile({
+          type: "asset",
+          fileName: "assets/country-flags.sprite.svg",
+          source: readFileSync(countryFlagSpritePath)
+        });
+        return `export default import.meta.ROLLUP_FILE_URL_${referenceId};`;
+      }
     }
-  }],
+  ],
   build: {
     target: "es2022",
     sourcemap: true,
