@@ -138,6 +138,7 @@
 
 .body {
   min-block-size: 0;
+  min-inline-size: 0;
   padding: var(--ds-space-0) var(--ds-space-6) var(--ds-space-6);
   overflow: auto;
   overscroll-behavior: contain;

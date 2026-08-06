@@ -12,6 +12,10 @@ FieldShell supports the shared outer/inner label placement. The owner supplies
 generic `labelFloated` state; FieldShell never reads a native value. Content and
 control fill the shell height and remaining width so the primary native control
 can own the normal hit area. The positioned inner label does not consume a row.
+Its transform is contained by a dedicated label viewport inside the content
+area, so resting-label scale cannot enlarge an ancestor's horizontal scroll
+area. The viewport clips only the label visual; the control, adornments, field
+border and focus ring remain outside that clipping boundary.
 Its logical inline inset and the native control padding resolve from the same
 internal geometry variables. Canonical inline padding is `space-2`, `space-3`
 and `space-4` for `sm`, `md` and `lg`; a start or end adornment consumes that

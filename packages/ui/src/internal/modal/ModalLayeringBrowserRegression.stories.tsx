@@ -1,7 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, waitFor, within } from "storybook/test";
+import { DatePicker } from "../../DatePicker/DatePicker";
+import { Dialog } from "../../Dialog/Dialog";
 import { Drawer } from "../../Drawer/Drawer";
+import { Input } from "../../Input/Input";
 import { Select } from "../../Select/Select";
 
 const items = [
@@ -153,6 +156,105 @@ function NestedEscapeFixture() {
   );
 }
 
+function HorizontalOverflowFields() {
+  const [selectValue, setSelectValue] = useState<string | null>(null);
+
+  return (
+    <div className="grid gap-3">
+      <Input
+        label="Очень длинная подпись большого пустого поля"
+        labelView="inner"
+        placeholder="Введите значение"
+        size="lg"
+      />
+      <Select
+        block
+        items={items}
+        label="Вариант внутри модального окна"
+        labelView="inner"
+        onChange={setSelectValue}
+        placeholder="Выберите вариант"
+        size="lg"
+        value={selectValue}
+      />
+      <DatePicker
+        block
+        label="Дата внутри модального окна"
+        labelView="inner"
+        size="lg"
+      />
+      {Array.from({ length: 24 }, (_, index) => (
+        <p className="typo-body" key={index}>
+          Строка {index + 1}: вертикальная прокрутка остаётся доступной.
+        </p>
+      ))}
+    </div>
+  );
+}
+
+function DrawerHorizontalOverflowFixture() {
+  return (
+    <Drawer
+      closeLabel="Закрыть проверку Drawer"
+      onOpenChange={() => undefined}
+      open
+      title="FieldShell overflow в Drawer"
+    >
+      <HorizontalOverflowFields />
+    </Drawer>
+  );
+}
+
+function DialogHorizontalOverflowFixture() {
+  return (
+    <Dialog
+      closeLabel="Закрыть проверку Dialog"
+      onOpenChange={() => undefined}
+      open
+      title="FieldShell overflow в Dialog"
+    >
+      <Input
+        label="Очень длинная подпись большого пустого поля в Dialog"
+        labelView="inner"
+        size="lg"
+      />
+    </Dialog>
+  );
+}
+
+function NarrowColumnOverflowFixture() {
+  return (
+    <div className="w-80" data-narrow-field-column="">
+      <Input
+        label="Очень длинная подпись большого пустого поля в узкой колонке"
+        labelView="inner"
+        size="lg"
+      />
+    </div>
+  );
+}
+
+function expectNoHorizontalOverflow(element: HTMLElement) {
+  expect(element.scrollWidth).toBeLessThanOrEqual(element.clientWidth + 1);
+}
+
+function expectLabelVisible(shell: HTMLElement) {
+  const viewport = shell.querySelector<HTMLElement>(
+    "[data-field-part=\"label-viewport\"]"
+  );
+  const label = shell.querySelector<HTMLElement>(
+    "[data-field-part=\"inner-label\"]"
+  );
+  if (!viewport || !label) throw new Error("Missing FieldShell label viewport");
+
+  const viewportRect = viewport.getBoundingClientRect();
+  const labelRect = label.getBoundingClientRect();
+  expect(labelRect.right).toBeGreaterThan(viewportRect.left);
+  expect(labelRect.left).toBeLessThan(viewportRect.right);
+  expect(labelRect.bottom).toBeGreaterThan(viewportRect.top);
+  expect(labelRect.top).toBeLessThan(viewportRect.bottom);
+}
+
 const meta = {
   title: "Internal/ModalLayeringBrowserRegression",
   component: Drawer,
@@ -215,6 +317,123 @@ export const FloatingAboveModalContent: Story = {
       .toHaveTextContent("alpha");
     await expect(body.getByRole("dialog", { name: "Floating above content" }))
       .toBeVisible();
+  }
+};
+
+export const FieldShellDrawerHorizontalOverflow: Story = {
+  args: {} as never,
+  render: () => <DrawerHorizontalOverflowFixture />,
+  play: async ({ canvasElement }) => {
+    const document = canvasElement.ownerDocument;
+    const page = within(document.body);
+    const dialog = await page.findByRole("dialog", {
+      name: "FieldShell overflow в Drawer"
+    });
+    const scrollContainer = dialog.querySelector<HTMLElement>(
+      "[data-modal-scroll-container]"
+    );
+    if (!scrollContainer) throw new Error("Missing modal scroll container");
+
+    const input = page.getByRole<HTMLInputElement>("textbox", {
+      name: "Очень длинная подпись большого пустого поля"
+    });
+    const inputShell = input.closest<HTMLElement>("[data-field-part=\"shell\"]");
+    if (!inputShell) throw new Error("Missing Input FieldShell");
+
+    expectNoHorizontalOverflow(scrollContainer);
+    expectLabelVisible(inputShell);
+
+    await userEvent.click(input);
+    await expect(input).toHaveFocus();
+    expectNoHorizontalOverflow(scrollContainer);
+    expectLabelVisible(inputShell);
+    const focusedShellStyles = getComputedStyle(inputShell);
+    expect(focusedShellStyles.overflowX).toBe("visible");
+    expect(focusedShellStyles.overflowY).toBe("visible");
+
+    const selectTrigger = page.getByRole("button", {
+      name: "Вариант внутри модального окна"
+    });
+    const selectShell = selectTrigger.closest<HTMLElement>(
+      "[data-field-part=\"shell\"]"
+    );
+    const chevron = selectShell?.querySelector<HTMLElement>(
+      "[data-select-chevron]"
+    );
+    if (!selectShell || !chevron) throw new Error("Missing Select status visual");
+    const shellRect = selectShell.getBoundingClientRect();
+    const chevronRect = chevron.getBoundingClientRect();
+    expect(chevronRect.left).toBeGreaterThanOrEqual(shellRect.left);
+    expect(chevronRect.right).toBeLessThanOrEqual(shellRect.right);
+
+    await userEvent.click(selectTrigger);
+    await waitFor(() => expect(document.querySelector("[data-select-surface]"))
+      .not.toBeNull());
+    expect(document.querySelector("[data-select-surface]")
+      ?.closest("[data-modal-floating-container]")).not.toBeNull();
+    expectNoHorizontalOverflow(scrollContainer);
+    await userEvent.keyboard("{Escape}");
+
+    const dateInput = page.getByRole<HTMLInputElement>("textbox", {
+      name: "Дата внутри модального окна"
+    });
+    await userEvent.click(dateInput);
+    await waitFor(() => expect(document.querySelector("[data-popover-surface]"))
+      .not.toBeNull());
+    expect(document.querySelector("[data-popover-surface]")
+      ?.closest("[data-modal-floating-container]")).not.toBeNull();
+    expectNoHorizontalOverflow(scrollContainer);
+    await userEvent.keyboard("{Escape}");
+
+    expect(scrollContainer.scrollHeight).toBeGreaterThan(scrollContainer.clientHeight);
+    scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    expect(scrollContainer.scrollTop).toBeGreaterThan(0);
+  }
+};
+
+export const FieldShellDialogHorizontalOverflow: Story = {
+  args: {} as never,
+  render: () => <DialogHorizontalOverflowFixture />,
+  play: async ({ canvasElement }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    const dialog = await page.findByRole("dialog", {
+      name: "FieldShell overflow в Dialog"
+    });
+    const scrollContainer = dialog.querySelector<HTMLElement>(
+      "[data-modal-scroll-container]"
+    );
+    const input = page.getByRole<HTMLInputElement>("textbox", {
+      name: "Очень длинная подпись большого пустого поля в Dialog"
+    });
+    const shell = input.closest<HTMLElement>("[data-field-part=\"shell\"]");
+    if (!scrollContainer || !shell) throw new Error("Missing Dialog overflow fixture");
+
+    expectNoHorizontalOverflow(scrollContainer);
+    expectLabelVisible(shell);
+    await userEvent.click(input);
+    expectNoHorizontalOverflow(scrollContainer);
+    expectLabelVisible(shell);
+  }
+};
+
+export const FieldShellNarrowColumnHorizontalOverflow: Story = {
+  args: {} as never,
+  render: () => <NarrowColumnOverflowFixture />,
+  play: async ({ canvasElement }) => {
+    const column = canvasElement.querySelector<HTMLElement>(
+      "[data-narrow-field-column]"
+    );
+    const input = within(canvasElement).getByRole<HTMLInputElement>("textbox", {
+      name: "Очень длинная подпись большого пустого поля в узкой колонке"
+    });
+    const shell = input.closest<HTMLElement>("[data-field-part=\"shell\"]");
+    if (!column || !shell) throw new Error("Missing narrow FieldShell fixture");
+
+    expectNoHorizontalOverflow(column);
+    expectLabelVisible(shell);
+    await userEvent.click(input);
+    expectNoHorizontalOverflow(column);
+    expectLabelVisible(shell);
   }
 };
 

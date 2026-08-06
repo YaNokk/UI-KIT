@@ -120,8 +120,13 @@ export const FieldShell = forwardRef<HTMLDivElement, FieldShellProps>(
         )}
         <span className={styles.content} data-field-part="content">
           {label == null ? null : (
-            <span className={styles.innerLabel} data-field-part="inner-label">
-              {label}
+            <span
+              className={styles.labelViewport}
+              data-field-part="label-viewport"
+            >
+              <span className={styles.innerLabel} data-field-part="inner-label">
+                {label}
+              </span>
             </span>
           )}
           <span className={styles.control} data-field-part="control">

@@ -4,6 +4,7 @@ declare const styles: {
   readonly control: string;
   readonly disabled: string;
   readonly invalid: string;
+  readonly labelViewport: string;
   readonly floated: string;
   readonly hasEndAdornment: string;
   readonly hasStartAdornment: string;
