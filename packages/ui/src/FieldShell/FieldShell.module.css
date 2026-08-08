@@ -73,10 +73,10 @@
   height: 100%;
 }
 
-.inner.floated .control,
-.inner:focus-within .control {
-  padding-block-end: var(--field-content-padding-bottom);
+.inner.floated [data-field-part="native-control"],
+.inner:focus-within [data-field-part="native-control"] {
   padding-block-start: var(--field-content-padding-top);
+  padding-block-end: var(--field-content-padding-bottom);
 }
 
 .inner.floated [data-field-vertical-invariant],

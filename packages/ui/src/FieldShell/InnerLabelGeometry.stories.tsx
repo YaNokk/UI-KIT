@@ -409,7 +409,19 @@ export const GeometryAssertions: Story = {
       if (!shell || !label) throw new Error("Inner field geometry was not rendered.");
       const labelRect = label.getBoundingClientRect();
       const valueRect = value.getBoundingClientRect();
-      expect(labelRect.bottom).toBeLessThanOrEqual(valueRect.top + tolerance);
+      const controlStyle = getComputedStyle(control);
+      const controlWrapper = control.closest<HTMLElement>(
+        "[data-field-part=\"control\"]"
+      );
+      if (!controlWrapper) throw new Error("FieldShell control wrapper was not rendered.");
+      expect(controlStyle.boxSizing).toBe("border-box");
+      expect(Math.abs(
+        control.getBoundingClientRect().height
+        - controlWrapper.getBoundingClientRect().height
+      )).toBeLessThanOrEqual(0.5);
+      expect(labelRect.bottom).toBeLessThanOrEqual(
+        valueRect.top + parseFloat(controlStyle.paddingBlockStart) + tolerance
+      );
       const shellStyle = getComputedStyle(shell);
       expect(parseFloat(shellStyle.getPropertyValue("--field-content-padding-bottom")))
         .toBeGreaterThan(0);

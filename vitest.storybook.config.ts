@@ -33,6 +33,9 @@ const storybookCsfTransform: Plugin = {
         "/packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx"
       )
       && !normalizedId.includes(
+        "/packages/ui/src/FieldShell/InnerLabelClickBehavior.stories.tsx"
+      )
+      && !normalizedId.includes(
         "/packages/ui/src/DesignSystemProvider/DesignSystemProvider.stories.tsx"
       )
       && !normalizedId.includes(
@@ -95,6 +98,7 @@ const storybookCsfTransform: Plugin = {
       stories: [
         "../../../packages/ui/src/DesignSystemProvider/DesignSystemProvider.stories.tsx",
         "../../../packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx",
+        "../../../packages/ui/src/FieldShell/InnerLabelClickBehavior.stories.tsx",
         "../../../packages/ui/src/FieldShell/InnerLabelGeometry.stories.tsx",
         "../../../packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/select/SharedFloatingTriggerBrowserRegression.stories.tsx",
@@ -156,6 +160,7 @@ export default defineConfig({
     include: [
       "packages/ui/src/DesignSystemProvider/DesignSystemProvider.stories.tsx",
       "packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx",
+      "packages/ui/src/FieldShell/InnerLabelClickBehavior.stories.tsx",
       "packages/ui/src/FieldShell/InnerLabelGeometry.stories.tsx",
       "packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx",
       "packages/ui/src/internal/select/SharedFloatingTriggerBrowserRegression.stories.tsx",

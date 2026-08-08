@@ -20,6 +20,10 @@
   user-select: none;
 }
 
+[data-label-view="inner"] .value > * {
+  pointer-events: none;
+}
+
 .valueContent {
   display: flex;
   flex: 1 1 auto;

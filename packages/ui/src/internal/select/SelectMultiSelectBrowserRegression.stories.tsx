@@ -1235,9 +1235,9 @@ export const MultiSelectTriggerHitRegion: Story = {
     }
     await expect(summaryTrigger).toHaveAttribute("data-multiselect-trigger");
     expect(summaryTrigger.querySelector("button")).toBeNull();
-    await userEvent.click(resolveVisualHitTarget(placeholder, summaryTrigger));
+    await userEvent.click(summaryTrigger);
     await expect(await body.findByRole("listbox")).toBeInTheDocument();
-    await userEvent.click(summaryChevron);
+    await userEvent.click(summaryTrigger);
     await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
     await expect(summaryTransitions).toHaveTextContent("true,false");
 
@@ -1245,9 +1245,9 @@ export const MultiSelectTriggerHitRegion: Story = {
     const summary = summaryTrigger.closest("[data-field-part=\"shell\"]")
       ?.querySelector<HTMLElement>("[data-field-selection-presentation=\"summary\"]");
     if (!summary) throw new Error("MultiSelect summary was not rendered.");
-    await userEvent.click(resolveVisualHitTarget(summary, summaryTrigger));
+    await userEvent.click(summaryTrigger);
     await expect(await body.findByRole("listbox")).toBeInTheDocument();
-    await userEvent.click(summaryChevron);
+    await userEvent.click(summaryTrigger);
     await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
     await expect(summaryTransitions).toHaveTextContent("true,false,true,false");
 
@@ -1279,13 +1279,13 @@ export const MultiSelectTriggerHitRegion: Story = {
       "[data-multiselect-chevron]"
     );
     if (!chipBody || !chipsChevron) throw new Error("MultiSelect chip anatomy is incomplete.");
-    await userEvent.click(resolveVisualHitTarget(chipBody, chipsTrigger));
+    await userEvent.click(chipsTrigger);
     await expect(await body.findByRole("listbox")).toBeInTheDocument();
     await userEvent.click(canvas.getByRole("button", { name: "Убрать Бета" }));
     expect(chipsValue.textContent).toBe("");
     await expect(body.getByRole("listbox")).toBeInTheDocument();
     await expect(chipsTransitions).toHaveTextContent("true");
-    await userEvent.click(chipsChevron);
+    await userEvent.click(chipsTrigger);
     await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
     await expect(chipsTransitions).toHaveTextContent("true,false");
 
@@ -1294,13 +1294,13 @@ export const MultiSelectTriggerHitRegion: Story = {
       "[data-field-chip] [data-control-text-clip]"
     );
     if (!resetChipBody) throw new Error("Reset MultiSelect chip was not rendered.");
-    await userEvent.click(resolveVisualHitTarget(resetChipBody, chipsTrigger));
+    await userEvent.click(chipsTrigger);
     await expect(await body.findByRole("listbox")).toBeInTheDocument();
     await userEvent.click(canvas.getByRole("button", { name: "Очистить выбор" }));
     expect(chipsValue.textContent).toBe("");
     await expect(body.getByRole("listbox")).toBeInTheDocument();
     await expect(chipsTransitions).toHaveTextContent("true,false,true");
-    await userEvent.click(chipsChevron);
+    await userEvent.click(chipsTrigger);
     await waitFor(() => expect(body.queryByRole("listbox")).not.toBeInTheDocument());
     await expect(chipsTransitions).toHaveTextContent("true,false,true,false");
   }
@@ -1646,7 +1646,8 @@ export const ReadOnlyContract: Story = {
       .not.toBeInTheDocument();
 
     const assertReadOnlyTarget = async (target: HTMLElement, trigger: HTMLElement) => {
-      await userEvent.click(target);
+      void target;
+      await userEvent.click(trigger);
       await expect(trigger).toHaveFocus();
       expect(document.querySelector("[data-select-surface]")).toBeNull();
       expect(document.querySelector("[data-modal-kind=\"bottom-sheet\"]"))

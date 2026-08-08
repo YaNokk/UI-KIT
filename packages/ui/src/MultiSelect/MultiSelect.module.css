@@ -16,6 +16,7 @@
 .tagViewport {
   position: relative;
   z-index: var(--ds-z-index-default);
+  box-sizing: border-box;
   display: flex;
   flex: 1 1 auto;
   align-items: center;
@@ -26,6 +27,12 @@
   pointer-events: none;
   padding-inline: var(--field-control-padding-inline-start)
     var(--field-control-padding-inline-end);
+}
+
+[data-label-view="inner"][data-label-floated] .tagViewport,
+[data-label-view="inner"]:focus-within .tagViewport {
+  padding-block-start: var(--field-content-padding-top);
+  padding-block-end: var(--field-content-padding-bottom);
 }
 
 .triggerStatus {

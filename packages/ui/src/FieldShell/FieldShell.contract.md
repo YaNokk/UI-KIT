@@ -50,3 +50,11 @@ inner label is pointer-transparent. Outer semantic labels keep native
 interactive descendants and nodes marked `data-field-interactive` preserve
 their own action. FieldShell is not focusable and never owns a value or business
 behavior.
+
+For inner-label fields, the primary native control retains a full-height
+border/hit box. Floated-label vertical spacing is applied inside that native
+control, never as padding on the FieldShell control wrapper. Therefore the
+pointer-transparent inner label overlays the native control rather than a
+non-interactive wrapper zone. This invariant applies equally while the label is
+owner-floated and while the field contains focus; it does not introduce root,
+content or label activation delegation.
