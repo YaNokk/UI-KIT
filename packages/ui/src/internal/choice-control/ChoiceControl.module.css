@@ -78,6 +78,7 @@
 }
 
 .indicator[data-kind="checkbox"] {
+  position: relative;
   border-radius: var(--ds-radius-sm);
 }
 
@@ -95,7 +96,10 @@
 
 .checkmark,
 .indeterminateMark {
+  position: absolute;
+  inset: 0;
   display: none;
+  margin: auto;
 }
 
 .indicator[data-kind="checkbox"][data-checked]:not([data-indeterminate]) .checkmark,

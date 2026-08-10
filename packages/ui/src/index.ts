@@ -208,3 +208,21 @@ export type {
   ThemePreference,
   ThemeProviderProps
 } from "./theme/ThemeProvider.js";
+export {
+  Table, TableBody, TableCell, TableEmpty, TableExpandCell, TableHead,
+  TableHeaderCell, TableRow, TableScrollContainer, TableSelectionCell,
+  TableSortableHeaderCell
+} from "./Table/index.js";
+export type {
+  TableCellProps, TableColumnAlign, TableDensity, TableEmptyProps,
+  TableHeaderCellProps, TableProps, TableSortableHeaderCellProps,
+  TableSortDirection
+} from "./Table/index.js";
+export { DataTable } from "./DataTable/index.js";
+export type {
+  DataTableCellContext, DataTableCellOverflow, DataTableColumn,
+  DataTableColumnAlign, DataTablePinnedColumnIds, DataTableProps,
+  DataTableRowKey, DataTableSelection, DataTableSort, DataTableStickySide
+} from "./DataTable/index.js";
+export { Pagination } from "./Pagination/index.js";
+export type { PaginationMessages, PaginationProps } from "./Pagination/index.js";

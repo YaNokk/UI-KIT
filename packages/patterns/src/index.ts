@@ -1,5 +1,2 @@
-/**
- * Iteration 0 intentionally exports no public patterns.
- * Add patterns only when a real vertical slice demonstrates the need.
- */
-export {};
+export { DataTableColumnSettings, DataTableSelectionBar, ResponsiveDataView } from "./DataTablePatterns.js";
+export type { DataTableColumnSettingsProps, DataTableSelectionBarProps, ResponsiveDataViewProps } from "./DataTablePatterns.js";

@@ -7,6 +7,12 @@
     "apps/*",
     "packages/*"
   ],
+  "intent": {
+    "skills": [
+      "@tanstack/react-table",
+      "@tanstack/table-core"
+    ]
+  },
   "scripts": {
     "build": "npm run tokens:generate && npm run build --workspace=@mypoint/tokens && npm run build --workspace=@mypoint/ui && npm run build --workspace=@mypoint/retail-ui",
     "tokens:generate": "node packages/tokens/scripts/generate.mjs",
@@ -31,6 +37,7 @@
     "international-phone-input:verify": "vitest run packages/ui/src/internal/phone packages/ui/src/internal/country-flags packages/ui/src/InternationalPhoneInput && npm run floating-trigger:verify && npm run test:storybook -- packages/ui/src/InternationalPhoneInput/InternationalPhoneInputBrowserRegression.stories.tsx",
     "textarea:forced-colors:verify": "vitest --config vitest.textarea-forced-colors.config.ts --run",
     "textarea:verify": "vitest run packages/ui/src/Textarea && npm run test:storybook -- packages/ui/src/Textarea/TextareaBrowserRegression.stories.tsx && npm run textarea:forced-colors:verify",
+    "table:verify": "vitest run packages/ui/src/Table packages/ui/src/DataTable packages/ui/src/Pagination packages/patterns/src && npm run test:storybook -- packages/ui/src/DataTable/DataTable.stories.tsx packages/ui/src/Pagination/Pagination.stories.tsx packages/patterns/src/DataTablePatterns.stories.tsx",
     "date-foundation:verify": "vitest run packages/ui/src/internal/date packages/ui/src/internal/calendar",
     "date-input:verify": "vitest run packages/ui/src/DateInput packages/ui/src/TimeInput packages/ui/src/DateTimeInput",
     "date-mask:verify": "vitest run packages/ui/src/internal/date/input-mask packages/ui/src/DateInput packages/ui/src/TimeInput packages/ui/src/DateTimeInput",

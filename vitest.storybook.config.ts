@@ -86,6 +86,15 @@ const storybookCsfTransform: Plugin = {
       && !normalizedId.includes(
         "/packages/ui/src/internal/calendar/CalendarBrowserRegression.stories.tsx"
       )
+      && !normalizedId.includes(
+        "/packages/ui/src/DataTable/DataTable.stories.tsx"
+      )
+      && !normalizedId.includes(
+        "/packages/ui/src/Pagination/Pagination.stories.tsx"
+      )
+      && !normalizedId.includes(
+        "/packages/patterns/src/DataTablePatterns.stories.tsx"
+      )
     ) {
       return undefined;
     }
@@ -114,7 +123,10 @@ const storybookCsfTransform: Plugin = {
         "../../../packages/ui/src/DateRangePicker/DateRangePickerBrowserRegression.stories.tsx",
         "../../../packages/ui/src/DateTimeRangePicker/DateTimeRangePickerBrowserRegression.stories.tsx",
         "../../../packages/ui/src/DateTimePicker/DateTimePickerBrowserRegression.stories.tsx",
-        "../../../packages/ui/src/internal/calendar/CalendarBrowserRegression.stories.tsx"
+        "../../../packages/ui/src/internal/calendar/CalendarBrowserRegression.stories.tsx",
+        "../../../packages/ui/src/DataTable/DataTable.stories.tsx",
+        "../../../packages/ui/src/Pagination/Pagination.stories.tsx",
+        "../../../packages/patterns/src/DataTablePatterns.stories.tsx"
       ],
       tagsFilter: defaultStorybookTagsFilter
     });
@@ -176,7 +188,10 @@ export default defineConfig({
       "packages/ui/src/DateRangePicker/DateRangePickerBrowserRegression.stories.tsx",
       "packages/ui/src/DateTimeRangePicker/DateTimeRangePickerBrowserRegression.stories.tsx",
       "packages/ui/src/DateTimePicker/DateTimePickerBrowserRegression.stories.tsx",
-      "packages/ui/src/internal/calendar/CalendarBrowserRegression.stories.tsx"
+      "packages/ui/src/internal/calendar/CalendarBrowserRegression.stories.tsx",
+      "packages/ui/src/DataTable/DataTable.stories.tsx",
+      "packages/ui/src/Pagination/Pagination.stories.tsx",
+      "packages/patterns/src/DataTablePatterns.stories.tsx"
     ],
     browser: {
       enabled: true,

@@ -1,0 +1,16 @@
+.ds-data-table { position: relative; min-inline-size: 0; }
+.ds-data-table-refresh { position: absolute; inset-block-start: var(--ds-space-2); inset-inline-end: var(--ds-space-2); z-index: var(--ds-z-index-sticky); display: grid; place-items: center; inline-size: var(--ds-size-control-sm); block-size: var(--ds-size-control-sm); border-radius: var(--ds-radius-full); background: var(--ds-background-surface-raised); box-shadow: var(--ds-shadow-sm); color: var(--ds-icon-accent); }
+.ds-data-table-caption { padding: var(--ds-space-3) var(--ds-space-4); color: var(--ds-text-primary); font: var(--ds-typography-body-strong); text-align: start; }
+.ds-data-table-header-content { position: relative; display: flex; align-items: center; gap: var(--ds-space-1); min-inline-size: 0; }
+.ds-data-table-header-label { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
+.ds-table-header-action, .ds-data-table-expand { display: inline-grid; place-items: center; flex: none; inline-size: var(--ds-size-icon-lg); block-size: var(--ds-size-icon-lg); padding: 0; border: 0; background: transparent; color: var(--ds-icon-secondary); cursor: pointer; }
+.ds-table-header-action[aria-pressed="true"] { color: var(--ds-icon-accent); }
+.ds-data-table-sort-indicator { color: var(--ds-icon-secondary); }
+.ds-table-resize { position: absolute; inset-block: calc(-1 * var(--ds-space-3)); inset-inline-end: calc(-1 * var(--ds-space-3)); inline-size: var(--ds-size-icon-lg); cursor: col-resize; touch-action: none; }
+.ds-table-resize::after { position: absolute; inset-block: var(--ds-space-2); inset-inline-start: calc(50% - var(--ds-border-width-default)); inline-size: var(--ds-border-width-strong); background: var(--ds-border-strong); content: ""; }
+.ds-table-resize:hover::after, .ds-table-resize:focus-visible::after { background: var(--ds-border-focus); }
+.ds-data-table-expand { inline-size: var(--ds-size-control-sm); block-size: var(--ds-size-control-sm); border-radius: var(--ds-radius-md); }
+.ds-data-table-expand:hover { background: var(--ds-action-ghost-background-hover); color: var(--ds-action-ghost-foreground); }
+.ds-data-table-expanded { padding: var(--ds-space-2); }
+.ds-data-table-live { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .ds-data-table-refresh { animation: none; } }

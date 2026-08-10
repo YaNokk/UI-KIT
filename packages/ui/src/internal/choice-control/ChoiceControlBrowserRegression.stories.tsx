@@ -423,3 +423,37 @@ export const GeometryThemeAndMedia: Story = {
       .not.toBe(getComputedStyle(brandIndicator).backgroundColor);
   }
 };
+
+export const CheckboxMarksAreLayoutNeutral: Story = {
+  render: () => (
+    <div className="grid gap-4">
+      {(["ltr", "rtl"] as const).map((direction) => (
+        <div data-checkbox-geometry-group={direction} dir={direction} key={direction}>
+          <Checkbox aria-label={`${direction} unchecked`} size="sm" />
+          <Checkbox aria-label={`${direction} checked`} checked size="sm" />
+          <Checkbox aria-label={`${direction} indeterminate`} indeterminate size="sm" />
+          <Checkbox aria-label={`${direction} disabled`} disabled size="sm" />
+        </div>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const direction of ["ltr", "rtl"] as const) {
+      const controls = ["unchecked", "checked", "indeterminate", "disabled"]
+        .map((state) => canvas.getByRole("checkbox", { name: `${direction} ${state}` }));
+      const indicators = controls.map(indicatorFor);
+      const reference = indicators[0]?.getBoundingClientRect();
+      if (!reference) throw new Error("Checkbox reference indicator is unavailable.");
+
+      for (const indicator of indicators) {
+        const rect = indicator.getBoundingClientRect();
+        expect(Math.abs(rect.width - reference.width)).toBeLessThanOrEqual(0.1);
+        expect(Math.abs(rect.height - reference.height)).toBeLessThanOrEqual(0.1);
+        for (const mark of indicator.querySelectorAll("svg")) {
+          expect(getComputedStyle(mark).position).toBe("absolute");
+        }
+      }
+    }
+  }
+};

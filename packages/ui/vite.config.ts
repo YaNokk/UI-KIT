@@ -157,6 +157,15 @@ export default defineConfig({
         "Tag/index": fileURLToPath(
           new URL("./src/Tag/index.ts", import.meta.url)
         ),
+        "Table/index": fileURLToPath(
+          new URL("./src/Table/index.ts", import.meta.url)
+        ),
+        "DataTable/index": fileURLToPath(
+          new URL("./src/DataTable/index.ts", import.meta.url)
+        ),
+        "Pagination/index": fileURLToPath(
+          new URL("./src/Pagination/index.ts", import.meta.url)
+        ),
         "Text/index": fileURLToPath(
           new URL("./src/Text/index.ts", import.meta.url)
         ),
