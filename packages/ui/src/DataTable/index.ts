@@ -1,4 +1,5 @@
 export { DataTable } from "./DataTable.js";
+export { reorderDataTableColumn } from "./dataTableAdapter.js";
 export type { DataTableProps } from "./DataTable.js";
 export type {
   DataTableCellContext,

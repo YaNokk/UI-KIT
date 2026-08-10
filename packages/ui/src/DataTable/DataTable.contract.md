@@ -30,3 +30,24 @@ Start имеет приоритет перед end. Это renderer safety polic
 Policy не скрывает DOM-колонки, не меняет tab order и не виртуализирует строки.
 Будущий virtual renderer обязан использовать финальные `table.getRowModel().rows`
 и стабильный `getRowId`.
+
+## Row action
+
+`onRowAction` добавляет pointer convenience для пассивной области строки и
+keyboard activation по Enter на самой строке. Строка сохраняет native `row`
+semantics и получает focus-visible состояние. Вложенные ссылки, кнопки, поля,
+selection/expansion controls, resize/reorder handles и элементы с
+`data-table-interactive` владеют собственным действием и не активируют строку.
+
+Если действие является навигацией, consumer по-прежнему обязан рендерить
+настоящую ссылку в primary cell. `onRowAction` не заменяет `href`.
+
+## Column state ownership
+
+`DataTable` применяет controlled `columnVisibility`, а
+`DataTableColumnSettings` редактирует это состояние. Persistence принадлежит
+consumer-у. `hideable: false` запрещает скрытие колонки.
+
+Порядок колонок меняется общим helper `reorderDataTableColumn`: перенос разрешён
+только внутри `start`, `center` или `end` зоны. Controlled `columnOrder` остаётся
+единственным source of truth; visibility и sizing привязаны к стабильным ID.

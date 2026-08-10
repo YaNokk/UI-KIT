@@ -16,6 +16,7 @@ import {
 import {
   type CSSProperties,
   type KeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
   type PointerEvent,
   type ReactNode,
   useEffect,
@@ -46,7 +47,7 @@ import {
   getCompleteColumnOrder,
   getControlledColumnPinning,
   getDataTableRowId,
-  reorderColumnInZone,
+  reorderDataTableColumn,
   resolveNonOverlappingColumnPinning
 } from "./dataTableAdapter.js";
 import type {
@@ -71,6 +72,25 @@ const SPECIAL_COLUMN_WIDTH = 48;
 const MINIMUM_SCROLL_FLOW_WIDTH = SPECIAL_COLUMN_WIDTH;
 const DEFAULT_COLUMN_WIDTH = 160;
 const EMPTY_EXPANDED_ROW_KEYS: DataTableRowKey[] = [];
+const INTERACTIVE_ROW_TARGET = [
+  "button",
+  "a",
+  "input",
+  "label",
+  "select",
+  "textarea",
+  "summary",
+  "[role='button']",
+  "[role='link']",
+  "[role='checkbox']",
+  "[role='switch']",
+  "[tabindex]",
+  "[contenteditable]:not([contenteditable='false'])",
+  "[data-table-interactive]",
+  "[data-table-drag-handle]",
+  "[data-table-resize-handle]",
+  "[data-table-expand]"
+].join(",");
 
 export interface DataTableProps<Row extends RowData, Key extends DataTableRowKey = DataTableRowKey> {
   rows: Row[];
@@ -100,6 +120,7 @@ export interface DataTableProps<Row extends RowData, Key extends DataTableRowKey
   refreshing?: boolean;
   emptyState?: ReactNode;
   noResultsState?: ReactNode;
+  onRowAction?: (row: Row) => void;
 }
 
 function includesKey<Key extends DataTableRowKey>(keys: Key[], key: Key): boolean {
@@ -153,7 +174,8 @@ export function DataTable<Row extends RowData, Key extends DataTableRowKey = Dat
   loading = false,
   refreshing = false,
   emptyState = "Нет данных",
-  noResultsState
+  noResultsState,
+  onRowAction
 }: DataTableProps<Row, Key>) {
   const controlledExpandedRowKeys = expandedRowKeys ?? EMPTY_EXPANDED_ROW_KEYS as Key[];
   const hasSelection = Boolean(selection && onSelectionChange);
@@ -322,8 +344,20 @@ export function DataTable<Row extends RowData, Key extends DataTableRowKey = Dat
     }
   };
 
+  const activateRow = (
+    event: KeyboardEvent<HTMLTableRowElement> | ReactMouseEvent<HTMLTableRowElement>,
+    row: Row
+  ) => {
+    if (!onRowAction || isInteractiveRowTarget(event.target, event.currentTarget)) return;
+    if ("key" in event) {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+    }
+    onRowAction(row);
+  };
+
   const commitReorder = (sourceId: string, targetId: string) => {
-    const order = reorderColumnInZone(columns, controlledColumnOrder, sourceId, targetId);
+    const order = reorderDataTableColumn(columns, controlledColumnOrder, sourceId, targetId);
     if (!order || !onColumnOrderChange) {
       setAnnouncement("Столбец нельзя переместить в другую закреплённую зону");
       return;
@@ -503,7 +537,11 @@ export function DataTable<Row extends RowData, Key extends DataTableRowKey = Dat
                 <DataTableRowFragment key={tableRow.id}>
                   <TableRow
                     aria-selected={selection ? selected : undefined}
+                    data-actionable={onRowAction ? "true" : undefined}
                     data-selected={selected || undefined}
+                    onClick={(event) => activateRow(event, row)}
+                    onKeyDown={(event) => activateRow(event, row)}
+                    tabIndex={onRowAction ? 0 : undefined}
                   >
                     {hasSelection && <TableSelectionCell data-sticky-edge={specialColumnIsStartEdge && !hasExpansion ? "true" : undefined} sticky="start" style={columnStyle(SPECIAL_COLUMN_WIDTH, 0)}><Checkbox aria-label={`Выбрать строку ${String(key)}`} checked={selected} onChange={(checked) => toggleRow(key, checked)} size="sm" /></TableSelectionCell>}
                     {hasExpansion && (
@@ -555,6 +593,12 @@ function getColumnLabel<Row>(column: DataTableColumn<Row>): string {
   if (column.headerLabel) return column.headerLabel;
   if (typeof column.header === "string" || typeof column.header === "number") return String(column.header);
   return "безымянный столбец";
+}
+
+function isInteractiveRowTarget(target: EventTarget | null, row: HTMLTableRowElement): boolean {
+  if (!(target instanceof Element) || target === row) return false;
+  const interactive = target.closest(INTERACTIVE_ROW_TARGET);
+  return interactive != null && interactive !== row && row.contains(interactive);
 }
 
 function DataTableRowFragment({ children }: { children: ReactNode }) {

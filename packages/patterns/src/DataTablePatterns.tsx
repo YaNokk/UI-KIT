@@ -4,7 +4,8 @@ import {
   Checkbox,
   type DataTableColumn,
   type DataTableRowKey,
-  type DataTableSelection
+  type DataTableSelection,
+  reorderDataTableColumn
 } from "@mypoint/ui";
 import "./DataTablePatterns.css";
 
@@ -17,8 +18,10 @@ export interface DataTableColumnSettingsProps<Row> {
   onReset: () => void;
 }
 
-function zone<Row>(column: DataTableColumn<Row>): "start" | "normal" | "end" {
-  return column.sticky ?? "normal";
+function columnLabel<Row>(column: DataTableColumn<Row>): string {
+  if (column.headerLabel) return column.headerLabel;
+  if (typeof column.header === "string" || typeof column.header === "number") return String(column.header);
+  return column.id;
 }
 
 export function DataTableColumnSettings<Row>({
@@ -33,13 +36,8 @@ export function DataTableColumnSettings<Row>({
   const byId = new Map(columns.map((column) => [column.id, column]));
   const ordered = [...columnOrder.filter((id) => byId.has(id)), ...columns.map((column) => column.id).filter((id) => !columnOrder.includes(id))];
   const move = (source: string, target: string) => {
-    const sourceColumn = byId.get(source);
-    const targetColumn = byId.get(target);
-    if (!sourceColumn || !targetColumn || sourceColumn.reorderable === false || zone(sourceColumn) !== zone(targetColumn)) return;
-    const next = [...ordered];
-    next.splice(next.indexOf(source), 1);
-    next.splice(next.indexOf(target), 0, source);
-    onColumnOrderChange(next);
+    const next = reorderDataTableColumn(columns, ordered, source, target);
+    if (next) onColumnOrderChange(next);
   };
   const drop = (event: DragEvent, target: string) => {
     event.preventDefault();
@@ -57,8 +55,8 @@ export function DataTableColumnSettings<Row>({
           const nextId = ordered[index + 1];
           const previousColumn = previousId == null ? undefined : byId.get(previousId);
           const nextColumn = nextId == null ? undefined : byId.get(nextId);
-          const sameZonePrevious = previousColumn != null && zone(previousColumn) === zone(column);
-          const sameZoneNext = nextColumn != null && zone(nextColumn) === zone(column);
+          const sameZonePrevious = previousColumn != null && previousColumn.sticky === column.sticky;
+          const sameZoneNext = nextColumn != null && nextColumn.sticky === column.sticky;
           return (
             <li draggable={column.reorderable !== false} key={id} onDragOver={(event) => event.preventDefault()} onDragStart={() => { dragged.current = id; }} onDrop={(event) => drop(event, id)}>
               <span className="ds-column-settings-grip" data-table-drag-handle="" title="Перетащить">⋮⋮</span>
@@ -70,8 +68,8 @@ export function DataTableColumnSettings<Row>({
                 size="sm"
               />
               <div className="ds-column-settings-actions">
-                <button aria-label={`Переместить ${id} влево`} disabled={!sameZonePrevious} onClick={() => { if (previousId) move(id, previousId); }} type="button">←</button>
-                <button aria-label={`Переместить ${id} вправо`} disabled={!sameZoneNext} onClick={() => { if (nextId) move(id, nextId); }} type="button">→</button>
+                <button aria-label={`Переместить ${columnLabel(column)} влево`} disabled={!sameZonePrevious} onClick={() => { if (previousId) move(id, previousId); }} type="button">←</button>
+                <button aria-label={`Переместить ${columnLabel(column)} вправо`} disabled={!sameZoneNext} onClick={() => { if (nextId) move(id, nextId); }} type="button">→</button>
               </div>
             </li>
           );

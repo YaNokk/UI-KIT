@@ -218,7 +218,7 @@ export type {
   TableHeaderCellProps, TableProps, TableSortableHeaderCellProps,
   TableSortDirection
 } from "./Table/index.js";
-export { DataTable } from "./DataTable/index.js";
+export { DataTable, reorderDataTableColumn } from "./DataTable/index.js";
 export type {
   DataTableCellContext, DataTableCellOverflow, DataTableColumn,
   DataTableColumnAlign, DataTablePinnedColumnIds, DataTableProps,

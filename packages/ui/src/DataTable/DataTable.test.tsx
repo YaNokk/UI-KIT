@@ -32,33 +32,83 @@ describe("DataTable", () => {
     expect(screen.queryByRole("button", { name: "ID" })).not.toBeInTheDocument();
   });
 
-  it("uses a real primary link for keyboard activation and isolates nested controls", async () => {
-    const onPrimaryAction = vi.fn();
+  it("activates actionable rows from passive areas and Enter while isolating nested controls", async () => {
+    const onRowAction = vi.fn();
+    const onNestedAction = vi.fn();
     const interactiveColumns: DataTableColumn<Row>[] = [
-      ...columns,
       {
-        id: "primary-action",
-        header: "Основное действие",
-        render: (row) => <a href={`/customers/${row.id}`} onClick={(event) => { event.preventDefault(); onPrimaryAction(row); }}>{row.name}</a>
+        id: "name",
+        header: "Имя",
+        accessor: "name",
+        reorderable: true,
+        resizable: true
       },
       {
-        id: "custom-action",
-        header: "Другое действие",
-        render: () => <span role="button" tabIndex={0}>Пользовательское действие</span>
+        id: "controls",
+        header: "Интерактивные элементы",
+        reorderable: true,
+        render: () => (
+          <div>
+            <button onClick={onNestedAction} type="button">Кнопка</button>
+            <a href="#details" onClick={(event) => event.preventDefault()}>Ссылка</a>
+            <input aria-label="Поле" />
+            <label><input type="checkbox" />Подпись checkbox</label>
+            <select aria-label="Список" defaultValue="a"><option value="a">A</option></select>
+            <textarea aria-label="Текст" />
+            <span onClick={onNestedAction} role="button" tabIndex={0}>Custom button</span>
+            <span data-table-interactive="" onClick={onNestedAction}>Custom interactive</span>
+          </div>
+        )
       }
     ];
-    render(<DataTable aria-label="Клиенты" columns={interactiveColumns} getRowKey={(row) => row.id} rows={rows} />);
-    const nestedButton = screen.getAllByRole("button", { name: "Открыть меню" }).at(0);
-    expect(nestedButton).toBeDefined();
-    if (nestedButton) await userEvent.click(nestedButton);
-    expect(onPrimaryAction).not.toHaveBeenCalled();
-    await userEvent.click(screen.getAllByRole("button", { name: "Пользовательское действие" })[0] as HTMLElement);
-    expect(onPrimaryAction).not.toHaveBeenCalled();
-    const primaryLink = screen.getByRole("link", { name: "Анна" });
-    primaryLink.focus();
+    render(
+      <DataTable
+        aria-label="Клиенты"
+        columns={interactiveColumns}
+        expandedRowKeys={[]}
+        getRowKey={(row) => row.id}
+        onColumnOrderChange={() => undefined}
+        onColumnSizingChange={() => undefined}
+        onExpandedRowKeysChange={() => undefined}
+        onRowAction={onRowAction}
+        onSelectionChange={() => undefined}
+        renderExpandedRow={(row) => `Подробности ${row.name}`}
+        rows={rows}
+        selection={{ mode: "explicit", selectedKeys: [] }}
+      />
+    );
+
+    await userEvent.click(screen.getByText("Анна"));
+    expect(onRowAction).toHaveBeenLastCalledWith(rows[0]);
+    onRowAction.mockClear();
+
+    const actionableRow = screen.getAllByRole("row")[1] as HTMLTableRowElement;
+    expect(actionableRow).toHaveAttribute("tabindex", "0");
+    expect(actionableRow).toHaveAttribute("data-actionable", "true");
+    actionableRow.focus();
     await userEvent.keyboard("{Enter}");
-    expect(onPrimaryAction).toHaveBeenCalledWith(rows[0]);
-    expect(screen.getAllByRole("row")[1]).not.toHaveAttribute("tabindex");
+    expect(onRowAction).toHaveBeenLastCalledWith(rows[0]);
+    onRowAction.mockClear();
+
+    for (const control of [
+      screen.getAllByRole("button", { name: "Кнопка" })[0],
+      screen.getAllByRole("link", { name: "Ссылка" })[0],
+      screen.getAllByRole("textbox", { name: "Поле" })[0],
+      screen.getAllByText("Подпись checkbox")[0],
+      screen.getAllByRole("combobox", { name: "Список" })[0],
+      screen.getAllByRole("textbox", { name: "Текст" })[0],
+      screen.getAllByRole("button", { name: "Custom button" })[0],
+      screen.getAllByText("Custom interactive")[0],
+      screen.getByRole("checkbox", { name: "Выбрать строку 1" }),
+      screen.getAllByRole("button", { name: "Развернуть строку" })[0],
+      screen.getByRole("button", { name: "Переместить столбец Имя" })
+    ]) {
+      expect(control).toBeDefined();
+      if (control) await userEvent.click(control);
+      expect(onRowAction).not.toHaveBeenCalled();
+    }
+    fireEvent.click(screen.getByRole("separator", { name: "Изменить ширину столбца Имя" }));
+    expect(onRowAction).not.toHaveBeenCalled();
   });
 
   it("header selection always selects only the current page", async () => {

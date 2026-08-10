@@ -1,13 +1,118 @@
 @import "@mypoint/tokens/responsive.css";
-.ds-pagination { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-space-3); color: var(--ds-text-secondary); font: var(--ds-typography-body-sm); }
-.ds-pagination-pages { display: flex; align-items: center; gap: var(--ds-space-1); }
-.ds-pagination-button { display: inline-grid; place-items: center; min-inline-size: var(--ds-size-control-sm); block-size: var(--ds-size-control-sm); padding-inline: var(--ds-space-2); border: var(--ds-border-width-default) solid var(--ds-border-default); border-radius: var(--ds-radius-md); background: var(--ds-background-surface); color: var(--ds-text-primary); font: var(--ds-typography-control-text-sm); cursor: pointer; }
-.ds-pagination-button svg { inline-size: var(--ds-size-icon-sm); block-size: var(--ds-size-icon-sm); stroke-width: var(--ds-icon-stroke-default); }
-.ds-pagination-button:hover:not(:disabled) { background: var(--ds-control-background-hover); border-color: var(--ds-control-border-hover); }
-.ds-pagination-button[aria-current="page"] { border-color: var(--ds-border-focus); background: var(--ds-background-selected); color: var(--ds-brand-accent-content); }
-.ds-pagination-button:focus-visible, .ds-pagination-size select:focus-visible { outline: var(--ds-focus-ring-width) solid var(--ds-focus-ring); outline-offset: var(--ds-space-1); }
-.ds-pagination-button:disabled { color: var(--ds-text-disabled); cursor: not-allowed; }
-.ds-pagination-ellipsis { display: inline-grid; place-items: center; min-inline-size: var(--ds-size-control-sm); }
-.ds-pagination-size { display: flex; align-items: center; gap: var(--ds-space-2); }
-.ds-pagination-size select { block-size: var(--ds-size-control-sm); padding-inline: var(--ds-space-2); border: var(--ds-border-width-default) solid var(--ds-control-border); border-radius: var(--ds-radius-md); background: var(--ds-control-background); color: var(--ds-control-text); font: var(--ds-typography-control-text-sm); }
-@media (--ds-below-md) { .ds-pagination { flex-wrap: wrap; } .ds-pagination-info { order: 2; } .ds-pagination-size { order: 3; inline-size: 100%; } }
+
+.ds-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
+  min-inline-size: 0;
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-body-sm);
+}
+
+.ds-pagination-navigation,
+.ds-pagination-controls,
+.ds-pagination-page-size,
+.ds-pagination-page-size-options {
+  display: flex;
+  align-items: center;
+}
+
+.ds-pagination-navigation { gap: var(--ds-space-3); }
+.ds-pagination-controls { gap: var(--ds-space-1); }
+.ds-pagination-page-size { gap: var(--ds-space-2); }
+
+.ds-pagination-button,
+.ds-pagination-current,
+.ds-pagination-page-size-button {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: var(--ds-size-control-sm);
+  block-size: var(--ds-size-control-sm);
+  padding-inline: var(--ds-space-2);
+  font: var(--ds-typography-control-text-sm);
+}
+
+.ds-pagination-button,
+.ds-pagination-current {
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-background-surface);
+  color: var(--ds-text-primary);
+}
+
+.ds-pagination-button { cursor: pointer; }
+.ds-pagination-button svg {
+  inline-size: var(--ds-size-icon-sm);
+  block-size: var(--ds-size-icon-sm);
+  stroke-width: var(--ds-icon-stroke-default);
+}
+
+.ds-pagination-button:hover:not(:disabled),
+.ds-pagination-page-size-button:hover:not(:disabled):not([aria-pressed="true"]) {
+  background: var(--ds-control-background-hover);
+  color: var(--ds-text-primary);
+}
+
+.ds-pagination-current {
+  border-color: var(--ds-border-focus);
+  background: var(--ds-background-selected);
+  color: var(--ds-brand-accent-content);
+}
+
+.ds-pagination-page-count,
+.ds-pagination-page-size-label { white-space: nowrap; }
+
+.ds-pagination-page-size-options {
+  overflow: hidden;
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-background-surface);
+}
+
+.ds-pagination-page-size-button {
+  border: 0;
+  background: transparent;
+  color: var(--ds-text-primary);
+  cursor: pointer;
+}
+
+.ds-pagination-page-size-button + .ds-pagination-page-size-button {
+  border-inline-start: var(--ds-border-width-default) solid var(--ds-border-default);
+}
+
+.ds-pagination-page-size-button[aria-pressed="true"] {
+  background: var(--ds-action-soft-background);
+  color: var(--ds-action-soft-foreground);
+}
+
+.ds-pagination-button:focus-visible,
+.ds-pagination-page-size-button:focus-visible {
+  position: relative;
+  z-index: var(--ds-z-index-base);
+  outline: var(--ds-focus-ring-width) solid var(--ds-focus-ring);
+  outline-offset: calc(-1 * var(--ds-focus-ring-width));
+}
+
+.ds-pagination-button:disabled,
+.ds-pagination-page-size-button:disabled {
+  background: var(--ds-control-background-disabled);
+  color: var(--ds-text-disabled);
+  cursor: not-allowed;
+}
+
+@media (--ds-below-md) {
+  .ds-pagination { align-items: flex-start; flex-wrap: wrap; }
+  .ds-pagination-navigation { flex-wrap: wrap; }
+  .ds-pagination-page-size { flex-basis: 100%; flex-wrap: wrap; }
+}
+
+@media (forced-colors: active) {
+  .ds-pagination-current,
+  .ds-pagination-page-size-button[aria-pressed="true"] {
+    border-color: Highlight;
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+}

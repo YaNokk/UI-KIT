@@ -99,7 +99,7 @@ export function resolveNonOverlappingColumnPinning<Row>({
   return { start, end };
 }
 
-export function reorderColumnInZone<Row>(
+export function reorderDataTableColumn<Row>(
   columns: DataTableColumn<Row>[],
   currentOrder: string[] | undefined,
   sourceId: string,

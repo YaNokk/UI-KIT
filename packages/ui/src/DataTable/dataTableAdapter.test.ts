@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getCompleteColumnOrder, getControlledColumnPinning, getDataTableRowId, reorderColumnInZone, resolveNonOverlappingColumnPinning } from "./dataTableAdapter";
+import { getCompleteColumnOrder, getControlledColumnPinning, getDataTableRowId, reorderDataTableColumn, resolveNonOverlappingColumnPinning } from "./dataTableAdapter";
 import type { DataTableColumn } from "./types";
 
 interface Row { id: string; name: string }
@@ -73,8 +73,8 @@ describe("DataTable TanStack adapter", () => {
   });
 
   it("rejects cross-zone reorder and permits reorder inside a zone", () => {
-    expect(reorderColumnInZone(columns, undefined, "name", "actions")).toBeNull();
-    expect(reorderColumnInZone(columns, undefined, "computed", "name"))
+    expect(reorderDataTableColumn(columns, undefined, "name", "actions")).toBeNull();
+    expect(reorderDataTableColumn(columns, undefined, "computed", "name"))
       .toEqual(["id", "computed", "name", "actions"]);
   });
 
