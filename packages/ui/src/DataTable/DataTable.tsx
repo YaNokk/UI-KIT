@@ -448,7 +448,7 @@ export function DataTable<Row extends RowData, Key extends DataTableRowKey = Dat
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {hasSelection && (
-                  <TableHeaderCell className="ds-table-selection-cell" data-sticky-edge={specialColumnIsStartEdge && !hasExpansion ? "true" : undefined} sticky="start" style={columnStyle(SPECIAL_COLUMN_WIDTH, 0)}>
+                  <TableHeaderCell align="center" className="ds-table-selection-cell" data-sticky-edge={specialColumnIsStartEdge && !hasExpansion ? "true" : undefined} sticky="start" style={columnStyle(SPECIAL_COLUMN_WIDTH, 0)}>
                     <Checkbox aria-label="Выбрать строки на странице" checked={allPageSelected} indeterminate={partiallySelected} onChange={togglePage} size="sm" />
                   </TableHeaderCell>
                 )}

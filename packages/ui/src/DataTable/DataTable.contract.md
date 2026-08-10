@@ -48,6 +48,11 @@ selection/expansion controls, resize/reorder handles и элементы с
 `DataTableColumnSettings` редактирует это состояние. Persistence принадлежит
 consumer-у. `hideable: false` запрещает скрытие колонки.
 
-Порядок колонок меняется общим helper `reorderDataTableColumn`: перенос разрешён
-только внутри `start`, `center` или `end` зоны. Controlled `columnOrder` остаётся
-единственным source of truth; visibility и sizing привязаны к стабильным ID.
+Порядок колонок меняется поддерживаемой utility `reorderDataTableColumn`: перенос
+разрешён только внутри `start`, `center` или `end` зоны. Utility нормализует
+controlled order, отклоняет неизвестные ID и используется как `DataTable`, так и
+`DataTableColumnSettings`. Это единственный намеренно публичный low-level helper
+табличного API; consumer-ы не должны копировать его алгоритм. При появлении
+отдельного shared table-model package перенос utility потребует обычной migration
+notice. Controlled `columnOrder` остаётся единственным source of truth;
+visibility и sizing привязаны к стабильным ID.

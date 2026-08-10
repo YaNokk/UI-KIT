@@ -21,6 +21,7 @@
 .ds-table-sort:focus-visible, .ds-table-header-action:focus-visible, .ds-table-resize:focus-visible { outline: var(--ds-focus-ring-width) solid var(--ds-focus-ring); outline-offset: var(--ds-space-1); border-radius: var(--ds-radius-sm); }
 .ds-table-icon { inline-size: var(--ds-size-icon-sm); block-size: var(--ds-size-icon-sm); flex: none; stroke-width: var(--ds-icon-stroke-default); }
 .ds-table-selection-cell, .ds-table-expand-cell { inline-size: var(--ds-size-control-sm); padding-inline: var(--ds-space-2); text-align: center; }
+.ds-table-selection-cell > * { margin-inline: auto; }
 .ds-table-empty { block-size: calc(var(--ds-size-table-row-default) * 3); padding: var(--ds-space-6); color: var(--ds-text-secondary); text-align: center; }
 .ds-table-header-cell[data-sticky], .ds-table-cell[data-sticky] { position: sticky; z-index: var(--ds-z-index-sticky); }
 .ds-table-header-cell[data-sticky="start"], .ds-table-cell[data-sticky="start"] { inset-inline-start: var(--ds-table-sticky-offset, 0); }

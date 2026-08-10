@@ -90,8 +90,8 @@ export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
 );
 
 export const TableSelectionCell = forwardRef<HTMLTableCellElement, TableCellProps>(
-  function TableSelectionCell({ className, ...props }, ref) {
-    return <TableCell {...props} className={classNames("ds-table-selection-cell", className)} ref={ref} />;
+  function TableSelectionCell({ align = "center", className, ...props }, ref) {
+    return <TableCell {...props} align={align} className={classNames("ds-table-selection-cell", className)} ref={ref} />;
   }
 );
 

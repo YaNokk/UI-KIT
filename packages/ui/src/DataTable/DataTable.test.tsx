@@ -115,7 +115,10 @@ describe("DataTable", () => {
     const onSelectionChange = vi.fn();
     const selection: DataTableSelection<number> = { mode: "explicit", selectedKeys: [] };
     render(<DataTable aria-label="Клиенты" columns={columns} getRowKey={(row) => row.id} onSelectionChange={onSelectionChange} rows={rows} selection={selection} />);
-    await userEvent.click(screen.getByRole("checkbox", { name: "Выбрать строки на странице" }));
+    const pageCheckbox = screen.getByRole("checkbox", { name: "Выбрать строки на странице" });
+    expect(pageCheckbox.closest("th")).toHaveAttribute("data-align", "center");
+    expect(screen.getByRole("checkbox", { name: "Выбрать строку 1" }).closest("td")).toHaveAttribute("data-align", "center");
+    await userEvent.click(pageCheckbox);
     expect(onSelectionChange).toHaveBeenCalledWith({ mode: "explicit", selectedKeys: [1, 2] });
   });
 
