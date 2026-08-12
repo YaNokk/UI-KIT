@@ -23,6 +23,18 @@ permissions, feature flags, active-route detection or application menu data.
   modal-local floating layer range when composed inside a modal.
 - Sidebar does not apply page offsets or responsive policy. A consuming shell
   places it in grid/flex layout and controls `collapsed` at its chosen
-  breakpoint. Header and footer remain fixed while `Sidebar.Content` owns menu
-  scrolling.
-
+  breakpoint. It receives its available block size from that container and
+  never applies viewport height, fixed positioning or page-level geometry.
+- Header and footer are non-growing flex siblings. `Sidebar.Content` uses
+  `flex: 1`, `min-block-size: 0` and `overflow-y: auto`, so it becomes the sole
+  internal scroll owner when the parent bounds Sidebar height. Without a
+  bounded parent, Sidebar grows naturally and no internal scrollbar appears.
+- Expanded, collapsed and flyout inline sizes use canonical `size.sidebar.*`
+  geometry tokens. Spacing tokens remain limited to padding, gaps and margins.
+- Navigation is intentionally a persistent dark/inverse surface in both
+  application themes. Mode may tune its neutral aliases; runtime brand affects
+  active/accent states, not the base navigation surface.
+- `interpolate-size` and `@starting-style` progressively enhance transitions in
+  supporting browsers. Unsupported browsers keep the same disclosure and
+  layout behavior with an immediate, functional state change; no JS
+  measurement fallback is required.

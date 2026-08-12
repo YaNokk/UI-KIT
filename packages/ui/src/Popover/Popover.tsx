@@ -4,7 +4,6 @@ import {
 } from "react";
 import { Portal } from "../Portal/Portal";
 import { classNames } from "../shared/classNames";
-import { scrollbarClassName } from "../styles/scrollbar";
 import {
   FloatingLayerContext,
   useFloatingOverlay
@@ -61,7 +60,7 @@ export function Popover({
           <FloatingLayerContext.Provider value={floating.childLayer}>
             <div
               {...floating.getFloatingProps()}
-              className={classNames(styles.surface, scrollbarClassName(), className)}
+              className={classNames(styles.surface, className)}
               data-floating-overlay=""
               data-popover-surface=""
               ref={floating.refs.setFloating}

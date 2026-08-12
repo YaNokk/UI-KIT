@@ -167,6 +167,12 @@
       "default": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
       "compact": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } }
     },
+    "sidebar": {
+      "expanded": { "$type": "dimension", "$value": { "value": 280, "unit": "px" } },
+      "collapsed": { "$type": "dimension", "$value": { "value": 64, "unit": "px" } },
+      "flyoutMin": { "$type": "dimension", "$value": { "value": 232, "unit": "px" } },
+      "flyoutMax": { "$type": "dimension", "$value": { "value": 256, "unit": "px" } }
+    },
     "tableRow": {
       "compact": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
       "default": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },

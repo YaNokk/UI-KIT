@@ -148,8 +148,12 @@
   --color-navigation-item-background-hover: var(--ds-navigation-item-background-hover);
   --color-navigation-item-background-active: var(--ds-navigation-item-background-active);
   --color-navigation-item-text: var(--ds-navigation-item-text);
+  --color-navigation-item-text-hover: var(--ds-navigation-item-text-hover);
+  --color-navigation-item-text-disabled: var(--ds-navigation-item-text-disabled);
   --color-navigation-item-text-active: var(--ds-navigation-item-text-active);
   --color-navigation-item-icon: var(--ds-navigation-item-icon);
+  --color-navigation-item-icon-hover: var(--ds-navigation-item-icon-hover);
+  --color-navigation-item-icon-disabled: var(--ds-navigation-item-icon-disabled);
   --color-navigation-item-icon-active: var(--ds-navigation-item-icon-active);
   --color-focus-ring: var(--ds-focus-ring);
   --color-focus-ring-offset: var(--ds-focus-ring-offset);

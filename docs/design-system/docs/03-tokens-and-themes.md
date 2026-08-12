@@ -123,6 +123,19 @@ size.scrollbar.compact
 Scrollbar colors are neutral, mode-aware and independent from runtime brand.
 The visual contract is opt-in and never creates a scroll container itself.
 
+### Sidebar geometry
+
+```text
+size.sidebar.expanded
+size.sidebar.collapsed
+size.sidebar.flyoutMin
+size.sidebar.flyoutMax
+```
+
+These canonical component dimensions express stable navigation geometry, not
+spacing. They are mode-, brand- and viewport-independent; responsive shell
+orchestration remains a consumer responsibility.
+
 ### Control
 
 ```text
@@ -192,10 +205,18 @@ navigation.item.background
 navigation.item.backgroundHover
 navigation.item.backgroundActive
 navigation.item.text
+navigation.item.textHover
+navigation.item.textDisabled
 navigation.item.textActive
 navigation.item.icon
+navigation.item.iconHover
+navigation.item.iconDisabled
 navigation.item.iconActive
 ```
+
+Navigation is an intentionally persistent dark/inverse surface in both light
+and dark application themes. Mode may tune its neutral aliases, while runtime
+brand affects active/accent states rather than the base navigation surface.
 
 ### Focus
 
@@ -400,12 +421,19 @@ Respect `prefers-reduced-motion`.
 
 ```text
 default     0
+focused   100
 sticky    100
 navigation 200
 popover   300
 modal     500
 toast     600
 ```
+
+Dropdown-like floating UI uses the canonical `popover` layer. Modal backdrops
+and surfaces are owned by the modal runtime within the `modal` contract. The
+system did not expose public `dropdown` or `overlay` z-index tokens before
+`navigation` was added, so no compatibility aliases are required. The invariant
+is `sticky/focused < navigation < popover < modal < toast`.
 
 ## Theme model
 

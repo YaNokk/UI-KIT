@@ -287,6 +287,22 @@ export const primitiveTokens = {
     "value": 2,
     "unit": "px"
   },
+  "size.sidebar.expanded": {
+    "value": 280,
+    "unit": "px"
+  },
+  "size.sidebar.collapsed": {
+    "value": 64,
+    "unit": "px"
+  },
+  "size.sidebar.flyoutMin": {
+    "value": 232,
+    "unit": "px"
+  },
+  "size.sidebar.flyoutMax": {
+    "value": 256,
+    "unit": "px"
+  },
   "size.tableRow.compact": {
     "value": 40,
     "unit": "px"
@@ -658,8 +674,12 @@ export const lightSemanticTokens = {
   "navigation.item.backgroundHover": "{navigation.surface}",
   "navigation.item.backgroundActive": "{brand.actionBackground}",
   "navigation.item.text": "{color.neutral.200}",
+  "navigation.item.textHover": "{color.neutral.0}",
+  "navigation.item.textDisabled": "{color.neutral.400}",
   "navigation.item.textActive": "{brand.actionForeground}",
   "navigation.item.icon": "{color.neutral.300}",
+  "navigation.item.iconHover": "{color.neutral.0}",
+  "navigation.item.iconDisabled": "{color.neutral.400}",
   "navigation.item.iconActive": "{brand.actionForeground}",
   "focus.ring": "{brand.accentFocus}",
   "focus.ringOffset": "{background.surface}",
@@ -815,8 +835,12 @@ export const darkSemanticTokens = {
   "navigation.item.backgroundHover": "{navigation.surface}",
   "navigation.item.backgroundActive": "{brand.actionBackground}",
   "navigation.item.text": "{color.neutral.200}",
+  "navigation.item.textHover": "{color.neutral.0}",
+  "navigation.item.textDisabled": "{color.neutral.400}",
   "navigation.item.textActive": "{brand.actionForeground}",
   "navigation.item.icon": "{color.neutral.300}",
+  "navigation.item.iconHover": "{color.neutral.0}",
+  "navigation.item.iconDisabled": "{color.neutral.400}",
   "navigation.item.iconActive": "{brand.actionForeground}",
   "focus.ring": "{brand.accentFocus}",
   "focus.ringOffset": "{background.surface}",

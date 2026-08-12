@@ -42,6 +42,8 @@ describe("Popover", () => {
     await user.click(screen.getByRole("button", { name: "Открыть Popover" }));
     const popover = await screen.findByRole("dialog");
     expect(popover).not.toHaveAttribute("aria-modal");
+    expect(popover).not.toHaveClass("ds-scrollbar");
+    expect(popover).not.toHaveClass("ds-scrollbar-compact");
 
     await user.click(document.body);
     await waitFor(() => {

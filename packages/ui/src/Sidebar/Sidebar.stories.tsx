@@ -98,32 +98,54 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Expanded: Story = { render: () => <Example /> };
+export const Expanded: Story = {
+  render: () => <Example />,
+  play: async ({ canvasElement }) => {
+    const sidebar = within(canvasElement).getByRole("complementary", {
+      name: "Основная навигация"
+    });
+    const styles = getComputedStyle(sidebar);
+    const canonicalWidth = getComputedStyle(document.documentElement)
+      .getPropertyValue("--ds-size-sidebar-expanded");
+    expect(styles.inlineSize).toBe(canonicalWidth);
+  }
+};
 export const Collapsed: Story = {
   render: () => <Example collapsed />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const sidebar = canvas.getByRole("complementary", { name: "Основная навигация" });
-    const assertCircularAndCentered = () => {
+    const assertCanonicalGeometryAndCentered = () => {
       const sidebarRect = sidebar.getBoundingClientRect();
       const sidebarCenter = sidebarRect.left + sidebarRect.width / 2;
       const controls = sidebar.querySelectorAll<HTMLElement>("[data-sidebar-nav-control]");
+      const rootStyles = getComputedStyle(document.documentElement);
+      const canonicalWidth = rootStyles.getPropertyValue("--ds-size-sidebar-collapsed");
+      const canonicalRadius = Number.parseFloat(
+        rootStyles.getPropertyValue("--ds-radius-lg")
+      );
 
+      expect(getComputedStyle(sidebar).inlineSize).toBe(canonicalWidth);
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        expect(getComputedStyle(sidebar).transitionDuration).toBe("0s");
+      }
       expect(controls.length).toBeGreaterThan(0);
       for (const control of controls) {
         const rect = control.getBoundingClientRect();
         const controlCenter = rect.left + rect.width / 2;
         expect(Math.abs(controlCenter - sidebarCenter)).toBeLessThanOrEqual(1);
+        expect(rect.width).toBe(rect.height);
         expect(Number.parseFloat(getComputedStyle(control).borderRadius))
-          .toBeGreaterThanOrEqual(rect.width / 2);
+          .toBe(canonicalRadius);
+        expect(canonicalRadius).toBeLessThan(rect.width / 2);
       }
     };
 
-    assertCircularAndCentered();
+    assertCanonicalGeometryAndCentered();
     const previousInlineSize = canvasElement.style.inlineSize;
     canvasElement.style.inlineSize = "calc(var(--ds-space-16) * 6 + var(--ds-space-10))";
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-    assertCircularAndCentered();
+    assertCanonicalGeometryAndCentered();
     canvasElement.style.inlineSize = previousInlineSize;
   }
 };
@@ -149,6 +171,8 @@ export const NestedGroupLayoutAnimation: Story = {
     if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
       expect(intermediateHeight).toBeGreaterThan(initialHeight);
       expect(intermediateHeight).toBeLessThan(finalHeight);
+    } else {
+      expect(getComputedStyle(submenu).transitionDuration).toBe("0s");
     }
   }
 };
@@ -185,7 +209,31 @@ export const ExpandSidebarLayoutAnimation: Story = {
 };
 
 export const ActiveAndDisabled: Story = { render: () => <Example /> };
-export const LongMenuScroll: Story = { render: () => <Example long /> };
+export const LongMenuScroll: Story = {
+  render: () => <Example long />,
+  play: async ({ canvasElement }) => {
+    const sidebar = within(canvasElement).getByRole("complementary", {
+      name: "Основная навигация"
+    });
+    const content = within(sidebar).getByRole("navigation", {
+      name: "Разделы приложения"
+    });
+    const header = sidebar.firstElementChild as HTMLElement | null;
+    const footer = sidebar.lastElementChild as HTMLElement | null;
+    if (!header || !footer) throw new Error("Sidebar slots are unavailable");
+
+    expect(content.scrollHeight).toBeGreaterThan(content.clientHeight);
+    expect(getComputedStyle(content).overflowY).toBe("auto");
+    expect(header.parentElement).toBe(sidebar);
+    expect(footer.parentElement).toBe(sidebar);
+    expect(content.contains(header)).toBe(false);
+    expect(content.contains(footer)).toBe(false);
+    expect(header.getBoundingClientRect().top)
+      .toBeGreaterThanOrEqual(sidebar.getBoundingClientRect().top);
+    expect(footer.getBoundingClientRect().bottom)
+      .toBeLessThanOrEqual(sidebar.getBoundingClientRect().bottom + 1);
+  }
+};
 export const LongLabels: Story = { render: () => <Example /> };
 export const HeaderAndFooterSlots: Story = { render: () => <Example alternateSlots /> };
 
@@ -195,7 +243,11 @@ export const CollapsedFlyout: Story = {
     const canvas = within(canvasElement);
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.hover(canvas.getByRole("button", { name: "Аналитика и отчётность" }));
-    await waitFor(() => expect(body.getByRole("dialog", { name: "Аналитика и отчётность" })).toBeVisible());
+    const flyout = await body.findByRole("dialog", { name: "Аналитика и отчётность" });
+    await waitFor(() => expect(flyout).toBeVisible());
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      expect(getComputedStyle(flyout).animationDuration).toBe("0s");
+    }
     await userEvent.keyboard("{Escape}");
     await waitFor(() => expect(body.queryByRole("dialog", { name: "Аналитика и отчётность" })).not.toBeInTheDocument());
   }

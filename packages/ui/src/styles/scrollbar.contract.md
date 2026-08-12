@@ -32,5 +32,7 @@ Consumer по-прежнему подключает `@mypoint/ui/styles.css`. Re
 ## Встроенные владельцы
 
 Стандартный вариант используется в Sidebar content, Table scroll container,
-Popover surface, Select listbox (включая виртуализированный owner) и modal body.
+Select listbox (включая виртуализированный owner) и modal body. Generic Popover
+surface не получает recipe автоматически: наличие surface само по себе не
+делает элемент официальным scroll owner.
 Компоненты продолжают самостоятельно владеть своей overflow-геометрией.

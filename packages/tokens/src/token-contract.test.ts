@@ -89,6 +89,29 @@ describe("scrollbar token contract", () => {
   });
 });
 
+describe("sidebar token contract", () => {
+  it("exposes canonical component geometry instead of spacing arithmetic", () => {
+    expect(primitiveTokens["size.sidebar.expanded"])
+      .toEqual({ value: 280, unit: "px" });
+    expect(primitiveTokens["size.sidebar.collapsed"])
+      .toEqual({ value: 64, unit: "px" });
+    expect(primitiveTokens["size.sidebar.flyoutMin"])
+      .toEqual({ value: 232, unit: "px" });
+    expect(primitiveTokens["size.sidebar.flyoutMax"])
+      .toEqual({ value: 256, unit: "px" });
+  });
+
+  it.each(themes)("%s exposes inverse navigation interaction colors", (_, tokens) => {
+    expect(tokens["navigation.item.textHover"]).toBe("{color.neutral.0}");
+    expect(tokens["navigation.item.textDisabled"]).toBe("{color.neutral.400}");
+    expect(tokens["navigation.item.iconHover"]).toBe("{color.neutral.0}");
+    expect(tokens["navigation.item.iconDisabled"]).toBe("{color.neutral.400}");
+    expect(tokens["navigation.item.backgroundActive"]).toBe("{brand.actionBackground}");
+    expect(tokens["navigation.item.textActive"]).toBe("{brand.actionForeground}");
+    expect(tokens["navigation.item.iconActive"]).toBe("{brand.actionForeground}");
+  });
+});
+
 describe("system color token contract", () => {
   const colors = ["gray", "blue", "green", "amber", "red", "purple", "brand"];
   const roles = [
@@ -221,6 +244,15 @@ describe("layer token contract", () => {
     expect(Object.keys(primitiveTokens)).not.toContain("zIndex.dropdown");
     expect(Object.keys(primitiveTokens)).not.toContain("zIndex.overlay");
     expect(primitiveTokens["zIndex.sticky"]).toBe(100);
+  });
+
+  it("keeps dropdown and modal overlay semantics on their established owners", () => {
+    expect(primitiveTokens["zIndex.navigation"])
+      .toBeLessThan(primitiveTokens["zIndex.popover"] as number);
+    expect(primitiveTokens["zIndex.popover"])
+      .toBeLessThan(primitiveTokens["zIndex.modal"] as number);
+    expect(Object.keys(primitiveTokens)).not.toContain("zIndex.dropdown");
+    expect(Object.keys(primitiveTokens)).not.toContain("zIndex.overlay");
   });
 });
 

@@ -201,8 +201,12 @@
       "backgroundHover": { "$type": "color", "$value": "{navigation.surface}" },
       "backgroundActive": { "$type": "color", "$value": "{brand.actionBackground}" },
       "text": { "$type": "color", "$value": "{color.neutral.200}" },
+      "textHover": { "$type": "color", "$value": "{color.neutral.0}" },
+      "textDisabled": { "$type": "color", "$value": "{color.neutral.400}" },
       "textActive": { "$type": "color", "$value": "{brand.actionForeground}" },
       "icon": { "$type": "color", "$value": "{color.neutral.300}" },
+      "iconHover": { "$type": "color", "$value": "{color.neutral.0}" },
+      "iconDisabled": { "$type": "color", "$value": "{color.neutral.400}" },
       "iconActive": { "$type": "color", "$value": "{brand.actionForeground}" }
     }
   },

@@ -396,7 +396,7 @@ function SelectListboxViewInner<Value extends string>(
         aria-multiselectable={multiple ? true : undefined}
         className={classNames(
           styles.scroll,
-          scrollbarClassName(),
+          !virtualized && scrollbarClassName(),
           virtualized && styles.virtualScrollHost
         )}
         data-select-scroll-owner={virtualized ? undefined : "listbox"}
