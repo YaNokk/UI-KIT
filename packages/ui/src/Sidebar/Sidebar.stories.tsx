@@ -181,9 +181,10 @@ export const ExpandSidebarLayoutAnimation: Story = {
   render: () => <Example collapsed />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const getLongItemHeight = () => canvas.getByRole("link", {
+    const getLongItemRect = () => canvas.getByRole("link", {
       name: "Склады и движение товаров с максимально длинной подписью"
-    }).getBoundingClientRect().height;
+    }).getBoundingClientRect();
+    const getLongItemHeight = () => getLongItemRect().height;
     const collapsedItemHeight = getLongItemHeight();
     await userEvent.click(canvas.getByRole("button", { name: "Развернуть навигацию" }));
     const trigger = canvas.getByRole("button", { name: "Аналитика и отчётность" });
@@ -193,12 +194,21 @@ export const ExpandSidebarLayoutAnimation: Story = {
     await new Promise((resolve) => setTimeout(resolve, 60));
     const intermediateHeight = submenu.getBoundingClientRect().height;
     const intermediateItemHeight = getLongItemHeight();
+    const intermediateItemWidth = getLongItemRect().width;
     await new Promise((resolve) => setTimeout(resolve, 180));
     const finalHeight = submenu.getBoundingClientRect().height;
     const finalItemHeight = getLongItemHeight();
+    const finalItemWidth = getLongItemRect().width;
+    const content = canvas.getByRole("navigation", { name: "Разделы приложения" });
+    const contentStyles = getComputedStyle(content);
+    const usableContentWidth = content.clientWidth
+      - Number.parseFloat(contentStyles.paddingInlineStart)
+      - Number.parseFloat(contentStyles.paddingInlineEnd);
 
     expect(finalHeight).toBeGreaterThan(0);
     expect(finalItemHeight).toBeGreaterThan(collapsedItemHeight);
+    expect(Math.abs(intermediateItemWidth - finalItemWidth)).toBeLessThanOrEqual(1);
+    expect(Math.abs(finalItemWidth - usableContentWidth)).toBeLessThanOrEqual(1);
     if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
       expect(intermediateHeight).toBeGreaterThan(0);
       expect(intermediateHeight).toBeLessThan(finalHeight);

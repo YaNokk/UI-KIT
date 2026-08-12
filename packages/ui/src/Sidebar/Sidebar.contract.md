@@ -31,6 +31,10 @@ permissions, feature flags, active-route detection or application menu data.
   bounded parent, Sidebar grows naturally and no internal scrollbar appears.
 - Expanded, collapsed and flyout inline sizes use canonical `size.sidebar.*`
   geometry tokens. Spacing tokens remain limited to padding, gaps and margins.
+- Items always fill the natural content box. During expanded-width reveal,
+  `Sidebar.Content` keeps the canonical expanded canvas and the root clips only
+  its inline overflow; this prevents temporary label rewrapping without making
+  an item calculate Sidebar width, padding or border geometry.
 - Navigation is intentionally a persistent dark/inverse surface in both
   application themes. Mode may tune its neutral aliases; runtime brand affects
   active/accent states, not the base navigation surface.
