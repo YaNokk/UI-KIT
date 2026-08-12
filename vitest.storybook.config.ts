@@ -93,6 +93,12 @@ const storybookCsfTransform: Plugin = {
         "/packages/ui/src/Pagination/Pagination.stories.tsx"
       )
       && !normalizedId.includes(
+        "/packages/ui/src/Sidebar/Sidebar.stories.tsx"
+      )
+      && !normalizedId.includes(
+        "/packages/ui/src/styles/Scrollbar.stories.tsx"
+      )
+      && !normalizedId.includes(
         "/packages/patterns/src/DataTablePatterns.stories.tsx"
       )
     ) {
@@ -126,6 +132,8 @@ const storybookCsfTransform: Plugin = {
         "../../../packages/ui/src/internal/calendar/CalendarBrowserRegression.stories.tsx",
         "../../../packages/ui/src/DataTable/DataTable.stories.tsx",
         "../../../packages/ui/src/Pagination/Pagination.stories.tsx",
+        "../../../packages/ui/src/Sidebar/Sidebar.stories.tsx",
+        "../../../packages/ui/src/styles/Scrollbar.stories.tsx",
         "../../../packages/patterns/src/DataTablePatterns.stories.tsx"
       ],
       tagsFilter: defaultStorybookTagsFilter
@@ -191,6 +199,8 @@ export default defineConfig({
       "packages/ui/src/internal/calendar/CalendarBrowserRegression.stories.tsx",
       "packages/ui/src/DataTable/DataTable.stories.tsx",
       "packages/ui/src/Pagination/Pagination.stories.tsx",
+      "packages/ui/src/Sidebar/Sidebar.stories.tsx",
+      "packages/ui/src/styles/Scrollbar.stories.tsx",
       "packages/patterns/src/DataTablePatterns.stories.tsx"
     ],
     browser: {

@@ -1,0 +1,22 @@
+declare const styles: {
+  readonly collapseTrigger: string;
+  readonly collapseIcon: string;
+  readonly content: string;
+  readonly flyout: string;
+  readonly flyoutItems: string;
+  readonly flyoutTitle: string;
+  readonly footer: string;
+  readonly group: string;
+  readonly header: string;
+  readonly item: string;
+  readonly itemAffordance: string;
+  readonly itemIcon: string;
+  readonly itemLabel: string;
+  readonly indicatorIcon: string;
+  readonly root: string;
+  readonly subitem: string;
+  readonly submenu: string;
+  readonly submenuClip: string;
+  readonly submenuContent: string;
+};
+export default styles;

@@ -7,6 +7,7 @@ import {
 } from "react";
 import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
 import { classNames } from "../shared/classNames.js";
+import { scrollbarClassName } from "../styles/scrollbar.js";
 import "./Table.css";
 
 export type TableDensity = "default" | "compact";
@@ -25,7 +26,13 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(
 
 export const TableScrollContainer = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   function TableScrollContainer({ className, ...props }, ref) {
-    return <div {...props} className={classNames("ds-table-scroll", className)} ref={ref} />;
+    return (
+      <div
+        {...props}
+        className={classNames("ds-table-scroll", scrollbarClassName(), className)}
+        ref={ref}
+      />
+    );
   }
 );
 

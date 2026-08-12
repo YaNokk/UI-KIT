@@ -111,6 +111,18 @@ border.focus
 border.danger
 ```
 
+### Scrollbar
+
+```text
+scrollbar.thumb
+scrollbar.thumbHover
+size.scrollbar.default
+size.scrollbar.compact
+```
+
+Scrollbar colors are neutral, mode-aware and independent from runtime brand.
+The visual contract is opt-in and never creates a scroll container itself.
+
 ### Control
 
 ```text
@@ -173,6 +185,9 @@ Status colors are independent from brand accent.
 ### Navigation
 
 ```text
+navigation.background
+navigation.surface
+navigation.border
 navigation.item.background
 navigation.item.backgroundHover
 navigation.item.backgroundActive
@@ -384,11 +399,10 @@ Respect `prefers-reduced-motion`.
 ### Z-index
 
 ```text
-base      0
+default     0
 sticky    100
-dropdown  200
+navigation 200
 popover   300
-overlay   400
 modal     500
 toast     600
 ```

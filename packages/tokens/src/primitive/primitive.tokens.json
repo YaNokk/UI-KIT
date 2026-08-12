@@ -147,6 +147,7 @@
     "default": { "$type": "number", "$value": 0 },
     "focused": { "$type": "number", "$value": 100 },
     "sticky": { "$type": "number", "$value": 100 },
+    "navigation": { "$type": "number", "$value": 200 },
     "popover": { "$type": "number", "$value": 300 },
     "modal": { "$type": "number", "$value": 500 },
     "toast": { "$type": "number", "$value": 600 }
@@ -161,6 +162,10 @@
       "sm": { "$type": "dimension", "$value": { "value": 16, "unit": "px" } },
       "md": { "$type": "dimension", "$value": { "value": 20, "unit": "px" } },
       "lg": { "$type": "dimension", "$value": { "value": 24, "unit": "px" } }
+    },
+    "scrollbar": {
+      "default": { "$type": "dimension", "$value": { "value": 4, "unit": "px" } },
+      "compact": { "$type": "dimension", "$value": { "value": 2, "unit": "px" } }
     },
     "tableRow": {
       "compact": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },

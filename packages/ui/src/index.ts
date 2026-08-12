@@ -1,5 +1,8 @@
 import "@mypoint/tokens/tokens.css";
 
+export { scrollbarClassName } from "./styles/scrollbar.js";
+export type { ScrollbarSize } from "./styles/scrollbar.js";
+
 export { DesignSystemProvider } from "./DesignSystemProvider/index.js";
 export type {
   DesignSystemProviderProps
@@ -170,6 +173,26 @@ export type {
   SpinnerSize,
   SpinnerTone
 } from "./Spinner/index.js";
+export {
+  Sidebar,
+  SidebarCollapseTrigger,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarItem,
+  SidebarSubitem
+} from "./Sidebar/index.js";
+export type {
+  SidebarCollapseTriggerProps,
+  SidebarContentProps,
+  SidebarFooterProps,
+  SidebarGroupProps,
+  SidebarHeaderProps,
+  SidebarItemProps,
+  SidebarProps,
+  SidebarSubitemProps
+} from "./Sidebar/index.js";
 export { StatusIndicator } from "./StatusIndicator/index.js";
 export type {
   StatusIndicatorProps,

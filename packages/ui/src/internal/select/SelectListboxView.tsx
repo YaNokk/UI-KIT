@@ -14,6 +14,7 @@ import { Button } from "../../Button/Button";
 import { Spinner } from "../../Spinner/Spinner";
 import type { ChoiceControlSize } from "../../shared/choiceControl";
 import { classNames } from "../../shared/classNames";
+import { scrollbarClassName } from "../../styles/scrollbar";
 import { ChoiceIndicator } from "../choice-control/ChoiceControl";
 import { choiceControlLabelClassName } from "../single-line-control-typography/singleLineControlTypography";
 import type {
@@ -334,9 +335,13 @@ function SelectListboxViewInner<Value extends string>(
       // Only flat option collections reach this branch. Grouped collections
       // use the regular role="group" rendering below.
       return (
-      <VList data-select-scroll-owner="virtual" ref={virtualRef}>
+        <VList
+          className={scrollbarClassName()}
+          data-select-scroll-owner="virtual"
+          ref={virtualRef}
+        >
           {optionRows.map(renderRow)}
-      </VList>
+        </VList>
       );
     }
 
@@ -391,6 +396,7 @@ function SelectListboxViewInner<Value extends string>(
         aria-multiselectable={multiple ? true : undefined}
         className={classNames(
           styles.scroll,
+          scrollbarClassName(),
           virtualized && styles.virtualScrollHost
         )}
         data-select-scroll-owner={virtualized ? undefined : "listbox"}

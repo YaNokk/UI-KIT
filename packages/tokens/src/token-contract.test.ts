@@ -75,6 +75,20 @@ describe("icon token contract", () => {
   });
 });
 
+describe("scrollbar token contract", () => {
+  it("exposes the canonical default and compact geometry", () => {
+    expect(primitiveTokens["size.scrollbar.default"]).toEqual({ value: 4, unit: "px" });
+    expect(primitiveTokens["size.scrollbar.compact"]).toEqual({ value: 2, unit: "px" });
+  });
+
+  it.each(themes)("%s exposes a neutral, brand-independent thumb family", (_, tokens) => {
+    expect(tokens["scrollbar.thumb"]).toBeDefined();
+    expect(tokens["scrollbar.thumbHover"]).toBeDefined();
+    expect(tokens["scrollbar.thumb"]).not.toContain("{brand.");
+    expect(tokens["scrollbar.thumbHover"]).not.toContain("{brand.");
+  });
+});
+
 describe("system color token contract", () => {
   const colors = ["gray", "blue", "green", "amber", "red", "purple", "brand"];
   const roles = [
@@ -192,12 +206,13 @@ describe("layer token contract", () => {
     const layers = [
       primitiveTokens["zIndex.default"],
       primitiveTokens["zIndex.focused"],
+      primitiveTokens["zIndex.navigation"],
       primitiveTokens["zIndex.popover"],
       primitiveTokens["zIndex.modal"],
       primitiveTokens["zIndex.toast"]
     ] as number[];
 
-    expect(layers).toEqual([0, 100, 300, 500, 600]);
+    expect(layers).toEqual([0, 100, 200, 300, 500, 600]);
     layers.reduce((previous, value) => {
       expect(previous).toBeLessThan(value);
       return value;

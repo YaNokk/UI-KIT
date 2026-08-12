@@ -155,6 +155,10 @@
       "types": "./dist/Select/index.d.ts",
       "import": "./dist/Select/index.js"
     },
+    "./sidebar": {
+      "types": "./dist/Sidebar/index.d.ts",
+      "import": "./dist/Sidebar/index.js"
+    },
     "./spinner": {
       "types": "./dist/Spinner/index.d.ts",
       "import": "./dist/Spinner/index.js"

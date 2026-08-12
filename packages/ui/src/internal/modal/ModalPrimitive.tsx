@@ -17,6 +17,7 @@ import { IconButton } from "../../IconButton/IconButton";
 import { Portal } from "../../Portal/Portal";
 import { Text } from "../../Text/Text";
 import { classNames } from "../../shared/classNames";
+import { scrollbarClassName } from "../../styles/scrollbar";
 import {
   ModalFocusReturnContext,
   ModalLayerContext,
@@ -387,7 +388,10 @@ export function ModalPrimitive({
                     </div>
                   </header>
 
-                  <div className={styles.body} data-modal-scroll-container="">
+                  <div
+                    className={classNames(styles.body, scrollbarClassName())}
+                    data-modal-scroll-container=""
+                  >
                     {children}
                     {surfaceChildren}
                   </div>

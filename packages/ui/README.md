@@ -92,6 +92,15 @@ the optional `@mypoint/ui/fonts.css` entry.
 React и ReactDOM предоставляются consumer-приложением. Tailwind в consumer не
 требуется.
 
+## Scrollbar foundation
+
+Для существующих scroll owners доступна opt-in recipe
+`scrollbarClassName("default" | "compact")`. Она стандартизирует только внешний
+вид scrollbar в Firefox и WebKit/Blink и намеренно не задаёт `overflow` или
+размеры контейнера. Цвета используют semantic scrollbar tokens и автоматически
+следуют light/dark theme; runtime brand на них не влияет. Полный контракт и
+пример находятся в `src/styles/scrollbar.contract.md`.
+
 Компоненты доступны через root named exports и явные ESM subpaths:
 `@mypoint/ui/design-system-provider`, `@mypoint/ui/button`, `@mypoint/ui/button-link`,
 `@mypoint/ui/icon-button`, `@mypoint/ui/spinner`, `@mypoint/ui/text`, `@mypoint/ui/heading` и

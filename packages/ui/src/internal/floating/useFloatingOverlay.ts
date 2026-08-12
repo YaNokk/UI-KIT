@@ -5,6 +5,7 @@ import {
   offset,
   shift,
   size,
+  safePolygon,
   useClick,
   useFloating,
   useFocus,
@@ -29,7 +30,7 @@ import type {
   FloatingSemanticRole
 } from "./types";
 
-type FloatingInteraction = "click" | "tooltip";
+type FloatingInteraction = "click" | "hover" | "tooltip";
 
 export interface UseFloatingOverlayOptions {
   dismissOnEscape: boolean;
@@ -160,18 +161,19 @@ export function useFloatingOverlay({
     whileElementsMounted: autoUpdate
   });
   const click = useClick(floating.context, {
-    enabled: interactionEnabled && interaction === "click"
+    enabled: interactionEnabled && (interaction === "click" || interaction === "hover")
   });
   const hover = useHover(floating.context, {
     delay: {
       close: TOOLTIP_CLOSE_DELAY,
-      open: TOOLTIP_OPEN_DELAY
+      open: interaction === "hover" ? 0 : TOOLTIP_OPEN_DELAY
     },
-    enabled: interactionEnabled && interaction === "tooltip",
+    enabled: interactionEnabled && (interaction === "tooltip" || interaction === "hover"),
+    handleClose: interaction === "hover" ? safePolygon() : undefined,
     move: false
   });
   const focus = useFocus(floating.context, {
-    enabled: interactionEnabled && interaction === "tooltip"
+    enabled: interactionEnabled && (interaction === "tooltip" || interaction === "hover")
   });
   const semantics = useRole(floating.context, {
     enabled: interactionEnabled && role !== undefined,

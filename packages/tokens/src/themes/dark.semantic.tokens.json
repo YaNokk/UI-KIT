@@ -43,6 +43,10 @@
     "focus": { "$type": "color", "$value": "{brand.accentFocus}" },
     "danger": { "$type": "color", "$value": "{color.red.300}" }
   },
+  "scrollbar": {
+    "thumb": { "$type": "color", "$value": "{color.neutral.700}" },
+    "thumbHover": { "$type": "color", "$value": "{color.neutral.600}" }
+  },
   "control": {
     "background": { "$type": "color", "$value": "{background.surface}" },
     "backgroundHover": { "$type": "color", "$value": "{background.subtle}" },
@@ -189,14 +193,17 @@
     }
   },
   "navigation": {
+    "background": { "$type": "color", "$value": "{color.neutral.950}" },
+    "surface": { "$type": "color", "$value": "{color.neutral.900}" },
+    "border": { "$type": "color", "$value": "{color.neutral.800}" },
     "item": {
       "background": { "$type": "color", "$value": "transparent" },
-      "backgroundHover": { "$type": "color", "$value": "{background.subtle}" },
-      "backgroundActive": { "$type": "color", "$value": "{brand.accentSoft}" },
-      "text": { "$type": "color", "$value": "{text.secondary}" },
-      "textActive": { "$type": "color", "$value": "{brand.accentContent}" },
-      "icon": { "$type": "color", "$value": "{icon.secondary}" },
-      "iconActive": { "$type": "color", "$value": "{brand.accent}" }
+      "backgroundHover": { "$type": "color", "$value": "{navigation.surface}" },
+      "backgroundActive": { "$type": "color", "$value": "{brand.actionBackground}" },
+      "text": { "$type": "color", "$value": "{color.neutral.200}" },
+      "textActive": { "$type": "color", "$value": "{brand.actionForeground}" },
+      "icon": { "$type": "color", "$value": "{color.neutral.300}" },
+      "iconActive": { "$type": "color", "$value": "{brand.actionForeground}" }
     }
   },
   "focus": {

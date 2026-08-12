@@ -1,0 +1,64 @@
+.canvas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(calc(var(--ds-space-16) * 3), 1fr));
+  gap: var(--ds-space-6);
+  padding: var(--ds-space-6);
+  color: var(--ds-text-primary);
+  background: var(--ds-background-page);
+}
+
+.example {
+  display: grid;
+  gap: var(--ds-space-3);
+  min-inline-size: 0;
+}
+
+.label {
+  margin: 0;
+  font: var(--ds-typography-body-strong);
+}
+
+.vertical,
+.horizontal {
+  box-sizing: border-box;
+  background: var(--ds-background-surface);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-lg);
+}
+
+.vertical {
+  block-size: calc(var(--ds-space-16) * 3);
+  overflow-y: auto;
+  padding: var(--ds-space-3);
+}
+
+.horizontal {
+  max-inline-size: calc(var(--ds-space-16) * 4);
+  overflow-x: auto;
+  padding: var(--ds-space-3);
+}
+
+.list {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  min-block-size: var(--ds-size-control-md);
+  padding: var(--ds-space-2) var(--ds-space-3);
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-body-sm);
+  background: var(--ds-background-subtle);
+  border-radius: var(--ds-radius-md);
+}
+
+.wide {
+  inline-size: calc(var(--ds-space-16) * 8);
+  color: var(--ds-text-secondary);
+  font: var(--ds-typography-body-sm);
+  white-space: nowrap;
+}
+

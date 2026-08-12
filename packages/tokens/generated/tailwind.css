@@ -36,6 +36,8 @@
   --color-border-subtle: var(--ds-border-subtle);
   --color-border-focus: var(--ds-border-focus);
   --color-border-danger: var(--ds-border-danger);
+  --color-scrollbar-thumb: var(--ds-scrollbar-thumb);
+  --color-scrollbar-thumb-hover: var(--ds-scrollbar-thumb-hover);
   --color-control-background: var(--ds-control-background);
   --color-control-background-hover: var(--ds-control-background-hover);
   --color-control-background-disabled: var(--ds-control-background-disabled);
@@ -139,6 +141,9 @@
   --color-system-color-brand-border: var(--ds-system-color-brand-border);
   --color-system-color-brand-solid-background: var(--ds-system-color-brand-solid-background);
   --color-system-color-brand-on-solid: var(--ds-system-color-brand-on-solid);
+  --color-navigation-background: var(--ds-navigation-background);
+  --color-navigation-surface: var(--ds-navigation-surface);
+  --color-navigation-border: var(--ds-navigation-border);
   --color-navigation-item-background: var(--ds-navigation-item-background);
   --color-navigation-item-background-hover: var(--ds-navigation-item-background-hover);
   --color-navigation-item-background-active: var(--ds-navigation-item-background-active);

@@ -1,0 +1,36 @@
+.frame {
+  display: flex;
+  block-size: calc(var(--ds-space-16) * 9);
+  padding: var(--ds-space-4);
+  background: var(--ds-background-page);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+  color: var(--ds-text-on-inverse);
+  font: var(--ds-typography-body-strong);
+}
+
+.logo {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  inline-size: var(--ds-size-control-md);
+  block-size: var(--ds-size-control-md);
+  color: var(--ds-brand-action-foreground);
+  background: var(--ds-brand-action-background);
+  border-radius: var(--ds-radius-full);
+}
+
+.logo svg {
+  inline-size: var(--ds-size-icon-md);
+  block-size: var(--ds-size-icon-md);
+}
+
+.footerText {
+  color: var(--ds-navigation-item-text);
+  font: var(--ds-typography-caption);
+}
+
