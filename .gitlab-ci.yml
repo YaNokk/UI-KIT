@@ -61,3 +61,4 @@ publish:
     - npm run registry:configure -- --publish
     - npm publish --workspace=@mypoint/tokens --userconfig=.npmrc
     - npm publish --workspace=@mypoint/ui --userconfig=.npmrc
+    - npm publish --workspace=@mypoint/retail-ui --userconfig=.npmrc
