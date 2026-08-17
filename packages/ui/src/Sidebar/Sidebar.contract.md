@@ -35,6 +35,13 @@ permissions, feature flags, active-route detection or application menu data.
   `Sidebar.Content` keeps the canonical expanded canvas and the root clips only
   its inline overflow; this prevents temporary label rewrapping without making
   an item calculate Sidebar width, padding or border geometry.
+- Footer controls keep a fixed control block size and a stable icon coordinate
+  while root width changes. Footer padding/alignment does not switch between
+  modes; long labels are clipped and ellipsized before the collapsed rail hides
+  them. Reduced motion removes the root transition without changing geometry.
+- A closed expanded submenu has synchronized `aria-hidden` and native `inert`
+  state. The attribute is written through the DOM boundary so React 18 and 19
+  do not receive incompatible boolean/string serialization.
 - Navigation is intentionally a persistent dark/inverse surface in both
   application themes. Mode may tune its neutral aliases; runtime brand affects
   active/accent states, not the base navigation surface.

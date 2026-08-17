@@ -51,6 +51,9 @@ const storybookCsfTransform: Plugin = {
         "/packages/ui/src/internal/modal/ModalLayeringBrowserRegression.stories.tsx"
       )
       && !normalizedId.includes(
+        "/packages/ui/src/internal/modal/ModalFoundation.stories.tsx"
+      )
+      && !normalizedId.includes(
         "/packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx"
       )
       && !normalizedId.includes(
@@ -96,6 +99,9 @@ const storybookCsfTransform: Plugin = {
         "/packages/ui/src/Sidebar/Sidebar.stories.tsx"
       )
       && !normalizedId.includes(
+        "/packages/ui/src/Notification/Notification.stories.tsx"
+      )
+      && !normalizedId.includes(
         "/packages/ui/src/styles/Scrollbar.stories.tsx"
       )
       && !normalizedId.includes(
@@ -118,6 +124,7 @@ const storybookCsfTransform: Plugin = {
         "../../../packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/select/SharedFloatingTriggerBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/modal/ModalLayeringBrowserRegression.stories.tsx",
+        "../../../packages/ui/src/internal/modal/ModalFoundation.stories.tsx",
         "../../../packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/single-line-control-typography/SingleLineControlTypography.stories.tsx",
@@ -133,6 +140,7 @@ const storybookCsfTransform: Plugin = {
         "../../../packages/ui/src/DataTable/DataTable.stories.tsx",
         "../../../packages/ui/src/Pagination/Pagination.stories.tsx",
         "../../../packages/ui/src/Sidebar/Sidebar.stories.tsx",
+        "../../../packages/ui/src/Notification/Notification.stories.tsx",
         "../../../packages/ui/src/styles/Scrollbar.stories.tsx",
         "../../../packages/patterns/src/DataTablePatterns.stories.tsx"
       ],
@@ -185,6 +193,7 @@ export default defineConfig({
       "packages/ui/src/internal/select/SelectMultiSelectBrowserRegression.stories.tsx",
       "packages/ui/src/internal/select/SharedFloatingTriggerBrowserRegression.stories.tsx",
       "packages/ui/src/internal/modal/ModalLayeringBrowserRegression.stories.tsx",
+      "packages/ui/src/internal/modal/ModalFoundation.stories.tsx",
       "packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx",
       "packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx",
       "packages/ui/src/internal/single-line-control-typography/SingleLineControlTypography.stories.tsx",
@@ -200,6 +209,7 @@ export default defineConfig({
       "packages/ui/src/DataTable/DataTable.stories.tsx",
       "packages/ui/src/Pagination/Pagination.stories.tsx",
       "packages/ui/src/Sidebar/Sidebar.stories.tsx",
+      "packages/ui/src/Notification/Notification.stories.tsx",
       "packages/ui/src/styles/Scrollbar.stories.tsx",
       "packages/patterns/src/DataTablePatterns.stories.tsx"
     ],

@@ -375,6 +375,11 @@ export const SidebarGroup = forwardRef<HTMLDivElement, SidebarGroupProps>(
     });
     const submenuId = useId();
     const [flyoutOpen, setFlyoutOpen] = useState(false);
+    const setSubmenuRef = useCallback((submenu: HTMLDivElement | null) => {
+      if (!submenu) return;
+      if (open) submenu.removeAttribute("inert");
+      else submenu.setAttribute("inert", "");
+    }, [open]);
 
     const trigger = (
       <button
@@ -419,7 +424,7 @@ export const SidebarGroup = forwardRef<HTMLDivElement, SidebarGroupProps>(
               className={styles.submenu}
               data-open={open ? "" : undefined}
               id={submenuId}
-              inert={!open}
+              ref={setSubmenuRef}
             >
               <div className={styles.submenuClip}>
                 <div className={styles.submenuContent}>{children}</div>

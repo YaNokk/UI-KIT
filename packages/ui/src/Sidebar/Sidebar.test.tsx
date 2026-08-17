@@ -71,6 +71,27 @@ describe("Sidebar", () => {
     expect(group).toHaveAttribute("aria-expanded", "false");
   });
 
+  it("serializes inert without React warnings and keeps closed descendants out of tab order", async () => {
+    const user = userEvent.setup();
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    render(<Navigation />);
+
+    const group = screen.getByRole("button", { name: "Настройки" });
+    const submenu = document.getElementById(group.getAttribute("aria-controls") ?? "");
+    const profile = screen.getByRole("button", { name: "Профиль", hidden: true });
+    expect(submenu).toHaveAttribute("inert");
+    expect(submenu).toHaveAttribute("aria-hidden", "true");
+
+    expect(profile.closest("[inert]")).toBe(submenu);
+
+    await user.click(group);
+    expect(submenu).not.toHaveAttribute("inert");
+    expect(submenu).toHaveAttribute("aria-hidden", "false");
+    expect(error).not.toHaveBeenCalled();
+    expect(warn).not.toHaveBeenCalled();
+  });
+
   it("supports controlled group state", async () => {
     const user = userEvent.setup();
     const onOpenChange = vi.fn();

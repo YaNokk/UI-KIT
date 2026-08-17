@@ -124,6 +124,9 @@ export default defineConfig({
         "NumberInput/index": fileURLToPath(
           new URL("./src/NumberInput/index.ts", import.meta.url)
         ),
+        "Notification/index": fileURLToPath(
+          new URL("./src/Notification/index.ts", import.meta.url)
+        ),
         "PasswordInput/index": fileURLToPath(
           new URL("./src/PasswordInput/index.ts", import.meta.url)
         ),
@@ -135,6 +138,9 @@ export default defineConfig({
         ),
         "Select/index": fileURLToPath(
           new URL("./src/Select/index.ts", import.meta.url)
+        ),
+        "Sidebar/index": fileURLToPath(
+          new URL("./src/Sidebar/index.ts", import.meta.url)
         ),
         "MultiSelect/index": fileURLToPath(
           new URL("./src/MultiSelect/index.ts", import.meta.url)
@@ -189,6 +195,7 @@ export default defineConfig({
         || id === "@mypoint/tokens"
         || id === "@radix-ui/react-dialog"
         || id === "lucide-react"
+        || id === "sonner"
         || id === "virtua"
         || id === "date-fns"
         || id.startsWith("date-fns/")

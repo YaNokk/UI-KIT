@@ -24,6 +24,12 @@ if (!fixtureApp.includes('from "@mypoint/ui/date-time-input"')) {
 if (!fixtureApp.includes('from "@mypoint/ui/date-time-picker"')) {
   throw new Error("Consumer fixture must exercise the DateTimePicker package subpath.");
 }
+if (!fixtureApp.includes('from "@mypoint/ui/sidebar"')) {
+  throw new Error("Consumer fixture must exercise the Sidebar package subpath.");
+}
+if (!fixtureApp.includes('from "@mypoint/ui/notification"')) {
+  throw new Error("Consumer fixture must exercise the Notification package subpath.");
+}
 
 function run(args, extraEnvironment = {}) {
   const result = spawnSync(process.execPath, [npmCli, ...args], {

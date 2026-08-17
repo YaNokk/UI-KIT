@@ -8,6 +8,7 @@ import { CheckboxGroup } from "@mypoint/ui/checkbox-group";
 import { IconButton } from "@mypoint/ui/icon-button";
 import { InternationalPhoneInput } from "@mypoint/ui/international-phone-input";
 import { Spinner } from "@mypoint/ui/spinner";
+import { Sidebar } from "@mypoint/ui/sidebar";
 import { StatusIndicator } from "@mypoint/ui/status-indicator";
 import { Tag } from "@mypoint/ui/tag";
 import { Textarea } from "@mypoint/ui/textarea";
@@ -23,6 +24,7 @@ import { DateRangePicker } from "@mypoint/ui/date-range-picker";
 import { DateTimeRangeInput } from "@mypoint/ui/date-time-range-input";
 import { DateTimeRangePicker } from "@mypoint/ui/date-time-range-picker";
 import { NumberInput } from "@mypoint/ui/number-input";
+import { NotificationProvider, notify } from "@mypoint/ui/notification";
 import { Radio } from "@mypoint/ui/radio";
 import { RadioGroup } from "@mypoint/ui/radio-group";
 import { Switch } from "@mypoint/ui/switch";
@@ -38,6 +40,8 @@ export function App() {
       brand={{ accentColor: "#0080ff", foregroundColor: "#ffffff" }}
       mode="light"
     >
+      <NotificationProvider />
+      <Button onClick={() => notify.success({ title: "Package smoke test" })}>Notify</Button>
       <Button variant="primary">Сохранить</Button>
       <SubpathButton variant="soft">Подробнее</SubpathButton>
       <ButtonLink href="/orders" variant="secondary">Заказы</ButtonLink>
@@ -57,6 +61,7 @@ export function App() {
       <LinkButton>Повторить</LinkButton>
       <IconButton aria-label="Обновить" icon={<RefreshCw />} />
       <Spinner label="Загрузка заказов" tone="accent" />
+      <Sidebar aria-label="Package subpath smoke test" />
       <StatusIndicator color={statusColor} label="Сервис доступен" />
       <Tag color={statusColor} dot>Выполнен</Tag>
       <Badge color="red" label="3 непрочитанных уведомления">{3}</Badge>

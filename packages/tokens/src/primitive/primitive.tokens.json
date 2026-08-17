@@ -173,6 +173,9 @@
       "flyoutMin": { "$type": "dimension", "$value": { "value": 232, "unit": "px" } },
       "flyoutMax": { "$type": "dimension", "$value": { "value": 256, "unit": "px" } }
     },
+    "notification": {
+      "inline": { "$type": "dimension", "$value": { "value": 320, "unit": "px" } }
+    },
     "tableRow": {
       "compact": { "$type": "dimension", "$value": { "value": 40, "unit": "px" } },
       "default": { "$type": "dimension", "$value": { "value": 48, "unit": "px" } },

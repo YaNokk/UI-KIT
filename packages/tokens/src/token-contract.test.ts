@@ -112,6 +112,13 @@ describe("sidebar token contract", () => {
   });
 });
 
+describe("notification token contract", () => {
+  it("exposes the canonical transient feedback width", () => {
+    expect(primitiveTokens["size.notification.inline"])
+      .toEqual({ value: 320, unit: "px" });
+  });
+});
+
 describe("system color token contract", () => {
   const colors = ["gray", "blue", "green", "amber", "red", "purple", "brand"];
   const roles = [

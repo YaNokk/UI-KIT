@@ -4,11 +4,15 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 import {
   BarChart3,
   Boxes,
+  Bell,
   CircleHelp,
   Home,
+  LogOut,
   Package,
+  ShieldCheck,
   Settings,
-  Store
+  Store,
+  UserRound
 } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import styles from "./Sidebar.stories.module.css";
@@ -52,9 +56,18 @@ function DemoItems({ long = false }: { long?: boolean }) {
   );
 }
 
-function Footer({ detailed = false }: { detailed?: boolean }) {
+function Footer({ detailed = false, stress = false }: { detailed?: boolean; stress?: boolean }) {
   return (
     <Sidebar.Footer>
+      {stress ? (
+        <>
+          <Sidebar.Item icon={<UserRound />} label="Профиль администратора международной торговой площадки" />
+          <Sidebar.Item icon={<Bell />} label="Центр уведомлений и важных системных сообщений" />
+          <Sidebar.Item icon={<ShieldCheck />} label="Безопасность, разрешения и управление доступом" />
+          <Sidebar.Item icon={<Settings />} label="Настройки рабочего пространства организации" />
+          <Sidebar.Item icon={<LogOut />} label="Выйти из текущей учётной записи" />
+        </>
+      ) : null}
       <Sidebar.Item icon={<CircleHelp />} label="Помощь" />
       {detailed ? <span className={styles.footerText}>Версия интерфейса 1.0</span> : null}
     </Sidebar.Footer>
@@ -64,11 +77,13 @@ function Footer({ detailed = false }: { detailed?: boolean }) {
 function Example({
   collapsed = false,
   long = false,
-  alternateSlots = false
+  alternateSlots = false,
+  footerStress = false
 }: {
   collapsed?: boolean;
   long?: boolean;
   alternateSlots?: boolean;
+  footerStress?: boolean;
 }) {
   const [isCollapsed, setCollapsed] = useState(collapsed);
   return (
@@ -82,7 +97,7 @@ function Example({
         <Sidebar.Content aria-label="Разделы приложения">
           <DemoItems long={long} />
         </Sidebar.Content>
-        <Footer detailed={alternateSlots} />
+        <Footer detailed={alternateSlots} stress={footerStress} />
       </Sidebar>
     </div>
   );
@@ -118,6 +133,10 @@ export const Collapsed: Story = {
     const assertCanonicalGeometryAndCentered = () => {
       const sidebarRect = sidebar.getBoundingClientRect();
       const sidebarCenter = sidebarRect.left + sidebarRect.width / 2;
+      const collapseTrigger = canvas.getByRole("button", {
+        name: "Развернуть навигацию"
+      });
+      const collapseTriggerRect = collapseTrigger.getBoundingClientRect();
       const controls = sidebar.querySelectorAll<HTMLElement>("[data-sidebar-nav-control]");
       const rootStyles = getComputedStyle(document.documentElement);
       const canonicalWidth = rootStyles.getPropertyValue("--ds-size-sidebar-collapsed");
@@ -126,6 +145,14 @@ export const Collapsed: Story = {
       );
 
       expect(getComputedStyle(sidebar).inlineSize).toBe(canonicalWidth);
+      expect(getComputedStyle(sidebar).overflowX).toBe("visible");
+      expect(collapseTriggerRect.right).toBeGreaterThan(sidebarRect.right);
+      expect(collapseTriggerRect.left).toBeLessThan(sidebarRect.right);
+      const exposedPointElements = document.elementsFromPoint(
+        collapseTriggerRect.right - 1,
+        collapseTriggerRect.top + collapseTriggerRect.height / 2
+      );
+      expect(exposedPointElements).toContain(collapseTrigger);
       if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
         expect(getComputedStyle(sidebar).transitionDuration).toBe("0s");
       }
@@ -246,6 +273,59 @@ export const LongMenuScroll: Story = {
 };
 export const LongLabels: Story = { render: () => <Example /> };
 export const HeaderAndFooterSlots: Story = { render: () => <Example alternateSlots /> };
+
+export const FooterCollapseExpandGeometry: Story = {
+  render: () => <Example footerStress />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const sidebar = canvas.getByRole("complementary", { name: "Основная навигация" });
+    const footer = sidebar.lastElementChild as HTMLElement | null;
+    if (!footer) throw new Error("Sidebar footer geometry is unavailable");
+
+    const capture = () => {
+      const profile = canvas.getByRole("button", {
+        name: "Профиль администратора международной торговой площадки"
+      });
+      const icon = profile.firstElementChild as HTMLElement | null;
+      if (!icon) throw new Error("Sidebar footer icon is unavailable");
+      return {
+        blockSize: profile.getBoundingClientRect().height,
+        iconCenter: icon.getBoundingClientRect().left
+          + icon.getBoundingClientRect().width / 2
+          - sidebar.getBoundingClientRect().left
+      };
+    };
+    const expanded = capture();
+    await userEvent.click(canvas.getByRole("button", { name: "Свернуть навигацию" }));
+    const collapseBeginning = capture();
+    await new Promise((resolve) => setTimeout(resolve, 60));
+    const collapseMiddle = capture();
+    await new Promise((resolve) => setTimeout(resolve, 180));
+    const collapsed = capture();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Развернуть навигацию" }));
+    const expandBeginning = capture();
+    await new Promise((resolve) => setTimeout(resolve, 60));
+    const expandMiddle = capture();
+    await new Promise((resolve) => setTimeout(resolve, 180));
+    const expandedAgain = capture();
+
+    for (const state of [
+      collapseBeginning,
+      collapseMiddle,
+      collapsed,
+      expandBeginning,
+      expandMiddle,
+      expandedAgain
+    ]) {
+      expect(Math.abs(state.iconCenter - expanded.iconCenter)).toBeLessThanOrEqual(1);
+      expect(state.blockSize).toBe(expanded.blockSize);
+    }
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      expect(getComputedStyle(sidebar).transitionDuration).toBe("0s");
+    }
+  }
+};
 
 export const CollapsedFlyout: Story = {
   render: () => <Example collapsed />,

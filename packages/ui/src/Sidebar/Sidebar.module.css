@@ -43,7 +43,20 @@
 .footer {
   flex-direction: column;
   align-items: stretch;
+  padding-inline: var(--ds-space-3);
   border-block-start: var(--ds-border-width-default) solid var(--ds-navigation-border);
+}
+
+.footer .item {
+  block-size: var(--ds-size-control-md);
+  min-block-size: var(--ds-size-control-md);
+  padding-inline: var(--ds-space-2);
+}
+
+.footer .itemLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .content {
@@ -269,7 +282,13 @@
 }
 
 .root[data-collapsed] .footer {
+  align-items: stretch;
   inline-size: 100%;
+  padding-inline: var(--ds-space-3);
+}
+
+.root[data-collapsed] .footer .item {
+  justify-content: flex-start;
 }
 
 .root[data-collapsed] .item {

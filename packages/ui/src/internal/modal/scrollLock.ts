@@ -5,6 +5,7 @@ interface CapturedStyles {
   bodyInlineSize: string;
   bodyOverflow: string;
   bodyOverscrollBehavior: string;
+  bodyPaddingInlineEnd: string;
   bodyPosition: string;
   documentOverflow: string;
   documentOverflowX: string;
@@ -28,6 +29,7 @@ export function acquireDocumentScrollLock(
   const scrollX = view.scrollX;
   const scrollY = view.scrollY;
   const scrollbarWidth = Math.max(0, view.innerWidth - root.clientWidth);
+  const bodyPaddingInlineEnd = view.getComputedStyle(body).paddingInlineEnd;
   const captured: CapturedStyles = {
     bodyInsetBlockStart: body.style.insetBlockStart,
     bodyInsetInlineEnd: body.style.insetInlineEnd,
@@ -35,6 +37,7 @@ export function acquireDocumentScrollLock(
     bodyInlineSize: body.style.inlineSize,
     bodyOverflow: body.style.overflow,
     bodyOverscrollBehavior: body.style.overscrollBehavior,
+    bodyPaddingInlineEnd: body.style.paddingInlineEnd,
     bodyPosition: body.style.position,
     documentOverflow: root.style.overflow,
     documentOverflowX: root.style.overflowX,
@@ -43,12 +46,11 @@ export function acquireDocumentScrollLock(
   };
 
   /*
-   * Fixing the body prevents document movement without padding compensation.
-   * If a classic scrollbar already occupied layout space, `overflow-y: scroll`
-   * keeps exactly that gutter. Overlay/mobile scrollbars keep no gutter.
+   * The document must stop being a scroll owner while a modal branch is open.
+   * A classic scrollbar is compensated on the fixed body instead of keeping an
+   * active scrollbar on the root; overlay scrollbars need no compensation.
    */
-  root.style.overflowX = "hidden";
-  root.style.overflowY = scrollbarWidth > 0 ? "scroll" : "hidden";
+  root.style.overflow = "hidden";
   root.style.overscrollBehavior = "none";
   body.style.position = "fixed";
   body.style.insetBlockStart = `${-scrollY}px`;
@@ -57,6 +59,9 @@ export function acquireDocumentScrollLock(
   body.style.inlineSize = "auto";
   body.style.overflow = "hidden";
   body.style.overscrollBehavior = "none";
+  if (scrollbarWidth > 0) {
+    body.style.paddingInlineEnd = `calc(${bodyPaddingInlineEnd} + ${scrollbarWidth}px)`;
+  }
   root.dataset.dsScrollLocked = "";
 
   let released = false;
@@ -76,6 +81,7 @@ export function acquireDocumentScrollLock(
       body.style.inlineSize = captured.bodyInlineSize;
       body.style.overflow = captured.bodyOverflow;
       body.style.overscrollBehavior = captured.bodyOverscrollBehavior;
+      body.style.paddingInlineEnd = captured.bodyPaddingInlineEnd;
       delete root.dataset.dsScrollLocked;
       view.scrollTo(scrollX, scrollY);
     }

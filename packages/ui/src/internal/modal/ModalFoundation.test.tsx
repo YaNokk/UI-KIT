@@ -18,6 +18,7 @@ import { DesignSystemProvider } from "../../DesignSystemProvider/DesignSystemPro
 import { Dialog } from "../../Dialog/Dialog";
 import { Drawer } from "../../Drawer/Drawer";
 import type { ModalCloseReason } from "../../modal/types";
+import { acquireDocumentScrollLock } from "./scrollLock";
 
 class TestPointerEvent extends MouseEvent {
   isPrimary: boolean;
@@ -101,6 +102,38 @@ function FocusDiscoveryFixture({ explicitInvalid }: { explicitInvalid: boolean }
 }
 
 describe("Modal foundation", () => {
+  it("hides classic document scrollbars, compensates their gutter and restores scroll state", () => {
+    Object.defineProperty(document.documentElement, "clientWidth", {
+      configurable: true,
+      value: 1000
+    });
+    Object.defineProperty(window, "innerWidth", {
+      configurable: true,
+      value: 1017
+    });
+    Object.defineProperties(window, {
+      scrollX: { configurable: true, value: 4 },
+      scrollY: { configurable: true, value: 240 }
+    });
+    document.documentElement.style.overflowY = "auto";
+    document.body.style.position = "relative";
+    document.body.style.paddingInlineEnd = "3px";
+    const lock = acquireDocumentScrollLock(document);
+
+    expect(document.documentElement.style.overflow).toBe("hidden");
+    expect(document.documentElement.style.overflowY).not.toBe("scroll");
+    expect(document.body.style.overflow).toBe("hidden");
+    expect(document.body.style.position).toBe("fixed");
+    expect(document.body.style.insetBlockStart).toBe("-240px");
+    expect(document.body.style.paddingInlineEnd).toBe("calc(3px + 17px)");
+
+    lock.release();
+    expect(document.documentElement.style.overflowY).toBe("auto");
+    expect(document.body.style.position).toBe("relative");
+    expect(document.body.style.paddingInlineEnd).toBe("3px");
+    expect(window.scrollTo).toHaveBeenCalledWith(4, 240);
+  });
+
   it("keeps the modal-local floating container inside the inherited theme scope", async () => {
     render(
       <DesignSystemProvider mode="dark">

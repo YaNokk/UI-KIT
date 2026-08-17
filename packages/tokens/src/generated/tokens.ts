@@ -303,6 +303,10 @@ export const primitiveTokens = {
     "value": 256,
     "unit": "px"
   },
+  "size.notification.inline": {
+    "value": 320,
+    "unit": "px"
+  },
   "size.tableRow.compact": {
     "value": 40,
     "unit": "px"

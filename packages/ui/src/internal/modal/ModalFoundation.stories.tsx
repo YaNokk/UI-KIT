@@ -1,6 +1,6 @@
 import { useContext, useRef, useState, type ComponentType } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { BottomSheet } from "../../BottomSheet/BottomSheet";
 import { Button } from "../../Button/Button";
 import { DesignSystemProvider } from "../../DesignSystemProvider/DesignSystemProvider";
@@ -8,6 +8,7 @@ import { Dialog, type DialogProps } from "../../Dialog/Dialog";
 import { Drawer } from "../../Drawer/Drawer";
 import { Input } from "../../Input/Input";
 import { Portal } from "../../Portal/Portal";
+import { Select } from "../../Select/Select";
 import { Text } from "../../Text/Text";
 import type { ModalBaseProps } from "../../modal/types";
 import { ModalLayerContext } from "./ModalRuntime";
@@ -117,6 +118,42 @@ function LongContent() {
         </p>
       ))}
     </div>
+  );
+}
+
+const nestedSheetSelectItems = [
+  { label: "Основной склад", textValue: "Основной склад", value: "main" },
+  { label: "Резервный склад", textValue: "Резервный склад", value: "reserve" },
+  { label: "Транзитный склад", textValue: "Транзитный склад", value: "transit" }
+] as const;
+
+function BottomSheetWithSelectHarness() {
+  const [open, setOpen] = useState(true);
+  const [value, setValue] = useState<string | null>(null);
+  return (
+    <BottomSheet
+      closeLabel="Закрыть оформление заказа"
+      footer={<Button variant="primary">Продолжить</Button>}
+      onOpenChange={setOpen}
+      open={open}
+      title="Оформление заказа"
+    >
+      <div className="grid gap-4">
+        <Text as="p" variant="body">
+          На компактном viewport Select открывается как вложенный BottomSheet.
+        </Text>
+        <Select
+          block
+          items={nestedSheetSelectItems}
+          label="Склад отгрузки"
+          locale="ru-RU"
+          onChange={setValue}
+          placeholder="Выберите склад"
+          value={value}
+        />
+        <output aria-label="Выбранный склад">{value ?? "не выбран"}</output>
+      </div>
+    </BottomSheet>
   );
 }
 
@@ -386,6 +423,32 @@ export const BottomSheetDefault: Story = {
 export const BottomSheetLongContent: Story = {
   args: {} as DialogProps,
   render: () => <Harness kind="sheet"><LongContent /></Harness>
+};
+
+export const BottomSheetWithNestedSelectSheet: Story = {
+  args: {} as DialogProps,
+  render: () => <BottomSheetWithSelectHarness />,
+  globals: {
+    viewport: { isRotated: false, value: "mobile" }
+  },
+  play: async ({ canvasElement }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    const parent = await page.findByRole("dialog", { name: "Оформление заказа" });
+    await userEvent.click(page.getByRole("button", { name: /Склад отгрузки/ }));
+    const nested = await page.findByRole("dialog", { name: "Выбор" });
+    expect(parent).toBeVisible();
+    expect(nested).toBeVisible();
+    expect(canvasElement.ownerDocument.querySelectorAll(
+      "[data-modal-kind='bottom-sheet']"
+    )).toHaveLength(2);
+
+    await userEvent.click(page.getByRole("option", { name: "Резервный склад" }));
+    await waitFor(() => expect(page.queryByRole("dialog", { name: "Выбор" }))
+      .not.toBeInTheDocument());
+    expect(parent).toBeVisible();
+    expect(page.getByRole("status", { name: "Выбранный склад" }))
+      .toHaveTextContent("reserve");
+  }
 };
 
 export const BottomSheetSwipe: Story = {

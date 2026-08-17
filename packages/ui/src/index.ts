@@ -136,6 +136,16 @@ export type {
   NumberInputChangeMeta,
   NumberInputProps
 } from "./NumberInput/index.js";
+export { Notification, NotificationProvider, notify } from "./Notification/index.js";
+export type {
+  NotificationAction,
+  NotificationId,
+  NotificationOptions,
+  NotificationProps,
+  NotificationProviderProps,
+  NotificationVariant,
+  Notify
+} from "./Notification/index.js";
 export { PasswordInput } from "./PasswordInput/index.js";
 export type { PasswordInputProps } from "./PasswordInput/index.js";
 export { Radio } from "./Radio/index.js";

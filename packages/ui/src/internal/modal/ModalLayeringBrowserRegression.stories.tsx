@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { DatePicker } from "../../DatePicker/DatePicker";
+import { Button } from "../../Button/Button";
 import { Dialog } from "../../Dialog/Dialog";
 import { Drawer } from "../../Drawer/Drawer";
 import { Input } from "../../Input/Input";
@@ -11,6 +12,38 @@ const items = [
   { value: "alpha", label: "Альфа", textValue: "Альфа" },
   { value: "beta", label: "Бета", textValue: "Бета" }
 ];
+
+function DrawerDocumentScrollOwnershipFixture() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ alignContent: "start", display: "grid", gap: "1rem", minBlockSize: "180vh" }}>
+      <div
+        data-bounded-app-scroll-owner=""
+        style={{ blockSize: "12rem", overflow: "auto" }}
+      >
+        <div style={{ blockSize: "40rem" }}>Bounded application scroll owner</div>
+      </div>
+      <div style={{ insetBlockEnd: "1rem", insetInlineStart: "1rem", position: "fixed" }}>
+        <Button onClick={() => setOpen(true)} variant="secondary">
+          Открыть длинный Drawer
+        </Button>
+      </div>
+      <Drawer
+        closeLabel="Закрыть длинный Drawer"
+        footer={<Button onClick={() => setOpen(false)} variant="primary">Готово</Button>}
+        onOpenChange={setOpen}
+        open={open}
+        title="Длинный Drawer с фиксированным footer"
+      >
+        <div style={{ display: "grid", gap: "1rem" }}>
+          {Array.from({ length: 24 }, (_, index) => (
+            <p key={index}>Строка {index + 1}: длинный Drawer body content.</p>
+          ))}
+        </div>
+      </Drawer>
+    </div>
+  );
+}
 
 function elementsAtCenter(element: Element) {
   const rect = element.getBoundingClientRect();
@@ -461,12 +494,60 @@ export const NestedDrawerEscapeAndLayerOrder: Story = {
       expect(body.queryByRole("dialog", { name: "Layered child drawer" }))
         .toBeNull();
     });
+    expect(document.documentElement).toHaveAttribute("data-ds-scroll-locked");
     await expect(transitions).toHaveTextContent("select,child");
     await expect(body.getByRole("dialog", { name: "Layered parent drawer" }))
       .toBeVisible();
 
     await userEvent.keyboard("{Escape}");
     await waitFor(() => expect(body.queryByRole("dialog")).toBeNull());
+    expect(document.documentElement).not.toHaveAttribute("data-ds-scroll-locked");
     await expect(transitions).toHaveTextContent("select,child,parent");
+  }
+};
+
+export const DrawerDocumentScrollOwnership: Story = {
+  args: {} as never,
+  render: () => <DrawerDocumentScrollOwnershipFixture />,
+  play: async ({ canvasElement }) => {
+    const ownerDocument = canvasElement.ownerDocument;
+    const ownerWindow = ownerDocument.defaultView;
+    if (!ownerWindow) throw new Error("Missing Storybook window");
+    const page = within(ownerDocument.body);
+    ownerDocument.documentElement.style.overflowY = "scroll";
+    ownerWindow.scrollTo(0, 320);
+    const originalScrollY = ownerWindow.scrollY;
+    const originalBlankRange = Math.max(
+      0,
+      ownerDocument.documentElement.scrollHeight
+        - ownerDocument.documentElement.clientHeight
+    );
+
+    await userEvent.click(page.getByRole("button", { name: "Открыть длинный Drawer" }));
+    const drawer = page.getByRole("dialog", {
+      name: "Длинный Drawer с фиксированным footer"
+    });
+    const scrollContainer = drawer.querySelector<HTMLElement>(
+      "[data-modal-scroll-container]"
+    );
+    if (!scrollContainer) throw new Error("Missing Drawer scroll container");
+
+    expect(ownerDocument.documentElement.style.overflow).toBe("hidden");
+    expect(ownerDocument.documentElement.style.overflowY).not.toBe("scroll");
+    expect(ownerDocument.body.style.position).toBe("fixed");
+    expect(getComputedStyle(scrollContainer).overflowY).toBe("auto");
+    expect(drawer.querySelector("footer")).not.toBeNull();
+    expect(
+      ownerDocument.documentElement.scrollHeight
+        - ownerDocument.documentElement.clientHeight
+    ).toBeLessThanOrEqual(originalBlankRange);
+
+    scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    expect(scrollContainer.scrollTop).toBeGreaterThan(0);
+    await userEvent.click(page.getByRole("button", { name: "Готово" }));
+    expect(ownerDocument.documentElement).not.toHaveAttribute("data-ds-scroll-locked");
+    expect(ownerDocument.documentElement.style.overflowY).toBe("scroll");
+    expect(ownerWindow.scrollY).toBe(originalScrollY);
+    ownerDocument.documentElement.style.overflowY = "";
   }
 };
