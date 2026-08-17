@@ -4,9 +4,10 @@ export { notify } from "./notify.js";
 export type {
   NotificationAction,
   NotificationId,
-  NotificationOptions,
   NotificationProps,
   NotificationProviderProps,
   NotificationVariant,
+  NotifyAction,
+  NotifyOptions,
   Notify
 } from "./Notification.types.js";

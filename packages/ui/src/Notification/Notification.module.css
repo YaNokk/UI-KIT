@@ -9,35 +9,10 @@
   min-block-size: var(--ds-size-control-lg);
   padding: var(--ds-space-3);
   overflow: hidden;
-  color: var(--ds-text-primary);
-  background: var(--ds-background-surface-raised);
-  border: var(--ds-border-width-default) solid var(--ds-border-default);
+  border-width: var(--ds-border-width-default);
+  border-style: solid;
   border-radius: var(--ds-radius-xl);
   box-shadow: var(--ds-shadow-md);
-}
-
-.root[data-variant="success"] {
-  color: var(--ds-status-success-foreground);
-  background: var(--ds-status-success-background);
-  border-color: var(--ds-status-success-border);
-}
-
-.root[data-variant="error"] {
-  color: var(--ds-status-danger-foreground);
-  background: var(--ds-status-danger-background);
-  border-color: var(--ds-status-danger-border);
-}
-
-.root[data-variant="warning"] {
-  color: var(--ds-status-warning-foreground);
-  background: var(--ds-status-warning-background);
-  border-color: var(--ds-status-warning-border);
-}
-
-.root[data-variant="info"] {
-  color: var(--ds-status-info-foreground);
-  background: var(--ds-status-info-background);
-  border-color: var(--ds-status-info-border);
 }
 
 .icon {
@@ -136,7 +111,12 @@
   inline-size: var(--width);
 }
 
-.viewport[data-sonner-toaster]:hover .progress {
+.viewport[data-sonner-toaster]:hover .progress,
+.root[data-pointer-paused="true"] .progress {
+  animation-play-state: paused;
+}
+
+.root[data-document-hidden="true"] .progress {
   animation-play-state: paused;
 }
 
@@ -145,13 +125,27 @@
 }
 
 @media (--ds-below-md) {
-  .viewport[data-sonner-toaster] {
+  .viewport.viewport[data-sonner-toaster] {
+    left: max(var(--ds-space-4), env(safe-area-inset-left));
+    right: max(var(--ds-space-4), env(safe-area-inset-right));
+    width: auto;
     inset-inline: max(var(--ds-space-4), env(safe-area-inset-left)) max(var(--ds-space-4), env(safe-area-inset-right));
     inline-size: auto;
     transform: none;
   }
 
-  .viewport[data-sonner-toaster] [data-sonner-toast] {
+  .viewport.viewport[data-sonner-toaster][data-y-position="top"] {
+    top: max(var(--ds-space-4), env(safe-area-inset-top));
+  }
+
+  .viewport.viewport[data-sonner-toaster][data-y-position="bottom"] {
+    bottom: max(var(--ds-space-4), env(safe-area-inset-bottom));
+  }
+
+  .viewport.viewport[data-sonner-toaster] [data-sonner-toast] {
+    left: 0;
+    right: 0;
+    width: 100%;
     inset-inline: 0;
     inline-size: 100%;
   }

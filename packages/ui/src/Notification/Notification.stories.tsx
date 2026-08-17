@@ -1,12 +1,20 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, waitFor, within } from "storybook/test";
+import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 import { Button } from "../Button/Button";
 import { DesignSystemProvider } from "../DesignSystemProvider/DesignSystemProvider";
 import { Dialog } from "../Dialog/Dialog";
 import { Notification } from "./Notification";
 import { NotificationProvider } from "./NotificationProvider";
 import { notify } from "./notify";
+
+function NotificationStoryBoundary({ children }: { children: ReactNode }) {
+  useEffect(() => {
+    notify.dismiss();
+    return () => notify.dismiss();
+  }, []);
+  return children;
+}
 
 const meta = {
   title: "Components/Notification",
@@ -18,7 +26,7 @@ const meta = {
     (Story) => (
       <DesignSystemProvider>
         <NotificationProvider containerLabel="Уведомления" />
-        <Story />
+        <NotificationStoryBoundary><Story /></NotificationStoryBoundary>
       </DesignSystemProvider>
     )
   ]
@@ -51,40 +59,66 @@ export const ImperativeQueue: Story = {
   play: async () => {
     const page = within(document.body);
     await userEvent.click(page.getByRole("button", { name: "Success" }));
-    const notification = await page.findByRole("status");
+    const title = await page.findByText("Настройки сохранены", { exact: true });
+    const notification = title.closest("[data-notification]");
+    expect(notification).not.toBeNull();
+    if (!(notification instanceof HTMLElement)) return;
     expect(notification).toHaveTextContent("Настройки сохранены");
     expect(notification.getBoundingClientRect().width).toBe(320);
     const toaster = notification.closest("[data-sonner-toaster]");
     expect(toaster).not.toBeNull();
-    if (toaster) expect(window.getComputedStyle(toaster).zIndex).toBe("600");
+    if (toaster) {
+      expect(window.getComputedStyle(toaster).zIndex).toBe("600");
+      expect(toaster.closest("[aria-live=polite], [aria-live=assertive]")).toBeNull();
+      expect(toaster.closest("[aria-live=off]")).not.toBeNull();
+    }
   }
 };
 
+const firstDedupeDismiss = fn();
+const finalDedupeDismiss = fn();
+
 function DedupeFixture() {
-  const [count, setCount] = useState(0);
   return (
-    <Button onClick={() => {
-      const next = count + 1;
-      setCount(next);
-      notify.info({ duration: 10_000, id: "sync", title: `Синхронизация ${next}` });
-    }} variant="secondary">Обновить одно уведомление</Button>
+    <div style={{ display: "flex", gap: "var(--ds-space-3)" }}>
+      <Button onClick={() => notify.info({
+        description: "Подготовка данных",
+        duration: 10_000,
+        id: "sync",
+        onDismiss: firstDedupeDismiss,
+        title: "Синхронизация 1"
+      })} variant="secondary">Создать уведомление</Button>
+      <Button onClick={() => notify.error({
+        description: "Повторите попытку",
+        duration: 12_000,
+        id: "sync",
+        onDismiss: finalDedupeDismiss,
+        title: "Синхронизация 2"
+      })} variant="secondary">Обновить уведомление</Button>
+    </div>
   );
 }
 
 export const DeduplicateById: Story = {
   render: () => <DedupeFixture />,
   play: async () => {
+    firstDedupeDismiss.mockClear();
+    finalDedupeDismiss.mockClear();
     const page = within(document.body);
-    const trigger = page.getByRole("button", { name: "Обновить одно уведомление" });
-    await userEvent.click(trigger);
-    await userEvent.click(trigger);
+    await userEvent.click(page.getByRole("button", { name: "Создать уведомление" }));
+    await userEvent.click(page.getByRole("button", { name: "Обновить уведомление" }));
     await waitFor(() => {
       const syncNotifications = page
-        .getAllByRole("status")
+        .getAllByRole("alert")
         .filter((notification) => notification.textContent?.includes("Синхронизация"));
       expect(syncNotifications).toHaveLength(1);
       expect(syncNotifications[0]).toHaveTextContent("Синхронизация 2");
+      expect(syncNotifications[0]).toHaveTextContent("Повторите попытку");
     });
+    expect(firstDedupeDismiss).not.toHaveBeenCalled();
+    notify.dismiss("sync");
+    await waitFor(() => expect(finalDedupeDismiss).toHaveBeenCalledOnce());
+    expect(firstDedupeDismiss).not.toHaveBeenCalled();
   }
 };
 
@@ -120,5 +154,205 @@ export const DarkMode: Story = {
         <Notification closeButton={false} description="Тёмная тема использует те же semantic status roles" title="Настройки сохранены" variant="success" />
       </div>
     </DesignSystemProvider>
+  )
+};
+
+export const MobileSafeArea: Story = {
+  parameters: { viewport: { defaultViewport: "mobile" } },
+  render: () => (
+    <Button onClick={() => notify.info({
+      duration: 10_000,
+      title: "Мобильное уведомление",
+      description: "Поверхность использует доступную ширину и safe-area отступы."
+    })} variant="secondary">Показать мобильное уведомление</Button>
+  ),
+  play: async () => {
+    const page = within(document.body);
+    await userEvent.click(page.getByRole("button", { name: "Показать мобильное уведомление" }));
+    const title = await page.findByText("Мобильное уведомление", { exact: true });
+    const notification = title.closest("[data-notification]");
+    expect(notification).not.toBeNull();
+    if (!(notification instanceof HTMLElement)) return;
+    const bounds = notification.getBoundingClientRect();
+    expect(bounds.left).toBeGreaterThanOrEqual(0);
+    expect(bounds.right).toBeLessThanOrEqual(window.innerWidth);
+    expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(document.documentElement.clientWidth);
+    if (window.matchMedia("(max-width: 767px)").matches) {
+      expect(bounds.left).toBeGreaterThanOrEqual(16);
+      expect(document.documentElement.clientWidth - bounds.right).toBeGreaterThanOrEqual(16);
+      expect(bounds.left).toBeCloseTo(16, 0);
+      expect(document.documentElement.clientWidth - bounds.right).toBeCloseTo(16, 0);
+    } else {
+      expect(bounds.width).toBe(320);
+    }
+  }
+};
+
+export const Persistent: Story = {
+  render: () => (
+    <Button onClick={() => notify.warning({
+      persistent: true,
+      title: "Соединение потеряно",
+      description: "Уведомление останется до явного закрытия."
+    })} variant="secondary">Показать persistent</Button>
+  ),
+  play: async () => {
+    const page = within(document.body);
+    await userEvent.click(page.getByRole("button", { name: "Показать persistent" }));
+    const title = await page.findByText("Соединение потеряно", { exact: true });
+    const notification = title.closest("[data-notification]");
+    expect(notification).not.toBeNull();
+    if (!(notification instanceof HTMLElement)) return;
+    expect(notification.querySelector("[data-notification-progress]")).toBeNull();
+    expect(within(notification).getByRole("button", { name: "Закрыть уведомление" })).toBeInTheDocument();
+  }
+};
+
+const closeDismissHandler = fn();
+
+export const CloseButton: Story = {
+  render: () => (
+    <Button onClick={() => notify.info({
+      duration: 10_000,
+      onDismiss: closeDismissHandler,
+      title: "Закрываемое уведомление"
+    })} variant="secondary">
+      Показать уведомление
+    </Button>
+  ),
+  play: async () => {
+    closeDismissHandler.mockClear();
+    const page = within(document.body);
+    await userEvent.click(page.getByRole("button", { name: "Показать уведомление" }));
+    const title = await page.findByText("Закрываемое уведомление", { exact: true });
+    const notification = title.closest("[data-notification]");
+    expect(notification).not.toBeNull();
+    if (!(notification instanceof HTMLElement)) return;
+    await userEvent.click(within(notification).getByRole("button", { name: "Закрыть уведомление" }));
+    await waitFor(() => expect(notification).not.toBeInTheDocument());
+    expect(closeDismissHandler).toHaveBeenCalledOnce();
+  }
+};
+
+const actionHandler = fn();
+const actionDismissHandler = fn();
+
+export const ActionDismiss: Story = {
+  render: () => (
+    <Button onClick={() => notify.error({
+      action: { label: "Повторить", onClick: actionHandler },
+      duration: 10_000,
+      onDismiss: actionDismissHandler,
+      title: "Не удалось сохранить"
+    })} variant="secondary">Показать действие</Button>
+  ),
+  play: async () => {
+    actionHandler.mockClear();
+    actionDismissHandler.mockClear();
+    const page = within(document.body);
+    await userEvent.click(page.getByRole("button", { name: "Показать действие" }));
+    await userEvent.click(await page.findByRole("button", { name: "Повторить" }));
+    expect(actionHandler).toHaveBeenCalledOnce();
+    await waitFor(() => expect(actionDismissHandler).toHaveBeenCalledOnce());
+  }
+};
+
+const programmaticDismissHandler = fn();
+const dismissAllFirstHandler = fn();
+const dismissAllSecondHandler = fn();
+
+export const ProgrammaticDismiss: Story = {
+  render: () => (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--ds-space-3)" }}>
+      <Button onClick={() => {
+        notify.info({
+          duration: 10_000,
+          id: "programmatic",
+          onDismiss: programmaticDismissHandler,
+          title: "Фоновая операция завершена"
+        });
+        notify.dismiss("programmatic");
+      }} variant="secondary">Закрыть по id</Button>
+      <Button onClick={() => {
+        notify.info({ duration: 10_000, id: "dismiss-all-1", onDismiss: dismissAllFirstHandler, title: "Первая операция" });
+        notify.warning({ duration: 10_000, id: "dismiss-all-2", onDismiss: dismissAllSecondHandler, title: "Вторая операция" });
+        notify.dismiss();
+      }} variant="secondary">Закрыть все</Button>
+    </div>
+  ),
+  play: async () => {
+    programmaticDismissHandler.mockClear();
+    dismissAllFirstHandler.mockClear();
+    dismissAllSecondHandler.mockClear();
+    const page = within(document.body);
+    await userEvent.click(page.getByRole("button", { name: "Закрыть по id" }));
+    await waitFor(() => expect(programmaticDismissHandler).toHaveBeenCalledOnce());
+    await userEvent.click(page.getByRole("button", { name: "Закрыть все" }));
+    await waitFor(() => {
+      expect(dismissAllFirstHandler).toHaveBeenCalledOnce();
+      expect(dismissAllSecondHandler).toHaveBeenCalledOnce();
+    });
+  }
+};
+
+const autoDismissHandler = fn();
+
+export const AutoDismiss: Story = {
+  render: () => (
+    <Button onClick={() => notify.success({
+      duration: 300,
+      onDismiss: autoDismissHandler,
+      title: "Автоматически закрывается"
+    })} variant="secondary">Проверить auto-close</Button>
+  ),
+  play: async () => {
+    autoDismissHandler.mockClear();
+    const page = within(document.body);
+    await userEvent.click(page.getByRole("button", { name: "Проверить auto-close" }));
+    const title = await page.findByText("Автоматически закрывается", { exact: true });
+    const notification = title.closest("[data-notification]");
+    expect(notification).not.toBeNull();
+    if (!notification) return;
+    await waitFor(() => expect(notification).not.toBeInTheDocument(), { timeout: 1_200 });
+    expect(autoDismissHandler).toHaveBeenCalledOnce();
+  }
+};
+
+export const HoverPauseLifecycle: Story = {
+  render: () => (
+    <Button onClick={() => notify.success({
+      duration: 500,
+      title: "Сохранено",
+      description: "Ёлки, заявки и предложения обновлены."
+    })} variant="secondary">Проверить паузу</Button>
+  ),
+  play: async () => {
+    const page = within(document.body);
+    await userEvent.click(page.getByRole("button", { name: "Проверить паузу" }));
+    const title = await page.findByText("Сохранено", { exact: true });
+    const notification = title.closest("[data-notification]");
+    expect(notification).not.toBeNull();
+    if (!notification) return;
+    await userEvent.hover(notification);
+    const progress = notification.querySelector("[data-notification-progress]");
+    expect(progress).not.toBeNull();
+    if (progress && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      expect(window.getComputedStyle(progress).animationPlayState).toBe("paused");
+    }
+    await new Promise<void>((resolve) => window.setTimeout(resolve, 650));
+    expect(notification).toBeInTheDocument();
+    await userEvent.unhover(notification);
+    await waitFor(() => expect(notification).not.toBeInTheDocument(), { timeout: 1_200 });
+  }
+};
+
+export const LongCyrillicContent: Story = {
+  render: () => (
+    <Notification
+      closeButton={false}
+      description="Изменения ещё обрабатываются. Дождитесь завершения синхронизации заявок, предложений и справочников."
+      title="Предупреждение о синхронизации данных"
+      variant="warning"
+    />
   )
 };

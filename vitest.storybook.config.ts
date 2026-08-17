@@ -33,6 +33,9 @@ const storybookCsfTransform: Plugin = {
         "/packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx"
       )
       && !normalizedId.includes(
+        "/packages/ui/src/Alert/Alert.stories.tsx"
+      )
+      && !normalizedId.includes(
         "/packages/ui/src/FieldShell/InnerLabelClickBehavior.stories.tsx"
       )
       && !normalizedId.includes(
@@ -117,6 +120,7 @@ const storybookCsfTransform: Plugin = {
       fileName: id,
       previewLevelTags: [],
       stories: [
+        "../../../packages/ui/src/Alert/Alert.stories.tsx",
         "../../../packages/ui/src/DesignSystemProvider/DesignSystemProvider.stories.tsx",
         "../../../packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx",
         "../../../packages/ui/src/FieldShell/InnerLabelClickBehavior.stories.tsx",
@@ -186,6 +190,7 @@ export default defineConfig({
     name: "storybook",
     fileParallelism: false,
     include: [
+      "packages/ui/src/Alert/Alert.stories.tsx",
       "packages/ui/src/DesignSystemProvider/DesignSystemProvider.stories.tsx",
       "packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx",
       "packages/ui/src/FieldShell/InnerLabelClickBehavior.stories.tsx",

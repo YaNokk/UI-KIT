@@ -1,24 +1,57 @@
 import { Toaster, toast } from "sonner";
-import type { CSSProperties } from "react";
+import { useLayoutEffect, useRef, type CSSProperties } from "react";
 import { Notification } from "../Notification.js";
 import type {
   NotificationId,
-  NotificationOptions,
-  NotificationProviderProps
+  NotificationProviderProps,
+  NotifyOptions
 } from "../Notification.types.js";
 import styles from "../Notification.module.css";
 
 const TOASTER_ID = "ds-notifications";
 const DEFAULT_DURATION = 4_000;
+let mountedHostCount = 0;
+let missingProviderId = 0;
+let renderVersion = 0;
+
+interface NotificationLifecycle {
+  dismissed: boolean;
+  onDismiss?: () => void;
+}
+
+const lifecycleById = new Map<NotificationId, NotificationLifecycle>();
+
+function completeLifecycle(id: NotificationId) {
+  const lifecycle = lifecycleById.get(id);
+  if (!lifecycle || lifecycle.dismissed) return;
+  lifecycle.dismissed = true;
+  lifecycleById.delete(id);
+  lifecycle.onDismiss?.();
+}
 
 export function NotificationHost({
   containerLabel = "Notifications",
   visibleNotifications = 4
 }: NotificationProviderProps) {
+  const hostRef = useRef<HTMLElement>(null);
   const viewportStyle = {
     "--width": "var(--ds-size-notification-inline)",
     "--gap": "var(--ds-space-3)"
   } as CSSProperties;
+
+  useLayoutEffect(() => {
+    mountedHostCount += 1;
+    return () => {
+      mountedHostCount = Math.max(0, mountedHostCount - 1);
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    // Notification content owns polite/assertive semantics. Keeping the host
+    // at `off` also preserves Radix modal's aria-live exemption without a
+    // second announcement from Sonner's default polite region.
+    hostRef.current?.setAttribute("aria-live", "off");
+  });
 
   return (
     <Toaster
@@ -36,6 +69,7 @@ export function NotificationHost({
       }}
       offset="var(--ds-space-6)"
       position="top-right"
+      ref={hostRef}
       swipeDirections={["right", "left"]}
       style={viewportStyle}
       toastOptions={{ unstyled: true }}
@@ -44,22 +78,32 @@ export function NotificationHost({
   );
 }
 
-export function showNotification(options: NotificationOptions): NotificationId {
-  const duration = options.persistent ? Infinity : (options.duration ?? DEFAULT_DURATION);
-  let dismissed = false;
-  const handleDismiss = () => {
-    if (dismissed) return;
-    dismissed = true;
-    options.onDismiss?.();
-  };
+export function showNotification(options: NotifyOptions): NotificationId {
+  if (mountedHostCount === 0) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn(
+        "[mypoint/ui] notify() requires a mounted NotificationProvider. The notification was ignored."
+      );
+    }
+    missingProviderId += 1;
+    return `notification-missing-provider-${missingProviderId}`;
+  }
 
-  return toast.custom((id) => (
+  const duration = options.persistent ? Infinity : (options.duration ?? DEFAULT_DURATION);
+  const currentRenderVersion = ++renderVersion;
+  function handleDismiss() {
+    completeLifecycle(notificationId);
+  }
+  const notificationId: NotificationId = toast.custom((id) => (
     <Notification
       {...(options.action ? { action: {
         label: options.action.label,
         onClick: () => {
-          options.action?.onClick();
-          toast.dismiss(id);
+          try {
+            options.action?.onClick();
+          } finally {
+            toast.dismiss(id);
+          }
         }
       } } : {})}
       closeButton={options.closeButton ?? true}
@@ -67,6 +111,7 @@ export function showNotification(options: NotificationOptions): NotificationId {
       duration={duration}
       onClose={() => toast.dismiss(id)}
       persistent={options.persistent ?? false}
+      key={currentRenderVersion}
       title={options.title}
       variant={options.variant ?? "neutral"}
     />
@@ -78,6 +123,19 @@ export function showNotification(options: NotificationOptions): NotificationId {
     toasterId: TOASTER_ID,
     unstyled: true
   });
+
+  const lifecycle = lifecycleById.get(notificationId);
+  if (lifecycle && !lifecycle.dismissed) {
+    if (options.onDismiss === undefined) delete lifecycle.onDismiss;
+    else lifecycle.onDismiss = options.onDismiss;
+  } else {
+    lifecycleById.set(notificationId, {
+      dismissed: false,
+      ...(options.onDismiss === undefined ? {} : { onDismiss: options.onDismiss })
+    });
+  }
+
+  return notificationId;
 }
 
 export function dismissNotification(id?: NotificationId): void {

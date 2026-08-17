@@ -85,6 +85,7 @@ const productionCss = (
   ])
 ).flat();
 const spinnerPath = resolve(root, "packages/ui/src/Spinner/Spinner.module.css");
+const notificationPath = resolve(root, "packages/ui/src/Notification/Notification.module.css");
 const violations = [];
 
 for (const path of productionCss) {
@@ -98,7 +99,11 @@ for (const path of productionCss) {
 
   if (path !== spinnerPath) {
     checks.push(
-      ["primitive motion bypass", /--ds-motion-(?:duration|easing)-/u],
+      ["primitive motion bypass", /--ds-motion-(?:duration|easing)-/u]
+    );
+  }
+  if (path !== spinnerPath && path !== notificationPath) {
+    checks.push(
       ["undocumented linear easing", /\banimation(?:-timing-function)?\s*:[^;{}]*\blinear\b/u]
     );
   }

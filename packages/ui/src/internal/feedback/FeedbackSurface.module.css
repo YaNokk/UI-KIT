@@ -1,0 +1,29 @@
+.surface {
+  color: var(--ds-text-primary);
+  background: var(--ds-background-surface-raised);
+  border-color: var(--ds-border-default);
+}
+
+.surface[data-feedback-variant="success"] {
+  color: var(--ds-status-success-foreground);
+  background: var(--ds-status-success-background);
+  border-color: var(--ds-status-success-border);
+}
+
+.surface[data-feedback-variant="error"] {
+  color: var(--ds-status-danger-foreground);
+  background: var(--ds-status-danger-background);
+  border-color: var(--ds-status-danger-border);
+}
+
+.surface[data-feedback-variant="warning"] {
+  color: var(--ds-status-warning-foreground);
+  background: var(--ds-status-warning-background);
+  border-color: var(--ds-status-warning-border);
+}
+
+.surface[data-feedback-variant="info"] {
+  color: var(--ds-status-info-foreground);
+  background: var(--ds-status-info-background);
+  border-color: var(--ds-status-info-border);
+}

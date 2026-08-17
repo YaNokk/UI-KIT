@@ -1,15 +1,15 @@
 import type { ReactNode } from "react";
+import type { FeedbackVariant } from "../internal/feedback/feedback.types.js";
 
 export type NotificationId = string | number;
-export type NotificationVariant = "success" | "error" | "warning" | "info" | "neutral";
+export type NotificationVariant = FeedbackVariant;
 
 export interface NotificationAction {
   label: ReactNode;
   onClick: () => void;
 }
 
-export interface NotificationOptions {
-  id?: NotificationId;
+export interface NotificationProps {
   variant?: NotificationVariant;
   title: ReactNode;
   description?: ReactNode;
@@ -17,12 +17,25 @@ export interface NotificationOptions {
   closeButton?: boolean;
   duration?: number;
   persistent?: boolean;
-  onDismiss?: () => void;
-}
-
-export interface NotificationProps extends Omit<NotificationOptions, "id" | "onDismiss"> {
   closeLabel?: string;
   onClose?: () => void;
+}
+
+export interface NotifyAction {
+  label: string;
+  onClick: () => void;
+}
+
+export interface NotifyOptions {
+  id?: NotificationId;
+  variant?: NotificationVariant;
+  title: string;
+  description?: string;
+  action?: NotifyAction;
+  closeButton?: boolean;
+  duration?: number;
+  persistent?: boolean;
+  onDismiss?: () => void;
 }
 
 export interface NotificationProviderProps {
@@ -31,11 +44,11 @@ export interface NotificationProviderProps {
 }
 
 export interface Notify {
-  (options: NotificationOptions): NotificationId;
-  success(options: Omit<NotificationOptions, "variant">): NotificationId;
-  error(options: Omit<NotificationOptions, "variant">): NotificationId;
-  warning(options: Omit<NotificationOptions, "variant">): NotificationId;
-  info(options: Omit<NotificationOptions, "variant">): NotificationId;
-  neutral(options: Omit<NotificationOptions, "variant">): NotificationId;
+  (options: NotifyOptions): NotificationId;
+  success(options: Omit<NotifyOptions, "variant">): NotificationId;
+  error(options: Omit<NotifyOptions, "variant">): NotificationId;
+  warning(options: Omit<NotifyOptions, "variant">): NotificationId;
+  info(options: Omit<NotifyOptions, "variant">): NotificationId;
+  neutral(options: Omit<NotifyOptions, "variant">): NotificationId;
   dismiss(id?: NotificationId): void;
 }

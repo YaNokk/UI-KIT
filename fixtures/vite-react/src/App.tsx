@@ -1,4 +1,5 @@
 import { Amount } from "@mypoint/ui/amount";
+import { Alert } from "@mypoint/ui/alert";
 import { AmountInput } from "@mypoint/ui/amount-input";
 import { Badge } from "@mypoint/ui/badge";
 import { Button as SubpathButton } from "@mypoint/ui/button";
@@ -41,7 +42,8 @@ export function App() {
       mode="light"
     >
       <NotificationProvider />
-      <Button onClick={() => notify.success({ title: "Package smoke test" })}>Notify</Button>
+      <Alert title="Package smoke test" variant="info">Alert subpath resolves.</Alert>
+      <Button onClick={() => notify.success({ title: "Package smoke test" })} variant="secondary">Notify</Button>
       <Button variant="primary">Сохранить</Button>
       <SubpathButton variant="soft">Подробнее</SubpathButton>
       <ButtonLink href="/orders" variant="secondary">Заказы</ButtonLink>

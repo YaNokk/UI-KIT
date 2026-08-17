@@ -29,6 +29,8 @@ const packages = [
     required: [
       "dist/index.js",
       "dist/index.d.ts",
+      "dist/Alert/index.js",
+      "dist/Alert/index.d.ts",
       "dist/Amount/index.js",
       "dist/Amount/index.d.ts",
       "dist/AmountInput/index.js",

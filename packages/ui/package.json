@@ -11,6 +11,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./alert": {
+      "types": "./dist/Alert/index.d.ts",
+      "import": "./dist/Alert/index.js"
+    },
     "./amount": {
       "types": "./dist/Amount/index.d.ts",
       "import": "./dist/Amount/index.js"

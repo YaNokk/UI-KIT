@@ -55,6 +55,9 @@ export default defineConfig({
     lib: {
       entry: {
         index: fileURLToPath(new URL("./src/index.ts", import.meta.url)),
+        "Alert/index": fileURLToPath(
+          new URL("./src/Alert/index.ts", import.meta.url)
+        ),
         "DesignSystemProvider/index": fileURLToPath(
           new URL("./src/DesignSystemProvider/index.ts", import.meta.url)
         ),

@@ -8,6 +8,8 @@ export type {
   DesignSystemProviderProps
 } from "./DesignSystemProvider/index.js";
 export type { BrandInput, ThemeMode } from "@mypoint/tokens";
+export { Alert } from "./Alert/index.js";
+export type { AlertProps, AlertVariant } from "./Alert/index.js";
 export { DateInput } from "./DateInput/index.js";
 export type { DateInputCorrection, DateInputProps, DateValue } from "./DateInput/index.js";
 export { TimeInput } from "./TimeInput/index.js";
@@ -140,10 +142,11 @@ export { Notification, NotificationProvider, notify } from "./Notification/index
 export type {
   NotificationAction,
   NotificationId,
-  NotificationOptions,
   NotificationProps,
   NotificationProviderProps,
   NotificationVariant,
+  NotifyAction,
+  NotifyOptions,
   Notify
 } from "./Notification/index.js";
 export { PasswordInput } from "./PasswordInput/index.js";
