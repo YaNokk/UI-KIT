@@ -1,0 +1,168 @@
+.root {
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: var(--ds-size-icon-sm) minmax(0, 1fr) auto;
+  gap: var(--ds-space-3);
+  align-items: start;
+  inline-size: 100%;
+  min-block-size: var(--ds-size-control-lg);
+  padding: var(--ds-space-3);
+  overflow: hidden;
+  color: var(--ds-text-primary);
+  background: var(--ds-background-surface-raised);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
+  border-radius: var(--ds-radius-xl);
+  box-shadow: var(--ds-shadow-md);
+}
+
+.root[data-variant="success"] {
+  color: var(--ds-status-success-foreground);
+  background: var(--ds-status-success-background);
+  border-color: var(--ds-status-success-border);
+}
+
+.root[data-variant="error"] {
+  color: var(--ds-status-danger-foreground);
+  background: var(--ds-status-danger-background);
+  border-color: var(--ds-status-danger-border);
+}
+
+.root[data-variant="warning"] {
+  color: var(--ds-status-warning-foreground);
+  background: var(--ds-status-warning-background);
+  border-color: var(--ds-status-warning-border);
+}
+
+.root[data-variant="info"] {
+  color: var(--ds-status-info-foreground);
+  background: var(--ds-status-info-background);
+  border-color: var(--ds-status-info-border);
+}
+
+.icon {
+  inline-size: var(--ds-size-icon-sm);
+  block-size: var(--ds-size-icon-sm);
+  margin-block-start: var(--ds-space-1);
+  color: currentColor;
+  stroke-width: var(--ds-icon-stroke-default);
+}
+
+.content {
+  min-inline-size: 0;
+}
+
+.title {
+  font: var(--ds-typography-control-text-sm);
+  overflow-wrap: anywhere;
+}
+
+.description {
+  margin-block-start: var(--ds-space-1);
+  font: var(--ds-typography-caption);
+  overflow-wrap: anywhere;
+}
+
+.action,
+.close {
+  color: currentColor;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.action {
+  min-block-size: var(--ds-size-control-sm);
+  margin-block-start: var(--ds-space-1);
+  padding: 0;
+  font: var(--ds-typography-control-text-sm);
+  text-decoration: underline;
+  text-underline-offset: var(--ds-space-1);
+}
+
+.close {
+  display: grid;
+  place-items: center;
+  inline-size: var(--ds-size-control-sm);
+  block-size: var(--ds-size-control-sm);
+  margin: calc(var(--ds-space-1) * -1);
+  padding: 0;
+  border-radius: var(--ds-radius-md);
+}
+
+.close svg {
+  inline-size: var(--ds-size-icon-sm);
+  block-size: var(--ds-size-icon-sm);
+  stroke-width: var(--ds-icon-stroke-default);
+}
+
+.action:hover,
+.close:hover {
+  background: var(--ds-control-background-hover);
+}
+
+.action:focus-visible,
+.close:focus-visible {
+  outline: var(--ds-focus-ring-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-ring-width);
+}
+
+.progressTrack {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: var(--ds-border-width-strong);
+  overflow: hidden;
+  background: var(--ds-border-subtle);
+}
+
+.progress {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  background: currentColor;
+  transform-origin: inline-start center;
+  animation: notification-progress var(--ds-notification-duration) linear forwards;
+}
+
+.viewport[data-sonner-toaster] {
+  --width: var(--ds-size-notification-inline);
+  --gap: var(--ds-space-3);
+  z-index: var(--ds-z-index-toast);
+  font-family: var(--ds-font-family-sans);
+}
+
+.viewport[data-sonner-toaster] [data-sonner-toast] {
+  inline-size: var(--width);
+}
+
+.viewport[data-sonner-toaster]:hover .progress {
+  animation-play-state: paused;
+}
+
+@keyframes notification-progress {
+  to { transform: scaleX(0); }
+}
+
+@media (--ds-below-md) {
+  .viewport[data-sonner-toaster] {
+    inset-inline: max(var(--ds-space-4), env(safe-area-inset-left)) max(var(--ds-space-4), env(safe-area-inset-right));
+    inline-size: auto;
+    transform: none;
+  }
+
+  .viewport[data-sonner-toaster] [data-sonner-toast] {
+    inset-inline: 0;
+    inline-size: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress { animation: none; }
+
+  .viewport[data-sonner-toaster],
+  .viewport[data-sonner-toaster] [data-sonner-toast],
+  .viewport[data-sonner-toaster] [data-sonner-toast] > * {
+    transition: none;
+  }
+}
