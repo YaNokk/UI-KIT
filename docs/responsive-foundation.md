@@ -24,7 +24,8 @@ breakpoints are not added until a real layout failure requires them.
 primitive.tokens.json
 ├ generated/responsive.css
 │  ├ --ds-below-md: width < 768px
-│  └ --ds-md-up:    width >= 768px
+│  ├ --ds-md-up:    width >= 768px
+│  └ --ds-xl-up:    width >= 1280px
 ├ src/generated/responsive.ts
 │  ├ breakpoints
 │  └ mediaQueries
@@ -64,6 +65,7 @@ polyfill.
 breakpoints.md        // 768
 mediaQueries.belowMd  // "(width < 768px)"
 mediaQueries.mdUp     // "(width >= 768px)"
+mediaQueries.xlUp     // "(width >= 1280px)"
 ```
 
 These constants support internal JavaScript policy when a concrete consumer

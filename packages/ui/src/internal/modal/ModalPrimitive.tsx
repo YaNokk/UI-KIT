@@ -31,6 +31,8 @@ import type {
 } from "../../modal/types";
 import type { ModalKind } from "./types";
 import { useBottomSheetGesture } from "./useBottomSheetGesture";
+import { activateDrawerModalBoundary } from "./adjacentDrawerWorkspace";
+import { useAdjacentDrawerLayout } from "./useAdjacentDrawerLayout";
 import styles from "./ModalPrimitive.module.css";
 
 const BACKDROP_DRAG_TOLERANCE = 8;
@@ -103,6 +105,7 @@ export function ModalPrimitive({
   const parentFocusReturn = useContext(ModalFocusReturnContext);
   const store = useResolvedModalRuntime();
   const view = useModalEntryView(store, id);
+  const adjacentDrawerLayout = useAdjacentDrawerLayout();
   const openRef = useRef(open);
   const callbackRef = useRef(onOpenChange);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -112,10 +115,15 @@ export function ModalPrimitive({
   const previousOpenRef = useRef(false);
   const pendingReasonRef = useRef<ModalCloseReason | null>(null);
   const guardPointerRef = useRef<GuardPointerSequence | null>(null);
+  const drawerWorkspaceMotionRef = useRef(false);
   const handleFloatingContainerRef = useCallback(
     (node: HTMLDivElement | null) => setFloatingContainer(node),
     []
   );
+  const handleContentRef = useCallback((node: HTMLDivElement | null) => {
+    contentRef.current = node;
+    store?.setSurface(id, node);
+  }, [id, store]);
 
   openRef.current = open;
   callbackRef.current = onOpenChange;
@@ -182,6 +190,50 @@ export function ModalPrimitive({
     guardPointerRef.current = null;
   }, [open, view.top]);
 
+  const drawerUsesWorkspaceSemantics = kind === "drawer"
+    && adjacentDrawerLayout
+    && view.drawerBranchHasAdjacentPair;
+  const activeDrawerWorkspace = drawerUsesWorkspaceSemantics
+    && view.drawerWorkspaceActive;
+  if (kind !== "drawer" || !open) {
+    drawerWorkspaceMotionRef.current = false;
+  } else if (drawerUsesWorkspaceSemantics) {
+    // Keep motion suppressed for the parent after its child leaves the branch.
+    // Otherwise removing `data-drawer-presentation` restarts drawerEnter.
+    drawerWorkspaceMotionRef.current = true;
+  }
+
+  useLayoutEffect(() => {
+    if (
+      !store
+      || kind !== "drawer"
+      || !view.top
+      || !view.surfaceReady
+      || !contentRef.current
+    ) return;
+    if (
+      activeDrawerWorkspace
+      && view.drawerPresentation === "adjacent-child"
+      && view.drawerWorkspaceReady
+    ) {
+      const workspace = store.getActiveDrawerWorkspace(id);
+      if (!workspace) return;
+      return activateDrawerModalBoundary({
+        surfaces: [workspace.parent, workspace.child]
+      });
+    }
+    return activateDrawerModalBoundary({ surfaces: [contentRef.current] });
+  }, [
+    activeDrawerWorkspace,
+    id,
+    kind,
+    store,
+    view.drawerPresentation,
+    view.drawerWorkspaceReady,
+    view.surfaceReady,
+    view.top
+  ]);
+
   const handleOpenChange = (nextOpen: boolean) => {
     if (nextOpen) return;
     const reason = pendingReasonRef.current;
@@ -216,13 +268,22 @@ export function ModalPrimitive({
   };
 
   return (
-    <DialogPrimitive.Root open={view.active} onOpenChange={handleOpenChange}>
+    <DialogPrimitive.Root
+      modal={kind !== "drawer"}
+      open={view.active}
+      onOpenChange={handleOpenChange}
+    >
       <Portal>
         <div
           className={styles.portal}
+          data-modal-portal=""
           style={{ zIndex: view.guardLayer }}
         >
-          {view.top ? (
+          {(
+            activeDrawerWorkspace
+              ? view.drawerPresentation === "adjacent-parent"
+              : view.top
+          ) ? (
             <div
               aria-hidden="true"
               className={styles.guard}
@@ -273,12 +334,27 @@ export function ModalPrimitive({
           ) : null}
 
           <DialogPrimitive.Content
-            aria-modal="true"
+            aria-modal={
+              kind !== "drawer"
+              || (activeDrawerWorkspace
+                ? view.drawerPresentation === "adjacent-parent"
+                : view.top)
+                ? "true"
+                : undefined
+            }
             className={classNames(
               styles.surface,
               surfaceClassNames[kind],
               className
             )}
+            data-drawer-presentation={
+              kind === "drawer" ? view.drawerPresentation ?? undefined : undefined
+            }
+            data-drawer-workspace-motion={
+              kind === "drawer" && drawerWorkspaceMotionRef.current
+                ? "none"
+                : undefined
+            }
             data-modal-kind={kind}
             data-modal-surface=""
             data-motion-ready=""
@@ -310,7 +386,7 @@ export function ModalPrimitive({
               }
             }}
             onPointerDownOutside={(event) => {
-              event.preventDefault();
+              if (!activeDrawerWorkspace) event.preventDefault();
             }}
             onPointerMove={(event) => {
               guardPointerRef.current = null;
@@ -324,7 +400,7 @@ export function ModalPrimitive({
                 sheetGesture.onPointerUp(event);
               }
             }}
-            ref={contentRef}
+            ref={handleContentRef}
             style={layerStyle}
             tabIndex={-1}
           >
@@ -360,7 +436,10 @@ export function ModalPrimitive({
                     <div aria-hidden="true" className={styles.dragHandle} />
                   ) : null}
 
-                  <header className={styles.header}>
+                  <header className={classNames(
+                    styles.header,
+                    styles.sectionDivider
+                  )}>
                     <div className={styles.heading}>
                       <DialogPrimitive.Title asChild>
                         <Heading level={2} variant="md">
@@ -397,7 +476,10 @@ export function ModalPrimitive({
                   </div>
 
                   {footer != null ? (
-                    <footer className={styles.footer}>{footer}</footer>
+                    <footer className={classNames(
+                      styles.footer,
+                      styles.sectionDivider
+                    )}>{footer}</footer>
                   ) : null}
                 </ModalLayerContext.Provider>
               </ModalFocusReturnContext.Provider>

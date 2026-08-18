@@ -163,8 +163,10 @@ export default defineConfig({
     exclude: ["@mypoint/tokens"],
     include: [
       "@storybook/addon-vitest/internal/test-utils",
+      "aria-hidden",
       "markdown-to-jsx",
-      "react/jsx-dev-runtime"
+      "react/jsx-dev-runtime",
+      "tabbable"
     ]
   },
   plugins: [storybookCsfTransform, tailwindcss()],

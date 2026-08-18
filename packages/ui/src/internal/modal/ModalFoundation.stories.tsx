@@ -72,13 +72,21 @@ function Harness({
 
 function NestedHarness({
   childKind,
+  childOpenInitially = false,
+  childTitle,
+  rootTitle,
   rootKind
 }: {
   childKind: keyof typeof components;
+  childOpenInitially?: boolean;
+  childTitle?: string;
+  rootTitle?: string;
   rootKind: keyof typeof components;
 }) {
   const [rootOpen, setRootOpen] = useState(true);
-  const [childOpen, setChildOpen] = useState(false);
+  const [childOpen, setChildOpen] = useState(childOpenInitially);
+  const [childActions, setChildActions] = useState(0);
+  const [rootActions, setRootActions] = useState(0);
   const Root = components[rootKind];
   const Child = components[childKind];
   return (
@@ -90,22 +98,134 @@ function NestedHarness({
         closeLabel="Закрыть root"
         onOpenChange={setRootOpen}
         open={rootOpen}
-        title={`${rootKind} root`}
+        title={rootTitle ?? `${rootKind} root`}
       >
         <Button onClick={() => setChildOpen(true)} variant="secondary">
           Открыть child
         </Button>
+        <Button
+          onClick={() => setRootActions((value) => value + 1)}
+          variant="secondary"
+        >
+          Действие root
+        </Button>
+        <Input label="Поле root" />
+        <output aria-label="Действия root">{rootActions}</output>
         <Child
           closeLabel="Закрыть child"
           onOpenChange={setChildOpen}
           open={childOpen}
-          title={`${childKind} child`}
+          title={childTitle ?? `${childKind} child`}
         >
           <Input label="Поле child" />
+          <Button
+            onClick={() => setChildActions((value) => value + 1)}
+            variant="secondary"
+          >
+            Действие child
+          </Button>
+          <output aria-label="Действия child">{childActions}</output>
         </Child>
       </Root>
     </>
   );
+}
+
+function DrawerDrawerDialogHarness() {
+  const [childOpen, setChildOpen] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(true);
+  return (
+    <Drawer
+      closeLabel="Закрыть Drawer A"
+      onOpenChange={() => undefined}
+      open
+      title="Drawer A"
+    >
+      <Drawer
+        closeLabel="Закрыть Drawer B"
+        onOpenChange={setChildOpen}
+        open={childOpen}
+        title="Drawer B"
+      >
+        <Dialog
+          closeLabel="Закрыть Dialog C"
+          onOpenChange={setDialogOpen}
+          open={dialogOpen}
+          title="Dialog C"
+        >
+          Dialog не меняет существующую геометрию пары Drawer A → Drawer B.
+        </Dialog>
+      </Drawer>
+    </Drawer>
+  );
+}
+
+function ThreeDrawerHarness() {
+  const [aOpen, setAOpen] = useState(true);
+  const [bOpen, setBOpen] = useState(true);
+  const [cOpen, setCOpen] = useState(true);
+  return (
+    <Drawer closeLabel="Закрыть A" onOpenChange={setAOpen} open={aOpen} title="Drawer A">
+      <Drawer closeLabel="Закрыть B" onOpenChange={setBOpen} open={bOpen} title="Drawer B">
+        <Drawer closeLabel="Закрыть C" onOpenChange={setCOpen} open={cOpen} title="Drawer C">
+          Текущая contextual workspace
+        </Drawer>
+      </Drawer>
+    </Drawer>
+  );
+}
+
+async function assertDrawerPresentation({
+  adjacent = true,
+  fullscreen = false,
+  workspaceActive = adjacent
+}: {
+  adjacent?: boolean;
+  fullscreen?: boolean;
+  workspaceActive?: boolean;
+} = {}) {
+  const drawers = Array.from(document.querySelectorAll<HTMLElement>(
+    "[data-modal-kind='drawer']"
+  ));
+  const parent = drawers.find((drawer) => drawer.getAttribute(
+    "data-drawer-presentation"
+  ) === "adjacent-parent");
+  const child = drawers.find((drawer) => drawer.getAttribute(
+    "data-drawer-presentation"
+  ) === "adjacent-child");
+  if (!parent || !child) throw new Error("Missing nested Drawer pair");
+
+  expect(getComputedStyle(parent).insetInlineEnd).toBe("0px");
+  await waitFor(() => expect(getComputedStyle(child).insetInlineEnd)
+    .toBe(adjacent ? "500px" : "0px"));
+  if (!adjacent) {
+    expect(getComputedStyle(child).inlineSize)
+      .toBe(getComputedStyle(parent).inlineSize);
+  }
+  if (fullscreen) {
+    expect(getComputedStyle(child).inlineSize).toBe(`${window.innerWidth}px`);
+  }
+  const guards = document.querySelectorAll<HTMLElement>("[data-modal-guard]");
+  expect(guards).toHaveLength(1);
+  const guard = guards[0];
+  if (!guard) throw new Error("Missing modal guard");
+  if (workspaceActive) {
+    expect(guard).not.toHaveAttribute("data-dim");
+    expect(Number(guard.style.zIndex)).toBeLessThan(Number(parent.style.zIndex));
+    expect(parent).toHaveAttribute("aria-modal", "true");
+    expect(child).not.toHaveAttribute("aria-modal");
+    expect(getComputedStyle(parent).animationName).toBe("none");
+    expect(getComputedStyle(child).animationName).toBe("none");
+    expect(getComputedStyle(parent).borderRadius).toBe("0px");
+    expect(getComputedStyle(child).borderRadius).toBe("0px");
+    expect(getComputedStyle(parent).boxShadow).toBe("none");
+    expect(getComputedStyle(child).boxShadow).toBe("none");
+    expect(getComputedStyle(parent).opacity).toBe("1");
+    expect(getComputedStyle(parent).filter).toBe("none");
+  } else if (!adjacent) {
+    expect(guard).not.toHaveAttribute("data-dim");
+  }
+  expect(document.documentElement).toHaveAttribute("data-ds-scroll-locked");
 }
 
 function LongContent() {
@@ -119,6 +239,47 @@ function LongContent() {
       ))}
     </div>
   );
+}
+
+function SectionDividerHarness({ kind }: { kind: "dialog" | "drawer" }) {
+  const [open, setOpen] = useState(true);
+  const Component = components[kind];
+  return (
+    <Component
+      closeLabel="Закрыть surface"
+      footer={(
+        <>
+          <Button variant="secondary">Отменить</Button>
+          <Button variant="primary">Сохранить</Button>
+        </>
+      )}
+      headerActions={<Button variant="secondary">Дополнительно</Button>}
+      onOpenChange={setOpen}
+      open={open}
+      title={kind === "drawer" ? "Новый заказ" : "Создание записи"}
+    >
+      <LongContent />
+    </Component>
+  );
+}
+
+async function assertSectionDividers(title: string) {
+  const surface = within(document.body).getByRole("dialog", { name: title });
+  const header = surface.querySelector("header");
+  const body = surface.querySelector<HTMLElement>(
+    "[data-modal-scroll-container]"
+  );
+  const footer = surface.querySelector("footer");
+  if (!header || !body || !footer) {
+    throw new Error("Missing modal surface sections");
+  }
+  const headerStyle = getComputedStyle(header);
+  const footerStyle = getComputedStyle(footer);
+  expect(headerStyle.borderBlockEndWidth).toBe("1px");
+  expect(footerStyle.borderBlockStartWidth).toBe("1px");
+  expect(headerStyle.borderBlockEndColor)
+    .toBe(footerStyle.borderBlockStartColor);
+  expect(getComputedStyle(body).paddingBlockStart).toBe("16px");
 }
 
 const nestedSheetSelectItems = [
@@ -399,14 +560,191 @@ export const DrawerDefault: Story = {
   render: () => <Harness kind="drawer" />
 };
 
-export const DrawerNested: Story = {
+export const DrawerSectionDividers: Story = {
   args: {} as DialogProps,
-  render: () => <NestedHarness childKind="dialog" rootKind="drawer" />
+  render: () => <SectionDividerHarness kind="drawer" />,
+  play: async () => assertSectionDividers("Новый заказ")
 };
 
-export const DrawerToDrawer: Story = {
+export const DialogSectionDividers: Story = {
   args: {} as DialogProps,
-  render: () => <NestedHarness childKind="drawer" rootKind="drawer" />
+  render: () => <SectionDividerHarness kind="dialog" />,
+  play: async () => assertSectionDividers("Создание записи")
+};
+
+export const DrawerNested: Story = {
+  args: {} as DialogProps,
+  render: () => (
+    <NestedHarness childKind="dialog" childOpenInitially rootKind="drawer" />
+  ),
+  play: async () => {
+    expect(document.querySelector("[data-drawer-presentation]"))
+      .toBeNull();
+  }
+};
+
+export const DrawerAdjacentNested: Story = {
+  args: {} as DialogProps,
+  render: () => (
+    <NestedHarness
+      childKind="drawer"
+      childOpenInitially
+      childTitle="Клиент Иван Петров"
+      rootKind="drawer"
+      rootTitle="Заказ №123"
+    />
+  ),
+  globals: { viewport: { isRotated: false, value: "desktop" } },
+  play: async () => {
+    await assertDrawerPresentation();
+    const parent = document.querySelector<HTMLElement>(
+      "[data-drawer-presentation='adjacent-parent']"
+    );
+    const child = document.querySelector<HTMLElement>(
+      "[data-drawer-presentation='adjacent-child']"
+    );
+    if (!parent || !child) throw new Error("Missing cooperative Drawer pair");
+    const parentAction = within(parent).getByRole("button", {
+      name: "Действие root"
+    });
+    await userEvent.click(parentAction);
+    expect(within(parent).getByRole("status", {
+      name: "Действия root"
+    })).toHaveTextContent("1");
+    const parentInput = within(parent).getByRole("textbox", {
+      name: "Поле root"
+    });
+    await userEvent.click(parentInput);
+    expect(parentInput).toHaveFocus();
+    const childAction = within(child).getByRole("button", {
+      name: "Действие child"
+    });
+    await userEvent.click(childAction);
+    expect(within(child).getByRole("status", {
+      name: "Действия child"
+    })).toHaveTextContent("1");
+    const childInput = within(child).getByRole("textbox", {
+      name: "Поле child"
+    });
+    await userEvent.click(childInput);
+    expect(childInput).toHaveFocus();
+    await userEvent.click(within(child).getByRole("button", {
+      name: "Закрыть child"
+    }));
+    await waitFor(() => expect(document.querySelector(
+      "[data-drawer-presentation='adjacent-child']"
+    )).toBeNull());
+    expect(parent).not.toHaveAttribute("data-drawer-presentation");
+    expect(parent).toHaveAttribute("data-drawer-workspace-motion", "none");
+    expect(getComputedStyle(parent).animationName).toBe("none");
+    expect(getComputedStyle(parent).transform).toBe("none");
+    await userEvent.click(within(parent).getByRole("button", {
+      name: "Открыть child"
+    }));
+    await waitFor(() => expect(document.querySelector(
+      "[data-drawer-presentation='adjacent-child']"
+    )).not.toBeNull());
+    await assertDrawerPresentation();
+  }
+};
+
+export const DrawerAdjacentThreshold: Story = {
+  args: {} as DialogProps,
+  render: () => (
+    <NestedHarness
+      childKind="drawer"
+      childOpenInitially
+      childTitle="Клиент Иван Петров"
+      rootKind="drawer"
+      rootTitle="Заказ №123"
+    />
+  ),
+  globals: { viewport: { isRotated: false, value: "tablet" } },
+  play: async () => assertDrawerPresentation({ adjacent: false })
+};
+
+export const DrawerAdjacentMobile: Story = {
+  args: {} as DialogProps,
+  render: () => (
+    <NestedHarness childKind="drawer" childOpenInitially rootKind="drawer" />
+  ),
+  globals: { viewport: { isRotated: false, value: "mobile" } },
+  play: async () => assertDrawerPresentation({
+    adjacent: false,
+    fullscreen: true
+  })
+};
+
+export const DrawerAdjacentRtl: Story = {
+  args: {} as DialogProps,
+  render: () => (
+    <DesignSystemProvider dir="rtl">
+      <NestedHarness childKind="drawer" childOpenInitially rootKind="drawer" />
+    </DesignSystemProvider>
+  ),
+  globals: { viewport: { isRotated: false, value: "desktop" } },
+  play: async () => {
+    await assertDrawerPresentation();
+    const parent = document.querySelector<HTMLElement>(
+      "[data-drawer-presentation='adjacent-parent']"
+    );
+    const child = document.querySelector<HTMLElement>(
+      "[data-drawer-presentation='adjacent-child']"
+    );
+    if (!parent || !child) throw new Error("Missing RTL Drawer stack");
+    expect(Math.round(
+      child.getBoundingClientRect().left - parent.getBoundingClientRect().left
+    )).toBe(500);
+  }
+};
+
+export const DrawerAdjacentWithDialog: Story = {
+  args: {} as DialogProps,
+  render: () => <DrawerDrawerDialogHarness />,
+  globals: { viewport: { isRotated: false, value: "desktop" } },
+  play: async ({ canvasElement }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await assertDrawerPresentation({ workspaceActive: false });
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(page.queryByRole("dialog", {
+      name: "Dialog C"
+    })).toBeNull());
+    await assertDrawerPresentation();
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(page.queryByRole("dialog", {
+      name: "Drawer B"
+    })).toBeNull());
+    expect(document.querySelector("[data-drawer-presentation]"))
+      .toBeNull();
+    expect(page.getByRole("dialog", { name: "Drawer A" })).toBeVisible();
+  }
+};
+
+export const DrawerAdjacentThreeLevels: Story = {
+  args: {} as DialogProps,
+  render: () => <ThreeDrawerHarness />,
+  globals: { viewport: { isRotated: false, value: "desktop" } },
+  play: async ({ canvasElement }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    await assertDrawerPresentation();
+    expect(document.querySelector(
+      "[data-drawer-presentation='adjacent-parent']"
+    )).toHaveTextContent("Drawer B");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(page.queryByRole("dialog", {
+      name: "Drawer C"
+    })).toBeNull());
+    await assertDrawerPresentation();
+    expect(document.querySelector(
+      "[data-drawer-presentation='adjacent-parent']"
+    )).toHaveTextContent("Drawer A");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(page.queryByRole("dialog", {
+      name: "Drawer B"
+    })).toBeNull());
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(page.queryByRole("dialog")).toBeNull());
+  }
 };
 
 export const DrawerMobile: Story = {
@@ -511,7 +849,13 @@ export const BottomSheetDesignerReference: Story = {
 
 export const StackStress: Story = {
   args: {} as DialogProps,
-  render: () => <NestedHarness childKind="sheet" rootKind="drawer" />
+  render: () => (
+    <NestedHarness childKind="sheet" childOpenInitially rootKind="drawer" />
+  ),
+  play: async () => {
+    expect(document.querySelector("[data-drawer-presentation]"))
+      .toBeNull();
+  }
 };
 
 export const RadixNestedFocus: Story = {

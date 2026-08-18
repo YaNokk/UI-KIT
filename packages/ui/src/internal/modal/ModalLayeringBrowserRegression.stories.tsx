@@ -128,10 +128,11 @@ function FloatingAboveContentFixture() {
 
 function NestedEscapeFixture() {
   const [parentOpen, setParentOpen] = useState(true);
-  const [childOpen, setChildOpen] = useState(true);
+  const [childOpen, setChildOpen] = useState(false);
   const [selectOpen, setSelectOpen] = useState(true);
   const [value, setValue] = useState<string | null>(null);
   const [transitions, setTransitions] = useState<string[]>([]);
+  const [parentActions, setParentActions] = useState(0);
   const recordTransition = (
     transition: "select" | "child" | "parent"
   ) => {
@@ -149,6 +150,16 @@ function NestedEscapeFixture() {
         open={parentOpen}
         title="Layered parent drawer"
       >
+        <Button onClick={() => setChildOpen(true)} variant="secondary">
+          Open layered child drawer
+        </Button>
+        <Button
+          onClick={() => setParentActions((value) => value + 1)}
+          variant="secondary"
+        >
+          Parent workspace action
+        </Button>
+        <output aria-label="Parent workspace actions">{parentActions}</output>
         <Drawer
           closeLabel="Close child drawer"
           onOpenChange={(nextOpen) => {
@@ -473,10 +484,49 @@ export const FieldShellNarrowColumnHorizontalOverflow: Story = {
 export const NestedDrawerEscapeAndLayerOrder: Story = {
   args: {} as never,
   render: () => <NestedEscapeFixture />,
+  globals: { viewport: { isRotated: false, value: "desktop" } },
   play: async ({ canvasElement }) => {
     const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(body.getByRole("button", {
+      name: "Open layered child drawer"
+    }));
     const option = await body.findByRole("option", { name: "Альфа" });
     await expect(option.contains(elementsAtCenter(option)[0] ?? null)).toBe(true);
+
+    const drawers = Array.from(canvasElement.ownerDocument.querySelectorAll<HTMLElement>(
+      "[data-modal-kind='drawer']"
+    ));
+    const parentDrawer = drawers.find((drawer) => drawer.getAttribute(
+      "data-drawer-presentation"
+    ) === "adjacent-parent");
+    const childDrawer = drawers.find((drawer) => drawer.getAttribute(
+      "data-drawer-presentation"
+    ) === "adjacent-child");
+    const guard = canvasElement.ownerDocument.querySelector<HTMLElement>(
+      "[data-modal-guard]"
+    );
+    if (!parentDrawer || !childDrawer || !guard) {
+      throw new Error("Missing active Drawer stack layers");
+    }
+    await expect(getComputedStyle(parentDrawer).insetInlineEnd).toBe("0px");
+    await waitFor(() => expect(getComputedStyle(childDrawer).insetInlineEnd)
+      .toBe("500px"));
+    await expect(canvasElement.ownerDocument.querySelectorAll(
+      "[data-modal-guard]"
+    )).toHaveLength(1);
+    await waitFor(() => {
+      const parentBounds = parentDrawer.getBoundingClientRect();
+      const childBounds = childDrawer.getBoundingClientRect();
+      expect(Math.abs(childBounds.right - parentBounds.left))
+        .toBeLessThanOrEqual(1);
+    });
+    await expect(Number(guard.style.zIndex))
+      .toBeLessThan(Number(parentDrawer.style.zIndex));
+    await expect(guard).not.toHaveAttribute("data-dim");
+    await expect(parentDrawer).toHaveAttribute("aria-modal", "true");
+    await expect(childDrawer).not.toHaveAttribute("aria-modal");
+    await expect(getComputedStyle(parentDrawer).animationName).toBe("none");
+    await expect(getComputedStyle(childDrawer).animationName).toBe("none");
 
     const transitions = canvasElement.ownerDocument.querySelector(
       "output[aria-label='Layer escape transitions']"
@@ -489,6 +539,15 @@ export const NestedDrawerEscapeAndLayerOrder: Story = {
     await expect(body.getByRole("dialog", { name: "Layered child drawer" }))
       .toBeVisible();
 
+    const parentAction = body.getByRole("button", {
+      name: "Parent workspace action"
+    });
+    await userEvent.click(parentAction);
+    await expect(body.getByRole("status", {
+      name: "Parent workspace actions"
+    })).toHaveTextContent("1");
+    await expect(parentAction).toHaveFocus();
+
     await userEvent.keyboard("{Escape}");
     await waitFor(() => {
       expect(body.queryByRole("dialog", { name: "Layered child drawer" }))
@@ -496,8 +555,15 @@ export const NestedDrawerEscapeAndLayerOrder: Story = {
     });
     expect(document.documentElement).toHaveAttribute("data-ds-scroll-locked");
     await expect(transitions).toHaveTextContent("select,child");
-    await expect(body.getByRole("dialog", { name: "Layered parent drawer" }))
-      .toBeVisible();
+    const activeParent = body.getByRole("dialog", {
+      name: "Layered parent drawer"
+    });
+    await expect(activeParent).toBeVisible();
+    await expect(activeParent)
+      .not.toHaveAttribute("data-drawer-presentation");
+    await waitFor(() => expect(body.getByRole("button", {
+      name: "Open layered child drawer"
+    })).toHaveFocus());
 
     await userEvent.keyboard("{Escape}");
     await waitFor(() => expect(body.queryByRole("dialog")).toBeNull());

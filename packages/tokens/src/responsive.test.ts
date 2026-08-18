@@ -15,6 +15,7 @@ describe("responsive foundation", () => {
     expect(breakpoints.md).toBe(768);
     expect(mediaQueries.belowMd).toBe("(width < 768px)");
     expect(mediaQueries.mdUp).toBe("(width >= 768px)");
+    expect(mediaQueries.xlUp).toBe("(width >= 1280px)");
 
     const isBelowMd = (width: number) => width < breakpoints.md;
     expect([
@@ -31,6 +32,9 @@ describe("responsive foundation", () => {
     );
     expect(generated).toContain(
       "@custom-media --ds-md-up (width >= 768px);"
+    );
+    expect(generated).toContain(
+      "@custom-media --ds-xl-up (width >= 1280px);"
     );
 
     const result = await postcss([

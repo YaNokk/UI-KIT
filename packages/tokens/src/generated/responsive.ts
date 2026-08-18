@@ -10,7 +10,8 @@ export const breakpoints = {
 
 export const mediaQueries = {
   belowMd: "(width < 768px)",
-  mdUp: "(width >= 768px)"
+  mdUp: "(width >= 768px)",
+  xlUp: "(width >= 1280px)"
 } as const;
 
 export type BreakpointName = keyof typeof breakpoints;

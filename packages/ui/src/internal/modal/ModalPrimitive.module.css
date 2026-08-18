@@ -62,8 +62,7 @@
   inline-size: min(var(--ds-size-overlay-drawer-md), 100vw);
   border-block: 0;
   border-inline-end: 0;
-  border-radius: var(--ds-radius-xl) var(--ds-space-0) var(--ds-space-0)
-    var(--ds-radius-xl);
+  border-radius: var(--ds-space-0);
 }
 
 .bottomSheet {
@@ -124,6 +123,16 @@
   padding-block-end: var(--ds-space-5);
 }
 
+.sectionDivider {
+  border-color: var(--ds-border-subtle);
+  border-style: solid;
+  border-width: var(--ds-space-0);
+}
+
+.header.sectionDivider {
+  border-block-end-width: var(--ds-border-width-default);
+}
+
 .heading {
   display: grid;
   gap: var(--ds-space-1);
@@ -139,7 +148,7 @@
 .body {
   min-block-size: 0;
   min-inline-size: 0;
-  padding: var(--ds-space-0) var(--ds-space-6) var(--ds-space-6);
+  padding: var(--ds-space-4) var(--ds-space-6) var(--ds-space-6);
   overflow: auto;
   overscroll-behavior: contain;
   touch-action: pan-y;
@@ -152,7 +161,7 @@
   align-items: center;
   justify-content: flex-end;
   padding: var(--ds-space-4) var(--ds-space-6);
-  border-block-start: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-block-start-width: var(--ds-border-width-default);
 }
 
 .dragHandle {
@@ -182,11 +191,24 @@
   .drawer {
     inline-size: 100vw;
     border-inline-start: 0;
-    border-radius: var(--ds-space-0);
   }
 
   .dialog {
     inline-size: calc(100vw - var(--ds-space-4));
+  }
+}
+
+@media (--ds-xl-up) {
+  .drawer[data-drawer-workspace-motion="none"][data-motion-ready] {
+    animation: none;
+  }
+
+  .drawer[data-drawer-presentation] {
+    box-shadow: none;
+  }
+
+  .drawer[data-drawer-presentation="adjacent-child"] {
+    inset-inline-end: var(--ds-size-overlay-drawer-md);
   }
 }
 

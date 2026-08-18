@@ -11,6 +11,7 @@ declare const styles: {
   readonly header: string;
   readonly heading: string;
   readonly portal: string;
+  readonly sectionDivider: string;
   readonly surface: string;
 };
 

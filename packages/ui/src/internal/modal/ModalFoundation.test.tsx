@@ -34,6 +34,24 @@ class TestPointerEvent extends MouseEvent {
 }
 
 const originalVisualViewport = window.visualViewport;
+const originalMatchMedia = window.matchMedia;
+
+function setAdjacentDrawerLayout(matches: boolean) {
+  const query = {
+    addEventListener: vi.fn(),
+    addListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+    matches,
+    media: "(width >= 1280px)",
+    onchange: null,
+    removeEventListener: vi.fn(),
+    removeListener: vi.fn()
+  } as unknown as MediaQueryList;
+  Object.defineProperty(window, "matchMedia", {
+    configurable: true,
+    value: vi.fn(() => query)
+  });
+}
 
 beforeEach(() => {
   window.scrollTo = vi.fn();
@@ -50,6 +68,10 @@ afterEach(() => {
   Object.defineProperty(window, "visualViewport", {
     configurable: true,
     value: originalVisualViewport
+  });
+  Object.defineProperty(window, "matchMedia", {
+    configurable: true,
+    value: originalMatchMedia
   });
 });
 
@@ -99,6 +121,13 @@ function FocusDiscoveryFixture({ explicitInvalid }: { explicitInvalid: boolean }
       Body
     </Dialog>
   );
+}
+
+function modalSurface(title: string) {
+  const heading = screen.getByText(title);
+  const surface = heading.closest<HTMLElement>("[data-modal-surface]");
+  if (!surface) throw new Error(`Missing modal surface: ${title}`);
+  return surface;
 }
 
 describe("Modal foundation", () => {
@@ -459,6 +488,230 @@ describe("Modal foundation", () => {
     await waitFor(() => expect(childClose).toHaveBeenCalledWith("escape"));
     expect(parentClose).not.toHaveBeenCalled();
     expect(screen.getByRole("dialog", { name: "Parent" })).toBeInTheDocument();
+  });
+
+  it("marks the active direct Drawer pair for adjacent presentation", async () => {
+    setAdjacentDrawerLayout(true);
+
+    function DrawerStack() {
+      const [childOpen, setChildOpen] = useState(true);
+      const [childActions, setChildActions] = useState(0);
+      const [parentActions, setParentActions] = useState(0);
+      return (
+        <>
+          <button data-testid="outside-workspace">Outside workspace</button>
+          <Drawer
+            closeLabel="Close parent stack Drawer"
+            onOpenChange={() => undefined}
+            open
+            title="Parent stack Drawer"
+          >
+            <button onClick={() => setParentActions((value) => value + 1)}>
+              Parent workspace action
+            </button>
+            <output aria-label="Parent workspace actions">{parentActions}</output>
+            <Drawer
+              closeLabel="Close child stack Drawer"
+              onOpenChange={setChildOpen}
+              open={childOpen}
+              title="Child stack Drawer"
+            >
+              <button onClick={() => setChildActions((value) => value + 1)}>
+                Child workspace action
+              </button>
+              <output aria-label="Child workspace actions">{childActions}</output>
+            </Drawer>
+          </Drawer>
+        </>
+      );
+    }
+
+    const user = userEvent.setup();
+    render(<DrawerStack />);
+    await waitFor(() => expect(modalSurface("Parent stack Drawer"))
+      .toHaveAttribute("data-drawer-presentation", "adjacent-parent"));
+    expect(modalSurface("Child stack Drawer"))
+      .toHaveAttribute("data-drawer-presentation", "adjacent-child");
+    expect(modalSurface("Parent stack Drawer"))
+      .toHaveAttribute("data-drawer-workspace-motion", "none");
+    expect(modalSurface("Child stack Drawer"))
+      .toHaveAttribute("data-drawer-workspace-motion", "none");
+    expect(modalSurface("Parent stack Drawer"))
+      .toHaveAttribute("aria-modal", "true");
+    expect(modalSurface("Child stack Drawer"))
+      .not.toHaveAttribute("aria-modal");
+    expect(document.querySelectorAll("[data-modal-guard]")).toHaveLength(1);
+    const guard = document.querySelector<HTMLElement>("[data-modal-guard]");
+    if (!guard) throw new Error("Missing cooperative workspace guard");
+    expect(Number(guard.style.zIndex)).toBeLessThan(
+      Number(modalSurface("Parent stack Drawer").style.zIndex)
+    );
+    expect(document.documentElement).toHaveAttribute("data-ds-scroll-locked");
+
+    const parentAction = screen.getByRole("button", {
+      name: "Parent workspace action"
+    });
+    await user.click(parentAction);
+    expect(parentAction).toHaveFocus();
+    expect(screen.getByRole("status", {
+      name: "Parent workspace actions"
+    })).toHaveTextContent("1");
+    await user.click(screen.getByRole("button", {
+      name: "Child workspace action"
+    }));
+    expect(screen.getByRole("button", {
+      name: "Child workspace action"
+    })).toHaveFocus();
+    expect(screen.getByRole("status", {
+      name: "Child workspace actions"
+    })).toHaveTextContent("1");
+
+    screen.getByTestId("outside-workspace").focus();
+    await waitFor(() => expect(modalSurface("Child stack Drawer").contains(
+      document.activeElement
+    )).toBe(true));
+
+    parentAction.focus();
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByText("Child stack Drawer"))
+      .not.toBeInTheDocument());
+    expect(modalSurface("Parent stack Drawer"))
+      .not.toHaveAttribute("data-drawer-presentation");
+    expect(modalSurface("Parent stack Drawer"))
+      .toHaveAttribute("data-drawer-workspace-motion", "none");
+    expect(document.documentElement).toHaveAttribute("data-ds-scroll-locked");
+    expect(screen.getByTestId("outside-workspace").closest(
+      "[data-ds-drawer-workspace-suppressed]"
+    )).not.toBeNull();
+  });
+
+  it.each([
+    ["Dialog", Dialog],
+    ["BottomSheet", BottomSheet]
+  ] as const)("does not offset Drawer for a direct %s child", async (
+    childTitle,
+    Child
+  ) => {
+    render(
+      <Drawer
+        closeLabel="Close mixed parent"
+        onOpenChange={() => undefined}
+        open
+        title={`Parent with ${childTitle}`}
+      >
+        <Child
+          closeLabel={`Close child ${childTitle}`}
+          onOpenChange={() => undefined}
+          open
+          title={`Child ${childTitle}`}
+        >
+          Child body
+        </Child>
+      </Drawer>
+    );
+
+    await waitFor(() => expect(modalSurface(`Child ${childTitle}`))
+      .toBeInTheDocument());
+    expect(modalSurface(`Parent with ${childTitle}`))
+      .not.toHaveAttribute("data-drawer-presentation");
+  });
+
+  it.each([
+    ["Dialog", Dialog],
+    ["BottomSheet", BottomSheet]
+  ] as const)("keeps the Drawer pair when its child opens a %s", async (
+    overlayTitle,
+    Overlay
+  ) => {
+    setAdjacentDrawerLayout(true);
+    render(
+      <Drawer
+        closeLabel="Close level one"
+        onOpenChange={() => undefined}
+        open
+        title="Drawer level one"
+      >
+        <Drawer
+          closeLabel="Close level two"
+          onOpenChange={() => undefined}
+          open
+          title="Drawer level two"
+        >
+          <Overlay
+            closeLabel="Close level three"
+            onOpenChange={() => undefined}
+            open
+            title={`${overlayTitle} level three`}
+          >
+            Overlay body
+          </Overlay>
+        </Drawer>
+      </Drawer>
+    );
+
+    await waitFor(() => expect(modalSurface(`${overlayTitle} level three`))
+      .toBeInTheDocument());
+    expect(modalSurface("Drawer level one"))
+      .toHaveAttribute("data-drawer-presentation", "adjacent-parent");
+    expect(modalSurface("Drawer level two"))
+      .toHaveAttribute("data-drawer-presentation", "adjacent-child");
+    expect(modalSurface("Drawer level one")).not.toHaveAttribute("aria-modal");
+    expect(modalSurface("Drawer level two")).not.toHaveAttribute("aria-modal");
+    expect(modalSurface(`${overlayTitle} level three`))
+      .toHaveAttribute("aria-modal", "true");
+  });
+
+  it("limits three nested Drawers to the latest adjacent pair", async () => {
+    setAdjacentDrawerLayout(true);
+    render(
+      <Drawer closeLabel="Close A" onOpenChange={() => undefined} open title="Drawer A">
+        <Drawer closeLabel="Close B" onOpenChange={() => undefined} open title="Drawer B">
+          <Drawer closeLabel="Close C" onOpenChange={() => undefined} open title="Drawer C">
+            C body
+          </Drawer>
+        </Drawer>
+      </Drawer>
+    );
+
+    await waitFor(() => expect(modalSurface("Drawer C")).toBeInTheDocument());
+    expect(modalSurface("Drawer A"))
+      .not.toHaveAttribute("data-drawer-presentation");
+    expect(modalSurface("Drawer B"))
+      .toHaveAttribute("data-drawer-presentation", "adjacent-parent");
+    expect(modalSurface("Drawer C"))
+      .toHaveAttribute("data-drawer-presentation", "adjacent-child");
+    expect(modalSurface("Drawer A")).not.toHaveAttribute("aria-modal");
+    expect(modalSurface("Drawer B")).toHaveAttribute("aria-modal", "true");
+    expect(modalSurface("Drawer C")).not.toHaveAttribute("aria-modal");
+  });
+
+  it("keeps an overlaid nested Drawer top-only below the adjacent breakpoint", async () => {
+    setAdjacentDrawerLayout(false);
+    render(
+      <Drawer
+        closeLabel="Close narrow parent"
+        onOpenChange={() => undefined}
+        open
+        title="Narrow parent"
+      >
+        <Drawer
+          closeLabel="Close narrow child"
+          onOpenChange={() => undefined}
+          open
+          title="Narrow child"
+        >
+          Child body
+        </Drawer>
+      </Drawer>
+    );
+
+    await waitFor(() => expect(modalSurface("Narrow child")).toBeInTheDocument());
+    const guard = document.querySelector<HTMLElement>("[data-modal-guard]");
+    if (!guard) throw new Error("Missing narrow Drawer guard");
+    expect(Number(guard.style.zIndex)).toBeGreaterThan(
+      Number(modalSurface("Narrow parent").style.zIndex)
+    );
+    expect(modalSurface("Narrow child")).toHaveAttribute("aria-modal", "true");
   });
 
   it("keeps ancestor invalidation exact and never transfers it to a remount", async () => {
