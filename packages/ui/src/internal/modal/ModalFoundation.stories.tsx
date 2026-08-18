@@ -283,6 +283,10 @@ async function assertSectionDividers(title: string) {
   expect(footerStyle.borderBlockStartWidth).toBe("1px");
   expect(headerStyle.borderBlockEndColor)
     .toBe(footerStyle.borderBlockStartColor);
+  assertModalBodyStartSpacing(body);
+}
+
+function assertModalBodyStartSpacing(body: HTMLElement) {
   expect(getComputedStyle(body).paddingBlockStart).toBe("16px");
 }
 
@@ -777,7 +781,17 @@ export const DrawerMobile: Story = {
 
 export const BottomSheetDefault: Story = {
   args: {} as DialogProps,
-  render: () => <Harness kind="sheet" />
+  render: () => <Harness kind="sheet" />,
+  play: async () => {
+    const surface = within(document.body).getByRole("dialog", {
+      name: "sheet surface"
+    });
+    const body = surface.querySelector<HTMLElement>(
+      "[data-modal-scroll-container]"
+    );
+    if (!body) throw new Error("Missing BottomSheet body");
+    assertModalBodyStartSpacing(body);
+  }
 };
 
 export const BottomSheetLongContent: Story = {

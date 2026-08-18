@@ -148,7 +148,8 @@
 .body {
   min-block-size: 0;
   min-inline-size: 0;
-  padding: var(--ds-space-4) var(--ds-space-6) var(--ds-space-6);
+  padding-block: var(--ds-space-4) var(--ds-space-6);
+  padding-inline: var(--ds-space-6);
   overflow: auto;
   overscroll-behavior: contain;
   touch-action: pan-y;
@@ -180,7 +181,8 @@
 }
 
 .bottomSheet .body {
-  padding: var(--ds-space-0) var(--ds-space-5) var(--ds-space-3);
+  padding-block-end: var(--ds-space-3);
+  padding-inline: var(--ds-space-5);
 }
 
 .bottomSheet .footer {
