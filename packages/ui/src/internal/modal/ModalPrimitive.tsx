@@ -1,4 +1,6 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { FocusScope } from "@radix-ui/react-focus-scope";
+import { hideOthers } from "aria-hidden";
 import { X } from "lucide-react";
 import {
   useContext,
@@ -10,6 +12,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type ReactElement,
   type ReactNode
 } from "react";
 import { Heading } from "../../Heading/Heading";
@@ -52,6 +55,30 @@ interface GuardPointerSequence {
   pointerId: number;
   startX: number;
   startY: number;
+}
+
+interface ModalSurfaceFocusScopeProps {
+  children: ReactElement;
+  kind: SurfaceKind;
+  trapped: boolean;
+}
+
+function ModalSurfaceFocusScope({
+  children,
+  kind,
+  trapped
+}: ModalSurfaceFocusScopeProps) {
+  if (kind !== "drawer") return children;
+  return (
+    <FocusScope
+      loop
+      onMountAutoFocus={(event) => event.preventDefault()}
+      onUnmountAutoFocus={(event) => event.preventDefault()}
+      trapped={trapped}
+    >
+      {children}
+    </FocusScope>
+  );
 }
 
 const surfaceClassNames: Record<SurfaceKind, string> = {
@@ -116,6 +143,8 @@ export function ModalPrimitive({
   const pendingReasonRef = useRef<ModalCloseReason | null>(null);
   const guardPointerRef = useRef<GuardPointerSequence | null>(null);
   const drawerWorkspaceMotionRef = useRef(false);
+  const previousActiveDrawerWorkspaceRef = useRef(false);
+  const lastDrawerFocusRef = useRef<HTMLElement | null>(null);
   const handleFloatingContainerRef = useCallback(
     (node: HTMLDivElement | null) => setFloatingContainer(node),
     []
@@ -222,7 +251,7 @@ export function ModalPrimitive({
         surfaces: [workspace.parent, workspace.child]
       });
     }
-    return activateDrawerModalBoundary({ surfaces: [contentRef.current] });
+    return hideOthers(contentRef.current);
   }, [
     activeDrawerWorkspace,
     id,
@@ -233,6 +262,44 @@ export function ModalPrimitive({
     view.surfaceReady,
     view.top
   ]);
+
+  useEffect(() => {
+    const wasActiveDrawerWorkspace = previousActiveDrawerWorkspaceRef.current;
+    previousActiveDrawerWorkspaceRef.current = activeDrawerWorkspace;
+
+    if (
+      !wasActiveDrawerWorkspace
+      || activeDrawerWorkspace
+      || kind !== "drawer"
+      || !open
+      || !view.top
+      || !contentRef.current
+    ) {
+      return;
+    }
+
+    const surface = contentRef.current;
+    const ownerWindow = surface.ownerDocument.defaultView;
+    const restoreFocus = () => {
+      if (surface.contains(surface.ownerDocument.activeElement)) return;
+      const lastTarget = lastDrawerFocusRef.current;
+      const target = isValidFocusTarget(lastTarget) && surface.contains(lastTarget)
+        ? lastTarget
+        : surface;
+      target.focus({ preventScroll: true });
+    };
+
+    // Radix resumes the parent FocusScope asynchronously after the child scope
+    // leaves. Keep the adjacent -> standalone handoff inside the parent surface
+    // during that single frame; subsequent containment belongs to FocusScope.
+    if (ownerWindow?.requestAnimationFrame) {
+      const frame = ownerWindow.requestAnimationFrame(restoreFocus);
+      return () => ownerWindow.cancelAnimationFrame(frame);
+    }
+
+    const timeout = setTimeout(restoreFocus, 0);
+    return () => clearTimeout(timeout);
+  }, [activeDrawerWorkspace, kind, open, view.top]);
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (nextOpen) return;
@@ -333,15 +400,16 @@ export function ModalPrimitive({
             />
           ) : null}
 
-          <DialogPrimitive.Content
-            aria-modal={
-              kind !== "drawer"
-              || (activeDrawerWorkspace
-                ? view.drawerPresentation === "adjacent-parent"
-                : view.top)
-                ? "true"
-                : undefined
-            }
+          <ModalSurfaceFocusScope
+            kind={kind}
+            trapped={kind === "drawer" && !activeDrawerWorkspace && view.top}
+          >
+            <DialogPrimitive.Content
+              aria-modal={
+                kind !== "drawer" || (!activeDrawerWorkspace && view.top)
+                  ? "true"
+                  : undefined
+              }
             className={classNames(
               styles.surface,
               surfaceClassNames[kind],
@@ -359,6 +427,11 @@ export function ModalPrimitive({
             data-modal-surface=""
             data-motion-ready=""
             onCloseAutoFocus={handleCloseAutoFocus}
+            onFocusCapture={(event) => {
+              if (kind === "drawer" && event.target instanceof HTMLElement) {
+                lastDrawerFocusRef.current = event.target;
+              }
+            }}
             onEscapeKeyDown={(event) => {
               if (!view.top || !dismissOnEscape) {
                 event.preventDefault();
@@ -484,7 +557,8 @@ export function ModalPrimitive({
                 </ModalLayerContext.Provider>
               </ModalFocusReturnContext.Provider>
             </ModalParentContext.Provider>
-          </DialogPrimitive.Content>
+            </DialogPrimitive.Content>
+          </ModalSurfaceFocusScope>
         </div>
       </Portal>
     </DialogPrimitive.Root>

@@ -91,7 +91,11 @@ function NestedHarness({
   const Child = components[childKind];
   return (
     <>
-      <Button onClick={() => setRootOpen(true)} variant="secondary">
+      <Button
+        data-testid="open-root"
+        onClick={() => setRootOpen(true)}
+        variant="secondary"
+      >
         Открыть root
       </Button>
       <Root
@@ -212,7 +216,7 @@ async function assertDrawerPresentation({
   if (workspaceActive) {
     expect(guard).not.toHaveAttribute("data-dim");
     expect(Number(guard.style.zIndex)).toBeLessThan(Number(parent.style.zIndex));
-    expect(parent).toHaveAttribute("aria-modal", "true");
+    expect(parent).not.toHaveAttribute("aria-modal");
     expect(child).not.toHaveAttribute("aria-modal");
     expect(getComputedStyle(parent).animationName).toBe("none");
     expect(getComputedStyle(child).animationName).toBe("none");
@@ -628,6 +632,16 @@ export const DrawerAdjacentNested: Story = {
     });
     await userEvent.click(childInput);
     expect(childInput).toHaveFocus();
+    await userEvent.tab();
+    expect(childAction).toHaveFocus();
+    await userEvent.tab();
+    expect(parent).toContainElement(document.activeElement as HTMLElement);
+    const parentClose = within(parent).getByRole("button", {
+      name: "Закрыть root"
+    });
+    parentClose.focus();
+    await userEvent.tab({ shift: true });
+    expect(child).toContainElement(document.activeElement as HTMLElement);
     await userEvent.click(within(child).getByRole("button", {
       name: "Закрыть child"
     }));
@@ -638,6 +652,14 @@ export const DrawerAdjacentNested: Story = {
     expect(parent).toHaveAttribute("data-drawer-workspace-motion", "none");
     expect(getComputedStyle(parent).animationName).toBe("none");
     expect(getComputedStyle(parent).transform).toBe("none");
+    const outsideTrigger = document.querySelector<HTMLElement>(
+      "[data-testid='open-root']"
+    );
+    if (!outsideTrigger) throw new Error("Missing outside root trigger");
+    outsideTrigger.focus();
+    await waitFor(() => expect(parent).toContainElement(
+      document.activeElement as HTMLElement
+    ));
     await userEvent.click(within(parent).getByRole("button", {
       name: "Открыть child"
     }));

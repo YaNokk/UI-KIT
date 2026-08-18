@@ -163,6 +163,7 @@ export default defineConfig({
     exclude: ["@mypoint/tokens"],
     include: [
       "@storybook/addon-vitest/internal/test-utils",
+      "@radix-ui/react-focus-scope",
       "aria-hidden",
       "markdown-to-jsx",
       "react/jsx-dev-runtime",

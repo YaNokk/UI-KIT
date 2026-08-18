@@ -32,10 +32,23 @@ enter/exit motion is intentionally disabled. The parent keeps that no-motion
 state for the remainder of its current open lifecycle after the child closes,
 so returning from a pair cannot restart the standalone enter animation.
 
+The two adjacent surfaces remain separately named `dialog` regions. Neither
+claims `aria-modal`, because they are sibling portal surfaces and no single
+dialog DOM subtree owns the whole workspace. The shared isolation boundary
+hides everything outside both portal roots and traps focus across their union.
+This keeps both regions available to assistive technology without a false
+single-owner modal claim.
+
 Opening a Dialog or BottomSheet above the pair restores normal top-only modal
 interaction until that overlay closes. Below `xl`, including the fullscreen
 compact layout, the child overlays its parent and remains the only interactive
 Drawer. For A → B → C, only B/C form the cooperative pair and A is suppressed.
+Standalone, narrow overlay and mobile fullscreen Drawer use the upstream Radix
+`FocusScope` trapping behavior plus the same `hideOthers` isolation primitive
+used by Radix Dialog. The custom tabbable traversal is limited to the wide
+multi-surface workspace. The internal Radix Root remains in stable non-modal
+mode because changing its `modal` flag swaps Content implementations and would
+remount a nested controlled Drawer while the pair is being established.
 
 Header and footer section boundaries share the modal foundation divider style:
 the existing default border width with the semantic subtle border color. No

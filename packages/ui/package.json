@@ -233,6 +233,7 @@
     "@maskito/phone": "^4.0.1",
     "@mypoint/tokens": "^0.1.6",
     "@radix-ui/react-dialog": "1.1.23",
+    "@radix-ui/react-focus-scope": "1.1.16",
     "@tanstack/react-table": "^9.1.0",
     "aria-hidden": "^1.2.6",
     "date-fns": "^4.4.0",

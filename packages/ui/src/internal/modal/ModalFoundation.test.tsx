@@ -537,7 +537,7 @@ describe("Modal foundation", () => {
     expect(modalSurface("Child stack Drawer"))
       .toHaveAttribute("data-drawer-workspace-motion", "none");
     expect(modalSurface("Parent stack Drawer"))
-      .toHaveAttribute("aria-modal", "true");
+      .not.toHaveAttribute("aria-modal");
     expect(modalSurface("Child stack Drawer"))
       .not.toHaveAttribute("aria-modal");
     expect(document.querySelectorAll("[data-modal-guard]")).toHaveLength(1);
@@ -547,6 +547,9 @@ describe("Modal foundation", () => {
       Number(modalSurface("Parent stack Drawer").style.zIndex)
     );
     expect(document.documentElement).toHaveAttribute("data-ds-scroll-locked");
+    expect(screen.getByTestId("outside-workspace").closest(
+      "[data-ds-drawer-workspace-suppressed]"
+    )).not.toBeNull();
 
     const parentAction = screen.getByRole("button", {
       name: "Parent workspace action"
@@ -556,12 +559,11 @@ describe("Modal foundation", () => {
     expect(screen.getByRole("status", {
       name: "Parent workspace actions"
     })).toHaveTextContent("1");
-    await user.click(screen.getByRole("button", {
+    const childAction = screen.getByRole("button", {
       name: "Child workspace action"
-    }));
-    expect(screen.getByRole("button", {
-      name: "Child workspace action"
-    })).toHaveFocus();
+    });
+    await user.click(childAction);
+    expect(childAction).toHaveFocus();
     expect(screen.getByRole("status", {
       name: "Child workspace actions"
     })).toHaveTextContent("1");
@@ -582,6 +584,9 @@ describe("Modal foundation", () => {
     expect(document.documentElement).toHaveAttribute("data-ds-scroll-locked");
     expect(screen.getByTestId("outside-workspace").closest(
       "[data-ds-drawer-workspace-suppressed]"
+    )).toBeNull();
+    expect(screen.getByTestId("outside-workspace").closest(
+      "[data-aria-hidden='true']"
     )).not.toBeNull();
   });
 
@@ -681,7 +686,7 @@ describe("Modal foundation", () => {
     expect(modalSurface("Drawer C"))
       .toHaveAttribute("data-drawer-presentation", "adjacent-child");
     expect(modalSurface("Drawer A")).not.toHaveAttribute("aria-modal");
-    expect(modalSurface("Drawer B")).toHaveAttribute("aria-modal", "true");
+    expect(modalSurface("Drawer B")).not.toHaveAttribute("aria-modal");
     expect(modalSurface("Drawer C")).not.toHaveAttribute("aria-modal");
   });
 

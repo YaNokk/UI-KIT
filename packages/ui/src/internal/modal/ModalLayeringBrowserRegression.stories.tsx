@@ -523,7 +523,7 @@ export const NestedDrawerEscapeAndLayerOrder: Story = {
     await expect(Number(guard.style.zIndex))
       .toBeLessThan(Number(parentDrawer.style.zIndex));
     await expect(guard).not.toHaveAttribute("data-dim");
-    await expect(parentDrawer).toHaveAttribute("aria-modal", "true");
+    await expect(parentDrawer).not.toHaveAttribute("aria-modal");
     await expect(childDrawer).not.toHaveAttribute("aria-modal");
     await expect(getComputedStyle(parentDrawer).animationName).toBe("none");
     await expect(getComputedStyle(childDrawer).animationName).toBe("none");
