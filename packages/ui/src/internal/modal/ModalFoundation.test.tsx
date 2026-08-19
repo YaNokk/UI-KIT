@@ -590,6 +590,66 @@ describe("Modal foundation", () => {
     )).not.toBeNull();
   });
 
+  it("uses the semantic Drawer size and the actual parent size for adjacent offset", async () => {
+    setAdjacentDrawerLayout(true);
+    render(
+      <Drawer
+        closeLabel="Close large parent"
+        onOpenChange={() => undefined}
+        open
+        size="lg"
+        title="Large parent"
+      >
+        <Drawer
+          closeLabel="Close medium child"
+          onOpenChange={() => undefined}
+          open
+          size="md"
+          title="Medium child"
+        >
+          Child
+        </Drawer>
+      </Drawer>
+    );
+
+    await waitFor(() => expect(modalSurface("Medium child"))
+      .toHaveAttribute("data-drawer-presentation", "adjacent-child"));
+    expect(modalSurface("Large parent")).toHaveAttribute("data-drawer-size", "lg");
+    expect(modalSurface("Medium child")).toHaveAttribute("data-drawer-size", "md");
+    expect(modalSurface("Medium child"))
+      .toHaveAttribute("data-adjacent-parent-size", "lg");
+  });
+
+  it("renders stable leading, heading, trailing and footer regions", async () => {
+    render(
+      <Drawer
+        closeLabel="Close chrome"
+        footer={<button>Primary footer action</button>}
+        headerActions={<button>Overflow actions</button>}
+        headerLeading={<button>Consumer leading control</button>}
+        onOpenChange={() => undefined}
+        open
+        title="Chrome regions"
+      >
+        Short body
+      </Drawer>
+    );
+
+    const surface = await screen.findByRole("dialog", { name: "Chrome regions" });
+    const header = surface.querySelector("header");
+    const body = surface.querySelector<HTMLElement>("[data-modal-scroll-container]");
+    const footer = surface.querySelector("footer");
+    if (!body || !footer) throw new Error("Missing Drawer body/footer regions");
+    expect(header).toHaveAttribute("data-has-leading");
+    expect(header).toContainElement(screen.getByRole("button", { name: "Consumer leading control" }));
+    expect(header).toContainElement(screen.getByRole("button", { name: "Overflow actions" }));
+    expect(header).toContainElement(screen.getByRole("button", { name: "Close chrome" }));
+    expect(body).toHaveTextContent("Short body");
+    expect(footer).toContainElement(screen.getByRole("button", { name: "Primary footer action" }));
+    expect(Array.from(surface.children).indexOf(body))
+      .toBeLessThan(Array.from(surface.children).indexOf(footer));
+  });
+
   it.each([
     ["Dialog", Dialog],
     ["BottomSheet", BottomSheet]

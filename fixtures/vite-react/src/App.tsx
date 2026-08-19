@@ -26,12 +26,16 @@ import { DateTimeRangeInput } from "@mypoint/ui/date-time-range-input";
 import { DateTimeRangePicker } from "@mypoint/ui/date-time-range-picker";
 import { NumberInput } from "@mypoint/ui/number-input";
 import { NotificationProvider, notify } from "@mypoint/ui/notification";
+import { Drawer } from "@mypoint/ui/drawer";
+import { ActionMenu } from "@mypoint/ui/action-menu";
+import { ModalFooterActions } from "@mypoint/ui/modal-footer";
+import { ModalHeaderActions } from "@mypoint/ui/modal-header";
 import { Radio } from "@mypoint/ui/radio";
 import { RadioGroup } from "@mypoint/ui/radio-group";
 import { Switch } from "@mypoint/ui/switch";
 import { QuantityInput } from "@mypoint/retail-ui/quantity-input";
 import "@mypoint/retail-ui/styles.css";
-import { RefreshCw } from "lucide-react";
+import { ChevronLeft, RefreshCw } from "lucide-react";
 
 export function App() {
   const statusColor: SystemColor = "green";
@@ -42,6 +46,22 @@ export function App() {
       mode="light"
     >
       <NotificationProvider />
+      <ActionMenu
+        actions={[{ id: "copy", label: "Copy", onSelect: () => undefined }]}
+        trigger={<SubpathButton variant="secondary">Actions</SubpathButton>}
+      />
+      <Drawer
+        closeLabel="Close package Drawer"
+        footer={<ModalFooterActions primary={<SubpathButton variant="primary">Save</SubpathButton>} />}
+        headerActions={<ModalHeaderActions actions={[{ id: "copy", label: "Copy", onSelect: () => undefined }]} />}
+        headerLeading={<IconButton aria-label="Back" icon={<ChevronLeft />} />}
+        onOpenChange={() => undefined}
+        open={false}
+        size="lg"
+        title="Package Drawer"
+      >
+        Drawer package smoke test
+      </Drawer>
       <Alert title="Package smoke test" variant="info">Alert subpath resolves.</Alert>
       <Button onClick={() => notify.success({ title: "Package smoke test" })} variant="secondary">Notify</Button>
       <Button variant="primary">Сохранить</Button>

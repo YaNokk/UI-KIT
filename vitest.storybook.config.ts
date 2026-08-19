@@ -36,6 +36,9 @@ const storybookCsfTransform: Plugin = {
         "/packages/ui/src/Alert/Alert.stories.tsx"
       )
       && !normalizedId.includes(
+        "/packages/ui/src/ActionMenu/ActionMenu.stories.tsx"
+      )
+      && !normalizedId.includes(
         "/packages/ui/src/FieldShell/InnerLabelClickBehavior.stories.tsx"
       )
       && !normalizedId.includes(
@@ -55,6 +58,9 @@ const storybookCsfTransform: Plugin = {
       )
       && !normalizedId.includes(
         "/packages/ui/src/internal/modal/ModalFoundation.stories.tsx"
+      )
+      && !normalizedId.includes(
+        "/packages/ui/src/Drawer/DrawerChrome.stories.tsx"
       )
       && !normalizedId.includes(
         "/packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx"
@@ -121,6 +127,7 @@ const storybookCsfTransform: Plugin = {
       previewLevelTags: [],
       stories: [
         "../../../packages/ui/src/Alert/Alert.stories.tsx",
+        "../../../packages/ui/src/ActionMenu/ActionMenu.stories.tsx",
         "../../../packages/ui/src/DesignSystemProvider/DesignSystemProvider.stories.tsx",
         "../../../packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx",
         "../../../packages/ui/src/FieldShell/InnerLabelClickBehavior.stories.tsx",
@@ -129,6 +136,7 @@ const storybookCsfTransform: Plugin = {
         "../../../packages/ui/src/internal/select/SharedFloatingTriggerBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/modal/ModalLayeringBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/modal/ModalFoundation.stories.tsx",
+        "../../../packages/ui/src/Drawer/DrawerChrome.stories.tsx",
         "../../../packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx",
         "../../../packages/ui/src/internal/single-line-control-typography/SingleLineControlTypography.stories.tsx",
@@ -194,6 +202,7 @@ export default defineConfig({
     fileParallelism: false,
     include: [
       "packages/ui/src/Alert/Alert.stories.tsx",
+      "packages/ui/src/ActionMenu/ActionMenu.stories.tsx",
       "packages/ui/src/DesignSystemProvider/DesignSystemProvider.stories.tsx",
       "packages/ui/src/FieldShell/InnerLabelBrowserRegression.stories.tsx",
       "packages/ui/src/FieldShell/InnerLabelClickBehavior.stories.tsx",
@@ -202,6 +211,7 @@ export default defineConfig({
       "packages/ui/src/internal/select/SharedFloatingTriggerBrowserRegression.stories.tsx",
       "packages/ui/src/internal/modal/ModalLayeringBrowserRegression.stories.tsx",
       "packages/ui/src/internal/modal/ModalFoundation.stories.tsx",
+      "packages/ui/src/Drawer/DrawerChrome.stories.tsx",
       "packages/ui/src/internal/system-color/SystemColorBrowserRegression.stories.tsx",
       "packages/ui/src/internal/system-color/SystemColorContrastBrowserRegression.stories.tsx",
       "packages/ui/src/internal/single-line-control-typography/SingleLineControlTypography.stories.tsx",

@@ -7,6 +7,8 @@ export type ModalCloseReason =
   | "close-button"
   | "ancestor";
 
+export type DrawerSize = "md" | "lg";
+
 export interface ModalOpenChangeMeta {
   reason: ModalCloseReason;
 }
@@ -18,6 +20,7 @@ export interface ModalBaseProps {
   description?: ReactNode;
   dismissOnEscape?: boolean;
   footer?: ReactNode;
+  headerLeading?: ReactNode;
   headerActions?: ReactNode;
   initialFocusRef?: RefObject<HTMLElement | null>;
   onOpenChange: (open: boolean, meta: ModalOpenChangeMeta) => void;

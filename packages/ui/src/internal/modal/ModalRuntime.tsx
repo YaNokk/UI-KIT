@@ -50,6 +50,7 @@ export interface ModalRuntimeStore {
 const emptyView: ModalEntryView = {
   active: false,
   activeChildKind: null,
+  adjacentParentDrawerSize: null,
   depth: -1,
   drawerBranchHasAdjacentPair: false,
   drawerPresentation: null,
@@ -249,6 +250,9 @@ function createModalRuntimeStore(): ModalRuntimeStore {
       return {
         active,
         activeChildKind,
+        adjacentParentDrawerSize: drawerPresentation === "adjacent-child"
+          ? adjacentParent?.drawerSize ?? null
+          : null,
         depth,
         drawerBranchHasAdjacentPair,
         drawerPresentation,

@@ -1,6 +1,6 @@
 {
   "name": "@mypoint/ui",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "type": "module",
   "files": [
     "dist",
@@ -14,6 +14,10 @@
     "./alert": {
       "types": "./dist/Alert/index.d.ts",
       "import": "./dist/Alert/index.js"
+    },
+    "./action-menu": {
+      "types": "./dist/ActionMenu/index.d.ts",
+      "import": "./dist/ActionMenu/index.js"
     },
     "./amount": {
       "types": "./dist/Amount/index.d.ts",
@@ -127,6 +131,14 @@
       "types": "./dist/modal/index.d.ts",
       "import": "./dist/modal/index.js"
     },
+    "./modal-header": {
+      "types": "./dist/ModalHeader/index.d.ts",
+      "import": "./dist/ModalHeader/index.js"
+    },
+    "./modal-footer": {
+      "types": "./dist/ModalFooter/index.d.ts",
+      "import": "./dist/ModalFooter/index.js"
+    },
     "./multi-select": {
       "types": "./dist/MultiSelect/index.d.ts",
       "import": "./dist/MultiSelect/index.js"
@@ -231,7 +243,7 @@
     "@maskito/core": "^4.0.1",
     "@maskito/kit": "^4.0.1",
     "@maskito/phone": "^4.0.1",
-    "@mypoint/tokens": "^0.1.7",
+    "@mypoint/tokens": "^0.1.8",
     "@radix-ui/react-dialog": "1.1.23",
     "@radix-ui/react-focus-scope": "1.1.16",
     "@tanstack/react-table": "^9.1.0",

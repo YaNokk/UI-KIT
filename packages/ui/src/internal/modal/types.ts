@@ -1,4 +1,5 @@
 import type {
+  DrawerSize,
   ModalOpenChangeMeta
 } from "../../modal/types";
 
@@ -13,6 +14,7 @@ export interface ModalRegistration {
   dim: boolean;
   dismissOnBackdrop: boolean;
   dismissOnEscape: boolean;
+  drawerSize: DrawerSize | null;
   ownerDocument: Document;
   getRequestedOpen: () => boolean;
   onOpenChange: (open: boolean, meta: ModalOpenChangeMeta) => void;
@@ -24,6 +26,7 @@ export interface ModalEntryView {
   depth: number;
   drawerBranchHasAdjacentPair: boolean;
   drawerPresentation: DrawerPresentation | null;
+  adjacentParentDrawerSize: DrawerSize | null;
   drawerWorkspaceActive: boolean;
   drawerWorkspaceReady: boolean;
   floatingLayer: number;

@@ -322,3 +322,22 @@ Regression coverage added for the correction:
 - nested Dialog with Popover A and later-opened Popover B: A config rerenders
   keep Escape order B → A and outside-press arbitration on B while the Dialog
   stays mounted.
+
+## ActionMenu semantic boundary
+
+`Tooltip` and `ActionMenu` share only the private
+`useResponsiveOverlayPresentation` selector. They keep independent interaction,
+ARIA, labels and surface controllers. ActionMenu owns a responsive command
+list: regular uses an anchored `role="menu"` surface directly on the floating
+foundation, compact uses BottomSheet. Generic Dropdown/DropdownMenu never
+changes presentation by viewport.
+
+| Intent | Component |
+| --- | --- |
+| hover/focus explanatory hint | Tooltip |
+| arbitrary anchored content | Popover |
+| stable dropdown/menu primitive | DropdownMenu |
+| responsive command list | ActionMenu |
+| modal header secondary/destructive commands | ModalHeaderActions |
+| complex blocking confirmation | Dialog |
+| mobile action presentation | internal ActionMenu → BottomSheet |

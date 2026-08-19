@@ -10,6 +10,13 @@ export type {
 export type { BrandInput, ThemeMode } from "@mypoint/tokens";
 export { Alert } from "./Alert/index.js";
 export type { AlertProps, AlertVariant } from "./Alert/index.js";
+export { ActionMenu } from "./ActionMenu/index.js";
+export type {
+  ActionMenuAction,
+  ActionMenuDangerAction,
+  ActionMenuNeutralAction,
+  ActionMenuProps
+} from "./ActionMenu/index.js";
 export { DateInput } from "./DateInput/index.js";
 export type { DateInputCorrection, DateInputProps, DateValue } from "./DateInput/index.js";
 export { TimeInput } from "./TimeInput/index.js";
@@ -48,7 +55,16 @@ export type { BottomSheetProps } from "./BottomSheet/index.js";
 export { Dialog } from "./Dialog/index.js";
 export type { DialogProps } from "./Dialog/index.js";
 export { Drawer } from "./Drawer/index.js";
-export type { DrawerProps } from "./Drawer/index.js";
+export type { DrawerProps, DrawerSize } from "./Drawer/index.js";
+export { ModalHeaderActions } from "./ModalHeader/index.js";
+export type {
+  ModalHeaderAction,
+  ModalHeaderActionsProps,
+  ModalHeaderDangerAction,
+  ModalHeaderNeutralAction
+} from "./ModalHeader/index.js";
+export { ModalFooterActions } from "./ModalFooter/index.js";
+export type { ModalFooterActionsProps } from "./ModalFooter/index.js";
 export type {
   ModalBaseProps,
   ModalCloseReason,

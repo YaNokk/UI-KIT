@@ -58,6 +58,9 @@ export default defineConfig({
         "Alert/index": fileURLToPath(
           new URL("./src/Alert/index.ts", import.meta.url)
         ),
+        "ActionMenu/index": fileURLToPath(
+          new URL("./src/ActionMenu/index.ts", import.meta.url)
+        ),
         "DesignSystemProvider/index": fileURLToPath(
           new URL("./src/DesignSystemProvider/index.ts", import.meta.url)
         ),
@@ -123,6 +126,12 @@ export default defineConfig({
         ),
         "modal/index": fileURLToPath(
           new URL("./src/modal/index.ts", import.meta.url)
+        ),
+        "ModalHeader/index": fileURLToPath(
+          new URL("./src/ModalHeader/index.ts", import.meta.url)
+        ),
+        "ModalFooter/index": fileURLToPath(
+          new URL("./src/ModalFooter/index.ts", import.meta.url)
         ),
         "NumberInput/index": fileURLToPath(
           new URL("./src/NumberInput/index.ts", import.meta.url)

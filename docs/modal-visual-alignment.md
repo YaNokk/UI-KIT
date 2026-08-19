@@ -14,7 +14,7 @@ remain the production value authority.
 | --- | --- | --- | --- | --- | --- |
 | Surface background | White/dark raised surface | Raised semantic surface | `background.surface.raised` | Keep | `--ds-background-surface-raised` |
 | Dialog width | 400/440/480 px examples | Canonical 500 px constraint | `size.overlay.dialog.md` | Keep; examples are use-case fixtures, not a size API | `--ds-size-overlay-dialog-md` |
-| Drawer width | Panel language; no authoritative width | Independent 500 px constraint | `size.overlay.drawer.md` | Keep provisional and independent from Dialog | `--ds-size-overlay-drawer-md` |
+| Drawer width | Dense forms benefit from a wider panel | Independent semantic sizes | `size.overlay.drawer.md/lg` | Keep 500 px default and admit a 600 px dense-form size | `--ds-size-overlay-drawer-md/lg` |
 | Surface radius | About 12 px | 12 px | `radius.xl` | Keep | `--ds-radius-xl` |
 | Surface border | Subtle neutral edge | Subtle semantic border | `border.subtle`, `border.width.default` | Keep | Existing semantic border |
 | Surface shadow | Strong modal elevation; prototype uses a larger raw shadow | Canonical large elevation | `shadow.lg` | Keep; raw prototype shadow would bypass the elevation scale | `--ds-shadow-lg` |
@@ -90,3 +90,7 @@ layers, scroll locking, VisualViewport behavior, or gesture thresholds.
 
 Any Radix upgrade still follows the upgrade baseline in
 `docs/modal-foundation.md`; this visual document does not replace it.
+
+The additive geometry pass keeps this visual language. It adds the semantic
+600 px boundary, makes Drawer body fill available height and standardizes
+header/footer composition without raw visual values.

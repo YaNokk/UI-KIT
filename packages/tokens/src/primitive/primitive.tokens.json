@@ -186,7 +186,8 @@
         "md": { "$type": "dimension", "$value": { "value": 500, "unit": "px" } }
       },
       "drawer": {
-        "md": { "$type": "dimension", "$value": { "value": 500, "unit": "px" } }
+        "md": { "$type": "dimension", "$value": { "value": 500, "unit": "px" } },
+        "lg": { "$type": "dimension", "$value": { "value": 600, "unit": "px" } }
       }
     }
   },

@@ -165,6 +165,10 @@ describe("overlay size token contract", () => {
       value: 500,
       unit: "px"
     });
+    expect(primitiveTokens["size.overlay.drawer.lg"]).toEqual({
+      value: 600,
+      unit: "px"
+    });
     expect(primitiveTokens["breakpoint.md"]).toEqual({
       value: 768,
       unit: "px"

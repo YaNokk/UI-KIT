@@ -1,14 +1,19 @@
 import { ModalPrimitive } from "../internal/modal/ModalPrimitive";
-import type { ModalBaseProps } from "../modal/types";
+import type { DrawerSize, ModalBaseProps } from "../modal/types";
 
-export type DrawerProps = ModalBaseProps;
+export type { DrawerSize } from "../modal/types";
 
-export function Drawer(props: DrawerProps) {
+export interface DrawerProps extends ModalBaseProps {
+  size?: DrawerSize;
+}
+
+export function Drawer({ size = "md", ...props }: DrawerProps) {
   return (
     <ModalPrimitive
       {...props}
       dim={false}
       dismissOnBackdrop={false}
+      drawerSize={size}
       kind="drawer"
     />
   );

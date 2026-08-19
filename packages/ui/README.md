@@ -131,6 +131,21 @@ placement, snap points и Radix types не входят в публичный AP
 focus, hierarchy, ancestor invalidation, layer arbitration и document scroll
 lock описаны в `../../docs/modal-foundation.md`.
 
+Drawer поддерживает semantic `size="md" | "lg"` (500/600 px, default `md`).
+Reusable header/footer chrome доступен через `@mypoint/ui/modal-header` и
+`@mypoint/ui/modal-footer`: нейтральный `headerLeading` slot отделён от overflow
+actions и canonical Close, а primary actions размещаются в footer. UI-kit
+владеет геометрией этих регионов, но contextual history/Router и конкретные
+Back/Forward controls остаются в consumer feature. Responsive
+Popover/BottomSheet и destructive confirmation описаны в
+`../../docs/modal-chrome.md`.
+
+Responsive command menus доступны через `@mypoint/ui/action-menu`. Один typed
+action model отображается как anchored menu на regular viewport и как
+BottomSheet на compact viewport; consumer media query не требуется. Generic
+Dropdown и Tooltip сохраняют собственные независимые контракты. Полная
+спецификация находится в `src/ActionMenu/ActionMenu.contract.md`.
+
 ## Amount foundation
 
 `Amount` и `AmountInput` используют безопасное целое значение в минорных

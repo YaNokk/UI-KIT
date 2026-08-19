@@ -103,8 +103,8 @@ Concrete z-index values are not public behavior.
 ## Tokens
 
 - `size.overlay.dialog.md = 500px` is the canonical constrained Dialog width.
-- `size.overlay.drawer.md = 500px` is provisional and must be visually reviewed
-  at 1440×900 and 768×1024 with dense, long and nested content.
+- `size.overlay.drawer.md = 500px` is the default Drawer geometry.
+- `size.overlay.drawer.lg = 600px` is the admitted dense-form geometry.
 - The roles remain independent even while their values match.
 - Both are brand-, theme- and mode-independent.
 - `breakpoint.md = 768px` is a separate responsive concept.
@@ -232,6 +232,27 @@ No `ModalRuntime`, focus, identity, backdrop or scroll-lock architecture
 changed in v1.4. Dialog and Drawer are frozen. BottomSheet API remains stable
 with the previously documented mobile-hardening work outstanding.
 
+## Drawer geometry and modal chrome additive pass
+
+Drawer registers its semantic `md | lg` size with the existing ModalRuntime.
+For an adjacent pair, the child view receives only the parent size enum and CSS
+resolves the matching token. There is no measurement, new stack, consumer
+offset, focus manager or scroll lock. Compact presentation still covers the
+viewport regardless of size.
+
+Drawer body is the sole flexible scroll region. Header and footer remain
+intrinsic siblings. Public modal chrome separates a neutral consumer-owned
+`headerLeading` slot, heading, trailing overflow actions and the canonical
+final close control. The UI-kit owns region geometry; contextual history,
+Router and entity/workspace navigation remain consumer feature concerns. See
+`modal-chrome.md`.
+
 Validation commands: `tokens:check`, lint, typecheck, Storybook MCP readiness
 and the complete unit suite. Build, Storybook build, pack/consumer and
 build-dependent tree-shaking gates are intentionally skipped by `AGENTS.md`.
+
+Responsive header commands are owned by ActionMenu, not ModalRuntime. Regular
+ActionMenu uses the modal-local floating container and stays below the next
+modal guard. Compact ActionMenu reuses BottomSheet, therefore registers as the
+top nested modal branch, shares the one document lock and restores focus to its
+trigger. No new guard, stack or adjacent-Drawer rule is introduced.

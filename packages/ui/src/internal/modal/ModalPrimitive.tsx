@@ -33,6 +33,7 @@ import type {
   ModalCloseReason
 } from "../../modal/types";
 import type { ModalKind } from "./types";
+import type { DrawerSize } from "../../modal/types";
 import { useBottomSheetGesture } from "./useBottomSheetGesture";
 import { activateDrawerModalBoundary } from "./adjacentDrawerWorkspace";
 import { useAdjacentDrawerLayout } from "./useAdjacentDrawerLayout";
@@ -45,6 +46,7 @@ type SurfaceKind = ModalKind;
 export interface ModalPrimitiveProps extends ModalBaseProps {
   dim: boolean;
   dismissOnBackdrop: boolean;
+  drawerSize?: DrawerSize;
   kind: SurfaceKind;
   surfaceChildren?: ReactNode;
   surfaceStyle?: CSSProperties;
@@ -117,7 +119,9 @@ export function ModalPrimitive({
   dim,
   dismissOnBackdrop,
   dismissOnEscape = true,
+  drawerSize,
   footer,
+  headerLeading,
   headerActions,
   initialFocusRef,
   kind,
@@ -186,6 +190,7 @@ export function ModalPrimitive({
             dim,
             dismissOnBackdrop,
             dismissOnEscape,
+            drawerSize: kind === "drawer" ? drawerSize ?? "md" : null,
             ownerDocument: document,
             getRequestedOpen: () => openRef.current,
             onOpenChange: (
@@ -198,6 +203,7 @@ export function ModalPrimitive({
       dim,
       dismissOnBackdrop,
       dismissOnEscape,
+      drawerSize,
       id,
       kind,
       open,
@@ -418,6 +424,12 @@ export function ModalPrimitive({
             data-drawer-presentation={
               kind === "drawer" ? view.drawerPresentation ?? undefined : undefined
             }
+            data-drawer-size={kind === "drawer" ? drawerSize ?? "md" : undefined}
+            data-adjacent-parent-size={
+              kind === "drawer"
+                ? view.adjacentParentDrawerSize ?? undefined
+                : undefined
+            }
             data-drawer-workspace-motion={
               kind === "drawer" && drawerWorkspaceMotionRef.current
                 ? "none"
@@ -512,7 +524,10 @@ export function ModalPrimitive({
                   <header className={classNames(
                     styles.header,
                     styles.sectionDivider
-                  )}>
+                  )} data-has-leading={headerLeading != null ? "" : undefined}>
+                    {headerLeading != null ? (
+                      <div className={styles.leading}>{headerLeading}</div>
+                    ) : null}
                     <div className={styles.heading}>
                       <DialogPrimitive.Title asChild>
                         <Heading level={2} variant="md">

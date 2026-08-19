@@ -33,6 +33,18 @@ if (!fixtureApp.includes('from "@mypoint/ui/sidebar"')) {
 if (!fixtureApp.includes('from "@mypoint/ui/notification"')) {
   throw new Error("Consumer fixture must exercise the Notification package subpath.");
 }
+if (!fixtureApp.includes('from "@mypoint/ui/drawer"')) {
+  throw new Error("Consumer fixture must exercise the Drawer package subpath.");
+}
+if (!fixtureApp.includes('from "@mypoint/ui/action-menu"')) {
+  throw new Error("Consumer fixture must exercise the action-menu package subpath.");
+}
+if (!fixtureApp.includes('from "@mypoint/ui/modal-header"')) {
+  throw new Error("Consumer fixture must exercise the modal-header package subpath.");
+}
+if (!fixtureApp.includes('from "@mypoint/ui/modal-footer"')) {
+  throw new Error("Consumer fixture must exercise the modal-footer package subpath.");
+}
 
 function run(args, extraEnvironment = {}) {
   const result = spawnSync(process.execPath, [npmCli, ...args], {

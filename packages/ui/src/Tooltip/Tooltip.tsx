@@ -19,8 +19,8 @@ import {
 } from "../internal/floating/trigger";
 import { useResolvedLocale } from "../internal/locale/LocaleContext";
 import {
-  useTooltipPresentation
-} from "../internal/floating/useTooltipPresentation";
+  useResponsiveOverlayPresentation
+} from "../internal/floating/useResponsiveOverlayPresentation";
 import type { FloatingPlacement } from "../internal/floating/types";
 import styles from "./Tooltip.module.css";
 
@@ -57,7 +57,7 @@ export function Tooltip({
   open: controlledOpen,
   placement = "top"
 }: TooltipProps) {
-  const presentation = useTooltipPresentation();
+  const presentation = useResponsiveOverlayPresentation();
   const locale = useResolvedLocale();
   const labels = resolveSheetLabels(locale);
   const controlled = controlledOpen !== undefined;

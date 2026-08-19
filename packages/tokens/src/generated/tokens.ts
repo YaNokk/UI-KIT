@@ -327,6 +327,10 @@ export const primitiveTokens = {
     "value": 500,
     "unit": "px"
   },
+  "size.overlay.drawer.lg": {
+    "value": 600,
+    "unit": "px"
+  },
   "breakpoint.sm": {
     "value": 640,
     "unit": "px"

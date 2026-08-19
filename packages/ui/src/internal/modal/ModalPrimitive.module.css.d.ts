@@ -10,6 +10,7 @@ declare const styles: {
   readonly guard: string;
   readonly header: string;
   readonly heading: string;
+  readonly leading: string;
   readonly portal: string;
   readonly sectionDivider: string;
   readonly surface: string;
