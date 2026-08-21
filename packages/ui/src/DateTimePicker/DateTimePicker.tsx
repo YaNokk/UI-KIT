@@ -1,5 +1,5 @@
 import { addDays } from "date-fns";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../Button/Button";
 import { DateTimeInput, type DateTimeInputProps } from "../DateTimeInput/DateTimeInput";
 import { Calendar } from "../internal/calendar/Calendar";
@@ -40,7 +40,7 @@ export interface DateTimePickerProps extends DateTimeInputProps {
   weekStartsOn?: WeekStartsOn;
 }
 
-export function DateTimePicker({
+export const DateTimePicker = forwardRef<HTMLInputElement, DateTimePickerProps>(function DateTimePicker({
   value: controlledValue,
   defaultValue = null,
   onChange,
@@ -61,7 +61,7 @@ export function DateTimePicker({
   disabled = false,
   readOnly = false,
   ...inputProps
-}: DateTimePickerProps) {
+}: DateTimePickerProps, forwardedRef) {
   const locale = useResolvedLocale(explicitLocale);
   const messages = resolveDateMessages(locale);
   const weekStartsOn = resolveWeekStartsOn(locale, explicitWeekStartsOn);
@@ -71,6 +71,11 @@ export function DateTimePicker({
   const [month, setMonth] = useState(() => value ? dateValueToLocalDate(value.slice(0, 10) as DateValue) : new Date());
   const [calendarViewKey, setCalendarViewKey] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const assignInputRef = useCallback((node: HTMLInputElement | null) => {
+    inputRef.current = node;
+    if (typeof forwardedRef === "function") forwardedRef(node);
+    else if (forwardedRef) forwardedRef.current = node;
+  }, [forwardedRef]);
   const pickerDraft = usePickerDraft({ value, open, commitMode, setValue });
   const { draft, displayValue } = pickerDraft;
   const context = useMemo(() => ({ now: new Date(), locale, timeZone }), [locale, timeZone]);
@@ -180,7 +185,7 @@ export function DateTimePicker({
           setDraftComplete(Boolean(parsed && isValidValue(parsed)));
         }}
         readOnly={readOnly}
-        ref={inputRef}
+        ref={assignInputRef}
         value={displayValue}
       />
     </div>
@@ -233,4 +238,4 @@ export function DateTimePicker({
       </div>
     </PickerOverlay>
   );
-}
+});

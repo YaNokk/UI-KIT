@@ -1,4 +1,12 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode
+} from "react";
 import { Button } from "../Button/Button";
 import { DateInput, type DateInputProps } from "../DateInput/DateInput";
 import { Calendar } from "../internal/calendar/Calendar";
@@ -35,7 +43,7 @@ export interface DatePickerProps extends DateInputProps {
   weekStartsOn?: WeekStartsOn;
 }
 
-export function DatePicker({
+export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(function DatePicker({
   value: controlledValue,
   defaultValue = null,
   onChange,
@@ -52,7 +60,7 @@ export function DatePicker({
   disabled = false,
   readOnly = false,
   ...inputProps
-}: DatePickerProps) {
+}: DatePickerProps, forwardedRef) {
   const locale = useResolvedLocale(explicitLocale);
   const weekStartsOn = resolveWeekStartsOn(locale, explicitWeekStartsOn);
   const messages = resolveDateMessages(locale);
@@ -61,6 +69,11 @@ export function DatePicker({
   const [month, setMonth] = useState(() => value ? dateValueToLocalDate(value) : new Date());
   const [calendarViewKey, setCalendarViewKey] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const assignInputRef = useCallback((node: HTMLInputElement | null) => {
+    inputRef.current = node;
+    if (typeof forwardedRef === "function") forwardedRef(node);
+    else if (forwardedRef) forwardedRef.current = node;
+  }, [forwardedRef]);
   const pickerDraft = usePickerDraft({ value, open, commitMode, setValue });
   const { draft, displayValue } = pickerDraft;
 
@@ -137,7 +150,7 @@ export function DatePicker({
         }}
         onClick={inputProps.onClick}
         readOnly={readOnly}
-        ref={inputRef}
+        ref={assignInputRef}
         value={displayValue}
       />
     </div>
@@ -184,4 +197,4 @@ export function DatePicker({
       ) : null}
     </PickerOverlay>
   );
-}
+});

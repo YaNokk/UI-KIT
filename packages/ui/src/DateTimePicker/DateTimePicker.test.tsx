@@ -3,6 +3,7 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { createRef } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DesignSystemProvider } from "../DesignSystemProvider";
 import { DateTimePicker } from "./DateTimePicker";
@@ -20,6 +21,17 @@ beforeEach(() => {
 });
 
 describe("DateTimePicker", () => {
+  it("forwards its ref to the trigger input", () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<DateTimePicker label="Date and time" locale="en-US" ref={ref} />);
+    const input = screen.getByRole("textbox", { name: "Date and time" });
+
+    expect(ref.current).toBe(input);
+    ref.current?.focus();
+    expect(input).toHaveFocus();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
   it("inherits provider locale and exposes localized presets", () => {
     render(
       <DesignSystemProvider locale="ru-RU">

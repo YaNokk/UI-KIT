@@ -3,12 +3,23 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { createRef } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { TimeInput } from "./TimeInput";
 
 afterEach(cleanup);
 
 describe("TimeInput", () => {
+  it("forwards its ref to the focusable input", () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<TimeInput aria-label="Время" ref={ref} />);
+    const input = screen.getByRole("textbox", { name: "Время" });
+
+    expect(ref.current).toBe(input);
+    ref.current?.focus();
+    expect(input).toHaveFocus();
+  });
+
   it("honors minuteStep and keeps invalid text uncommitted", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();

@@ -4,12 +4,23 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axe from "axe-core";
+import { createRef } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DateInput } from "./DateInput";
 
 afterEach(cleanup);
 
 describe("DateInput", () => {
+  it("forwards its ref to the focusable input", () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<DateInput aria-label="Дата" ref={ref} />);
+    const input = screen.getByRole("textbox", { name: "Дата" });
+
+    expect(ref.current).toBe(input);
+    ref.current?.focus();
+    expect(input).toHaveFocus();
+  });
+
   it("keeps partial text local and emits only a complete canonical date", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();

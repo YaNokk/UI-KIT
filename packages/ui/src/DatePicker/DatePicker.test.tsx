@@ -3,6 +3,7 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { createRef } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DesignSystemProvider } from "../DesignSystemProvider";
 import { DatePicker } from "./DatePicker";
@@ -20,6 +21,17 @@ beforeEach(() => {
 });
 
 describe("DatePicker", () => {
+  it("forwards its ref to the trigger input", () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<DatePicker label="Date" locale="en-US" ref={ref} />);
+    const input = screen.getByRole("textbox", { name: "Date" });
+
+    expect(ref.current).toBe(input);
+    ref.current?.focus();
+    expect(input).toHaveFocus();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
   it("commits a selected date immediately by default", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
