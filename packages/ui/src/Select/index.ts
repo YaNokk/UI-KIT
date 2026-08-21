@@ -4,7 +4,8 @@ export type {
   SelectAction,
   SelectCollectionItem,
   SelectGroup,
-  SelectOption
+  SelectOption,
+  SelectValue
 } from "../internal/select/collection";
 export type {
   SelectCollectionState,

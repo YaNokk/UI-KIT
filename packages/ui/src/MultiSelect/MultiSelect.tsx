@@ -25,6 +25,8 @@ import {
   type SelectCollectionItem,
   type SelectInteractiveRow,
   type SelectOption,
+  type SelectValue,
+  getSelectValueIdentity,
   normalizeSelectCollection
 } from "../internal/select/collection";
 import { resolveSelectMessages } from "../internal/select/messages";
@@ -51,7 +53,7 @@ const fieldValueRoleNames: Record<FieldSize, string> = {
   lg: "fieldValueTextLg"
 };
 
-export interface MultiSelectProps<Value extends string = string> {
+export interface MultiSelectProps<Value extends SelectValue = string> {
   value: Value[];
   onChange: (value: Value[]) => void;
   items: readonly SelectCollectionItem<Value>[];
@@ -89,7 +91,7 @@ interface DisplayEntry {
 }
 
 export const MultiSelect = forwardRef(function MultiSelectInner<
-  Value extends string
+  Value extends SelectValue
 >(
   {
     value,
@@ -618,7 +620,7 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
                           value.indexOf(entry) === activeTagIndex && styles.activeTag
                         )}
                         data-field-chip=""
-                        key={entry}
+                        key={getSelectValueIdentity(entry)}
                       >
                         <span aria-hidden="true" className={styles.tagLabel} data-control-text-clip="">
                           <span
@@ -689,11 +691,16 @@ export const MultiSelect = forwardRef(function MultiSelectInner<
   return (
     <>
       {name ? value.map((entry) => (
-        <input key={entry} name={name} type="hidden" value={entry} />
+        <input
+          key={getSelectValueIdentity(entry)}
+          name={name}
+          type="hidden"
+          value={entry}
+        />
       )) : null}
       {trigger}
     </>
   );
-}) as <Value extends string = string>(
+}) as <Value extends SelectValue = string>(
   props: MultiSelectProps<Value> & { ref?: React.ForwardedRef<HTMLElement> }
 ) => React.ReactElement;

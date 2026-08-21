@@ -1,6 +1,7 @@
 import type {
   SelectCollection,
-  SelectOptionRow
+  SelectOptionRow,
+  SelectValue
 } from "./collection";
 
 export function createTypeaheadMatcher(locale: string) {
@@ -15,11 +16,11 @@ export function createTypeaheadMatcher(locale: string) {
     return collator.compare(textValue.slice(0, query.length), query) === 0;
   };
 
-  return function match(
-    collection: SelectCollection<string>,
+  return function match<Value extends SelectValue>(
+    collection: SelectCollection<Value>,
     query: string,
     afterRowId: string | null
-  ): SelectOptionRow<string> | null {
+  ): SelectOptionRow<Value> | null {
     const candidates = collection.optionNavigationRows;
     const total = candidates.length;
     if (total === 0 || query.length === 0) return null;

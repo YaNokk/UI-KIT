@@ -29,6 +29,8 @@ MultiSelect  — multiple selection + tags в trigger
 Зафиксирован вариант из рекомендации плана (Candidate A):
 
 ```ts
+type SelectValue = string | number;
+
 // Select
 value: Value | null;
 selectedItem?: SelectOption<Value>;
@@ -37,6 +39,13 @@ selectedItem?: SelectOption<Value>;
 value: Value[];
 selectedItems?: SelectOption<Value>[];
 ```
+
+`Value` сохраняется без coercion во всей collection/selection-модели и в
+consumer callbacks. Число `0` является обычным выбранным значением; только
+`null` означает пустой scalar Select. MultiSelect использует `Value[]`, где
+только `[]` означает пустой выбор. Строковая сериализация допускается лишь для
+DOM id/hidden input и не меняет публичное значение. Search query всегда
+остаётся отдельной строкой и сопоставляется с `Option.textValue`.
 
 Правила разрешения отображения:
 
@@ -67,6 +76,8 @@ Cache никогда не перетирается текущей страниц
   `group-header`);
 - identity: option → `value`, action → `id`, group → `id`; индексы и
   порядок рендера identity не являются;
+- DOM row identity включает runtime type значения, поэтому `0` и `"0"` не
+  конфликтуют даже в явно объявленном union `string | number`;
 - DEV-валидация предупреждает о дубликатах value/id, пустых
   `textValue`, вложенных группах (вложенность игнорируется flatten);
 - навигация работает по коллекции, а не по смонтированному DOM:
@@ -277,7 +288,8 @@ host без собственного overflow, поэтому там также 
 
 Single Select использует один hidden input. MultiSelect создаёт отдельный hidden
 input с одинаковым `name` для каждого значения; comma-join не используется.
-Контракт проверяется через реальный `FormData.getAll(name)`.
+HTML по определению сериализует number в строку, но React callbacks сохраняют
+исходный scalar type. Контракт проверяется через реальный `FormData.getAll(name)`.
 
 ## Что не входит в v1.1
 

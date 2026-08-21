@@ -1,6 +1,6 @@
 {
   "name": "@mypoint/retail-ui",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "type": "module",
   "files": [
     "dist",
@@ -25,7 +25,7 @@
     "build": "vite build --configLoader runner && tsc -p tsconfig.build.json"
   },
   "peerDependencies": {
-    "@mypoint/ui": "^0.1.8",
+    "@mypoint/ui": "^0.1.9",
     "react": "^18.2.0 || ^19.0.0",
     "react-dom": "^18.2.0 || ^19.0.0"
   },

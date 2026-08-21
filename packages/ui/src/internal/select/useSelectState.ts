@@ -13,7 +13,8 @@ import {
   type SelectCollection,
   type SelectCollectionItem,
   type SelectInteractiveRow,
-  type SelectOptionRow
+  type SelectOptionRow,
+  type SelectValue
 } from "./collection";
 import { createTypeaheadMatcher } from "./typeahead";
 import type { SelectCollectionState } from "./types";
@@ -28,11 +29,11 @@ export type SelectResolvedStatus =
   | "empty"
   | "error";
 
-export type SelectCommit<Value extends string> = (
+export type SelectCommit<Value extends SelectValue> = (
   row: SelectInteractiveRow<Value>
 ) => void;
 
-export interface UseSelectStateOptions<Value extends string> {
+export interface UseSelectStateOptions<Value extends SelectValue> {
   items: readonly SelectCollectionItem<Value>[];
   collectionState?: SelectCollectionState | undefined;
   open: boolean;
@@ -40,7 +41,7 @@ export interface UseSelectStateOptions<Value extends string> {
   locale?: string | undefined;
 }
 
-export interface SelectStateController<Value extends string> {
+export interface SelectStateController<Value extends SelectValue> {
   collection: SelectCollection<Value>;
   status: SelectResolvedStatus;
   statusMessage: ReactNode;
@@ -64,7 +65,7 @@ export interface SelectStateController<Value extends string> {
   moveActive: (direction: 1 | -1 | "first" | "last") => void;
 }
 
-export function useSelectState<Value extends string>({
+export function useSelectState<Value extends SelectValue>({
   items,
   collectionState,
   open,
@@ -197,7 +198,7 @@ export function useSelectState<Value extends string>({
 
       const matcher = createTypeaheadMatcher(resolvedLocale);
       const match = matcher(
-        collection as SelectCollection<string>,
+        collection,
         typeaheadBuffer.current,
         activeRow?.rowId ?? null
       );

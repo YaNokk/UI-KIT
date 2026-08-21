@@ -1,5 +1,13 @@
 # Select selection semantics
 
+Public `SelectValue` is `string | number`. Select preserves `Value` through
+items, groups, normalized maps, `selectedItem` and `onChange`; `0` is selected,
+while `null` is the only empty scalar and clear emits `null`. MultiSelect
+preserves the same value type in arrays and clear emits `[]`. DOM ids and
+native hidden inputs may serialize values, but this never changes the value
+returned to the consumer. Search query state remains an independent string and
+matches the presentation-only `textValue`.
+
 Select and MultiSelect resolve selection visuals exclusively through the
 runtime semantic token graph. A selected row uses `background.selected` and
 the soft-action foreground; selected hover and active states use the matching

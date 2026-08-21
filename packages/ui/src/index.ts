@@ -182,7 +182,8 @@ export type {
   SelectCollectionStatus,
   SelectGroup,
   SelectOption,
-  SelectProps
+  SelectProps,
+  SelectValue
 } from "./Select/index.js";
 export { MultiSelect } from "./MultiSelect/index.js";
 export type { MultiSelectProps } from "./MultiSelect/index.js";

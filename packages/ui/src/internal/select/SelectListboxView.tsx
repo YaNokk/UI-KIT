@@ -21,7 +21,8 @@ import type {
   SelectActionRow,
   SelectInteractiveRow,
   SelectOptionRow,
-  SelectRow
+  SelectRow,
+  SelectValue
 } from "./collection";
 import type { SelectResolvedStatus } from "./useSelectState";
 import type { SelectMessages } from "./types";
@@ -29,7 +30,7 @@ import styles from "./SelectListbox.module.css";
 
 const DEFAULT_VIRTUALIZATION_THRESHOLD = 500;
 
-export interface SelectListboxViewProps<Value extends string> {
+export interface SelectListboxViewProps<Value extends SelectValue> {
   rows: SelectRow<Value>[];
   status: SelectResolvedStatus;
   statusMessage: ReactNode;
@@ -82,7 +83,7 @@ function RowContent({ leading, label, description, trailing }: RowContentSlots) 
   );
 }
 
-function SelectListboxViewInner<Value extends string>(
+function SelectListboxViewInner<Value extends SelectValue>(
   {
     rows,
     status,
@@ -416,7 +417,7 @@ function SelectListboxViewInner<Value extends string>(
 }
 
 export const SelectListboxView = forwardRef(SelectListboxViewInner) as <
-  Value extends string
+  Value extends SelectValue
 >(
   props: SelectListboxViewProps<Value> & {
     ref?: React.ForwardedRef<HTMLDivElement>;

@@ -1,6 +1,12 @@
 import type { ReactNode } from "react";
 
-export interface SelectOption<Value extends string = string> {
+export type SelectValue = string | number;
+
+export function getSelectValueIdentity(value: SelectValue): string {
+  return typeof value + ":" + String(value);
+}
+
+export interface SelectOption<Value extends SelectValue = string> {
   type?: "option";
   value: Value;
   label: ReactNode;
@@ -23,19 +29,19 @@ export interface SelectAction {
   onSelect: () => void;
 }
 
-export interface SelectGroup<Value extends string = string> {
+export interface SelectGroup<Value extends SelectValue = string> {
   type: "group";
   id: string;
   label: ReactNode;
   items: SelectOption<Value>[];
 }
 
-export type SelectCollectionItem<Value extends string = string> =
+export type SelectCollectionItem<Value extends SelectValue = string> =
   | SelectOption<Value>
   | SelectAction
   | SelectGroup<Value>;
 
-export interface SelectOptionRow<Value extends string = string> {
+export interface SelectOptionRow<Value extends SelectValue = string> {
   type: "option";
   rowId: string;
   rowIndex: number;
@@ -60,16 +66,16 @@ export interface SelectGroupHeaderRow {
   label: ReactNode;
 }
 
-export type SelectRow<Value extends string = string> =
+export type SelectRow<Value extends SelectValue = string> =
   | SelectOptionRow<Value>
   | SelectActionRow
   | SelectGroupHeaderRow;
 
-export type SelectInteractiveRow<Value extends string = string> =
+export type SelectInteractiveRow<Value extends SelectValue = string> =
   | SelectOptionRow<Value>
   | SelectActionRow;
 
-export interface SelectCollection<Value extends string = string> {
+export interface SelectCollection<Value extends SelectValue = string> {
   rows: SelectRow<Value>[];
   optionNavigationRows: SelectOptionRow<Value>[];
   actionFocusItems: SelectActionRow[];
@@ -77,13 +83,13 @@ export interface SelectCollection<Value extends string = string> {
   optionCount: number;
 }
 
-function isSelectAction<Value extends string>(
+function isSelectAction<Value extends SelectValue>(
   item: SelectCollectionItem<Value>
 ): item is SelectAction {
   return (item as SelectAction).type === "action";
 }
 
-function isSelectGroup<Value extends string>(
+function isSelectGroup<Value extends SelectValue>(
   item: SelectCollectionItem<Value>
 ): item is SelectGroup<Value> {
   return (item as SelectGroup<Value>).type === "group";
@@ -94,7 +100,7 @@ function warnDev(message: string) {
   console.warn("[Select] " + message);
 }
 
-export function normalizeSelectCollection<Value extends string>(
+export function normalizeSelectCollection<Value extends SelectValue>(
   items: readonly SelectCollectionItem<Value>[]
 ): SelectCollection<Value> {
   const rows: SelectRow<Value>[] = [];
@@ -127,7 +133,7 @@ export function normalizeSelectCollection<Value extends string>(
     }
     const row: SelectOptionRow<Value> = {
       type: "option",
-      rowId: "option:" + option.value,
+      rowId: "option:" + getSelectValueIdentity(option.value),
       rowIndex: rows.length,
       ...(groupId !== undefined ? { groupId } : {}),
       option: { ...option, type: "option" },

@@ -22,6 +22,18 @@ const baseItems: SelectCollectionItem[] = [
   { value: "d", label: "Дельта", textValue: "Дельта" }
 ];
 
+const numericItems: SelectCollectionItem<number>[] = [
+  {
+    type: "group",
+    id: "numbers",
+    label: "Числа",
+    items: [
+      { value: 0, label: "Ноль", textValue: "Ноль" },
+      { value: 2, label: "Два", textValue: "Два" }
+    ]
+  }
+];
+
 function ControlledSelect(
   props: Partial<SelectProps> & Pick<SelectProps, "items">
 ) {
@@ -38,6 +50,29 @@ function ControlledSelect(
       placeholder="Выберите клиента"
       value={value}
       items={props.items}
+    />
+  );
+}
+
+function ControlledNumericSelect({
+  initialValue,
+  onChange
+}: {
+  initialValue: number | null;
+  onChange?: (value: number | null) => void;
+}) {
+  const [value, setValue] = useState<number | null>(initialValue);
+  return (
+    <Select<number>
+      clearable
+      items={numericItems}
+      label="Число"
+      onChange={(next) => {
+        setValue(next);
+        onChange?.(next);
+      }}
+      placeholder="Выберите число"
+      value={value}
     />
   );
 }
@@ -674,6 +709,51 @@ describe("Select", () => {
     }
     expect(onOpenChange).not.toHaveBeenCalled();
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("round-trips number values, treats 0 as selected and clears to null", async () => {
+    const user = userEvent.setup();
+    const values: Array<number | null> = [];
+    render(
+      <ControlledNumericSelect
+        initialValue={0}
+        onChange={(value) => values.push(value)}
+      />
+    );
+
+    const trigger = screen.getByRole("button", { name: "Число" });
+    expect(trigger).toHaveTextContent("Ноль");
+    await user.click(trigger);
+    expect(screen.getByRole("group", { name: "Числа" })).toBeVisible();
+    expect(screen.getByRole("option", { name: "Ноль" }))
+      .toHaveAttribute("aria-selected", "true");
+    await user.click(screen.getByRole("option", { name: "Два" }));
+    expect(values[0]).toBe(2);
+    expect(typeof values[0]).toBe("number");
+    await user.click(screen.getByRole("button", { name: "Очистить выбор" }));
+    expect(values).toEqual([2, null]);
+  });
+
+  it("uses null as the only empty scalar and supports numeric selectedItem", () => {
+    const { rerender } = render(
+      <ControlledNumericSelect initialValue={null} />
+    );
+    expect(screen.getByRole("button", { name: "Число" }))
+      .toHaveTextContent("Выберите число");
+    expect(screen.queryByRole("button", { name: "Очистить выбор" }))
+      .not.toBeInTheDocument();
+
+    rerender(
+      <Select<number>
+        items={[]}
+        label="Удалённое число"
+        onChange={() => undefined}
+        selectedItem={{ value: 42, label: "Сорок два", textValue: "Сорок два" }}
+        value={42}
+      />
+    );
+    expect(screen.getByRole("button", { name: "Удалённое число" }))
+      .toHaveTextContent("Сорок два");
   });
 
   it("keeps a searchable panel inside the Dialog focus scope", async () => {

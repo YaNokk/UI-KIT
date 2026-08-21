@@ -1,11 +1,11 @@
-import { useState, type ComponentProps } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within } from "storybook/test";
 import { Dialog } from "../Dialog/Dialog";
 import { DesignSystemProvider } from "../DesignSystemProvider/DesignSystemProvider";
 import type { SelectCollectionItem } from "../internal/select/collection";
 import fixtureStyles from "../internal/select/SelectStories.module.css";
-import { Select } from "./Select";
+import { Select, type SelectProps } from "./Select";
 
 const customerItems: SelectCollectionItem[] = [
   {
@@ -52,6 +52,19 @@ const customerItems: SelectCollectionItem[] = [
   }
 ];
 
+const numericItems: SelectCollectionItem<number>[] = [
+  {
+    type: "group",
+    id: "numeric-values",
+    label: "Числовые значения",
+    items: [
+      { value: 0, label: "Ноль", textValue: "Ноль" },
+      { value: 1, label: "Один", textValue: "Один" },
+      { value: 2, label: "Два", textValue: "Два" }
+    ]
+  }
+];
+
 // eslint-disable-next-line design-system/no-design-literals -- Deliberate high-luminance runtime brand stress input.
 const lightSelectionBrand = { accentColor: "#facc15", foregroundColor: "#111827" };
 // eslint-disable-next-line design-system/no-design-literals -- Deliberate dark-mode runtime brand stress input.
@@ -61,7 +74,7 @@ function SelectHarness({
   items = customerItems,
   initialValue = null,
   ...props
-}: Omit<ComponentProps<typeof Select>, "items" | "onChange" | "value"> & {
+}: Omit<SelectProps<string>, "items" | "onChange" | "value"> & {
   initialValue?: string | null;
   items?: SelectCollectionItem[];
 }) {
@@ -103,6 +116,24 @@ function ControlledSearchSelect() {
       searchable
       searchProps={{ onChange: setQuery, value: query }}
     />
+  );
+}
+
+function NumericSelectHarness() {
+  const [value, setValue] = useState<number | null>(0);
+  return (
+    <div>
+      <Select<number>
+        clearable
+        items={numericItems}
+        label="Число"
+        onChange={setValue}
+        value={value}
+      />
+      <output aria-label="Тип и значение">
+        {value === null ? "null" : `${typeof value}:${value}`}
+      </output>
+    </div>
   );
 }
 
@@ -196,6 +227,22 @@ export const RemoteSelectedValue: Story = {
       value="remote:42"
     />
   )
+};
+
+export const NumericValuesIncludingZero: Story = {
+  args: {} as never,
+  render: () => <NumericSelectHarness />,
+  play: async ({ canvasElement }) => {
+    const page = within(canvasElement.ownerDocument.body);
+    const trigger = page.getByRole("button", { name: "Число" });
+    await expect(trigger).toHaveTextContent("Ноль");
+    await userEvent.click(trigger);
+    await expect(page.getByRole("option", { name: "Ноль" }))
+      .toHaveAttribute("aria-selected", "true");
+    await userEvent.click(page.getByRole("option", { name: "Два" }));
+    await expect(page.getByRole("status", { name: "Тип и значение" }))
+      .toHaveTextContent("number:2");
+  }
 };
 
 export const LongCollection: Story = {

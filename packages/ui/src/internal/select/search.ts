@@ -2,21 +2,22 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
   SelectCollectionItem,
   SelectGroup,
-  SelectOption
+  SelectOption,
+  SelectValue
 } from "./collection";
 import type { SelectSearchProps } from "./types";
 
-function isGroup<Value extends string>(
+function isGroup<Value extends SelectValue>(
   item: SelectCollectionItem<Value>
 ): item is SelectGroup<Value> {
   return item.type === "group";
 }
 
-function isAction<Value extends string>(item: SelectCollectionItem<Value>) {
+function isAction<Value extends SelectValue>(item: SelectCollectionItem<Value>) {
   return item.type === "action";
 }
 
-export function filterSelectItems<Value extends string>(
+export function filterSelectItems<Value extends SelectValue>(
   items: readonly SelectCollectionItem<Value>[],
   query: string,
   filter?: SelectSearchProps["filter"]
@@ -47,7 +48,7 @@ export function filterSelectItems<Value extends string>(
   return filtered;
 }
 
-export function useSelectSearch<Value extends string>(
+export function useSelectSearch<Value extends SelectValue>(
   items: readonly SelectCollectionItem<Value>[],
   searchable: boolean,
   searchProps?: SelectSearchProps

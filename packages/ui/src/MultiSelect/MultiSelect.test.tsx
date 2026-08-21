@@ -20,6 +20,11 @@ const baseItems: SelectCollectionItem[] = [
   { value: "d", label: "Дельта", textValue: "Дельта" }
 ];
 
+const numericItems: SelectCollectionItem<number>[] = [
+  { value: 0, label: "Ноль", textValue: "Ноль" },
+  { value: 2, label: "Два", textValue: "Два" }
+];
+
 function ControlledMulti(
   props: Partial<MultiSelectProps> & Pick<MultiSelectProps, "items">
 ) {
@@ -36,6 +41,26 @@ function ControlledMulti(
       placeholder="Выберите теги"
       value={value}
       items={props.items}
+    />
+  );
+}
+
+function ControlledNumericMulti({
+  onChange
+}: {
+  onChange: (value: number[]) => void;
+}) {
+  const [value, setValue] = useState<number[]>([0]);
+  return (
+    <MultiSelect<number>
+      clearable
+      items={numericItems}
+      label="Числа"
+      onChange={(next) => {
+        setValue(next);
+        onChange(next);
+      }}
+      value={value}
     />
   );
 }
@@ -104,6 +129,22 @@ describe("MultiSelect", () => {
     // toggle off
     await user.click(screen.getByRole("option", { name: /Альфа/ }));
     expect(onChange).toHaveBeenCalledWith(["b"]);
+  });
+
+  it("round-trips numeric values including 0 and clears to an empty array", async () => {
+    const user = userEvent.setup();
+    const values: number[][] = [];
+    render(<ControlledNumericMulti onChange={(value) => values.push(value)} />);
+
+    expect(screen.getByText("Ноль")).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "Числа" }));
+    expect(screen.getByRole("option", { name: "Ноль" }))
+      .toHaveAttribute("aria-selected", "true");
+    await user.click(screen.getByRole("option", { name: "Два" }));
+    expect(values[0]).toEqual([0, 2]);
+    expect(values[0]?.every((value) => typeof value === "number")).toBe(true);
+    await user.click(screen.getByRole("button", { name: "Очистить выбор" }));
+    expect(values).toEqual([[0, 2], []]);
   });
 
   it("keeps the private ChoiceIndicator visual-only and toggles through its option once", async () => {

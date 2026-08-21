@@ -24,6 +24,7 @@ import {
   type SelectCollectionItem,
   type SelectInteractiveRow,
   type SelectOption,
+  type SelectValue,
   normalizeSelectCollection
 } from "../internal/select/collection";
 import { resolveSelectMessages } from "../internal/select/messages";
@@ -48,7 +49,7 @@ const textRoleNames: Record<FieldSize, string> = {
   lg: "fieldValueTextLg"
 };
 
-export interface SelectProps<Value extends string = string> {
+export interface SelectProps<Value extends SelectValue = string> {
   value: Value | null;
   onChange: (value: Value | null) => void;
   items: readonly SelectCollectionItem<Value>[];
@@ -80,7 +81,7 @@ export interface SelectProps<Value extends string = string> {
   "aria-label"?: string | undefined;
 }
 
-export const Select = forwardRef(function SelectInner<Value extends string>(
+export const Select = forwardRef(function SelectInner<Value extends SelectValue>(
   {
     value,
     onChange,
@@ -453,6 +454,6 @@ export const Select = forwardRef(function SelectInner<Value extends string>(
       {trigger}
     </>
   );
-}) as <Value extends string = string>(
+}) as <Value extends SelectValue = string>(
   props: SelectProps<Value> & { ref?: React.ForwardedRef<HTMLElement> }
 ) => React.ReactElement;

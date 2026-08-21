@@ -1,9 +1,9 @@
-import { useState, type ComponentProps } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { DesignSystemProvider } from "../DesignSystemProvider/DesignSystemProvider";
 import type { SelectCollectionItem } from "../internal/select/collection";
 import fixtureStyles from "../internal/select/SelectStories.module.css";
-import { MultiSelect } from "./MultiSelect";
+import { MultiSelect, type MultiSelectProps } from "./MultiSelect";
 
 const tagItems: SelectCollectionItem[] = [
   { value: "new", label: "Новый", textValue: "Новый" },
@@ -33,7 +33,7 @@ function MultiSelectHarness({
   initialValue = [],
   ...props
 }: Omit<
-  ComponentProps<typeof MultiSelect>,
+  MultiSelectProps<string>,
   "items" | "onChange" | "value"
 > & {
   initialValue?: string[];
